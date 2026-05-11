@@ -17,30 +17,54 @@
   let activeDrawHandler = null;
   let undoControl = null;
 
+  function clearContainer(container) {
+    if (!container) return;
+    container.textContent = "";
+  }
+
+  function renderCallout(container, variant, message) {
+    if (!container) return;
+    clearContainer(container);
+    if (!message) return;
+
+    const callout = document.createElement("wa-callout");
+    callout.setAttribute("variant", variant);
+    const span = document.createElement("span");
+    span.textContent = String(message);
+    callout.appendChild(span);
+    container.appendChild(callout);
+  }
+
+  function renderAreaText(container, areaLabel, areaKm2Text) {
+    if (!container) return;
+    clearContainer(container);
+
+    const info = document.createElement("small");
+    info.style.color = "#666";
+    info.textContent = `${areaLabel}: ${areaKm2Text} km²`;
+    container.appendChild(info);
+  }
+
   function showAreaInfo(areaKm2, warning) {
     const areaInfo = document.getElementById("area-info");
     if (!areaInfo) return;
     if (areaKm2 == null) {
-      areaInfo.innerHTML = "";
+      clearContainer(areaInfo);
       return;
     }
     const formatted = areaKm2.toLocaleString(undefined, {
       maximumFractionDigits: 1,
     });
     if (warning) {
-      areaInfo.innerHTML = `<wa-callout variant="warning"><span>${warning}</span></wa-callout>`;
+      renderCallout(areaInfo, "warning", warning);
     } else {
-      areaInfo.innerHTML =
-        `<small style="color: #666;">${MAP_I18N.areaLabel}: ${formatted} km²</small>`;
+      renderAreaText(areaInfo, MAP_I18N.areaLabel, formatted);
     }
   }
 
   function setMapError(message) {
     const mapError = document.getElementById("map-error");
-    if (!mapError) return;
-    mapError.innerHTML = message
-      ? `<wa-callout variant="danger"><span>${message}</span></wa-callout>`
-      : "";
+    renderCallout(mapError, "danger", message || "");
   }
 
   function updateGeoJSON() {

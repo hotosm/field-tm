@@ -1,0 +1,169 @@
+{% if has_xlsform and has_data_extract and has_task_areas %}
+<div id="step-5-container" class="ftm-step ftm-step--complete">
+  <div class="ftm-step__header">
+    <h3 class="ftm-step__title">{{ _("Step 5: Finalise Project") }}</h3>
+    <wa-badge variant="success">{{ _("Ready") }}</wa-badge>
+  </div>
+  <p class="ftm-step__description">
+    {{ _("All prerequisites are complete! Create the project in your chosen mapping tool.") }}
+  </p>
+
+  <form
+    id="finalise-project-form"
+    hx-post="/create-project-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+    hx-target="#finalise-status"
+    hx-swap="innerHTML"
+  >
+    <div id="finalise-actions" class="ftm-step__actions">
+      <wa-button id="finalise-project-btn" type="button" variant="brand" style="min-width: 200px">
+        {{ _("Finalise Project") }}
+      </wa-button>
+      <button
+        id="advanced-options-toggle"
+        type="button"
+        class="wa-button wa-button--default ftm-advanced-toggle"
+        style="min-width: 200px"
+      >
+        {{ _("Advanced Config") }}
+      </button>
+    </div>
+
+    <input type="hidden" id="finalize-source" name="finalize_source" value="default" />
+    <input
+      type="hidden"
+      id="external_project_instance_url_hidden"
+      name="external_project_instance_url"
+      value=""
+    />
+    <input
+      type="hidden"
+      id="external_project_username_hidden"
+      name="external_project_username"
+      value=""
+    />
+    <input
+      type="hidden"
+      id="external_project_password_hidden"
+      name="external_project_password"
+      value=""
+    />
+    <input type="hidden" id="qfield_cloud_url_hidden" name="qfield_cloud_url" value="" />
+    <input type="hidden" id="qfield_cloud_user_hidden" name="qfield_cloud_user" value="" />
+    <input type="hidden" id="qfield_cloud_password_hidden" name="qfield_cloud_password" value="" />
+  </form>
+
+  <div id="finalise-status" class="ftm-step__status"></div>
+
+  <wa-dialog
+    id="finalise-confirm-dialog"
+    label="{{ _('Confirm Project Finalisation') }}"
+    with-header
+  >
+    <p id="finalise-confirm-message" style="margin: 0; line-height: 1.6; color: #444">
+      {{ _("Are you sure you want to finalise this project?") }}
+    </p>
+    <div slot="footer" class="ftm-flex-end">
+      <wa-button id="finalise-cancel-btn" variant="default">{{ _("Cancel") }}</wa-button>
+      <wa-button id="finalise-confirm-btn" variant="brand">{{ _("Confirm & Finalise") }}</wa-button>
+    </div>
+  </wa-dialog>
+
+  <div id="credentials-modal" class="ftm-modal-backdrop">
+    <div class="ftm-modal">
+      <h3 id="credentials-modal-title" class="ftm-modal__title">{{ _("Custom Credentials") }}</h3>
+      <form id="credentials-form" style="display: flex; flex-direction: column; gap: 15px">
+        <div id="odk-credentials-fields" style="display: none">
+          <div>
+            <label class="ftm-split-label"
+              >{{ _("ODK Central URL") }} <span class="ftm-form-required">*</span></label
+            >
+            <wa-input
+              type="url"
+              id="odk-url-input"
+              name="external_project_instance_url"
+              placeholder="{{ _('https://your-odk-central.com') }}"
+              style="width: 100%"
+            ></wa-input>
+          </div>
+          <div>
+            <label class="ftm-split-label"
+              >{{ _("Username") }} <span class="ftm-form-required">*</span></label
+            >
+            <wa-input
+              type="text"
+              id="odk-username-input"
+              name="external_project_username"
+              placeholder="{{ _('Username') }}"
+              style="width: 100%"
+            ></wa-input>
+          </div>
+          <div>
+            <label class="ftm-split-label"
+              >{{ _("Password") }} <span class="ftm-form-required">*</span></label
+            >
+            <wa-input
+              type="password"
+              id="odk-password-input"
+              name="external_project_password"
+              placeholder="{{ _('Password') }}"
+              style="width: 100%"
+            ></wa-input>
+          </div>
+        </div>
+
+        <div id="qfield-credentials-fields" style="display: none">
+          <div>
+            <label class="ftm-split-label"
+              >{{ _("QField Cloud URL") }} <span class="ftm-form-required">*</span></label
+            >
+            <wa-input
+              type="url"
+              id="qfield-url-input"
+              name="qfield_cloud_url"
+              placeholder="{{ _('https://qfield.cloud') }}"
+              style="width: 100%"
+            ></wa-input>
+          </div>
+          <div>
+            <label class="ftm-split-label"
+              >{{ _("Username") }} <span class="ftm-form-required">*</span></label
+            >
+            <wa-input
+              type="text"
+              id="qfield-username-input"
+              name="qfield_cloud_user"
+              placeholder="{{ _('qfield_username') }}"
+              style="width: 100%"
+            ></wa-input>
+          </div>
+          <div>
+            <label class="ftm-split-label"
+              >{{ _("Password") }} <span class="ftm-form-required">*</span></label
+            >
+            <wa-input
+              type="password"
+              id="qfield-password-input"
+              name="qfield_cloud_password"
+              placeholder="{{ _('qfield_password') }}"
+              style="width: 100%"
+            ></wa-input>
+          </div>
+        </div>
+
+        <div id="credentials-error" style="margin-top: 10px"></div>
+        <div class="ftm-modal__footer">
+          <wa-button type="button" id="cancel-creds-btn" variant="default"
+            >{{ _("Cancel") }}</wa-button
+          >
+          <wa-button type="button" id="test-creds-btn" variant="default"
+            >{{ _("Test Credentials") }}</wa-button
+          >
+          <wa-button type="submit" id="save-creds-btn" variant="brand"
+            >{{ _("Save & Continue") }}</wa-button
+          >
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endif %}

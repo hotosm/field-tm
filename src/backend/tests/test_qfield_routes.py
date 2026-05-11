@@ -21,12 +21,9 @@ import base64
 from contextlib import asynccontextmanager
 from io import BytesIO
 from types import SimpleNamespace
-from uuid import uuid4
 
 import pytest
 
-from app.auth.api_key import hash_api_key
-from app.db.models import DbApiKey
 from app.qfield import qfield_crud
 from app.qfield.qfield_crud import (
     _build_qfc_service_account_email,
@@ -39,45 +36,9 @@ from app.qfield.qfield_crud import (
     _strip_feature_properties_for_qfield,
     clean_tags_for_qgis,
 )
+from app.qfield.qfield_routes import qfield_router
 from app.qfield.qfield_schemas import QFieldCloud
 from app.qfield.qfield_utils import normalise_qfc_url
-
-
-@pytest.fixture()
-async def ensure_api_keys_table(db):
-    """Ensure the api_keys table exists for API-key-protected route tests."""
-    async with db.cursor() as cur:
-        await cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS public.api_keys (
-                id SERIAL PRIMARY KEY,
-                user_sub character varying NOT NULL
-                    REFERENCES public.users(sub) ON DELETE CASCADE,
-                key_hash character varying NOT NULL UNIQUE,
-                name character varying,
-                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                last_used_at TIMESTAMPTZ,
-                is_active BOOLEAN NOT NULL DEFAULT TRUE
-            );
-            """
-        )
-    await db.commit()
-
-
-@pytest.fixture()
-async def admin_api_key(db, admin_user, ensure_api_keys_table):
-    """Create a real API key row for integration route calls."""
-    raw_key = f"ftm_qfield_{uuid4().hex}"
-    await DbApiKey.create(
-        db,
-        DbApiKey(
-            user_sub=admin_user.sub,
-            key_hash=hash_api_key(raw_key),
-            name="qfield route integration key",
-        ),
-    )
-    await db.commit()
-    return raw_key
 
 
 async def test_qfield_creds_test_invalid_credentials_returns_400(client):
@@ -94,36 +55,14 @@ async def test_qfield_creds_test_invalid_credentials_returns_400(client):
     assert response.status_code == 400
 
 
-async def test_qfield_add_collaborator_requires_api_key(client):
-    """Collaborator route should reject requests without an API key."""
-    response = await client.post(
-        "/api/v1/qfield/projects/nonexistent/collaborators",
-        json={"username": "new-user", "role": "editor"},
+def test_legacy_qfield_add_collaborator_api_is_removed():
+    """Collaborator management belongs to the token-based QFC admin HTMX flow."""
+    route_paths = [route.path for route in qfield_router.routes]
+
+    assert "/api/v1/qfield/test-credentials" in route_paths
+    assert (
+        "/api/v1/qfield/projects/{qfc_project_id:str}/collaborators" not in route_paths
     )
-
-    assert response.status_code == 401
-
-
-@pytest.mark.parametrize(
-    "payload",
-    [
-        {"username": "new-user", "role": "editor"},
-        {"username": "new-user"},
-    ],
-)
-async def test_qfield_add_collaborator_with_real_api_key_rejects_only_auth_failures(
-    client, admin_api_key, payload
-):
-    """Valid API keys should pass auth across collaborator payload variants."""
-    response = await client.post(
-        "/api/v1/qfield/projects/nonexistent/collaborators",
-        headers={"x-api-key": admin_api_key},
-        json=payload,
-    )
-
-    # We only assert the auth boundary here; downstream QFieldCloud may return
-    # project-not-found (404) or service/login failures (500) depending stack state.
-    assert response.status_code != 401
 
 
 def test_clean_tags_for_qgis_stringifies_nested_properties():

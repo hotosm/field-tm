@@ -260,41 +260,6 @@ async def claim_simple_project_basemap_generation(
     return True
 
 
-async def claim_simple_project_basemap_resume(
-    db: AsyncConnection,
-    project_id: int,
-) -> bool:
-    """Atomically claim a triggered simple basemap for status reconciliation."""
-    claim_sql = """
-        UPDATE projects
-        SET updated_at = NOW()
-        WHERE id = %(project_id)s
-          AND field_mapping_app::text = %(field_mapping_app)s
-          AND status::text = %(project_status)s
-          AND basemap_status = 'generating'
-          AND basemap_stac_item_id IS NOT NULL
-          AND BTRIM(basemap_stac_item_id) <> ''
-        RETURNING id;
-    """
-
-    async with db.cursor() as cur:
-        await cur.execute(
-            claim_sql,
-            {
-                "project_id": project_id,
-                "field_mapping_app": FieldMappingApp.QFIELD.value,
-                "project_status": ProjectStatus.PUBLISHED.value,
-            },
-        )
-        claimed_row = await cur.fetchone()
-
-    if not claimed_row:
-        return False
-
-    await db.commit()
-    return True
-
-
 async def generate_odk_central_project_content(
     project_odk_id: int,
     project_odk_form_id: str,

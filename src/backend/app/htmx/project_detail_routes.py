@@ -49,6 +49,9 @@ from app.projects.project_services import (
 )
 
 from .htmx_helpers import callout as _callout
+from .setup_steps.setup_step_responses import (
+    hx_redirect_response as _hx_redirect_response,
+)
 
 
 def _app_name(project: DbProject) -> str:
@@ -266,12 +269,7 @@ async def delete_project_htmx(
         )
 
     await db.commit()
-    return Response(
-        content="",
-        media_type="text/html",
-        status_code=status.HTTP_200_OK,
-        headers={"HX-Redirect": "/projects"},
-    )
+    return _hx_redirect_response("/projects")
 
 
 @get(

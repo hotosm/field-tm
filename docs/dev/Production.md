@@ -212,7 +212,7 @@ just start prod-with-odk
 ### Field-TM with self-hosted Hanko login
 
 Set `AUTH_PROVIDER=bundled` in `.env` (or select it during `just config setup`),
-then run `just start prod` — the login overlay is included automatically.
+then run `just start prod` - the login overlay is included automatically.
 
 All commands will:
 

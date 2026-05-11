@@ -34,15 +34,15 @@ dependencies = [
     "psycopg[c,pool]==3.3.3",
     "cryptography==46.0.6",
     "pyxform==4.0.0",
-    "pyodk>=1.2.1",
+    "pyodk==1.2.1",
     # TODO replace with official version, once PR merged
     # https://github.com/opengisch/QFieldCloud/pull/1506
     "qfieldcloud-sdk",
     "osm-login-python==2.0.0",
     "pg-nearest-city==2.0.0",
     "raw-data-api-py==0.3.0",
-    "geojson-aoi-parser>=0.3.5",
-    "hotosm-auth[litestar] @ git+https://github.com/hotosm/login.git@feat/litestar#subdirectory=auth-libs/python",
+    "geojson-aoi-parser==0.3.5",
+    "hotosm-auth[litestar] @ git+https://github.com/hotosm/login.git@a2a1ce2a395c#subdirectory=auth-libs/python",
     "osm-fieldwork",
     "area-splitter",
 ]

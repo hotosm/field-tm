@@ -597,9 +597,9 @@ test = [
 requires-dist = [
     { name = "area-splitter", editable = "packages/area-splitter" },
     { name = "cryptography", specifier = "==46.0.6" },
-    { name = "geojson-aoi-parser", specifier = ">=0.3.5" },
+    { name = "geojson-aoi-parser", specifier = "==0.3.5" },
     { name = "geojson-pydantic", specifier = "==1.1.2" },
-    { name = "hotosm-auth", extras = ["litestar"], git = "https://github.com/hotosm/login.git?subdirectory=auth-libs%2Fpython&rev=feat%2Flitestar" },
+    { name = "hotosm-auth", extras = ["litestar"], git = "https://github.com/hotosm/login.git?subdirectory=auth-libs%2Fpython&rev=a2a1ce2a395c" },
     { name = "litestar", extras = ["jinja"], specifier = "==2.21.1" },
     { name = "osm-fieldwork", editable = "packages/osm-fieldwork" },
     { name = "osm-login-python", specifier = "==2.0.0" },
@@ -607,7 +607,7 @@ requires-dist = [
     { name = "psycopg", extras = ["c", "pool"], specifier = "==3.3.3" },
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pydantic-settings", specifier = "==2.6.0" },
-    { name = "pyodk", specifier = ">=1.2.1" },
+    { name = "pyodk", specifier = "==1.2.1" },
     { name = "python-multipart", specifier = "==0.0.22" },
     { name = "pyxform", specifier = "==4.0.0" },
     { name = "qfieldcloud-sdk", git = "https://github.com/hotosm/qfieldcloud-sdk-python?rev=feat%2Ftemp-cgi-plus-user-api" },
@@ -792,8 +792,8 @@ wheels = [
 
 [[package]]
 name = "hotosm-auth"
-version = "0.2.9"
-source = { git = "https://github.com/hotosm/login.git?subdirectory=auth-libs%2Fpython&rev=feat%2Flitestar#d6f31b9b31f99aba7d39f90addc22df4fbf795b6" }
+version = "0.2.12"
+source = { git = "https://github.com/hotosm/login.git?subdirectory=auth-libs%2Fpython&rev=a2a1ce2a395c#a2a1ce2a395c17f5589cffe7af5cb135b6c73b11" }
 dependencies = [
     { name = "cryptography" },
     { name = "httpx" },
@@ -805,6 +805,7 @@ dependencies = [
 [package.optional-dependencies]
 litestar = [
     { name = "litestar" },
+    { name = "psycopg" },
 ]
 
 [[package]]

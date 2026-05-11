@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-04-24 17:45+0100\n"
+"POT-Creation-Date: 2026-05-10 03:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,15 +17,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:145
+#: app/main.py:144
 msgid "Validation failed"
 msgstr ""
 
-#: app/main.py:169
+#: app/main.py:168
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr ""
 
-#: app/main.py:287
+#: app/main.py:286
 msgid "Could not connect to database"
 msgstr ""
 
@@ -120,7 +120,8 @@ msgstr ""
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr ""
 
-#: app/central/central_deps.py:199 app/htmx/project_create_routes.py:391
+#: app/central/central_deps.py:199
+#: app/htmx/project_create/project_create_templates.py:104
 msgid "Provide a valid .xls or .xlsx file"
 msgstr ""
 
@@ -171,232 +172,197 @@ msgstr ""
 msgid "Your geojson file is invalid."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:67 app/htmx/setup_step_routes.py:83
-msgid "Project not found or access denied."
+#: app/htmx/project_detail_routes.py:97
+msgid "Mapper Login (QFieldCloud)"
 msgstr ""
 
-#: app/htmx/basemap_routes.py:240
-msgid "Basemap attached to QField project successfully."
+#: app/htmx/project_detail_routes.py:100
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
+msgid "Username:"
 msgstr ""
 
-#: app/htmx/basemap_routes.py:250
-msgid "Basemap attach has not started yet."
+#: app/htmx/project_detail_routes.py:103
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
+msgid "Password:"
 msgstr ""
 
-#: app/htmx/basemap_routes.py:259
+#: app/htmx/project_detail_routes.py:106
+msgid "Scan the QR code, then enter these credentials in QField."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:118
+msgid "Scan QR Code"
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:120
+#, python-format
+msgid "Use %(app_name)s to scan this QR code and load the project."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:122
+msgid "Project QR Code"
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:123
+msgid "Download QR Code"
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:175
+msgid ""
+"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
+" running."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:179
+msgid "The mapping server returned an error. Check its logs for details."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:182
+msgid ""
+"Authentication failed connecting to the mapping server. Check the "
+"configured credentials."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:185
+msgid "An unexpected error occurred while generating the QR code."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:247
+#, python-format
+msgid "Project (%(project_id)s) not found."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:254
+msgid "Only the project manager can delete this project."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:292 app/templates/project_details.html:172
+msgid "Project not found."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:321
+#: app/htmx/setup_steps/setup_step_responses.py:71
+#, python-format
+msgid "Error: %(error_msg)s"
+msgstr ""
+
+#: app/htmx/basemap/basemap_attach_flow.py:67
 msgid ""
 "Basemap attach failed for now. Your project is ready to use. Please retry"
 " attach."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:264
+#: app/htmx/basemap/basemap_attach_flow.py:72
 msgid ""
 "Basemap attach could not complete due to a temporary network issue. Your "
 "project is ready to use. Please retry attach."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:305
-msgid "Failed to search imagery right now. Please try again shortly."
-msgstr ""
-
-#: app/htmx/basemap_routes.py:318
-msgid "Failed to start basemap generation right now. Please try again shortly."
-msgstr ""
-
-#: app/htmx/basemap_routes.py:332
-msgid "Failed to refresh basemap status right now. Please try again shortly."
-msgstr ""
-
-#: app/htmx/basemap_routes.py:360
+#: app/htmx/basemap/basemap_attach_flow.py:87
 msgid "Basemap attach is available after publication."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:369
+#: app/htmx/basemap/basemap_attach_flow.py:96
 msgid "Basemap attach is only available for QField projects."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:379
+#: app/htmx/basemap/basemap_attach_flow.py:106
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:388
+#: app/htmx/basemap/basemap_attach_flow.py:115
 msgid "No generated basemap download URL is available yet."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:402
+#: app/htmx/basemap/basemap_attach_flow.py:129
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
 "%(config)s."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:490
+#: app/htmx/basemap/basemap_fragments.py:17
+#: app/htmx/setup_steps/setup_step_responses.py:91
+msgid "Project not found or access denied."
+msgstr ""
+
+#: app/htmx/basemap/basemap_fragments.py:112
+msgid "Basemap attached to QField project successfully."
+msgstr ""
+
+#: app/htmx/basemap/basemap_fragments.py:122
+msgid "Basemap attach has not started yet."
+msgstr ""
+
+#: app/htmx/basemap/basemap_fragments.py:133
+msgid "Failed to search imagery right now. Please try again shortly."
+msgstr ""
+
+#: app/htmx/basemap/basemap_fragments.py:146
+msgid "Failed to start basemap generation right now. Please try again shortly."
+msgstr ""
+
+#: app/htmx/basemap/basemap_fragments.py:160
+msgid "Failed to refresh basemap status right now. Please try again shortly."
+msgstr ""
+
+#: app/htmx/basemap/basemap_routes.py:93
 msgid "Basemap tools are available after publication."
 msgstr ""
 
-#: app/htmx/basemap_routes.py:650
+#: app/htmx/basemap/basemap_routes.py:253
 msgid "No basemap generation in progress."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:81
+#: app/htmx/project_create/project_create_parsing.py:15
 msgid ""
 "Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, "
 "or FeatureCollection)."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:204
+#: app/htmx/project_create/project_create_simple_flow.py:55
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:409
-msgid "Failed to load template form."
-msgstr ""
-
-#: app/htmx/project_create_routes.py:417
-msgid "Please select a form or upload a file."
-msgstr ""
-
-#: app/htmx/project_create_routes.py:719 app/htmx/project_create_routes.py:866
-msgid "An unexpected error occurred. Please try again."
-msgstr ""
-
-#: app/htmx/project_create_routes.py:782
+#: app/htmx/project_create/project_create_simple_flow.py:152
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:893 app/htmx/project_detail_routes.py:294
-#: app/templates/project_details.html:172
-msgid "Project not found."
+#: app/htmx/project_create/project_create_submit_routes.py:139
+#: app/htmx/project_create/project_create_submit_routes.py:200
+msgid "An unexpected error occurred. Please try again."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:903
-msgid "Project ID mismatch. You do not have access to this project."
+#: app/htmx/project_create/project_create_templates.py:119
+msgid "Failed to load template form."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:948
+#: app/htmx/project_create/project_create_templates.py:127
+msgid "Please select a form or upload a file."
+msgstr ""
+
+#: app/htmx/project_create/project_create_xlsform_routes.py:132
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr ""
 
-#: app/htmx/project_create_routes.py:972 app/htmx/setup_step_routes.py:77
-msgid "An unexpected error occurred"
-msgstr ""
-
-#: app/htmx/project_create_routes.py:976
-msgid "Error"
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:94
-msgid "Mapper Login (QFieldCloud)"
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:97
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
-msgid "Username:"
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:100
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
-msgid "Password:"
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:103
-msgid "Scan the QR code, then enter these credentials in QField."
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:115
-msgid "Scan QR Code"
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:117
-#, python-format
-msgid "Use %(app_name)s to scan this QR code and load the project."
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:119
-msgid "Project QR Code"
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:120
-msgid "Download QR Code"
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:172
-msgid ""
-"Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
-" running."
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:176
-msgid "The mapping server returned an error. Check its logs for details."
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:179
-msgid ""
-"Authentication failed connecting to the mapping server. Check the "
-"configured credentials."
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:182
-msgid "An unexpected error occurred while generating the QR code."
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:244 app/projects/project_routes.py:347
-#, python-format
-msgid "Project (%(project_id)s) not found."
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:251
-msgid "Only the project manager can delete this project."
-msgstr ""
-
-#: app/htmx/project_detail_routes.py:323 app/htmx/setup_step_routes.py:598
-#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
-#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
-#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
-#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
-#: app/htmx/setup_step_routes.py:1390
-#, python-format
-msgid "Error: %(error_msg)s"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:51
-msgid "Admin"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:52 app/templates/project_details.html:72
-msgid "Manager"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:53
-msgid "Editor"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:54
-msgid "Reporter"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:55
-msgid "Reader"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:89
+#: app/htmx/qfc_admin/qfc_admin_routes.py:73
 msgid "This user does not exist. Please create it first."
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:91
+#: app/htmx/qfc_admin/qfc_admin_routes.py:75
 msgid "This user is already a collaborator on this project."
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:92 app/qfield/qfield_crud.py:1199
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1199
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:98
+#: app/htmx/qfc_admin/qfc_admin_routes.py:82
 #, python-format
 msgid ""
 "This project belongs to the %(organization)s organization. The user must "
@@ -405,219 +371,318 @@ msgid ""
 " members."
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:146
+#: app/htmx/qfc_admin/qfc_admin_routes.py:119
 msgid "All fields are required."
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:161
+#: app/htmx/qfc_admin/qfc_admin_routes.py:134
 msgid "Login succeeded but no token received."
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:169
+#: app/htmx/qfc_admin/qfc_admin_routes.py:142
 msgid "Login failed. Check your URL and credentials."
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:200
-msgid "QFieldCloud Projects"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:205
-msgid "Connected as"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:206
-msgid "to"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:212
-msgid "Log Out"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:217
-msgid "No projects found."
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:226
-msgid "Public"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:228
-msgid "Private"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:242
-msgid "Manage"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:252
-msgid "Project"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:252
-msgid "Owner"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:252
-msgid "Visibility"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:252 app/templates/new_project.html:58
-#: app/templates/project_details.html:58
-msgid "Description"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:281
+#: app/htmx/qfc_admin/qfc_admin_routes.py:181
 msgid "Session expired. Please log in again."
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:300
+#: app/htmx/qfc_admin/qfc_admin_routes.py:196
 #, python-format
 msgid "Could not load collaborators: %(exc)s"
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:370
-msgid "Update"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:373 app/htmx/qfc_admin_routes.py:380
-#: app/htmx/qfc_admin_routes.py:388
-msgid "Remove"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:378
-msgid "Remove Collaborator"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:380
-msgid "from this project?"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:384 app/templates/new_project.html:133
-#: app/templates/partials/project_details/setup_steps.html:700
-#: app/templates/partials/project_details/setup_steps.html:795
-msgid "Cancel"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:394
-msgid "User"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:394
-msgid "Role"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:394
-msgid "Actions"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:400
-msgid "No collaborators yet."
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:414
-#: app/templates/partials/project_details/setup_steps.html:728
-#: app/templates/partials/project_details/setup_steps.html:734
-#: app/templates/partials/project_details/setup_steps.html:768
-#: app/templates/qfc_admin.html:52
-msgid "Username"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:424
-msgid "Add Collaborator"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:432
-msgid "Close"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:439
-msgid "Collaborators"
-msgstr ""
-
-#: app/htmx/qfc_admin_routes.py:463
+#: app/htmx/qfc_admin/qfc_admin_routes.py:227
 msgid "Username is required."
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:513
+#: app/htmx/qfc_admin/qfc_admin_routes.py:281
 #, python-format
 msgid "Failed to remove collaborator: %(exc)s"
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:552
+#: app/htmx/qfc_admin/qfc_admin_routes.py:324
 #, python-format
 msgid "Failed to update collaborator: %(exc)s"
 msgstr ""
 
-#: app/htmx/qfc_admin_routes.py:576
+#: app/htmx/qfc_admin/qfc_admin_routes.py:351
 #, python-format
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:156
-msgid ""
-"Project finalisation failed. Please check your settings and try again. If"
-" it continues, send the technical details below to your instance "
-"administrator or support team."
+#: app/htmx/qfc_admin/qfc_admin_templates.py:9
+msgid "Admin"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:225
-msgid "Invalid GeoJSON data in request. Please try uploading again."
+#: app/htmx/qfc_admin/qfc_admin_templates.py:10
+#: app/templates/project_details.html:72
+msgid "Manager"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:231
-msgid "Error reading GeoJSON data from request."
+#: app/htmx/qfc_admin/qfc_admin_templates.py:11
+msgid "Editor"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:252
+#: app/htmx/qfc_admin/qfc_admin_templates.py:12
+msgid "Reporter"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:13
+msgid "Reader"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:51
+msgid "QFieldCloud Projects"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:56
+msgid "Connected as"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:57
+msgid "to"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:63
+msgid "Log Out"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:68
+msgid "No projects found."
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:77
+msgid "Public"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:79
+msgid "Private"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:93
+msgid "Manage"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:103
+msgid "Project"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:103
+msgid "Owner"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:103
+msgid "Visibility"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:103
+#: app/templates/new_project.html:58 app/templates/project_details.html:58
+msgid "Description"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:175
+msgid "Update"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:178
+#: app/htmx/qfc_admin/qfc_admin_templates.py:185
+#: app/htmx/qfc_admin/qfc_admin_templates.py:193
+msgid "Remove"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:183
+msgid "Remove Collaborator"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:185
+msgid "from this project?"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:189
+#: app/templates/new_project.html:133
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:66
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:156
+msgid "Cancel"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:199
+msgid "User"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:199
+msgid "Role"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:199
+msgid "Actions"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:205
+msgid "No collaborators yet."
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:218
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:90
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:96
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:129
+#: app/templates/qfc_admin.html:52
+msgid "Username"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:228
+msgid "Add Collaborator"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:236
+msgid "Close"
+msgstr ""
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:243
+msgid "Collaborators"
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:66
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:150
+msgid "Data Extract"
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:78
+#, python-format
+msgid "OSM data downloaded successfully! Found %(feature_count)s features."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:81
 #, python-format
 msgid ""
-"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
-"Please select a smaller area."
+"Previewing %(feature_count)s features on map. Review the data below. If "
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"downloading again with different parameters."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:260
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:111
+#: app/templates/partials/project_details/style_and_scripts.html:26
+msgid "Invalid file type. Please upload a .geojson or .json file."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:134
+msgid "No valid geometries found in GeoJSON."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:162
+#, python-format
+msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:165
 #, python-format
 msgid ""
-"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
-"longer to process. The data extract API is limited to 200 km²."
+"Previewing %(feature_count)s features on map. Review the data below. If "
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"uploading a different file."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:195
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:317
+msgid ""
+"No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
+"first."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:216
+#: app/htmx/setup_steps/setup_step_map_layers.py:27
 msgid "Project AOI"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:339
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:227
+#, python-format
+msgid "Data Extract (%(feature_count)s features)"
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:244
+#, python-format
+msgid ""
+"Previewing %(feature_count)s data features on map. Review the data, then "
+"continue to the next step."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
+msgid ""
+"✓ Collect-new-data mode selected. Task splitting is skipped and you can "
+"continue."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
+msgid ""
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:374
+msgid "No data extract provided."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:381
+msgid "Invalid data extract format."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:398
+#, python-format
+msgid ""
+"✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
+"complete."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_helpers.py:42
+msgid "Invalid GeoJSON data in request. Please try uploading again."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_extract_helpers.py:50
+msgid "Error reading GeoJSON data from request."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:95
+msgid "Project mapping app is not configured for finalisation."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:133
+msgid ""
+"Provide ODK URL, username, and password (all 3), or leave them all blank "
+"to use server defaults."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_map_layers.py:39
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:353
+#: app/htmx/setup_steps/setup_step_map_layers.py:52
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:362
+#: app/htmx/setup_steps/setup_step_map_layers.py:61
 msgid "Task ID"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:363
+#: app/htmx/setup_steps/setup_step_map_layers.py:62
 msgid "Building Count"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:397
+#: app/htmx/setup_steps/setup_step_map_layers.py:81
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:453
+#: app/htmx/setup_steps/setup_step_map_layers.py:132
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
 "%(algorithm)s."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:460
+#: app/htmx/setup_steps/setup_step_map_layers.py:139
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -626,152 +691,87 @@ msgid ""
 "regenerate."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
-msgid "Data Extract"
+#: app/htmx/setup_steps/setup_step_responses.py:86
+msgid "An unexpected error occurred"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:560
-#, python-format
-msgid "OSM data downloaded successfully! Found %(feature_count)s features."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:563
-#, python-format
+#: app/htmx/setup_steps/setup_step_responses.py:161
 msgid ""
-"Previewing %(feature_count)s features on map. Review the data below. If "
-"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
-"downloading again with different parameters."
+"Project finalisation failed. Please check your settings and try again. If"
+" it continues, send the technical details below to your instance "
+"administrator or support team."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:635
-#: app/templates/partials/project_details/style_and_scripts.html:28
-msgid "Invalid file type. Please upload a .geojson or .json file."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:660
-msgid "No valid geometries found in GeoJSON."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:692
-#, python-format
-msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:695
-#, python-format
-msgid ""
-"Previewing %(feature_count)s features on map. Review the data below. If "
-"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
-"uploading a different file."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
-msgid ""
-"No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
-"first."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:791
-#, python-format
-msgid "Data Extract (%(feature_count)s features)"
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:810
-#, python-format
-msgid ""
-"Previewing %(feature_count)s data features on map. Review the data, then "
-"continue to the next step."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:870
-msgid ""
-"✓ Collect-new-data mode selected. Task splitting is skipped and you can "
-"continue."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:948
-msgid ""
-"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
-"tasks)."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:1018
+#: app/htmx/setup_steps/setup_step_split_routes.py:96
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1049
+#: app/htmx/setup_steps/setup_step_split_routes.py:127
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
 "features. The entire AOI will be used as a single task."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1056
+#: app/htmx/setup_steps/setup_step_split_routes.py:134
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
 " features together."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1115
+#: app/htmx/setup_steps/setup_step_split_routes.py:187
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1142
+#: app/htmx/setup_steps/setup_step_split_routes.py:209
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1204
+#: app/htmx/setup_steps/setup_step_split_routes.py:263
 msgid "Please select a splitting option."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1225
+#: app/htmx/setup_steps/setup_step_split_routes.py:284
 msgid "✓ Task splitting is not required for this project setup."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1282
-msgid "No data extract provided."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:1286
-msgid "Invalid data extract format."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:1303
-#, python-format
-msgid ""
-"✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
-"complete."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:1353
+#: app/htmx/setup_steps/setup_step_split_routes.py:333
 msgid "No task areas data provided."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1357
+#: app/htmx/setup_steps/setup_step_split_routes.py:337
 msgid "Invalid task areas data format."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1374
-#: app/templates/partials/project_details/setup_steps.html:461
+#: app/htmx/setup_steps/setup_step_split_routes.py:357
+#: app/templates/partials/project_details/setup_steps/step4_split.html:21
 msgid "✓ Split tasks saved successfully"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1429
+#: app/htmx/setup_steps/setup_step_validate_routes.py:47
+#, python-format
 msgid ""
-"Provide ODK URL, username, and password (all 3), or leave them all blank "
-"to use server defaults."
+"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
+"Please reduce your project area."
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1551
+#: app/htmx/setup_steps/setup_step_validate_routes.py:52
+#, python-format
+msgid ""
+"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
+"longer to process."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:77
 msgid "GeoJSON is required"
 msgstr ""
 
-#: app/htmx/setup_step_routes.py:1562
+#: app/htmx/setup_steps/setup_step_validate_routes.py:87
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr ""
 
@@ -783,28 +783,24 @@ msgstr ""
 msgid "Failed to generate data extract from the raw data API."
 msgstr ""
 
-#: app/projects/project_crud.py:858
+#: app/projects/project_crud.py:901
 msgid "QField project ID not found."
 msgstr ""
 
-#: app/projects/project_crud.py:891
+#: app/projects/project_crud.py:934
 msgid "Project name not found."
 msgstr ""
 
-#: app/projects/project_crud.py:898
+#: app/projects/project_crud.py:941
 msgid "ODK project ID not found."
 msgstr ""
 
-#: app/projects/project_crud.py:907
+#: app/projects/project_crud.py:950
 msgid "Appuser token not found."
 msgstr ""
 
-#: app/projects/project_crud.py:924
+#: app/projects/project_crud.py:967
 msgid "Failed to generate QR code."
-msgstr ""
-
-#: app/projects/project_routes.py:103
-msgid "Template XLSForm content is empty."
 msgstr ""
 
 #: app/projects/project_services.py:75
@@ -1345,11 +1341,11 @@ msgstr ""
 msgid "Something went wrong. Please try again."
 msgstr ""
 
-#: app/templates/new_project.html:264
+#: app/templates/new_project.html:272
 msgid "A project with this name already exists. Please choose a different name."
 msgstr ""
 
-#: app/templates/new_project.html:349
+#: app/templates/new_project.html:356
 msgid "Description is required."
 msgstr ""
 
@@ -1447,7 +1443,7 @@ msgstr ""
 msgid "Enter your QFieldCloud credentials to manage collaborators."
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps.html:756
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:117
 #: app/templates/qfc_admin.html:36
 msgid "QField Cloud URL"
 msgstr ""
@@ -1460,9 +1456,9 @@ msgstr ""
 msgid "admin"
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps.html:740
-#: app/templates/partials/project_details/setup_steps.html:746
-#: app/templates/partials/project_details/setup_steps.html:780
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:102
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:108
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:141
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr ""
@@ -1559,10 +1555,10 @@ msgid ""
 msgstr ""
 
 #: app/templates/partials/new_project/map_section.html:42
-#: app/templates/partials/project_details/setup_steps.html:159
-#: app/templates/partials/project_details/setup_steps.html:335
-#: app/templates/partials/project_details/setup_steps.html:476
-#: app/templates/partials/project_details/setup_steps.html:684
+#: app/templates/partials/project_details/setup_steps/step2_form.html:124
+#: app/templates/partials/project_details/setup_steps/step3_data.html:69
+#: app/templates/partials/project_details/setup_steps/step4_split.html:36
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:27
 msgid "Advanced Config"
 msgstr ""
 
@@ -1612,14 +1608,14 @@ msgstr ""
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
-#: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:279
-#: app/templates/partials/project_details/setup_steps.html:453
+#: app/templates/partials/project_details/setup_steps/step2_form.html:12
+#: app/templates/partials/project_details/setup_steps/step3_data.html:13
+#: app/templates/partials/project_details/setup_steps/step4_split.html:13
 msgid "Complete"
 msgstr ""
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:274
+#: app/templates/partials/project_details/setup_steps/step3_data.html:8
 msgid "Step 3: Get Data"
 msgstr ""
 
@@ -1628,7 +1624,7 @@ msgid "Step 4: Split into Tasks"
 msgstr ""
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:667
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:4
 msgid "Step 5: Finalise Project"
 msgstr ""
 
@@ -1652,537 +1648,188 @@ msgstr ""
 msgid "Project Setup"
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 2: Select Survey Form"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:62
-msgid "Choose Survey Type:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:64
-msgid "Loading survey types..."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:81
-msgid "Or use your own form instead:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:89
-msgid "Upload Custom XLSForm"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:103
-msgid ""
-"Note: Field-TM will automatically inject additional fields into your form"
-" for task\n"
-"          division and feature selection. Your form should only contain "
-"the survey questions you\n"
-"          want to ask (do not include select_one_from_file fields for "
-"tasks/features)."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:133
-msgid ""
-"Recommended defaults are active for ODK projects, including ODK Collect\n"
-"          compatibility."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:140
-#, python-format
-msgid "Recommended defaults are active for %(app_name)s projects."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:147
-msgid "Recommended defaults are active for this project."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:166
-msgid "Default Language:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:168
-msgid "English"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:169
-msgid "Spanish"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:170
-msgid "French"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:171
-msgid "Portuguese"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:172
-msgid "Swahili"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:173
-msgid "Hindi"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:188
-msgid "Form Options:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:201
-msgid "Include photo upload question"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:215
-msgid "Make photo mandatory"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:220
-msgid "Asks the user to take a photo at their location."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:231
-msgid "Include digitisation verification question"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:235
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:258
-msgid "Continue"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:262
-msgid "✓ Survey form uploaded successfully"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:284
-msgid "Download the recommended OSM data for your survey form."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:286
-msgid "Review the data on the map, then continue."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:299
-#: app/templates/partials/project_details/style_and_scripts.html:27
-msgid "Download OSM Data"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:325
-msgid "Collect New Data Only"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:342
-msgid "Use custom data inputs or override the default OSM download options."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:348
-msgid "OSM Category:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:351
-msgid "OSM Buildings"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:352
-msgid "OSM Highways"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "OSM Healthcare"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:354
-msgid "OSM Toilets"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:355
-msgid "OSM Religious"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:356
-msgid "OSM Landuse"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:357
-msgid "OSM Waterways"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:358
-msgid "OSM Water Points"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:359
-msgid "OSM Waste Disposal"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:360
-msgid "OSM Education"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:361
-msgid "OSM Cemeteries"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:362
-msgid "OSM Amenities"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:367
-msgid "Geometry Type:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:370
-msgid "Polygon"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:371
-msgid "Polyline"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:372
-msgid "Point"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:385
-msgid "Use centroids"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:397
-msgid "Upload Custom GeoJSON"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:416
-msgid "Generating OSM data extract... This may take a moment."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:435
-msgid "OSM data extract ready"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:448
-msgid "Step 4: Split into Tasks (Optional)"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:458
-msgid "✓ Task splitting is not relevant without existing data"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:464
-msgid ""
-"Generate task areas by splitting the Area of Interest (AOI). Choose an "
-"algorithm and\n"
-"      parameters, then split. Review the preview, and click \"Accept Task"
-" Areas\" to save. Or\n"
-"      click"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:467
-#: app/templates/partials/project_details/setup_steps.html:486
-msgid "Skip"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:468
-msgid "to use the whole AOI as a single task."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:500
-msgid "Choose which linear features influence building-based task splitting."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:524
-msgid "Include roads"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:533
-msgid "Include rivers"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:542
-msgid "Include railways"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:551
-msgid "Include aeroways"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:558
-msgid "Algorithm:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:560
-msgid "Select splitting option..."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:561
-#: app/templates/partials/project_details/style_and_scripts.html:30
-msgid "Split by Square"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:562
-msgid "Average Buildings v1 (Voronoi)"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:564
-msgid "Average Buildings v2 (Straight Skeleton)"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:566
-msgid "Split by Specific Number of Tasks"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:573
-msgid "Avg. Buildings per Task:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:585
-msgid "Number of Tasks:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:597
-msgid "Dimension (meters):"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:616
-msgid "Split Again"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:616
-#: app/templates/partials/project_details/style_and_scripts.html:32
-msgid "Split AOI"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:652
-msgid "Splitting AOI into tasks... This may take a moment."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:668
-msgid "Ready"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:671
-msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:676
-msgid "Finalise Project"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:693
-msgid "Confirm Project Finalisation"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:697
-msgid "Are you sure you want to finalise this project?"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:702
-msgid "Confirm & Finalise"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:710
-msgid "Custom Credentials"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:716
-msgid "ODK Central URL"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:722
-msgid "https://your-odk-central.com"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:762
-msgid "https://qfield.cloud"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:774
-msgid "qfield_username"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:786
-msgid "qfield_password"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:798
-#: app/templates/partials/project_details/style_and_scripts.html:49
-msgid "Test Credentials"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:801
-msgid "Save & Continue"
-msgstr ""
-
-#: app/templates/partials/project_details/style_and_scripts.html:10
+#: app/templates/partials/project_details/style_and_scripts.html:8
 msgid "Select a survey type..."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:11
+#: app/templates/partials/project_details/style_and_scripts.html:9
 msgid "No survey types available"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:12
+#: app/templates/partials/project_details/style_and_scripts.html:10
 msgid "No survey forms are available. Upload a custom form in Advanced Config."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:13
+#: app/templates/partials/project_details/style_and_scripts.html:11
 msgid "Select a survey type, or upload a custom form in Advanced Config."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:14
+#: app/templates/partials/project_details/style_and_scripts.html:12
 msgid "Survey type selected."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:15
+#: app/templates/partials/project_details/style_and_scripts.html:13
 msgid "Invalid file type. Please upload a .xls or .xlsx file."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:16
+#: app/templates/partials/project_details/style_and_scripts.html:14
 msgid "Selected file:"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:17
+#: app/templates/partials/project_details/style_and_scripts.html:15
 msgid "Custom form selected."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:18
+#: app/templates/partials/project_details/style_and_scripts.html:16
 msgid "Choose a survey type first, or upload a custom form in Advanced Config."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:19
+#: app/templates/partials/project_details/style_and_scripts.html:17
 msgid "polygons"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:20
+#: app/templates/partials/project_details/style_and_scripts.html:18
 msgid "polylines"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:21
+#: app/templates/partials/project_details/style_and_scripts.html:19
 msgid "points"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:22
+#: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:23
+#: app/templates/partials/project_details/style_and_scripts.html:21
 msgid ""
 "You uploaded a custom form, so this OSM download is optional. Use "
 "Advanced Config to upload your own GeoJSON or adjust download settings."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:24
+#: app/templates/partials/project_details/style_and_scripts.html:22
 #, python-format
 msgid ""
 "Recommended source: %(title)s (%(geom_label)s). Review the data on the "
 "map, then continue."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:25
+#: app/templates/partials/project_details/style_and_scripts.html:23
 #, python-format
 msgid ""
 "Recommended source updated (%(geom_label)s). Review the data on the map, "
 "then continue."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:26
+#: app/templates/partials/project_details/style_and_scripts.html:24
 msgid "Downloading..."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:29
+#: app/templates/partials/project_details/setup_steps/step3_data.html:33
+#: app/templates/partials/project_details/style_and_scripts.html:25
+msgid "Download OSM Data"
+msgstr ""
+
+#: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Confirm No Splitting"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:31
+#: app/templates/partials/project_details/setup_steps/step4_split.html:121
+#: app/templates/partials/project_details/style_and_scripts.html:28
+msgid "Split by Square"
+msgstr ""
+
+#: app/templates/partials/project_details/style_and_scripts.html:29
 msgid "Split by Buildings"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:33
+#: app/templates/partials/project_details/setup_steps/step4_split.html:175
+#: app/templates/partials/project_details/style_and_scripts.html:30
+msgid "Split AOI"
+msgstr ""
+
+#: app/templates/partials/project_details/style_and_scripts.html:31
 msgid "Select Option"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:34
+#: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Confirming..."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:35
+#: app/templates/partials/project_details/style_and_scripts.html:33
 msgid "Splitting..."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:36
+#: app/templates/partials/project_details/style_and_scripts.html:34
 msgid "ODK Central"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:37
+#: app/templates/partials/project_details/style_and_scripts.html:35
 msgid "QField"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:38
+#: app/templates/partials/project_details/style_and_scripts.html:36
 msgid "the mapping tool"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:39
+#: app/templates/partials/project_details/style_and_scripts.html:37
 msgid "Project type not set. Please set the field mapping app first."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:40
+#: app/templates/partials/project_details/style_and_scripts.html:38
 #, python-format
 msgid ""
 "Are you sure you want to finalise this project in %(project_type)s? This "
 "will create the project, upload forms, and generate all necessary files."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:41
+#: app/templates/partials/project_details/style_and_scripts.html:39
 msgid "Custom ODK Credentials"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:42
+#: app/templates/partials/project_details/style_and_scripts.html:40
 msgid "Custom QField Credentials"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:43
+#: app/templates/partials/project_details/style_and_scripts.html:41
 msgid "Please fill in all fields."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:44
+#: app/templates/partials/project_details/style_and_scripts.html:42
 msgid "Testing..."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:45
+#: app/templates/partials/project_details/style_and_scripts.html:43
 msgid "Testing credentials..."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:46
+#: app/templates/partials/project_details/style_and_scripts.html:44
 msgid "✓ Credentials are valid!"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:47
+#: app/templates/partials/project_details/style_and_scripts.html:45
 msgid "Invalid credentials. Please check and try again."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:48
+#: app/templates/partials/project_details/style_and_scripts.html:46
 #, python-format
 msgid "Error testing credentials: %(message)s"
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:50
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:159
+#: app/templates/partials/project_details/style_and_scripts.html:47
+msgid "Test Credentials"
+msgstr ""
+
+#: app/templates/partials/project_details/style_and_scripts.html:48
 msgid "Please test credentials first before continuing."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:51
+#: app/templates/partials/project_details/style_and_scripts.html:49
 #, python-format
 msgid "Creating project in %(project_type)s... This may take a moment."
 msgstr ""
 
-#: app/templates/partials/project_details/style_and_scripts.html:52
+#: app/templates/partials/project_details/style_and_scripts.html:50
 msgid "Error:"
 msgstr ""
 
@@ -2203,30 +1850,30 @@ msgid ""
 msgstr ""
 
 #: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:47
-#: app/templates/partials/project_details/fragments/basemap_progress.html:109
-#: app/templates/partials/project_details/fragments/basemap_progress.html:113
+#: app/templates/partials/project_details/fragments/basemap_progress.html:48
+#: app/templates/partials/project_details/fragments/basemap_progress.html:111
+#: app/templates/partials/project_details/fragments/basemap_progress.html:116
 msgid "Checking..."
 msgstr ""
 
 #: app/templates/partials/project_details/fragments/basemap_progress.html:44
-#: app/templates/partials/project_details/fragments/basemap_progress.html:47
-#: app/templates/partials/project_details/fragments/basemap_progress.html:110
-#: app/templates/partials/project_details/fragments/basemap_progress.html:113
+#: app/templates/partials/project_details/fragments/basemap_progress.html:48
+#: app/templates/partials/project_details/fragments/basemap_progress.html:112
+#: app/templates/partials/project_details/fragments/basemap_progress.html:116
 msgid "Check Status"
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:67
+#: app/templates/partials/project_details/fragments/basemap_progress.html:69
 msgid ""
 "Basemap generation is in progress. Use the button below to check the "
 "latest status."
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:68
+#: app/templates/partials/project_details/fragments/basemap_progress.html:70
 msgid "STAC item"
 msgstr ""
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:69
+#: app/templates/partials/project_details/fragments/basemap_progress.html:71
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:15
 msgid "Zoom"
 msgstr ""
@@ -2348,5 +1995,353 @@ msgstr ""
 
 #: app/templates/partials/project_details/fragments/split_preview.html:27
 msgid "Accept Task Choices"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:7
+msgid "Step 2: Select Survey Form"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:17
+msgid "Choose a preset survey type, or upload your own custom XLSForm."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:28
+msgid "Choose Survey Type:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:30
+msgid "Loading survey types..."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:46
+msgid "Or use your own form instead:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:54
+msgid "Upload Custom XLSForm"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:68
+msgid ""
+"Note: Field-TM will automatically inject additional fields into your form"
+" for task\n"
+"        division and feature selection. Your form should only contain the"
+" survey questions you want\n"
+"        to ask (do not include select_one_from_file fields for "
+"tasks/features)."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:98
+msgid ""
+"Recommended defaults are active for ODK projects, including ODK Collect\n"
+"        compatibility."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:105
+#, python-format
+msgid "Recommended defaults are active for %(app_name)s projects."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:112
+msgid "Recommended defaults are active for this project."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:131
+msgid "Default Language:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:133
+msgid "English"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:134
+msgid "Spanish"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:135
+msgid "French"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:136
+msgid "Portuguese"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:137
+msgid "Swahili"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:138
+msgid "Hindi"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:153
+msgid "Form Options:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:163
+msgid "Include photo upload question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:177
+msgid "Make photo mandatory"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:182
+msgid "Asks the user to take a photo at their location."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:193
+msgid "Include digitisation verification question"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:197
+msgid "Asks the mapper to verify if existing features are correctly digitised."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:220
+msgid "Continue"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:224
+msgid "✓ Survey form uploaded successfully"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:18
+msgid "Download the recommended OSM data for your survey form."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:20
+msgid "Review the data on the map, then continue."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+msgid "Collect New Data Only"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:76
+msgid "Use custom data inputs or override the default OSM download options."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:81
+msgid "OSM Category:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:83
+msgid "OSM Buildings"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:84
+msgid "OSM Highways"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+msgid "OSM Healthcare"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:86
+msgid "OSM Toilets"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:87
+msgid "OSM Religious"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:88
+msgid "OSM Landuse"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:89
+msgid "OSM Waterways"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:90
+msgid "OSM Water Points"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:91
+msgid "OSM Waste Disposal"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:92
+msgid "OSM Education"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:93
+msgid "OSM Cemeteries"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:94
+msgid "OSM Amenities"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:99
+msgid "Geometry Type:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:102
+msgid "Polygon"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:103
+msgid "Polyline"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+msgid "Point"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:113
+msgid "Use centroids"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:125
+msgid "Upload Custom GeoJSON"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:144
+msgid "Generating OSM data extract... This may take a moment."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:163
+msgid "OSM data extract ready"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:8
+msgid "Step 4: Split into Tasks (Optional)"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:18
+msgid "✓ Task splitting is not relevant without existing data"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:24
+msgid ""
+"Generate task areas by splitting the Area of Interest (AOI). Choose an "
+"algorithm and\n"
+"    parameters, then split. Review the preview, and click \"Accept Task "
+"Areas\" to save. Or click"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:27
+#: app/templates/partials/project_details/setup_steps/step4_split.html:46
+msgid "Skip"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:28
+msgid "to use the whole AOI as a single task."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:60
+msgid "Choose which linear features influence building-based task splitting."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:84
+msgid "Include roads"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:93
+msgid "Include rivers"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:102
+msgid "Include railways"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+msgid "Include aeroways"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:118
+msgid "Algorithm:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:120
+msgid "Select splitting option..."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:122
+msgid "Average Buildings v1 (Voronoi)"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:124
+msgid "Average Buildings v2 (Straight Skeleton)"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:126
+msgid "Split by Specific Number of Tasks"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:132
+msgid "Avg. Buildings per Task:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:144
+msgid "Number of Tasks:"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:156
+msgid "Dimension (meters):"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:175
+msgid "Split Again"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:211
+msgid "Splitting AOI into tasks... This may take a moment."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:5
+msgid "Ready"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:8
+msgid ""
+"All prerequisites are complete! Create the project in your chosen mapping"
+" tool."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:19
+msgid "Finalise Project"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:59
+msgid "Confirm Project Finalisation"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:63
+msgid "Are you sure you want to finalise this project?"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+msgid "Confirm & Finalise"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:73
+msgid "Custom Credentials"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:78
+msgid "ODK Central URL"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:84
+msgid "https://your-odk-central.com"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:123
+msgid "https://qfield.cloud"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:135
+msgid "qfield_username"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:147
+msgid "qfield_password"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:162
+msgid "Save & Continue"
 msgstr ""
 

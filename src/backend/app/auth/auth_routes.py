@@ -16,16 +16,12 @@
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
 
-"""Auth routes for API key lifecycle management."""
+"""Auth routes for authenticated user profile sync and retrieval."""
 
-from litestar import Router, delete, get, post
-from litestar import status_codes as status
+from litestar import Router, get
 from litestar.di import Provide
-from litestar.exceptions import HTTPException
 from psycopg import AsyncConnection
-from pydantic import BaseModel
 
-from app.auth.api_key import generate_api_key, hash_api_key
 from app.auth.auth_deps import (
     get_user_is_admin,
     get_user_sub,
@@ -35,13 +31,7 @@ from app.auth.auth_deps import (
 from app.auth.auth_schemas import AuthUser
 from app.auth.user_crud import get_or_create_user
 from app.db.database import db_conn
-from app.db.models import DbApiKey, DbUser
-
-
-class ApiKeyCreateRequest(BaseModel):
-    """Input payload for creating an API key."""
-
-    name: str | None = None
+from app.db.models import DbUser
 
 
 def _build_auth_user(auth_user: object) -> AuthUser:
@@ -55,90 +45,6 @@ def _build_auth_user(auth_user: object) -> AuthUser:
         profile_img=getattr(auth_user, "profile_img", None),
         is_admin=get_user_is_admin(auth_user),
     )
-
-
-@post(
-    "/api-keys",
-    summary="Create a new API key for the current user.",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-    },
-    status_code=status.HTTP_201_CREATED,
-)
-async def create_api_key_route(
-    db: AsyncConnection,
-    auth_user: object,
-    data: ApiKeyCreateRequest,
-) -> dict:
-    """Generate a key, store only the hash, and return the raw key once."""
-    db_user = await get_or_create_user(db, _build_auth_user(auth_user))
-
-    raw_key = generate_api_key()
-    db_key = await DbApiKey.create(
-        db,
-        DbApiKey(
-            user_sub=db_user.sub,
-            key_hash=hash_api_key(raw_key),
-            name=data.name,
-        ),
-    )
-    await db.commit()
-
-    return {
-        "id": db_key.id,
-        "name": db_key.name,
-        "created_at": db_key.created_at,
-        "is_active": db_key.is_active,
-        "api_key": raw_key,
-    }
-
-
-@get(
-    "/api-keys",
-    summary="List API keys for the current user.",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-    },
-)
-async def list_api_keys_route(db: AsyncConnection, auth_user: object) -> list[dict]:
-    """List API keys (without exposing raw key or stored hash)."""
-    keys = await DbApiKey.all_for_user(db, get_user_sub(auth_user))
-    return [
-        {
-            "id": key.id,
-            "name": key.name,
-            "created_at": key.created_at,
-            "last_used_at": key.last_used_at,
-            "is_active": key.is_active,
-        }
-        for key in keys
-    ]
-
-
-@delete(
-    "/api-keys/{key_id:int}",
-    summary="Revoke (deactivate) an API key for the current user.",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-    },
-    status_code=status.HTTP_204_NO_CONTENT,
-)
-async def revoke_api_key_route(
-    key_id: int,
-    db: AsyncConnection,
-    auth_user: object,
-) -> None:
-    """Deactivate a key so it can no longer authenticate requests."""
-    revoked = await DbApiKey.deactivate(db, key_id, get_user_sub(auth_user))
-    if not revoked:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"API key with id={key_id} not found.",
-        )
-    await db.commit()
 
 
 @get(
@@ -168,8 +74,5 @@ auth_router = Router(
     tags=["api"],
     route_handlers=[
         get_current_user_profile,
-        create_api_key_route,
-        list_api_keys_route,
-        revoke_api_key_route,
     ],
 )

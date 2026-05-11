@@ -2,21 +2,16 @@
 
 from litestar import Router
 
-from app.htmx.basemap_routes import (
-    basemap_attach_htmx,
-    basemap_attach_status_htmx,
-    basemap_generate_htmx,
-    basemap_search_htmx,
-    basemap_status_htmx,
-)
+from app.htmx.basemap.basemap_routes import ROUTE_HANDLERS as BASEMAP_HANDLERS
 from app.htmx.landing_routes import landing, login_page, metrics_partial
-from app.htmx.project_create_routes import (
-    create_project_htmx,
-    create_simple_project_htmx,
-    get_template_xlsform,
-    new_project,
-    new_project_simple,
-    upload_xlsform_htmx,
+from app.htmx.project_create.project_create_page_routes import (
+    ROUTE_HANDLERS as PROJECT_CREATE_PAGE_HANDLERS,
+)
+from app.htmx.project_create.project_create_submit_routes import (
+    ROUTE_HANDLERS as PROJECT_CREATE_SUBMIT_HANDLERS,
+)
+from app.htmx.project_create.project_create_xlsform_routes import (
+    ROUTE_HANDLERS as PROJECT_CREATE_XLSFORM_HANDLERS,
 )
 from app.htmx.project_detail_routes import (
     delete_project_htmx,
@@ -24,28 +19,18 @@ from app.htmx.project_detail_routes import (
     project_qrcode_htmx,
 )
 from app.htmx.project_list_routes import project_listing
-from app.htmx.qfc_admin_routes import (
-    add_collaborator,
-    list_collaborators,
-    qfc_admin_login,
-    qfc_admin_page,
-    remove_collaborator,
-    update_collaborator,
+from app.htmx.qfc_admin.qfc_admin_routes import ROUTE_HANDLERS as QFC_ADMIN_HANDLERS
+from app.htmx.setup_steps.setup_step_extract_routes import (
+    ROUTE_HANDLERS as SETUP_STEP_EXTRACT_HANDLERS,
 )
-from app.htmx.setup_step_routes import (
-    accept_data_extract_htmx,
-    accept_split_htmx,
-    collect_new_data_only_htmx,
-    create_project_odk_htmx,
-    create_project_qfield_htmx,
-    download_osm_data_htmx,
-    preview_geojson_htmx,
-    preview_tasks_and_data_htmx,
-    skip_task_split_htmx,
-    split_aoi_htmx,
-    submit_geojson_data_extract_htmx,
-    upload_geojson_htmx,
-    validate_geojson,
+from app.htmx.setup_steps.setup_step_finalize_routes import (
+    ROUTE_HANDLERS as SETUP_STEP_FINALIZE_HANDLERS,
+)
+from app.htmx.setup_steps.setup_step_split_routes import (
+    ROUTE_HANDLERS as SETUP_STEP_SPLIT_HANDLERS,
+)
+from app.htmx.setup_steps.setup_step_validate_routes import (
+    ROUTE_HANDLERS as SETUP_STEP_VALIDATE_HANDLERS,
 )
 from app.htmx.static_routes import (
     serve_apple_touch_icon,
@@ -58,6 +43,7 @@ from app.htmx.static_routes import (
     serve_pwa_512,
     serve_static_css,
     serve_static_image,
+    serve_static_js,
 )
 
 htmx_router = Router(
@@ -76,40 +62,20 @@ htmx_router = Router(
         login_page,
         project_listing,
         metrics_partial,
-        new_project,
-        new_project_simple,
+        *PROJECT_CREATE_PAGE_HANDLERS,
         project_details,
         delete_project_htmx,
-        create_project_htmx,
-        create_simple_project_htmx,
+        *PROJECT_CREATE_SUBMIT_HANDLERS,
         serve_static_css,
+        serve_static_js,
         serve_static_image,
-        get_template_xlsform,
-        upload_xlsform_htmx,
-        download_osm_data_htmx,
-        collect_new_data_only_htmx,
-        upload_geojson_htmx,
-        preview_geojson_htmx,
-        submit_geojson_data_extract_htmx,
-        preview_tasks_and_data_htmx,
-        skip_task_split_htmx,
-        split_aoi_htmx,
-        accept_data_extract_htmx,
-        accept_split_htmx,
-        create_project_odk_htmx,
-        create_project_qfield_htmx,
+        *PROJECT_CREATE_XLSFORM_HANDLERS,
+        *SETUP_STEP_EXTRACT_HANDLERS,
+        *SETUP_STEP_SPLIT_HANDLERS,
+        *SETUP_STEP_FINALIZE_HANDLERS,
         project_qrcode_htmx,
-        validate_geojson,
-        qfc_admin_page,
-        qfc_admin_login,
-        list_collaborators,
-        add_collaborator,
-        remove_collaborator,
-        update_collaborator,
-        basemap_search_htmx,
-        basemap_generate_htmx,
-        basemap_status_htmx,
-        basemap_attach_htmx,
-        basemap_attach_status_htmx,
+        *SETUP_STEP_VALIDATE_HANDLERS,
+        *QFC_ADMIN_HANDLERS,
+        *BASEMAP_HANDLERS,
     ],
 )

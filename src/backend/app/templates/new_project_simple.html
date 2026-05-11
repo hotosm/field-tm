@@ -56,6 +56,24 @@ endblock %} {% block content %}
   const submitIndicator = document.getElementById("submit-indicator");
   const formErrorContainer = document.getElementById("form-error-container");
 
+  function renderWarningCallout(container, message) {
+    if (!container || !message) return;
+    container.textContent = "";
+    const wrapper = document.createElement("div");
+    wrapper.id = "form-error";
+    wrapper.style.marginBottom = "16px";
+    wrapper.style.display = "block";
+
+    const callout = document.createElement("wa-callout");
+    callout.setAttribute("variant", "warning");
+    const span = document.createElement("span");
+    span.id = "form-error-message";
+    span.textContent = message;
+    callout.appendChild(span);
+    wrapper.appendChild(callout);
+    container.appendChild(wrapper);
+  }
+
   document.body.addEventListener("simpleCollectNewDataNotice", function (event) {
     let noticeMsg = "";
     if (event.detail && typeof event.detail === "object") {
@@ -66,7 +84,7 @@ endblock %} {% block content %}
 
     if (!noticeMsg || !formErrorContainer) return;
 
-    formErrorContainer.innerHTML = `<div id="form-error" style="margin-bottom: 16px; display: block;"><wa-callout variant="warning"><span id="form-error-message">${noticeMsg}</span></wa-callout></div>`;
+    renderWarningCallout(formErrorContainer, noticeMsg);
   });
 
   if (form && submitBtn) {

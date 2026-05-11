@@ -43,7 +43,7 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
             self._send_error(404, f"Unknown endpoint: {self.path}")
 
     def _handle_field(self):
-        """Handle /field POST — existing xlsform workflow."""
+        """Handle /field POST - existing xlsform workflow."""
         try:
             data = self._read_json_body()
             if data is None:
@@ -81,7 +81,7 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
             self._send_error(500, f"Internal server error: {e}")
 
     def _handle_drone(self):
-        """Handle /drone POST — drone project generation."""
+        """Handle /drone POST - drone project generation."""
         try:
             data = self._read_json_body()
             if data is None:
@@ -127,7 +127,7 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
             )
 
             if isinstance(result, bytes):
-                # Success — return raw zip bytes
+                # Success - return raw zip bytes
                 self.send_response(200)
                 self.send_header("Content-Type", "application/zip")
                 self.send_header(
@@ -147,7 +147,7 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
             self._send_error(500, f"Internal server error: {e}")
 
     def _handle_basemap(self):
-        """Handle /basemap POST — attach MBTiles to existing QField project."""
+        """Handle /basemap POST - attach MBTiles to existing QField project."""
         try:
             data = self._read_json_body()
             if data is None:

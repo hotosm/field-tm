@@ -87,10 +87,16 @@ async def metrics_partial(request: HTMXRequest, db: AsyncConnection) -> Template
                     FROM projects
                 ) AS mapped_features_count,
                 (
-                    SELECT COUNT(DISTINCT country)
-                    FROM users
-                    WHERE country IS NOT NULL
-                      AND TRIM(country) <> ''
+                    SELECT COUNT(DISTINCT project_country)
+                    FROM (
+                        SELECT NULLIF(
+                            BTRIM(REGEXP_REPLACE(location_str, '^.*,', '')),
+                            ''
+                        ) AS project_country
+                        FROM projects
+                        WHERE location_str IS NOT NULL
+                    ) AS normalized_project_locations
+                    WHERE project_country IS NOT NULL
                 ) AS countries_covered;
             """
         )

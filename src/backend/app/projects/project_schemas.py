@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""DTOs and schemas for project endpoints."""
+"""DTOs and schemas for project workflows."""
 
 from typing import Annotated, Optional, Self, Union
 

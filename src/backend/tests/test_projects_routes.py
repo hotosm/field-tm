@@ -34,7 +34,7 @@ from app.central.central_crud import create_odk_project
 from app.central.central_schemas import ODKCentral
 from app.db.enums import FieldMappingApp, ProjectStatus, XLSFormType
 from app.helpers.geometry_utils import check_crs
-from app.projects import project_crud, project_routes, project_services
+from app.projects import project_crud, project_services
 from app.projects.project_schemas import CreateProjectRequest, ProjectUpdate
 from app.qfield.qfield_crud import QFieldProjectResult
 
@@ -1005,34 +1005,6 @@ async def test_delete_project_with_downstream_keeps_ftm_on_remote_failure(monkey
         await project_services.delete_project_with_downstream(db, 20)
 
     delete_mock.assert_not_awaited()
-
-
-async def test_api_delete_project_returns_422_on_downstream_failure(monkeypatch):
-    """API delete should block local deletion when downstream deletion fails."""
-    monkeypatch.setattr(
-        project_routes,
-        "api_key_required",
-        AsyncMock(return_value=Mock()),
-    )
-    monkeypatch.setattr(
-        project_routes,
-        "delete_project_with_downstream",
-        AsyncMock(
-            side_effect=project_services.DownstreamDeleteError("cannot delete remote")
-        ),
-    )
-    db = Mock()
-    db.commit = AsyncMock()
-
-    with pytest.raises(Exception) as exc:
-        await project_routes.api_delete_project.fn(
-            request=Mock(),
-            project_id=11,
-            db=db,
-        )
-
-    assert getattr(exc.value, "status_code", None) == 422
-    db.commit.assert_not_awaited()
 
 
 if __name__ == "__main__":

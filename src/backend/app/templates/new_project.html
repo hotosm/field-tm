@@ -148,6 +148,17 @@ endblock %} {% block content %}
   const hashtagsContainer = document.getElementById("hashtags-container");
   const hashtags = new Set();
 
+  function renderCallout(container, variant, message) {
+    if (!container) return;
+    container.textContent = "";
+    if (!message) return;
+    const callout = document.createElement("wa-callout");
+    callout.setAttribute("variant", variant);
+    const span = document.createElement("span");
+    span.textContent = message;
+    callout.appendChild(span);
+    container.appendChild(callout);
+  }
   function showError(message) {
     if (!errorContainer || !errorMessageEl) return;
     errorMessageEl.textContent = message || I18N.somethingWentWrong;
@@ -257,12 +268,9 @@ endblock %} {% block content %}
     const projectNameInput = document.getElementById("project_name_input");
 
     if (projectNameError) {
-      if (errorMsg) {
-        projectNameError.innerHTML = `<wa-callout variant="danger"><span>${errorMsg}</span></wa-callout>`;
-      } else {
-        projectNameError.innerHTML =
-          '<wa-callout variant="danger"><span>{{ _("A project with this name already exists. Please choose a different name.") }}</span></wa-callout>';
-      }
+      const fallbackDuplicateMessage =
+        {{ _("A project with this name already exists. Please choose a different name.")|tojson }};
+      renderCallout(projectNameError, "danger", errorMsg || fallbackDuplicateMessage);
     }
 
     if (projectNameInput) {
@@ -289,7 +297,7 @@ endblock %} {% block content %}
 
     const projectNameError = document.getElementById("project-name-error");
     if (projectNameError) {
-      projectNameError.innerHTML = `<wa-callout variant="danger"><span>${errorMessage}</span></wa-callout>`;
+      renderCallout(projectNameError, "danger", errorMessage);
     }
 
     const projectNameInput = document.getElementById("project_name_input");
@@ -306,7 +314,7 @@ endblock %} {% block content %}
     projectNameInput.addEventListener("input", function () {
       const projectNameError = document.getElementById("project-name-error");
       if (projectNameError) {
-        projectNameError.innerHTML = "";
+        projectNameError.textContent = "";
       }
     });
   }
@@ -316,7 +324,7 @@ endblock %} {% block content %}
     descriptionInput.addEventListener("input", function () {
       const descriptionError = document.getElementById("description-error");
       if (descriptionError) {
-        descriptionError.innerHTML = "";
+        descriptionError.textContent = "";
       }
     });
   }
@@ -337,16 +345,15 @@ endblock %} {% block content %}
       clearError();
 
       const projectNameError = document.getElementById("project-name-error");
-      if (projectNameError) projectNameError.innerHTML = "";
+      if (projectNameError) projectNameError.textContent = "";
       const descriptionError = document.getElementById("description-error");
-      if (descriptionError) descriptionError.innerHTML = "";
+      if (descriptionError) descriptionError.textContent = "";
 
       if (!descriptionInput || !(descriptionInput.value ?? "").trim()) {
         e.preventDefault();
         e.stopPropagation();
         if (descriptionError) {
-          descriptionError.innerHTML =
-            '<wa-callout variant="danger"><span>{{ _("Description is required.") }}</span></wa-callout>';
+          renderCallout(descriptionError, "danger", {{ _("Description is required.")|tojson }});
         }
         if (descriptionInput) {
           setTimeout(() => {

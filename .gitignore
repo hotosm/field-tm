@@ -101,4 +101,5 @@ field-tm-*.tgz
 # Agents
 config
 .claude
+.codex
 .openapi

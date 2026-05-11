@@ -1,0 +1,1 @@
+"""HTMX basemap route modules."""

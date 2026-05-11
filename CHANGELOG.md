@@ -19,6 +19,7 @@
 
 - add option to bundle OAM imagery, update translations, fix issues
 - **translations**: osm_fieldwork is monolingual PO, update UI string for all langs
+- **auth**: remove API-key auth lifecycle and align profile auth route behavior
 
 ## 2026.1.3 (2026-03-23)
 

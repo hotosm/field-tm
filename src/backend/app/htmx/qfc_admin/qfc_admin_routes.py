@@ -23,8 +23,6 @@ as hidden form fields with every HTMX request.  The server never stores
 credentials or sessions.
 """
 
-import html
-import json
 import logging
 from asyncio import get_running_loop
 from functools import partial
@@ -42,19 +40,13 @@ from app.i18n import _
 from app.qfield.qfield_crud import add_qfc_project_collaborator
 from app.qfield.qfield_utils import resolve_backend_qfc_url, strip_qfc_api_suffix
 
-from .htmx_helpers import callout as _callout
+from ..htmx_helpers import callout as _callout
+from .qfc_admin_templates import (
+    render_collaborators_panel as _render_collaborators_panel,
+)
+from .qfc_admin_templates import render_management_area as _render_management_area
 
 log = logging.getLogger(__name__)
-
-# ── Roles available in the collaborator dropdown ────────────────────────
-COLLABORATOR_ROLES = [
-    ("admin", _("Admin")),
-    ("manager", _("Manager")),
-    ("editor", _("Editor")),
-    ("reporter", _("Reporter")),
-    ("reader", _("Reader")),
-]
-
 
 # ── Helpers ─────────────────────────────────────────────────────────────
 
@@ -74,14 +66,6 @@ def _resolve_login_qfc_url(submitted_url: str) -> str:
     return resolve_backend_qfc_url(submitted_url)
 
 
-def _hidden_fields_html(qfc_url: str, qfc_token: str) -> str:
-    """Return hidden input elements that carry QFC state between requests."""
-    return (
-        f'<input type="hidden" name="qfc_url" value="{html.escape(qfc_url)}" />'
-        f'<input type="hidden" name="qfc_token" value="{html.escape(qfc_token)}" />'
-    )
-
-
 def _friendly_add_collaborator_error(exc: Exception) -> str:
     """Map verbose QFC collaborator errors to user-friendly messages."""
     msg = str(exc).lower()
@@ -90,30 +74,6 @@ def _friendly_add_collaborator_error(exc: Exception) -> str:
     if "already exists" in msg:
         return _("This user is already a collaborator on this project.")
     return _("Failed to add collaborator: %(exc)s") % {"exc": exc}
-
-
-def _org_membership_permission_error(organization: str) -> str:
-    """Return a clear error when the user cannot manage org members."""
-    return _(
-        "This project belongs to the %(organization)s organization. "
-        "The user must be added to that organization before they can be "
-        "added as a collaborator. Your QFieldCloud account does not have "
-        "permission to manage organization members."
-    ) % {"organization": organization}
-
-
-def _role_badge_variant(role: str) -> str:
-    """Map a QFC collaborator role to a wa-badge variant."""
-    return {
-        "admin": "danger",
-        "manager": "warning",
-        "editor": "primary",
-        "reporter": "neutral",
-        "reader": "neutral",
-    }.get(role, "neutral")
-
-
-# ── Page render ─────────────────────────────────────────────────────────
 
 
 @get(path="/qfc-admin")
@@ -179,88 +139,14 @@ async def qfc_admin_login(
         projects = []
 
     return Response(
-        content=_render_management_area(qfc_url, token, username, projects),
+        content=_render_management_area(
+            qfc_url,
+            token,
+            username,
+            projects,
+            base_url=_strip_api_suffix(qfc_url),
+        ),
         media_type="text/html",
-    )
-
-
-def _render_management_area(
-    qfc_url: str,
-    token: str,
-    username: str,
-    projects: list,
-) -> str:
-    """Build the full management area HTML returned after login."""
-    hidden = _hidden_fields_html(qfc_url, token)
-    base_url = _strip_api_suffix(qfc_url)
-
-    header = f"""
-<div class="ftm-flex-between" style="margin-bottom:1.5rem">
-  <div>
-    <h2 class="ftm-section-title" style="margin:0">{_("QFieldCloud Projects")}</h2>
-    <p
-      style="margin:4px 0 0;color:var(--ftm-text-muted);
-             font-size:var(--hot-font-size-small)"
-    >
-      {_("Connected as")} <strong>{html.escape(username)}</strong>
-      {_("to")} <code>{html.escape(base_url)}</code>
-    </p>
-  </div>
-  <wa-button variant="default" size="small"
-    onclick="document.getElementById('qfc-management').innerHTML='';
-             document.getElementById('qfc-login-panel').style.display='block';">
-    {_("Log Out")}
-  </wa-button>
-</div>"""
-
-    if not projects:
-        table = f'<p style="color:var(--ftm-text-muted)">{_("No projects found.")}</p>'
-    else:
-        rows = []
-        for p in projects:
-            pid = html.escape(str(p.get("id", "")))
-            name = html.escape(str(p.get("name", "Untitled")))
-            owner = html.escape(str(p.get("owner", "")))
-            desc = html.escape(str(p.get("description", ""))[:80])
-            visibility = (
-                f'<wa-badge variant="success">{_("Public")}</wa-badge>'
-                if p.get("is_public", False)
-                else f'<wa-badge variant="neutral">{_("Private")}</wa-badge>'
-            )
-            rows.append(f"""
-<tr class="ftm-qfc-project-row" id="qfc-project-row-{pid}">
-  <td style="font-weight:var(--hot-font-weight-semibold)">{name}</td>
-  <td><code style="font-size:0.8em">{owner}</code></td>
-  <td>{visibility}</td>
-  <td
-    style="color:var(--ftm-text-muted);font-size:var(--hot-font-size-small)"
-  >{desc}</td>
-  <td>
-    <form hx-get="/qfc-admin/projects/{pid}/collaborators"
-          hx-target="#qfc-collabs-{pid}" hx-swap="innerHTML">
-      {hidden}
-      <wa-button variant="default" size="small" type="submit">{_("Manage")}</wa-button>
-    </form>
-  </td>
-</tr>
-<tr><td colspan="5" id="qfc-collabs-{pid}" class="ftm-qfc-collabs-cell"></td></tr>""")
-
-        table = f"""
-<div style="overflow-x:auto">
-  <table class="ftm-qfc-table">
-    <thead>
-      <tr><th>{_("Project")}</th><th>{_("Owner")}</th><th>{_("Visibility")}</th><th>{_("Description")}</th><th></th></tr>
-    </thead>
-    <tbody>{"".join(rows)}</tbody>
-  </table>
-</div>"""
-
-    return (
-        header
-        + table
-        + "\n<script>"
-        + "document.getElementById('qfc-login-panel').style.display='none';"
-        + "</script>"
     )
 
 
@@ -273,6 +159,7 @@ async def list_collaborators(
     project_id: str,
     qfc_url: str = Parameter(query="qfc_url", default=""),
     qfc_token: str = Parameter(query="qfc_token", default=""),
+    qfc_username: str = Parameter(query="qfc_username", default=""),
 ) -> Response:
     """List collaborators for a QFC project."""
     # HTMX sends form data as query params on GET
@@ -288,10 +175,6 @@ async def list_collaborators(
         collaborators = await loop.run_in_executor(
             None, partial(client.get_project_collaborators, project_id)
         )
-        # Get project details (to know the owner for org membership)
-        project = await loop.run_in_executor(
-            None, partial(client.get_project, project_id)
-        )
     except Exception as exc:
         log.warning("QFC list collaborators failed: %s", exc)
         return Response(
@@ -302,144 +185,12 @@ async def list_collaborators(
             media_type="text/html",
         )
 
-    owner = project.get("owner", "")
-
     return Response(
         content=_render_collaborators_panel(
-            qfc_url, qfc_token, project_id, owner, collaborators
+            qfc_url, qfc_token, qfc_username, project_id, collaborators
         ),
         media_type="text/html",
     )
-
-
-def _render_collaborators_panel(
-    qfc_url: str,
-    token: str,
-    project_id: str,
-    owner: str,
-    collaborators: list,
-) -> str:
-    """Build the collaborator management panel HTML."""
-    hidden = _hidden_fields_html(qfc_url, token)
-    pid_e = html.escape(project_id)
-    owner_e = html.escape(owner)
-    target_id = f"qfc-collabs-{pid_e}"
-
-    dialogs = []
-
-    if collaborators:
-        collab_rows = []
-        for c in collaborators:
-            uname = html.escape(str(c.get("collaborator", "")))
-            role = str(c.get("role", "reader"))
-            role_options = "".join(
-                (
-                    f'<option value="{r}" {"selected" if r == role else ""}>'
-                    f"{label}</option>"
-                )
-                for r, label in COLLABORATOR_ROLES
-            )
-            dialog_id = f"qfc-rm-{pid_e}-{uname}"
-            hx_vals = html.escape(
-                json.dumps(
-                    {"qfc_url": qfc_url, "qfc_token": token, "project_owner": owner}
-                )
-            )
-
-            collab_rows.append(f"""
-<tr id="qfc-collab-{pid_e}-{uname}">
-  <td style="font-weight:var(--hot-font-weight-semibold)">{uname}</td>
-  <td>
-    <wa-badge variant="{_role_badge_variant(role)}">
-      {html.escape(role.title())}
-    </wa-badge>
-  </td>
-  <td class="ftm-qfc-collab-actions">
-    <form hx-patch="/qfc-admin/projects/{pid_e}/collaborators/{uname}"
-          hx-target="#{target_id}" hx-swap="innerHTML"
-          style="display:inline-flex;gap:0.5rem;align-items:center">
-      {hidden}
-      <input type="hidden" name="project_owner" value="{owner_e}" />
-      <select
-        name="role"
-        class="ftm-projects-filter__select"
-        style="width:auto;min-width:6rem"
-      >
-        {role_options}
-      </select>
-      <wa-button variant="default" size="small" type="submit">{_("Update")}</wa-button>
-    </form>
-    <wa-button variant="danger" size="small" outline
-      onclick="document.getElementById('{dialog_id}').show()">{_("Remove")}</wa-button>
-  </td>
-</tr>""")
-
-            dialogs.append(f"""
-<wa-dialog id="{dialog_id}" label="{_("Remove Collaborator")}" with-header>
-  <p style="margin:0;line-height:1.6">
-    {_("Remove")} <strong>{uname}</strong> {_("from this project?")}
-  </p>
-  <div slot="footer" class="ftm-flex-end">
-    <wa-button variant="default"
-      onclick="document.getElementById('{dialog_id}').hide()">{_("Cancel")}</wa-button>
-    <wa-button variant="danger"
-      hx-delete="/qfc-admin/projects/{pid_e}/collaborators/{uname}"
-      hx-target="#{target_id}" hx-swap="innerHTML"
-      hx-vals="{hx_vals}">{_("Remove")}</wa-button>
-  </div>
-</wa-dialog>""")
-
-        collab_table = f"""
-<table class="ftm-qfc-table ftm-qfc-table--nested">
-  <thead><tr><th>{_("User")}</th><th>{_("Role")}</th><th>{_("Actions")}</th></tr></thead>
-  <tbody>{"".join(collab_rows)}</tbody>
-</table>"""
-    else:
-        collab_table = (
-            '<p style="color:var(--ftm-text-muted);'
-            f'font-size:var(--hot-font-size-small)">{_("No collaborators yet.")}</p>'
-        )
-
-    role_options_add = "".join(
-        f'<option value="{r}"{"selected" if r == "editor" else ""}>{label}</option>'
-        for r, label in COLLABORATOR_ROLES
-    )
-    add_form = f"""
-<div class="ftm-qfc-add-collab">
-  <form hx-post="/qfc-admin/projects/{pid_e}/collaborators"
-        hx-target="#{target_id}" hx-swap="innerHTML"
-        class="ftm-qfc-add-collab-form">
-    {hidden}
-    <input type="hidden" name="project_owner" value="{owner_e}" />
-    <wa-input name="new_username" placeholder="{_("Username")}" size="small"
-              required style="flex:1;min-width:8rem"></wa-input>
-    <select
-      name="new_role"
-      class="ftm-projects-filter__select"
-      style="width:auto;min-width:6rem"
-    >
-      {role_options_add}
-    </select>
-    <wa-button variant="primary" size="small" type="submit">
-      {_("Add Collaborator")}
-    </wa-button>
-  </form>
-</div>"""
-
-    close_btn = f"""
-<div style="text-align:right;margin-bottom:0.5rem">
-  <wa-button variant="default" size="small"
-    onclick="document.getElementById('{target_id}').innerHTML=''">{_("Close")}</wa-button>
-</div>"""
-
-    return f"""<div class="ftm-qfc-collab-panel">
-  {close_btn}
-  <h4
-    style="margin:0 0 0.75rem;font-family:var(--hot-font-sans-variant-condensed)"
-  >{_("Collaborators")}</h4>
-  {collab_table}
-  {add_form}
-</div>{"".join(dialogs)}"""
 
 
 @post(
@@ -454,9 +205,9 @@ async def add_collaborator(
     """Add a collaborator to a QFC project."""
     qfc_url = data.get("qfc_url", "")
     qfc_token = data.get("qfc_token", "")
+    qfc_username = data.get("qfc_username", "")
     username = (data.get("new_username") or "").strip()
     role_str = data.get("new_role", "editor")
-    owner = data.get("project_owner", "")
 
     if not username:
         return Response(
@@ -469,8 +220,8 @@ async def add_collaborator(
 
     try:
         client = _qfc_client(qfc_url, qfc_token)
-        # Set username so org-ownership check works correctly
-        client.username = owner
+        # Set the authenticated QFC user so org-owned project handling works.
+        client.username = qfc_username
         await add_qfc_project_collaborator(client, project_id, username, role)
     except Exception as exc:
         log.warning("QFC add collaborator failed: %s", exc)
@@ -481,7 +232,9 @@ async def add_collaborator(
         )
 
     # Re-render the full collaborator panel
-    return await _reload_collaborators(loop, client, project_id, qfc_url, qfc_token)
+    return await _reload_collaborators(
+        loop, client, project_id, qfc_url, qfc_token, qfc_username
+    )
 
 
 @delete(
@@ -497,10 +250,12 @@ async def remove_collaborator(
     """Remove a collaborator from a QFC project."""
     qfc_url = data.get("qfc_url", "")
     qfc_token = data.get("qfc_token", "")
+    qfc_username = data.get("qfc_username", "")
 
     loop = get_running_loop()
     try:
         client = _qfc_client(qfc_url, qfc_token)
+        client.username = qfc_username
         await loop.run_in_executor(
             None,
             partial(client.remove_project_collaborator, project_id, username),
@@ -515,7 +270,9 @@ async def remove_collaborator(
             media_type="text/html",
         )
 
-    return await _reload_collaborators(loop, client, project_id, qfc_url, qfc_token)
+    return await _reload_collaborators(
+        loop, client, project_id, qfc_url, qfc_token, qfc_username
+    )
 
 
 @patch(path="/qfc-admin/projects/{project_id:str}/collaborators/{username:str}")
@@ -528,6 +285,7 @@ async def update_collaborator(
     """Change a collaborator's role."""
     qfc_url = data.get("qfc_url", "")
     qfc_token = data.get("qfc_token", "")
+    qfc_username = data.get("qfc_username", "")
     role_str = data.get("role", "editor")
 
     role = ProjectCollaboratorRole(role_str)
@@ -535,6 +293,7 @@ async def update_collaborator(
 
     try:
         client = _qfc_client(qfc_url, qfc_token)
+        client.username = qfc_username
         await loop.run_in_executor(
             None,
             partial(
@@ -554,21 +313,24 @@ async def update_collaborator(
             media_type="text/html",
         )
 
-    return await _reload_collaborators(loop, client, project_id, qfc_url, qfc_token)
+    return await _reload_collaborators(
+        loop, client, project_id, qfc_url, qfc_token, qfc_username
+    )
 
 
 async def _reload_collaborators(
-    loop, client: Client, project_id: str, qfc_url: str, qfc_token: str
+    loop,
+    client: Client,
+    project_id: str,
+    qfc_url: str,
+    qfc_token: str,
+    qfc_username: str,
 ) -> Response:
     """Re-fetch collaborators and return the full panel HTML."""
     try:
         collaborators = await loop.run_in_executor(
             None, partial(client.get_project_collaborators, project_id)
         )
-        project = await loop.run_in_executor(
-            None, partial(client.get_project, project_id)
-        )
-        owner = project.get("owner", "")
     except Exception as exc:
         return Response(
             content=_callout(
@@ -580,7 +342,17 @@ async def _reload_collaborators(
 
     return Response(
         content=_render_collaborators_panel(
-            qfc_url, qfc_token, project_id, owner, collaborators
+            qfc_url, qfc_token, qfc_username, project_id, collaborators
         ),
         media_type="text/html",
     )
+
+
+ROUTE_HANDLERS = [
+    qfc_admin_page,
+    qfc_admin_login,
+    list_collaborators,
+    add_collaborator,
+    remove_collaborator,
+    update_collaborator,
+]

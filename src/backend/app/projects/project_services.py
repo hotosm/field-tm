@@ -17,9 +17,9 @@
 #
 """Shared service layer for project operations.
 
-These functions contain the core business logic used by both HTMX routes
-and REST API routes. They accept typed arguments and raise domain exceptions
-(not HTTP exceptions), returning plain data structures.
+These functions contain the core business logic used by HTMX flows and
+other backend workflows. They accept typed arguments and raise domain
+exceptions (not HTTP exceptions), returning plain data structures.
 """
 
 import json
