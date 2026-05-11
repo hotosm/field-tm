@@ -1187,3 +1187,67 @@ body {
 .ftm-login-back:hover {
   text-decoration: underline;
 }
+
+/* --- Header language selector ----------------------------- */
+.ftm-header-lang-trigger::part(base) {
+  background: white;
+  border: 0;
+  color: var(--hot-color-neutral-900, #404248);
+  box-shadow: none;
+}
+
+.ftm-header-lang-trigger:hover::part(base),
+.ftm-header-lang-trigger:focus-visible::part(base) {
+  background: white;
+}
+
+.ftm-header-lang-trigger::part(label) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.ftm-header-lang-trigger__icon {
+  color: var(--hot-color-neutral-700, #62646a);
+  font-size: 0.7rem;
+}
+
+.ftm-header-lang-menu {
+  min-width: 12rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.ftm-header-lang-option {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--hot-color-neutral-900, #404248);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: start;
+  cursor: pointer;
+}
+
+.ftm-header-lang-option:hover,
+.ftm-header-lang-option:focus-visible {
+  background: var(--hot-color-neutral-100, #e8e8e8);
+  outline: none;
+}
+
+.ftm-header-lang-option--active {
+  background: color-mix(in oklab, var(--wa-color-brand-fill-loud, #d43f3f) 12%, white);
+  font-weight: var(--hot-font-weight-semibold, 600);
+}

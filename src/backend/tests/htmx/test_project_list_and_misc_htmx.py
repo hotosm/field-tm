@@ -242,8 +242,8 @@ async def test_project_listing_shows_empty_state_when_no_projects(client):
     )
 
 
-def test_landing_template_renders_locale_selector():
-    """Landing template should render the locale selector in the existing footer."""
+def test_layout_template_renders_locale_selector_in_header():
+    """Layout template should render the locale selector in the hot-header lang slot."""
     templates_dir = Path(__file__).resolve().parents[2] / "app" / "templates"
     env = Environment(
         loader=FileSystemLoader(str(templates_dir)),
@@ -270,10 +270,11 @@ def test_landing_template_renders_locale_selector():
     template = env.get_template("landing.html")
     rendered = template.render(create_project_href="/new")
 
+    assert 'slot="lang"' in rendered
     assert 'data-locale-switch="en"' in rendered
     assert 'data-locale-switch="pt"' in rendered
     assert 'data-locale-switch="pt_br"' in rendered
-    assert "<wa-dropdown>" in rendered
+    assert "ftm-header-lang-menu" in rendered
     assert "landing-footer-social" in rendered
     assert "Field Tasking Manager" in rendered
     assert "FIELD TASKING MANAGER" not in rendered
