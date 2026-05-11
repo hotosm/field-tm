@@ -482,6 +482,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "nirvn",
+      "name": "Mathieu Pellerin",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1728657?v=4",
+      "profile": "https://github.com/nirvn",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
