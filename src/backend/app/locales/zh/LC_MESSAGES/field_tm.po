@@ -1363,7 +1363,7 @@ msgstr "浏览项目"
 
 #: app/templates/new_project_custom.html:9
 msgid ""
-"Just the basics on this page — what you're mapping, where, and which app "
+"Just the basics on this page: what you're mapping, where, and which app "
 "mappers will use.\n"
 "    You'll pick your survey questions and map data on the next page."
 msgstr "此页只填写基础信息：你要绘制什么、在哪里绘制，以及制图员将使用哪个应用。你将在下一页选择调查问题和地图数据。"
@@ -1472,7 +1472,7 @@ msgid "Description is required."
 msgstr "描述为必填项。"
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
+msgid "Quick Setup - OSM Buildings"
 msgstr "OSM 建筑物"
 
 #: app/templates/new_project_simple.html:9

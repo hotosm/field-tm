@@ -86,7 +86,7 @@ def test_basemap_progress_fragment_uses_manual_status_check_only():
     compact_html = " ".join(html.split())
     assert 'class="js-basemap-check-text"' in compact_html
     assert "Checking..." in compact_html
-    # The spinner is hidden on initial render — only the click handler reveals it.
+    # The spinner is hidden on initial render; only the click handler reveals it.
     assert 'js-basemap-spinner" style="display: none;' in compact_html
 
 

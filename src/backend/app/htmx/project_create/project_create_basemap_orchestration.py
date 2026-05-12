@@ -146,7 +146,7 @@ async def start_simple_project_tilepack(
     elif status_value == "generating":
         next_attach_status = "pending_autostart"
     else:
-        # status_value is "failed" or unexpected — there is nothing to autostart.
+        # status_value is "failed" or unexpected - there is nothing to autostart.
         next_attach_status = "idle"
 
     await DbProject.update(

@@ -1481,7 +1481,7 @@ msgstr "Explorar projetos"
 
 #: app/templates/new_project_custom.html:9
 msgid ""
-"Just the basics on this page — what you're mapping, where, and which app "
+"Just the basics on this page: what you're mapping, where, and which app "
 "mappers will use.\n"
 "    You'll pick your survey questions and map data on the next page."
 msgstr ""
@@ -1610,7 +1610,7 @@ msgid "Description is required."
 msgstr "A descrição é obrigatória."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
+msgid "Quick Setup - OSM Buildings"
 msgstr "Edifícios OSM"
 
 #: app/templates/new_project_simple.html:9
