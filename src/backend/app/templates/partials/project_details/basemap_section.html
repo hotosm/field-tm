@@ -44,11 +44,14 @@ project.basemap_status == 'generating' or project.basemap_attach_status in ('in_
   </div>
 
   <div id="basemap-workspace" style="margin-top: 12px">
-    {% if project.basemap_status == 'generating' or (project.basemap_status == 'failed' and
+    {# If attach already succeeded, the basemap is functionally available — render the ready
+    fragment regardless of basemap_status (guards against stale 'generating' state after upstream
+    tilepack polls). #} {% if project.basemap_attach_status == 'ready' or project.basemap_status ==
+    'ready' %} {% include "partials/project_details/fragments/basemap_ready.html" %} {% elif
+    project.basemap_status == 'generating' or (project.basemap_status == 'failed' and
     project.basemap_stac_item_id) %} {% include
     "partials/project_details/fragments/basemap_progress.html" %} {% elif project.basemap_status ==
-    'ready' %} {% include "partials/project_details/fragments/basemap_ready.html" %} {% elif
-    project.basemap_status == 'failed' %}
+    'failed' %}
     <wa-callout variant="danger">
       <span>{{ _("Basemap generation previously failed. Please search again and retry.") }}</span>
     </wa-callout>

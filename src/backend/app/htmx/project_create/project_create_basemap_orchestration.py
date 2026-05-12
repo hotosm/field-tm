@@ -46,6 +46,13 @@ async def resume_simple_project_tilepack_if_needed(
     status_value, download_url = await check_tilepack_status(stac_item_id)
     resolved_url = download_url or project.basemap_url
     is_ready_with_url = status_value == "ready" and bool(resolved_url)
+    # Once the project has flipped to "ready" with a stored URL, refuse to
+    # downgrade on a later poll (upstream can return 200 OK without a URL,
+    # which we map to "generating").
+    already_ready = project.basemap_status == "ready" and bool(project.basemap_url)
+    persisted_status = (
+        "ready" if already_ready and not is_ready_with_url else status_value
+    )
     now = datetime.now(timezone.utc)
 
     if is_ready_with_url:
@@ -59,7 +66,7 @@ async def resume_simple_project_tilepack_if_needed(
         bg_db,
         project.id,
         project_schemas.ProjectUpdate(
-            basemap_status=status_value,
+            basemap_status=persisted_status,
             basemap_url=resolved_url,
             basemap_attach_status=next_attach_status,
             basemap_attach_error=None,

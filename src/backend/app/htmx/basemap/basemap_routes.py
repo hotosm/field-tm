@@ -68,6 +68,25 @@ from .basemap_fragments import (
 log = logging.getLogger(__name__)
 
 
+def _resolve_persisted_basemap_status(
+    project: DbProject,
+    upstream_status: str,
+    is_ready_with_url: bool,
+) -> str:
+    """Pick the basemap_status value to persist after an upstream poll.
+
+    Once we have flipped to "ready" with a stored URL, refuse to downgrade on
+    a later poll. The upstream tilepack API can return 200 OK without a URL
+    after the tilepack has been served (parsed as "generating"), which would
+    otherwise strand the project even though the basemap is already
+    downloaded and attached.
+    """
+    already_ready = project.basemap_status == "ready" and bool(project.basemap_url)
+    if already_ready and not is_ready_with_url:
+        return "ready"
+    return upstream_status
+
+
 @post(
     path="/projects/{project_id:int}/basemap/search",
     dependencies={
@@ -272,12 +291,16 @@ async def basemap_status_htmx(
 
         resolved_url = download_url or project.basemap_url
         is_ready_with_url = status_value == "ready" and bool(resolved_url)
+        persisted_status = _resolve_persisted_basemap_status(
+            project, status_value, is_ready_with_url
+        )
+        show_ready = persisted_status == "ready" and bool(resolved_url)
 
         await DbProject.update(
             db,
             project_id,
             ProjectUpdate(
-                basemap_status=status_value,
+                basemap_status=persisted_status,
                 basemap_url=resolved_url,
                 basemap_minzoom=basemap_minzoom,
                 basemap_maxzoom=basemap_maxzoom,
@@ -294,20 +317,12 @@ async def basemap_status_htmx(
             await enqueue_autostart_attach(db, project_id, resolved_url)
 
         refreshed_project = await DbProject.one(db, project_id)
-        return (
-            ready_fragment(
-                refreshed_project,
-                basemap_size_bytes=basemap_size_bytes,
-                basemap_minzoom=basemap_minzoom,
-                basemap_maxzoom=basemap_maxzoom,
-            )
-            if is_ready_with_url
-            else progress_fragment(
-                refreshed_project,
-                basemap_size_bytes=basemap_size_bytes,
-                basemap_minzoom=basemap_minzoom,
-                basemap_maxzoom=basemap_maxzoom,
-            )
+        fragment = ready_fragment if show_ready else progress_fragment
+        return fragment(
+            refreshed_project,
+            basemap_size_bytes=basemap_size_bytes,
+            basemap_minzoom=basemap_minzoom,
+            basemap_maxzoom=basemap_maxzoom,
         )
     except Exception:
         log.exception("Basemap status refresh failed for project %s", project_id)
