@@ -76,6 +76,10 @@ digitisation_choices = [
     },
     {
         "list_name": "digitisation_problem",
+        "name": "offset",
+    },
+    {
+        "list_name": "digitisation_problem",
         "name": "other",
     },
 ]

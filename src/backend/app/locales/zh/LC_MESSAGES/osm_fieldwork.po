@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-11 22:06+0100\n"
+"POT-Creation-Date: 2026-05-12 21:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh\n"
@@ -86,36 +86,40 @@ msgstr "OSM 用户名"
 
 #: i18n/osm_fieldwork_strings.py:22
 msgctxt "xlsform_label"
+msgid "offset"
+msgstr "偏移"
+
+#: i18n/osm_fieldwork_strings.py:23
+msgctxt "xlsform_label"
 msgid "osm_username"
 msgstr "其他"
 
-#: i18n/osm_fieldwork_strings.py:23
+#: i18n/osm_fieldwork_strings.py:24
 msgctxt "xlsform_label"
 msgid "other"
 msgstr "拆分"
 
-#: i18n/osm_fieldwork_strings.py:24
+#: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
 msgid "split"
 msgstr "调查问题"
 
-#: i18n/osm_fieldwork_strings.py:25
+#: i18n/osm_fieldwork_strings.py:26
 msgctxt "xlsform_label"
 msgid "survey_questions"
 msgstr "任务"
 
-#: i18n/osm_fieldwork_strings.py:26
+#: i18n/osm_fieldwork_strings.py:27
 msgctxt "xlsform_label"
 msgid "task"
 msgstr "核验"
 
-#: i18n/osm_fieldwork_strings.py:27
+#: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
 msgid "verification"
 msgstr "是"
 
-#: i18n/osm_fieldwork_strings.py:28
+#: i18n/osm_fieldwork_strings.py:29
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "是"
-
