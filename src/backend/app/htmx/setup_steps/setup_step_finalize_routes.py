@@ -193,12 +193,14 @@ async def create_project_qfield_htmx(
         qfield_url_param = data.get("qfield_cloud_url", "").strip()
         qfield_user = data.get("qfield_cloud_user", "").strip()
         qfield_password = data.get("qfield_cloud_password", "").strip()
+        qfield_org = data.get("qfield_cloud_org", "").strip() or None
 
         if qfield_url_param and qfield_user and qfield_password:
             custom_qfield_creds = QFieldCloud(
                 qfield_cloud_url=qfield_url_param,
                 qfield_cloud_user=qfield_user,
                 qfield_cloud_password=qfield_password,
+                qfield_cloud_org=qfield_org,
             )
         qfield_result = await finalize_qfield_project(
             db=db, project_id=project_id, custom_qfield_creds=custom_qfield_creds

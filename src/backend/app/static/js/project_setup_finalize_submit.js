@@ -41,6 +41,7 @@ export function initProjectSetupFinalizeSubmit({
       const qfieldUrlHidden = document.getElementById("qfield_cloud_url_hidden");
       const qfieldUserHidden = document.getElementById("qfield_cloud_user_hidden");
       const qfieldPassHidden = document.getElementById("qfield_cloud_password_hidden");
+      const qfieldOrgHidden = document.getElementById("qfield_cloud_org_hidden");
 
       if (finalizeSource) finalizeSource.value = customCreds ? "custom" : "default";
 
@@ -50,6 +51,7 @@ export function initProjectSetupFinalizeSubmit({
       if (qfieldUrlHidden) qfieldUrlHidden.value = "";
       if (qfieldUserHidden) qfieldUserHidden.value = "";
       if (qfieldPassHidden) qfieldPassHidden.value = "";
+      if (qfieldOrgHidden) qfieldOrgHidden.value = "";
 
       if (customCreds) {
         if (isOdk) {
@@ -60,6 +62,7 @@ export function initProjectSetupFinalizeSubmit({
           if (qfieldUrlHidden) qfieldUrlHidden.value = customCreds.url || "";
           if (qfieldUserHidden) qfieldUserHidden.value = customCreds.username || "";
           if (qfieldPassHidden) qfieldPassHidden.value = customCreds.password || "";
+          if (qfieldOrgHidden) qfieldOrgHidden.value = customCreds.org || "";
         }
       }
 

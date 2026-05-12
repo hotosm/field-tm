@@ -41,6 +41,9 @@ class QFieldCloud(BaseModel):
     qfield_cloud_url: Optional[HttpUrlStr] = None
     qfield_cloud_user: Optional[str] = None
     qfield_cloud_password: Optional[str] = None
+    # Optional org name. When set, the project is created under this org;
+    # when unset, the project is created under qfield_cloud_user.
+    qfield_cloud_org: Optional[str] = None
 
     @field_validator("qfield_cloud_url", mode="after")
     @classmethod

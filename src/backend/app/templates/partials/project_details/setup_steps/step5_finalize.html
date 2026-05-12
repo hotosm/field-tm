@@ -50,6 +50,7 @@
     <input type="hidden" id="qfield_cloud_url_hidden" name="qfield_cloud_url" value="" />
     <input type="hidden" id="qfield_cloud_user_hidden" name="qfield_cloud_user" value="" />
     <input type="hidden" id="qfield_cloud_password_hidden" name="qfield_cloud_password" value="" />
+    <input type="hidden" id="qfield_cloud_org_hidden" name="qfield_cloud_org" value="" />
   </form>
 
   <div id="finalise-status" class="ftm-step__status"></div>
@@ -112,7 +113,17 @@
         </div>
 
         <div id="qfield-credentials-fields" style="display: none">
-          <div>
+          <wa-radio-group
+            id="qfield-mode-radio"
+            label="{{ _('Where should this project live?') }}"
+            value="official"
+            style="margin-bottom: 10px"
+          >
+            <wa-radio value="official">{{ _("Use my account on app.qfield.cloud") }}</wa-radio>
+            <wa-radio value="custom">{{ _("Use a custom-hosted QFieldCloud instance") }}</wa-radio>
+          </wa-radio-group>
+
+          <div id="qfield-url-row" style="display: none">
             <label class="ftm-split-label"
               >{{ _("QField Cloud URL") }} <span class="ftm-form-required">*</span></label
             >
@@ -145,6 +156,16 @@
               id="qfield-password-input"
               name="qfield_cloud_password"
               placeholder="{{ _('qfield_password') }}"
+              style="width: 100%"
+            ></wa-input>
+          </div>
+          <div>
+            <label class="ftm-split-label">{{ _("Organisation name") }}</label>
+            <wa-input
+              type="text"
+              id="qfield-org-input"
+              name="qfield_cloud_org"
+              placeholder="{{ _('Optional — leave blank to create under your username') }}"
               style="width: 100%"
             ></wa-input>
           </div>

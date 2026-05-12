@@ -17,7 +17,13 @@ export function initProjectSetupFinalizeCredentials({
 }) {
   const isOdk = projectType === "ODK";
   const isQField = projectType === "QField";
+  const OFFICIAL_QFIELDCLOUD_URL = "https://app.qfield.cloud";
   let customCreds = null;
+
+  function getQFieldMode() {
+    const modeRadio = document.getElementById("qfield-mode-radio");
+    return modeRadio?.value === "custom" ? "custom" : "official";
+  }
 
   function showError(message, variant = "danger") {
     if (credentialsError) {
@@ -34,10 +40,17 @@ export function initProjectSetupFinalizeCredentials({
       };
     }
     if (isQField) {
+      const mode = getQFieldMode();
+      const url =
+        mode === "custom"
+          ? document.getElementById("qfield-url-input")?.value?.trim()
+          : OFFICIAL_QFIELDCLOUD_URL;
       return {
-        url: document.getElementById("qfield-url-input")?.value?.trim(),
+        url,
         username: document.getElementById("qfield-username-input")?.value?.trim(),
         password: document.getElementById("qfield-password-input")?.value?.trim(),
+        org: document.getElementById("qfield-org-input")?.value?.trim() || "",
+        mode,
       };
     }
     return null;
@@ -69,10 +82,29 @@ export function initProjectSetupFinalizeCredentials({
         credentialsModalTitle.textContent = i18nStrings.customQFieldCredentials;
         if (odkCredentialsFields) odkCredentialsFields.style.display = "none";
         if (qfieldCredentialsFields) qfieldCredentialsFields.style.display = "block";
+        updateQFieldUrlVisibility();
       }
 
       credentialsModal.classList.add("ftm-modal-backdrop--visible");
     });
+  }
+
+  function updateQFieldUrlVisibility() {
+    const urlRow = document.getElementById("qfield-url-row");
+    if (!urlRow) return;
+    urlRow.style.display = getQFieldMode() === "custom" ? "block" : "none";
+  }
+
+  if (isQField) {
+    const modeRadio = document.getElementById("qfield-mode-radio");
+    if (modeRadio) {
+      modeRadio.addEventListener("change", function () {
+        updateQFieldUrlVisibility();
+        // Switching modes invalidates any previously-tested credentials
+        customCreds = null;
+        if (credentialsError) credentialsError.innerHTML = "";
+      });
+    }
   }
 
   if (credentialsModal) {
@@ -120,6 +152,7 @@ export function initProjectSetupFinalizeCredentials({
               qfield_cloud_url: creds.url,
               qfield_cloud_user: creds.username,
               qfield_cloud_password: creds.password,
+              qfield_cloud_org: creds.org || null,
             }),
           });
         }
