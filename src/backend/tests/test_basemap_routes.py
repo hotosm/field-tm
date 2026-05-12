@@ -69,7 +69,6 @@ def test_basemap_progress_fragment_uses_manual_status_check_only():
         {
             "project": project,
             "progress_scope": None,
-            "is_initially_processing": True,
             "basemap_size_bytes": 1048576,
             "basemap_minzoom": 10,
             "basemap_maxzoom": 16,
@@ -78,41 +77,38 @@ def test_basemap_progress_fragment_uses_manual_status_check_only():
     )
 
     assert "Status updates automatically every few seconds." not in html
-    assert (
-        "Basemap generation is in progress. "
-        "Use the button below to check the latest status." in html
-    )
-    assert 'hx-trigger="load delay:3s"' not in html
+    assert "Basemap generation is in progress on the imagery server." in html
+    assert "Click below to check whether" in html
+    assert 'hx-trigger="load' not in html
+    assert "every " not in html.lower() or "every few" not in html
     assert html.count('hx-get="/projects/55/basemap/status"') == 1
     assert 'hx-disabled-elt="this"' in html
     compact_html = " ".join(html.split())
     assert 'class="js-basemap-check-text"' in compact_html
     assert "Checking..." in compact_html
-    assert 'js-basemap-spinner" style="display: inline-flex;' in compact_html
+    # The spinner is hidden on initial render — only the click handler reveals it.
+    assert 'js-basemap-spinner" style="display: none;' in compact_html
 
 
 def test_basemap_attach_progress_fragment_shows_initial_processing_state():
-    """Attach progress should render active processing markers on first load."""
+    """Attach progress should render the manual check action without auto-polling."""
     project = Mock(id=56, basemap_attach_status="in_progress")
     html = _render_template(
         "partials/project_details/fragments/basemap_progress.html",
         {
             "project": project,
             "progress_scope": "attach",
-            "is_initially_processing": True,
         },
     )
 
-    assert (
-        "Basemap attach is in progress. "
-        "Use the button below to check the latest status." in html
-    )
-    assert 'hx-trigger="load delay:3s"' not in html
+    assert "Basemap is attaching to the QField project." in html
+    assert 'hx-trigger="load' not in html
     assert html.count('hx-get="/projects/56/basemap/attach-status"') == 1
     compact_html = " ".join(html.split())
     assert 'class="js-basemap-check-text"' in compact_html
     assert "Checking..." in compact_html
-    assert 'js-basemap-spinner" style="display: inline-flex;' in compact_html
+    # The spinner stays hidden until the user actually clicks Check Status.
+    assert 'js-basemap-spinner" style="display: none;' in compact_html
 
 
 def test_basemap_attach_progress_fragment_shows_warning_and_retry_on_failed_attach():
@@ -130,7 +126,6 @@ def test_basemap_attach_progress_fragment_shows_warning_and_retry_on_failed_atta
         {
             "project": project,
             "progress_scope": "attach",
-            "is_initially_processing": False,
         },
     )
 
@@ -686,6 +681,100 @@ async def test_basemap_status_transitions_to_ready(monkeypatch):
     )
 
 
+async def test_basemap_status_auto_attaches_for_pending_autostart_project(
+    monkeypatch,
+):
+    """Manual status poll should auto-enqueue attach for autostart-marked projects."""
+    project = Mock(
+        id=171,
+        basemap_stac_item_id="item",
+        basemap_url=None,
+        basemap_attach_status="pending_autostart",
+    )
+    refreshed_project = Mock(
+        field_mapping_app=FieldMappingApp.QFIELD,
+        basemap_stac_item_id="item",
+        basemap_attach_status="in_progress",
+        basemap_minzoom=None,
+        basemap_maxzoom=None,
+    )
+    db = Mock()
+    db.commit = AsyncMock()
+
+    monkeypatch.setattr(
+        basemap_routes,
+        "check_tilepack_status",
+        AsyncMock(return_value=("ready", "https://tiles/ready.mbtiles")),
+    )
+    update_mock = AsyncMock()
+    monkeypatch.setattr(basemap_routes.DbProject, "update", update_mock)
+    monkeypatch.setattr(
+        basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
+    )
+    create_task_mock = Mock()
+    monkeypatch.setattr(basemap_attach_flow.asyncio, "create_task", create_task_mock)
+
+    response = await basemap_routes.basemap_status_htmx.fn(
+        request=Mock(query_params={}),
+        db=db,
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=171,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.template_name.endswith("basemap_ready.html")
+    # Two updates: status route persists ready/url, then attach enqueue flips
+    # attach_status to in_progress.
+    assert update_mock.await_count == 2
+    last_update = update_mock.await_args_list[-1].args[2]
+    assert last_update.basemap_attach_status == "in_progress"
+    create_task_mock.assert_called_once()
+
+
+async def test_basemap_status_does_not_auto_attach_for_manual_flow(monkeypatch):
+    """Manual generate flow should NOT auto-enqueue attach when status flips ready."""
+    project = Mock(
+        id=172,
+        basemap_stac_item_id="item",
+        basemap_url=None,
+        basemap_attach_status="idle",
+    )
+    refreshed_project = Mock(
+        field_mapping_app=FieldMappingApp.QFIELD,
+        basemap_stac_item_id="item",
+        basemap_attach_status="idle",
+        basemap_minzoom=None,
+        basemap_maxzoom=None,
+    )
+    db = Mock()
+    db.commit = AsyncMock()
+
+    monkeypatch.setattr(
+        basemap_routes,
+        "check_tilepack_status",
+        AsyncMock(return_value=("ready", "https://tiles/ready.mbtiles")),
+    )
+    monkeypatch.setattr(basemap_routes.DbProject, "update", AsyncMock())
+    monkeypatch.setattr(
+        basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
+    )
+    create_task_mock = Mock()
+    monkeypatch.setattr(basemap_attach_flow.asyncio, "create_task", create_task_mock)
+
+    response = await basemap_routes.basemap_status_htmx.fn(
+        request=Mock(query_params={}),
+        db=db,
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=172,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.template_name.endswith("basemap_ready.html")
+    create_task_mock.assert_not_called()
+
+
 async def test_basemap_status_progress_preserves_size_context(monkeypatch):
     """Status polling should preserve size and zoom context while generating."""
     project = Mock(id=19, basemap_stac_item_id="item", basemap_url=None)
@@ -794,7 +883,7 @@ async def test_basemap_status_preserves_generating_state_on_status_refresh_failu
 
     assert response.status_code == status.HTTP_200_OK
     assert response.template_name.endswith("basemap_progress.html")
-    assert response.context["is_initially_processing"] is True
+    assert response.context["progress_scope"] == "generation"
     assert response.context["basemap_size_bytes"] == 1048576
     update_mock.assert_not_awaited()
     db.commit.assert_not_awaited()
@@ -863,14 +952,22 @@ async def test_basemap_attach_requires_ready_status():
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-async def test_basemap_attach_requires_download_url():
-    """Attach should reject ready basemaps that do not have a download URL."""
+async def test_basemap_attach_requires_download_url(monkeypatch):
+    """Attach should reject ready basemaps that have no URL and cannot self-heal."""
     project = Mock(
         id=24,
         status=ProjectStatus.PUBLISHED,
         field_mapping_app=FieldMappingApp.QFIELD,
         basemap_status="ready",
+        basemap_stac_item_id="item-stale",
         basemap_url=None,
+    )
+
+    # Upstream still has no URL → reconcile cannot self-heal, attach should bail.
+    monkeypatch.setattr(
+        basemap_attach_flow,
+        "check_tilepack_status",
+        AsyncMock(return_value=("generating", None)),
     )
 
     response = await basemap_routes.basemap_attach_htmx.fn(
@@ -882,6 +979,59 @@ async def test_basemap_attach_requires_download_url():
     )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "Basemap download URL is not available yet" in str(response.content)
+
+
+async def test_basemap_attach_self_heals_missing_url_from_upstream(monkeypatch):
+    """Attach should recover a ready basemap when upstream now has the URL."""
+    project = Mock(
+        id=124,
+        status=ProjectStatus.PUBLISHED,
+        field_mapping_app=FieldMappingApp.QFIELD,
+        basemap_status="ready",
+        basemap_stac_item_id="item-recovered",
+        basemap_url=None,
+        basemap_attach_status=None,
+    )
+    refreshed_project = Mock(
+        id=124,
+        field_mapping_app=FieldMappingApp.QFIELD,
+        basemap_attach_status="in_progress",
+    )
+    db = Mock()
+    db.commit = AsyncMock()
+
+    monkeypatch.setattr(
+        basemap_attach_flow,
+        "check_tilepack_status",
+        AsyncMock(return_value=("ready", "https://tiles/recovered.mbtiles")),
+    )
+    monkeypatch.setattr(
+        basemap_attach_flow,
+        "get_missing_basemap_attach_config",
+        Mock(return_value=[]),
+    )
+    update_mock = AsyncMock()
+    monkeypatch.setattr(basemap_routes.DbProject, "update", update_mock)
+    monkeypatch.setattr(
+        basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
+    )
+    monkeypatch.setattr(basemap_attach_flow.asyncio, "create_task", Mock())
+
+    response = await basemap_routes.basemap_attach_htmx.fn(
+        request=Mock(),
+        db=db,
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=124,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.template_name.endswith("basemap_progress.html")
+    assert response.context["progress_scope"] == "attach"
+    # Two updates: reconcile persists URL, then start_basemap_attach marks attach.
+    assert update_mock.await_count == 2
+    assert project.basemap_url == "https://tiles/recovered.mbtiles"
 
 
 async def test_basemap_attach_missing_config_returns_clean_error(monkeypatch):

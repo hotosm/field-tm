@@ -13,7 +13,8 @@ from litestar import status_codes as status
 
 from app.config import AuthProvider, settings
 from app.htmx.project_create.project_create_page_routes import (
-    new_project,
+    new_project_chooser,
+    new_project_custom,
     new_project_simple,
 )
 from app.htmx.project_create.project_create_parsing import (
@@ -995,7 +996,7 @@ async def test_resume_simple_project_tilepack_if_needed_updates_status(
     update_mock.assert_awaited_once()
     update_payload = update_mock.await_args.args[2]
     assert update_payload.basemap_status == "generating"
-    assert update_payload.basemap_attach_status == "idle"
+    assert update_payload.basemap_attach_status == "pending_autostart"
     db.commit.assert_awaited_once()
     create_task_mock.assert_not_called()
 
@@ -1091,10 +1092,25 @@ async def test_new_project_redirects_guests_to_login(monkeypatch):
     request.url.path = "/new"
     request.headers = {}
 
-    response = await new_project.fn(request=request, db=Mock(), auth_user=None)
+    response = await new_project_chooser.fn(request=request, auth_user=None)
 
     assert response.status_code == status.HTTP_307_TEMPORARY_REDIRECT
     assert response.headers["Location"] == "/login?return_to=%2Fnew"
+
+
+async def test_new_project_custom_redirects_guests_to_login(monkeypatch):
+    """The custom-project page should redirect unauthenticated guests to login."""
+    monkeypatch.setattr(settings, "DEBUG", False)
+    monkeypatch.setattr(settings, "AUTH_PROVIDER", AuthProvider.BUNDLED)
+
+    request = Mock()
+    request.url.path = "/new/custom"
+    request.headers = {}
+
+    response = await new_project_custom.fn(request=request, auth_user=None)
+
+    assert response.status_code == status.HTTP_307_TEMPORARY_REDIRECT
+    assert response.headers["Location"] == "/login?return_to=%2Fnew%2Fcustom"
 
 
 async def test_new_project_simple_redirects_guests_to_login(monkeypatch):
@@ -1108,7 +1124,6 @@ async def test_new_project_simple_redirects_guests_to_login(monkeypatch):
 
     response = await new_project_simple.fn(
         request=request,
-        db=Mock(),
         auth_user=None,
     )
 
@@ -1125,7 +1140,7 @@ async def test_new_project_htmx_redirects_guests_with_hx_redirect(monkeypatch):
     request.url.path = "/new"
     request.headers = {"HX-Request": "true"}
 
-    response = await new_project.fn(request=request, db=Mock(), auth_user=None)
+    response = await new_project_chooser.fn(request=request, auth_user=None)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.headers["HX-Redirect"] == "/login?return_to=%2Fnew"
@@ -1144,7 +1159,6 @@ async def test_new_project_simple_htmx_redirects_guests_with_hx_redirect(
 
     response = await new_project_simple.fn(
         request=request,
-        db=Mock(),
         auth_user=None,
     )
 
@@ -1152,25 +1166,27 @@ async def test_new_project_simple_htmx_redirects_guests_with_hx_redirect(
     assert response.headers["HX-Redirect"] == "/login?return_to=%2Fnew%2Fsimple"
 
 
-async def test_new_project_page_renders_simple_cta(client):
-    """Standard create page should link directly to simple page."""
+async def test_new_project_page_renders_both_workflow_cards(client):
+    """Chooser page should link to both the simple and custom workflows."""
     response = await client.get("/new", headers={"HX-Request": "true"})
 
     assert response.status_code == status.HTTP_200_OK
     assert 'href="/new/simple"' in response.text
-    assert "Create Project" in response.text
+    assert 'href="/new/custom"' in response.text
+    assert "Map buildings" in response.text
+    assert "Something else" in response.text
 
 
-async def test_new_project_and_simple_share_map_ids(client):
-    """Both new-project pages should expose shared map element contracts."""
-    standard_response = await client.get("/new", headers={"HX-Request": "true"})
+async def test_new_project_custom_and_simple_share_map_ids(client):
+    """Custom and simple project-create pages should expose shared map elements."""
+    custom_response = await client.get("/new/custom", headers={"HX-Request": "true"})
     simple_response = await client.get("/new/simple", headers={"HX-Request": "true"})
 
-    assert standard_response.status_code == status.HTTP_200_OK
+    assert custom_response.status_code == status.HTTP_200_OK
     assert simple_response.status_code == status.HTTP_200_OK
 
-    assert 'id="map"' in standard_response.text
-    assert 'id="outline-geojson"' in standard_response.text
+    assert 'id="map"' in custom_response.text
+    assert 'id="outline-geojson"' in custom_response.text
     assert 'id="map"' in simple_response.text
     assert 'id="outline-geojson"' in simple_response.text
 
@@ -1209,6 +1225,8 @@ def test_new_project_simple_template_has_submit_loading_indicator():
     assert "Creating project and preparing map" in rendered
     assert 'id="submit-btn"' in rendered
     assert "aria-busy" in rendered
+    assert 'getResponseHeader("HX-Redirect")' in rendered
+    assert 'startsWith("/projects/")' in rendered
 
 
 def test_new_project_simple_template_uses_gettext_for_map_strings():
@@ -1222,7 +1240,7 @@ def test_new_project_simple_template_uses_gettext_for_map_strings():
 
     translations = {
         "Create Project": "Crear proyecto",
-        "Back to Standard Form": "Volver al formulario estandar",
+        "Switch to Custom Project": "Cambiar a proyecto personalizado",
         "Creating project and preparing map...": (
             "Creando proyecto y preparando mapa..."
         ),
@@ -1249,7 +1267,7 @@ def test_new_project_simple_template_uses_gettext_for_map_strings():
     rendered = env.get_template("new_project_simple.html").render()
 
     assert "Crear proyecto" in rendered
-    assert "Volver al formulario estandar" in rendered
+    assert "Cambiar a proyecto personalizado" in rendered
     assert "Creando proyecto y preparando mapa..." in rendered
     assert '"Superficie"' in rendered
     assert '"Geometria invalida"' in rendered

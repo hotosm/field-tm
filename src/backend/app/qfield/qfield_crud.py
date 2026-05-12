@@ -17,6 +17,7 @@
 #
 """Logic for interaction with QFieldCloud & data."""
 
+import asyncio
 import base64
 import json
 import logging
@@ -45,6 +46,7 @@ from psycopg import AsyncConnection
 from qfieldcloud_sdk.interfaces import QfcRequestException
 from qfieldcloud_sdk.sdk import (
     FileTransferType,
+    JobTypes,
     OrganizationMemberRole,
     ProjectCollaboratorRole,
 )
@@ -232,12 +234,7 @@ def _build_qfc_service_account_email(username: str) -> str:
     if not local_part:
         local_part = "ftm-qfield-user"
 
-    domain = (settings.FTM_DOMAIN or "field.localhost").strip().lower()
-    domain = re.sub(r"[^a-z0-9.-]+", "-", domain).strip(".-")
-    if not domain or "." not in domain:
-        domain = "noreply.local"
-
-    return f"{local_part}@{domain}"
+    return f"{local_part}@fieldtm.org"
 
 
 # ---------------------------------------------------------------------------
@@ -721,6 +718,93 @@ async def _delete_qgis_job(db: AsyncConnection, job_id) -> None:
     log.debug("Deleted QGIS job %s", job_id)
 
 
+async def _wait_for_projectfile_processing(
+    *,
+    loop,
+    client,
+    api_project_id: str,
+    attempts: int = 3,
+    poll_interval: float = 2.0,
+    poll_timeout: float = 180.0,
+) -> None:
+    """Trigger process_projectfile, poll until it finishes, retry on failure.
+
+    QFieldCloud auto-enqueues a process_projectfile job when the .qgz is
+    uploaded, but the qfield-app gunicorn worker can drop in-flight requests
+    when it rotates on max-requests. That leaves the job seeing an incomplete
+    project (e.g. missing .qgz) and silently no-oping. We explicitly trigger
+    with force=True and poll, retrying if the job ends in ``failed``.
+    """
+    last_status: Optional[str] = None
+    for attempt in range(1, attempts + 1):
+        job = await loop.run_in_executor(
+            None,
+            partial(
+                client.job_trigger,
+                api_project_id,
+                JobTypes.PROCESS_PROJECTFILE,
+                force=True,
+            ),
+        )
+        job_id = job.get("id")
+        if not job_id:
+            log.warning(
+                "QFC job_trigger returned no id on attempt %d for project %s",
+                attempt,
+                api_project_id,
+            )
+            continue
+
+        elapsed = 0.0
+        while elapsed < poll_timeout:
+            await asyncio.sleep(poll_interval)
+            elapsed += poll_interval
+            try:
+                status_resp = await loop.run_in_executor(
+                    None, partial(client.job_status, job_id)
+                )
+            except Exception as exc:
+                log.warning(
+                    "QFC job_status failed on attempt %d for job %s: %s",
+                    attempt,
+                    job_id,
+                    exc,
+                )
+                continue
+            last_status = status_resp.get("status")
+            if last_status == "finished":
+                log.info(
+                    "QFC process_projectfile finished on attempt %d for project %s",
+                    attempt,
+                    api_project_id,
+                )
+                return
+            if last_status == "failed":
+                log.warning(
+                    "QFC process_projectfile failed on attempt %d for project %s",
+                    attempt,
+                    api_project_id,
+                )
+                break
+        else:
+            log.warning(
+                "QFC process_projectfile timed out on attempt %d for project %s "
+                "(last status: %s)",
+                attempt,
+                api_project_id,
+                last_status,
+            )
+
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=_(
+            "QFieldCloud did not finish processing the project file after "
+            "%(attempts)d attempts (last status: %(status)s)."
+        )
+        % {"attempts": attempts, "status": last_status or "unknown"},
+    )
+
+
 async def _call_qgis_wrapper(
     *,
     job_id: str,
@@ -915,6 +999,17 @@ async def _upload_to_qfieldcloud(
                 ),
             )
             log.debug("Upload complete: %s", upload_info)
+
+            # The qfield-app's gunicorn worker can rotate on max-requests
+            # mid-upload, dropping the in-flight .qgz upload or the
+            # auto-enqueued process_projectfile job. Re-trigger explicitly
+            # and poll, retrying on failure, so we don't end up with a
+            # half-processed project the user cannot open in QField.
+            await _wait_for_projectfile_processing(
+                loop=loop,
+                client=client,
+                api_project_id=api_project_id,
+            )
         except Exception as e:
             # Rollback: delete the QFieldCloud project on upload failure
             log.warning(

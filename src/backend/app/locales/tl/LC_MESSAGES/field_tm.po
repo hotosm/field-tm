@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-05-10 03:59+0100\n"
+"POT-Creation-Date: 2026-05-11 22:06+0100\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: tl\n"
@@ -30,64 +30,48 @@ msgstr ""
 
 #: app/main.py:286
 msgid "Could not connect to database"
-msgstr ""
-"Hindi makakonekta sa database\n"
-"Walang wastong identifier ang"
+msgstr "Hindi makakonekta sa database"
 
 #: app/auth/auth_deps.py:73
 msgid "Authenticated user is missing a valid identifier."
-msgstr ""
-"Authenticated user.\n"
-"Ang gumagamit ng"
+msgstr "Authenticated user."
 
 #: app/auth/roles.py:142
 msgid "User must be an administrator"
-msgstr ""
-"ay dapat na isang administrator\n"
-"Walang pahintulot ang"
+msgstr "ay dapat na isang administrator"
 
 #: app/auth/roles.py:163
 msgid "User does not have permission to access the project."
-msgstr ""
-"User na i-access ang proyekto.\n"
-"Naka-lock ang"
+msgstr "User na i-access ang proyekto."
 
 #: app/auth/roles.py:234
 #, python-format
 msgid "Project is locked since it is in %(state)s state."
-msgstr ""
-"Project dahil nasa %(state)s state ito.\n"
-"Ang"
+msgstr "Project dahil nasa %(state)s state ito."
 
 #: app/auth/user_crud.py:88
 #, python-format
 msgid "User (%(user_sub)s) could not be inserted in db"
-msgstr ""
-"User (%(user_sub)s) ay hindi maipasok sa db\n"
-"Nabigong i-upload ng"
+msgstr "User (%(user_sub)s) ay hindi maipasok sa db"
 
 #: app/central/central_crud.py:151
 #, python-format
 msgid "Error listing projects on ODK Central: %(error)s"
-msgstr "Buksan ang proyekto sa ODK Central"
+msgstr "Error sa paglilista ng mga proyekto sa ODK Central: %(error)s"
 
 #: app/central/central_crud.py:182
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
-msgstr "Buksan ang proyekto sa ODK Central"
+msgstr "Error sa paggawa ng proyekto sa ODK Central: %(error)s"
 
 #: app/central/central_crud.py:244
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
-msgstr ""
-"ang form sa ODK Central: %(error)s\n"
-"Kinakailangan ng"
+msgstr "ang form sa ODK Central: %(error)s"
 
 #: app/central/central_crud.py:259
 msgid "form_id is required to list submissions with pyodk."
-msgstr ""
-"form_id upang ilista ang mga pagsusumite na may pyodk.\n"
-"Di-wasto ang"
+msgstr "form_id upang ilista ang mga pagsusumite na may pyodk."
 
 #: app/central/central_crud.py:302
 #, python-format
@@ -96,15 +80,11 @@ msgstr "XLSForm: %(error)s"
 
 #: app/central/central_crud.py:429
 msgid "Conversion GeoJSON --> CSV failed"
-msgstr ""
-"Conversion GeoJSON --> Nabigo ang CSV\n"
-"Wala pang isinumite ang"
+msgstr "Conversion GeoJSON --> Nabigo ang CSV"
 
 #: app/central/central_crud.py:500
 msgid "Project contains no submissions yet"
-msgstr ""
-"Project\n"
-"Ang field ng data ng 'geometry' ng"
+msgstr "Project"
 
 #: app/central/central_crud.py:562
 msgid "'geometry' data field is mandatory"
@@ -114,25 +94,20 @@ msgstr "ay sapilitan"
 msgid "ODK project_id is missing; cannot create/merge entity lists."
 msgstr ""
 "ODK project_id ay nawawala; hindi maaaring gumawa/magsama ng mga listahan"
-" ng entity.\n"
-"Hindi makabuo ng token ang"
+" ng entity."
 
 #: app/central/central_crud.py:963
 msgid "Could not generate token for app user."
-msgstr ""
-"para sa user ng app.\n"
-"Hindi maitalaga ng"
+msgstr "para sa user ng app."
 
 #: app/central/central_crud.py:995 app/central/central_crud.py:1001
 msgid "An error occurred while creating the app user token."
-msgstr "May nangyaring hindi inaasahang error habang ginagawa ang QR code."
+msgstr "May naganap na error habang ginagawa ang token ng user ng app."
 
 #: app/central/central_crud.py:1015
 #, python-format
 msgid "Could not assign %(scope)s role to app user."
-msgstr ""
-"ang tungkulin ng PTOKEN0X sa user ng app.\n"
-"Walang ibinalik na user ID ang"
+msgstr "Hindi maitalaga ang tungkuling %(scope)s sa user ng app."
 
 #: app/central/central_crud.py:1054
 msgid "Could not find 'Project Manager' role in ODK Central."
@@ -140,15 +115,11 @@ msgstr "Buksan ang proyekto sa ODK Central"
 
 #: app/central/central_crud.py:1079
 msgid "ODK Central returned no user ID after creation."
-msgstr ""
-"ODK Central pagkatapos gawin.\n"
-"Nabigo ang"
+msgstr "ODK Central pagkatapos gawin."
 
 #: app/central/central_crud.py:1212
 msgid "Failed to create ODK Central manager user."
-msgstr ""
-"na gumawa ng user ng tagapamahala ng ODK Central.\n"
-"Nabigo ang"
+msgstr "na gumawa ng user ng tagapamahala ng ODK Central."
 
 #: app/central/central_crud.py:1232
 msgid "Unexpected error while testing ODK Central credentials."
@@ -166,16 +137,12 @@ msgstr "Walang ibinigay na data extract."
 #: app/helpers/basemap_services.py:26
 #, python-format
 msgid "%(action)s failed with HTTP %(status_code)s."
-msgstr ""
-"%(action)s gamit ang HTTP %(status_code)s.\n"
-"Nabigo ang"
+msgstr "%(action)s gamit ang HTTP %(status_code)s."
 
 #: app/helpers/basemap_services.py:40
 #, python-format
 msgid "%(action)s failed due to upstream connection error."
-msgstr ""
-"%(action)s dahil sa error sa upstream na koneksyon.\n"
-"Ang"
+msgstr "%(action)s dahil sa error sa upstream na koneksyon."
 
 #: app/helpers/basemap_services.py:178
 #, python-format
@@ -426,60 +393,47 @@ msgstr "Hindi umiiral ang user na ito. Pakigawa muna ito."
 msgid "This user is already a collaborator on this project."
 msgstr "Kasali na ang user na ito bilang collaborator sa proyektong ito."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1199
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1257
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "Nabigong magdagdag ng collaborator: %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:82
-#, python-format
-msgid ""
-"This project belongs to the %(organization)s organization. The user must "
-"be added to that organization before they can be added as a collaborator."
-" Your QFieldCloud account does not have permission to manage organization"
-" members."
-msgstr ""
-"Ang proyektong ito ay pag-aari ng organisasyong %(organization)s. Dapat "
-"munang idagdag ang user sa organisasyong iyon bago siya maidagdag bilang "
-"collaborator. Walang pahintulot ang iyong QFieldCloud account na mamahala"
-" ng mga miyembro ng organisasyon."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:119
+#: app/htmx/qfc_admin/qfc_admin_routes.py:106
 msgid "All fields are required."
 msgstr "Kinakailangan ang lahat ng field."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:134
+#: app/htmx/qfc_admin/qfc_admin_routes.py:121
 msgid "Login succeeded but no token received."
 msgstr "Matagumpay ang pag-login ngunit walang natanggap na token."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:142
+#: app/htmx/qfc_admin/qfc_admin_routes.py:129
 msgid "Login failed. Check your URL and credentials."
 msgstr "Nabigo ang pag-login. Suriin ang iyong URL at mga kredensyal."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:181
+#: app/htmx/qfc_admin/qfc_admin_routes.py:168
 msgid "Session expired. Please log in again."
 msgstr "Nag-expire ang session. Mangyaring mag-log in muli."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:196
+#: app/htmx/qfc_admin/qfc_admin_routes.py:183
 #, python-format
 msgid "Could not load collaborators: %(exc)s"
 msgstr "Hindi ma-load ang mga collaborator: %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:227
+#: app/htmx/qfc_admin/qfc_admin_routes.py:214
 msgid "Username is required."
 msgstr "Kinakailangan ang username."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:281
+#: app/htmx/qfc_admin/qfc_admin_routes.py:268
 #, python-format
 msgid "Failed to remove collaborator: %(exc)s"
 msgstr "Nabigong alisin ang collaborator: %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:324
+#: app/htmx/qfc_admin/qfc_admin_routes.py:311
 #, python-format
 msgid "Failed to update collaborator: %(exc)s"
 msgstr "Nabigong i-update ang collaborator: %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:351
+#: app/htmx/qfc_admin/qfc_admin_routes.py:338
 #, python-format
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "Nabigo ang pag-refresh ng collaborator: %(exc)s"
@@ -550,7 +504,7 @@ msgid "Visibility"
 msgstr "Pagiging nakikita"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/new_project.html:58 app/templates/project_details.html:58
+#: app/templates/project_details.html:58
 msgid "Description"
 msgstr "Paglalarawan"
 
@@ -573,7 +527,7 @@ msgid "from this project?"
 msgstr "mula sa proyektong ito?"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
-#: app/templates/new_project.html:133
+#: app/templates/new_project_custom.html:156
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:66
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:156
 msgid "Cancel"
@@ -868,7 +822,6 @@ msgid "Invalid task areas data format."
 msgstr "Hindi wastong format ng data para sa task areas."
 
 #: app/htmx/setup_steps/setup_step_split_routes.py:357
-#: app/templates/partials/project_details/setup_steps/step4_split.html:21
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ Matagumpay na na-save ang mga hinating gawain"
 
@@ -906,9 +859,7 @@ msgstr ""
 
 #: app/projects/project_crud.py:147
 msgid "Failed to generate data extract from the raw data API."
-msgstr ""
-"Nabigong bumuo ng data extract mula sa raw data API.\n"
-"Walang laman ang nilalaman ng Template ng"
+msgstr "Nabigong bumuo ng data extract mula sa raw data API."
 
 #: app/projects/project_crud.py:901
 msgid "QField project ID not found."
@@ -953,109 +904,90 @@ msgstr "Lugar {latitude:.4f}_{longitude:.4f}"
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:110
+#: app/qfield/qfield_crud.py:164
 msgid "Project outline is missing or has no geometry."
 msgstr "Project."
 
-#: app/qfield/qfield_crud.py:116
+#: app/qfield/qfield_crud.py:170
 msgid "Project outline geometry has no coordinates."
-msgstr ""
-"Project outline geometry ay walang mga coordinate.\n"
-"Kinakailangan ang"
+msgstr "Project outline geometry ay walang mga coordinate."
 
-#: app/qfield/qfield_crud.py:425
+#: app/qfield/qfield_crud.py:479
 msgid "Project outline is required for QField project creation."
 msgstr "✓ Hindi kailangan ang paghahati ng gawain para sa setup ng proyektong ito."
 
-#: app/qfield/qfield_crud.py:430
+#: app/qfield/qfield_crud.py:484
 msgid "XLSForm is required for QField project creation."
-msgstr ""
-"XLSForm para sa paggawa ng proyekto ng QField.\n"
-"Nabigong baguhin ng"
+msgstr "XLSForm para sa paggawa ng proyekto ng QField."
 
-#: app/qfield/qfield_crud.py:447
+#: app/qfield/qfield_crud.py:501
 msgid "Failed to modify XLSForm for QField."
-msgstr ""
-"ang XLSForm para sa QField.\n"
-"Nakumpleto ang"
+msgstr "ang XLSForm para sa QField."
 
-#: app/qfield/qfield_crud.py:488
+#: app/qfield/qfield_crud.py:542
 msgid "QGIS wrapper completed but wrote no output files."
-msgstr ""
-"QGIS wrapper ngunit walang naisulat na mga output file.\n"
-"Nakumpleto ang"
+msgstr "QGIS wrapper ngunit walang naisulat na mga output file."
 
-#: app/qfield/qfield_crud.py:500
+#: app/qfield/qfield_crud.py:554
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS wrapper ngunit walang .qgz file sa output."
 
-#: app/qfield/qfield_crud.py:530
+#: app/qfield/qfield_crud.py:584
 msgid "QField project ID is missing; cannot attach basemap."
-msgstr ""
-"QField project ID ay nawawala; hindi makapag-attach ng basemap.\n"
-"Nabigo ang pagbuo ng proyekto ng"
+msgstr "QField project ID ay nawawala; hindi makapag-attach ng basemap."
 
-#: app/qfield/qfield_crud.py:564
+#: app/qfield/qfield_crud.py:618
 msgid "Basemap attach completed but produced no project files."
 msgstr "Naikabit na ang basemap sa proyekto ng QField."
 
-#: app/qfield/qfield_crud.py:713 app/qfield/qfield_crud.py:727
+#: app/qfield/qfield_crud.py:771 app/qfield/qfield_crud.py:785
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
-msgstr ""
-"QGIS: %(error)s\n"
-"Ang"
+msgstr "QGIS: %(error)s"
 
-#: app/qfield/qfield_crud.py:720
+#: app/qfield/qfield_crud.py:778
 msgid "QGIS wrapper returned invalid JSON."
-msgstr ""
-"QGIS wrapper ay nagbalik ng di-wastong JSON.\n"
-"Nabigong i-download ng"
+msgstr "QGIS wrapper ay nagbalik ng di-wastong JSON."
 
-#: app/qfield/qfield_crud.py:744
+#: app/qfield/qfield_crud.py:802
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
-msgstr ""
-"ang basemap MBTiles para sa pag-upload (HTTP %(status)s).\n"
-"Hindi na-upload ng"
+msgstr "ang basemap MBTiles para sa pag-upload (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:759
+#: app/qfield/qfield_crud.py:817
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "I-download ang QR Code"
 
-#: app/qfield/qfield_crud.py:874
+#: app/qfield/qfield_crud.py:932
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
-msgstr ""
-"ang mga file sa QFieldCloud: %(error)s\n"
-"Ang"
+msgstr "ang mga file sa QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1148
+#: app/qfield/qfield_crud.py:1206
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "Hindi nahanap ang proyekto (%(project_id)s)."
 
-#: app/qfield/qfield_crud.py:1168
+#: app/qfield/qfield_crud.py:1226
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
 " to the organization: %(error)s"
 msgstr ""
 "Project ay kabilang sa organisasyong '%(owner)s'. Hindi maidagdag ang "
-"'%(username)s' sa organisasyon: %(error)s\n"
-"Ang"
+"'%(username)s' sa organisasyon: %(error)s"
 
-#: app/qfield/qfield_crud.py:1186
+#: app/qfield/qfield_crud.py:1244
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "User na '%(username)s' ay wala sa QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1193
+#: app/qfield/qfield_crud.py:1251
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
-msgstr "Kasali na ang user na ito bilang collaborator sa proyektong ito."
+msgstr "Ang user na '%(username)s' ay collaborator na sa proyektong ito."
 
-#: app/qfield/qfield_crud.py:1234
+#: app/qfield/qfield_crud.py:1292
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Wasto ang mga kredensyal!"
 
@@ -1115,12 +1047,9 @@ msgstr "Maghanap"
 msgid "Search projects…"
 msgstr "Maghanap ng mga proyekto…"
 
-#: app/templates/home.html:68 app/templates/landing.html:568
-#: app/templates/layout.html:235 app/templates/new_project.html:1
-#: app/templates/new_project.html:20 app/templates/new_project.html:128
-#: app/templates/new_project_simple.html:1
-#: app/templates/new_project_simple.html:4
-#: app/templates/new_project_simple.html:36
+#: app/templates/home.html:68 app/templates/landing.html:503
+#: app/templates/layout.html:280 app/templates/new_project_chooser.html:1
+#: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "Lumikha ng Proyekto"
 
@@ -1173,11 +1102,11 @@ msgstr ""
 "Walang nahanap na proyekto. Gawin ang una mong proyekto para "
 "makapagsimula."
 
-#: app/templates/landing.html:558
+#: app/templates/landing.html:493
 msgid "Coordinate field campaigns"
 msgstr "I-coordinate ang mga field campaign"
 
-#: app/templates/landing.html:561
+#: app/templates/landing.html:496
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
@@ -1185,19 +1114,19 @@ msgstr ""
 "Pinapahusay ang kahusayan at katumpakan ng field mapping sa pamamagitan "
 "ng maayos na koordinasyon."
 
-#: app/templates/landing.html:565
+#: app/templates/landing.html:500
 msgid "Explore Projects"
 msgstr "Tuklasin ang mga Proyekto"
 
-#: app/templates/landing.html:578
+#: app/templates/landing.html:513
 msgid "Loading metrics..."
 msgstr "Nilo-load ang mga sukatan..."
 
-#: app/templates/landing.html:586
+#: app/templates/landing.html:521
 msgid "What is it?"
 msgstr "Ano ito?"
 
-#: app/templates/landing.html:588
+#: app/templates/landing.html:523
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
 "map features\n"
@@ -1207,7 +1136,7 @@ msgstr ""
 "magdagdag ng lokal na kaalaman sa mga feature ng mapa sa pamamagitan ng "
 "pag-coordinate ng field mapping."
 
-#: app/templates/landing.html:592
+#: app/templates/landing.html:527
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
 "mature tools\n"
@@ -1222,21 +1151,21 @@ msgstr ""
 "mga team na mahusay na mangolekta ng geospatial data gamit ang karaniwang"
 " available na mga Android device."
 
-#: app/templates/landing.html:599
+#: app/templates/landing.html:534
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr ""
 "Isang project manager ang nagpapakita ng FieldTM mapping workflow sa "
 "isang laptop"
 
-#: app/templates/landing.html:605
+#: app/templates/landing.html:540
 msgid "Main Features"
 msgstr "Pangunahing Mga Tampok"
 
-#: app/templates/landing.html:608
+#: app/templates/landing.html:543
 msgid "Flexible Data Collection"
 msgstr "Nababagong Pagkolekta ng Data"
 
-#: app/templates/landing.html:610
+#: app/templates/landing.html:545
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
 "workflows that\n"
@@ -1245,11 +1174,11 @@ msgstr ""
 "Sinusuportahan ang iba't ibang survey form, maraming format ng data, at "
 "nababagong workflow na akma sa iba't ibang pangangailangan sa operasyon."
 
-#: app/templates/landing.html:615
+#: app/templates/landing.html:550
 msgid "Open Source and Customizable"
 msgstr "Open Source at Nako-customize"
 
-#: app/templates/landing.html:617
+#: app/templates/landing.html:552
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
 "\n"
@@ -1258,11 +1187,11 @@ msgstr ""
 "Iangkop ang Field-TM sa sarili mong survey logic, mga istruktura ng data,"
 " at mga pangangailangan sa integration."
 
-#: app/templates/landing.html:622
+#: app/templates/landing.html:557
 msgid "Entity-Level Tracking"
 msgstr "Pagsubaybay sa Antas ng Entity"
 
-#: app/templates/landing.html:624
+#: app/templates/landing.html:559
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed\n"
@@ -1271,19 +1200,19 @@ msgstr ""
 "Subaybayan ang progreso ng survey sa antas ng gawain at feature upang "
 "mabilis na makagawa ng desisyong may sapat na basehan ang mga manager."
 
-#: app/templates/landing.html:632
+#: app/templates/landing.html:567
 msgid "Who is it for?"
 msgstr "Para kanino ito?"
 
-#: app/templates/landing.html:635
+#: app/templates/landing.html:570
 msgid "Project Manager"
 msgstr "Tagapamahala ng Proyekto"
 
-#: app/templates/landing.html:636
+#: app/templates/landing.html:571
 msgid "Create and coordinate field campaigns"
 msgstr "Lumikha at mag-coordinate ng mga field campaign"
 
-#: app/templates/landing.html:638
+#: app/templates/landing.html:573
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
 " interest,\n"
@@ -1293,33 +1222,33 @@ msgstr ""
 "mapping project, tukuyin ang mga area of interest, magdisenyo ng mga "
 "survey form, at hatiin ang trabaho sa mga gawaing madaling pamahalaan."
 
-#: app/templates/landing.html:642
+#: app/templates/landing.html:577
 msgid "Define a project area and upload or choose a survey form"
 msgstr "Tukuyin ang lugar ng proyekto at mag-upload o pumili ng survey form"
 
-#: app/templates/landing.html:643
+#: app/templates/landing.html:578
 msgid "Split the area into tasks and generate a data extract"
 msgstr "Hatiin ang lugar sa mga gawain at bumuo ng data extract"
 
-#: app/templates/landing.html:644
+#: app/templates/landing.html:579
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "I-publish ang proyekto sa ODK Central o QFieldCloud"
 
-#: app/templates/landing.html:645
+#: app/templates/landing.html:580
 msgid "Share a QR code so mappers can start collecting data"
 msgstr ""
 "Magbahagi ng QR code upang makapagsimulang mangolekta ng data ang mga "
 "mapper"
 
-#: app/templates/landing.html:649
+#: app/templates/landing.html:584
 msgid "Field Mapper"
 msgstr "Tagapagmapa sa Field"
 
-#: app/templates/landing.html:650
+#: app/templates/landing.html:585
 msgid "Collect data in the field with your phone"
 msgstr "Mangolekta ng data sa field gamit ang iyong telepono"
 
-#: app/templates/landing.html:652
+#: app/templates/landing.html:587
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
 "publishes a\n"
@@ -1330,35 +1259,35 @@ msgstr ""
 "na ng project manager ang isang proyekto, direkta nila itong maa-access "
 "sa mobile app na kanilang pinili."
 
-#: app/templates/landing.html:656
+#: app/templates/landing.html:591
 msgid "Scan the QR code shared by your project manager"
 msgstr "I-scan ang QR code na ibinahagi ng iyong project manager"
 
-#: app/templates/landing.html:657
+#: app/templates/landing.html:592
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "Awtomatikong nilo-load ang proyekto sa ODK Collect o QField"
 
-#: app/templates/landing.html:658
+#: app/templates/landing.html:593
 msgid "Navigate to your assigned task area and collect data"
 msgstr "Pumunta sa nakatalagang task area at mangolekta ng data"
 
-#: app/templates/landing.html:659
+#: app/templates/landing.html:594
 msgid "Submit your survey, which goes straight to the server"
 msgstr "Isumite ang iyong survey, na direktang mapupunta sa server"
 
-#: app/templates/landing.html:666
+#: app/templates/landing.html:601
 msgid "Field-TM Use Cases"
 msgstr "Mga Use Case ng Field-TM"
 
-#: app/templates/landing.html:671
+#: app/templates/landing.html:606
 msgid "Field mapping in progress"
 msgstr "Isinasagawang field mapping"
 
-#: app/templates/landing.html:676
+#: app/templates/landing.html:611
 msgid "1. Community Mapping"
 msgstr "1. Pagmamapa ng Komunidad"
 
-#: app/templates/landing.html:678
+#: app/templates/landing.html:613
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public\n"
@@ -1368,11 +1297,11 @@ msgstr ""
 " ang mga impormal na pamayanan, pampublikong pasilidad, at lokal na "
 "serbisyo para sa inklusibong pagpaplano."
 
-#: app/templates/landing.html:683
+#: app/templates/landing.html:618
 msgid "2. Urban Planning and Management"
 msgstr "2. Urban Planning at Pamamahala"
 
-#: app/templates/landing.html:685
+#: app/templates/landing.html:620
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities\n"
@@ -1382,11 +1311,11 @@ msgstr ""
 "survey ng mga bahay, kalsada, at utility gamit ang malinaw at madaling "
 "pamahalaang mga gawaing pang-mapping."
 
-#: app/templates/landing.html:690
+#: app/templates/landing.html:625
 msgid "3. Disaster Response and Recovery"
 msgstr "3. Pagtugon at Pagbangon mula sa Sakuna"
 
-#: app/templates/landing.html:692
+#: app/templates/landing.html:627
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
 "volunteers, and\n"
@@ -1396,73 +1325,69 @@ msgstr ""
 "i-coordinate ang mga boluntaryo, at maghatid ng mapagkakatiwalaang data "
 "para sa mga operasyong pangtulong."
 
-#: app/templates/landing.html:701
+#: app/templates/landing.html:636
 msgid "Resources"
 msgstr "Mga Resource"
 
-#: app/templates/landing.html:709
+#: app/templates/landing.html:644
 msgid "Data Prep"
 msgstr "Paghahanda ng Data"
 
-#: app/templates/landing.html:710
+#: app/templates/landing.html:645
 msgid "HOT Export Tool"
 msgstr "Kasangkapan sa Pag-export ng HOT"
 
-#: app/templates/landing.html:712
+#: app/templates/landing.html:647
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr ""
 "Mag-download ng task-ready na geospatial data extract para sa lugar ng "
 "iyong proyekto."
 
-#: app/templates/landing.html:721 app/templates/landing.html:733
+#: app/templates/landing.html:656 app/templates/landing.html:668
 msgid "Documentation"
 msgstr "Dokumentasyon"
 
-#: app/templates/landing.html:722
+#: app/templates/landing.html:657
 msgid "ODK Central Guide"
 msgstr "Gabay sa ODK Central"
 
-#: app/templates/landing.html:724
+#: app/templates/landing.html:659
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr ""
 "Alamin kung paano pamahalaan ang mga form, app user, at mga field "
 "submission sa ODK."
 
-#: app/templates/landing.html:734
+#: app/templates/landing.html:669
 msgid "QField Guide"
 msgstr "Gabay sa QField"
 
-#: app/templates/landing.html:736
+#: app/templates/landing.html:671
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "I-set up ang mga proyekto sa QFieldCloud at mga mobile workflow para sa "
 "offline mapping."
 
-#: app/templates/landing.html:746
+#: app/templates/landing.html:681
 msgid "Need assistance?"
 msgstr "Kailangan ng tulong?"
 
-#: app/templates/landing.html:747
+#: app/templates/landing.html:682
 msgid "Email:"
 msgstr "Adres ng email:"
-
-#: app/templates/landing.html:763
-msgid "Language"
-msgstr "Wika"
 
 #: app/templates/layout.html:13
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Koordinadong field mapping para sa mga kampanya ng Open Mapping."
 
-#: app/templates/layout.html:168 app/templates/login.html:1
+#: app/templates/layout.html:195 app/templates/login.html:1
 msgid "Login"
 msgstr "Mag-login"
 
-#: app/templates/layout.html:228
+#: app/templates/layout.html:273
 msgid "Projects"
 msgstr "Mga Proyekto"
 
-#: app/templates/layout.html:242
+#: app/templates/layout.html:287
 msgid "QField Admin"
 msgstr "Administrator ng QField"
 
@@ -1486,84 +1411,261 @@ msgstr "Naka-disable ang authentication sa deployment na ito."
 msgid "Back to home"
 msgstr "Bumalik sa home"
 
-#: app/templates/new_project.html:4
-msgid "Create New Project"
-msgstr "Lumikha ng Bagong Proyekto"
+#: app/templates/new_project_chooser.html:4
+msgid "What do you want to map?"
+msgstr "Ano ang gusto mong i-map?"
 
-#: app/templates/new_project.html:17
+#: app/templates/new_project_chooser.html:6
 msgid ""
-"If you are collecting OSM Buildings, use the simple workflow with AOI "
-"only."
+"Pick the option that fits your project. You can change your mind later by"
+" starting over."
 msgstr ""
-"Kung nangongolekta ka ng OSM Buildings, gamitin ang simpleng daloy na may"
-" AOI lamang."
+"Piliin ang opsiyong akma sa iyong proyekto. Maaari kang magbago ng isip "
+"mamaya sa pamamagitan ng pagsisimula muli."
 
-#: app/templates/new_project.html:45
-msgid "Project Name"
+#: app/templates/new_project_chooser.html:14
+#: app/templates/new_project_chooser.html:26
+#: app/templates/new_project_simple.html:7
+msgid "Map buildings"
+msgstr "Mga Gusali ng OSM"
+
+#: app/templates/new_project_chooser.html:17
+msgid "Quickest way to start. Just draw your area on the map and you're done."
+msgstr ""
+"Pinakamabilis na paraan para magsimula. Iguhit lang ang iyong lugar sa "
+"mapa at tapos na."
+
+#: app/templates/new_project_chooser.html:21
+msgid "We'll pre-fill the project for you"
+msgstr "Paunang pupunan namin ang proyekto para sa iyo"
+
+#: app/templates/new_project_chooser.html:22
+msgid "Uses building outlines already in OpenStreetMap"
+msgstr "Gumagamit ng mga outline ng gusali na nasa OpenStreetMap na"
+
+#: app/templates/new_project_chooser.html:23
+msgid "Comes with a ready-made survey for buildings"
+msgstr "May kasamang handa nang survey para sa mga gusali"
+
+#: app/templates/new_project_chooser.html:32
+msgid "Something else"
+msgstr "Iba pa"
+
+#: app/templates/new_project_chooser.html:35
+msgid ""
+"Use this for anything that isn't buildings. You'll get more options to "
+"set things up\n"
+"        the way you want."
+msgstr ""
+"Gamitin ito para sa anumang hindi gusali. Magkakaroon ka ng higit pang "
+"opsiyon para i-set up ito ayon sa gusto mo."
+
+#: app/templates/new_project_chooser.html:41
+msgid ""
+"Map roads, healthcare, water points, toilets, schools, and many other "
+"things"
+msgstr ""
+"I-map ang mga kalsada, serbisyong pangkalusugan, punto ng tubig, "
+"palikuran, paaralan, at marami pang iba"
+
+#: app/templates/new_project_chooser.html:43
+msgid "Bring your own survey questions"
+msgstr "Dalhin ang sarili mong mga tanong sa survey"
+
+#: app/templates/new_project_chooser.html:44
+msgid "Bring your own map data, or start with an empty map"
+msgstr "Dalhin ang sarili mong datos ng mapa, o magsimula sa walang laman na mapa"
+
+#: app/templates/new_project_chooser.html:45
+msgid "Control how the area is divided up for mappers"
+msgstr "Kontrolin kung paano hahatiin ang lugar para sa mga mapper"
+
+#: app/templates/new_project_chooser.html:48
+msgid "Set up a custom project"
+msgstr "Maghanap ng mga proyekto…"
+
+#: app/templates/new_project_custom.html:1
+msgid "Create Custom Project"
+msgstr "Lumikha ng Proyekto"
+
+#: app/templates/new_project_custom.html:5
+#: app/templates/new_project_simple.html:5
+msgid "Back"
+msgstr "Bumalik"
+
+#: app/templates/new_project_custom.html:7
+msgid "Set up your project"
+msgstr "Tuklasin ang mga Proyekto"
+
+#: app/templates/new_project_custom.html:9
+msgid ""
+"Just the basics on this page — what you're mapping, where, and which app "
+"mappers will use.\n"
+"    You'll pick your survey questions and map data on the next page."
+msgstr ""
+"Mga pangunahing bagay lang sa pahinang ito: ano ang ima-map mo, saan, at "
+"aling app ang gagamitin ng mga mapper. Pipiliin mo ang mga tanong sa "
+"survey at datos ng mapa sa susunod na pahina."
+
+#: app/templates/new_project_custom.html:32
+msgid "About your project"
+msgstr "Bumalik sa Mga Proyekto"
+
+#: app/templates/new_project_custom.html:34
+msgid ""
+"Give your project a clear name and a short summary so mappers know what "
+"it's\n"
+"          about."
+msgstr ""
+"Bigyan ang proyekto ng malinaw na pangalan at maikling buod para alam ng "
+"mga mapper kung tungkol saan ito."
+
+#: app/templates/new_project_custom.html:40
+msgid "Project name"
 msgstr "Pangalan ng Proyekto"
 
-#: app/templates/new_project.html:50
-msgid "Enter project name"
-msgstr "Ilagay ang pangalan ng proyekto"
+#: app/templates/new_project_custom.html:45
+msgid "e.g. Buildings in West Nairobi"
+msgstr "hal. Mga gusali sa Kanlurang Nairobi"
 
-#: app/templates/new_project.html:63
-msgid "Enter project description"
-msgstr "Ilagay ang paglalarawan ng proyekto"
+#: app/templates/new_project_custom.html:53
+msgid "What are you mapping?"
+msgstr "Handa para sa Mapping"
 
-#: app/templates/new_project.html:72
-msgid "Field Mapping App"
-msgstr "App para sa Field Mapping"
+#: app/templates/new_project_custom.html:58
+msgid ""
+"A short description. e.g. Mapping water points and toilets in informal "
+"settlements."
+msgstr ""
+"Maikling paglalarawan. hal. Pagmamapa ng mga punto ng tubig at palikuran "
+"sa mga informal settlement."
 
-#: app/templates/new_project.html:113 app/templates/project_details.html:95
-msgid "Hashtags"
+#: app/templates/new_project_custom.html:67
+msgid "Which app will mappers use?"
+msgstr "Aling app ang gagamitin ng mga mapper?"
+
+#: app/templates/new_project_custom.html:69
+msgid "Pick the app you want mappers to install on their phone to do the survey."
+msgstr ""
+"Piliin ang app na gusto mong ipa-install sa telepono ng mga mapper para "
+"gawin ang survey."
+
+#: app/templates/new_project_custom.html:89
+msgid ""
+"Powerful GIS-style mapping app, including geometry editing, but with a "
+"simple\n"
+"                mapping pathway enabled via our HOT plugin."
+msgstr ""
+"Makapangyarihang GIS-style mapping app, kabilang ang pag-edit ng "
+"geometry, pero may simpleng daloy ng pagmamapa na pinagana ng aming HOT "
+"plugin."
+
+#: app/templates/new_project_custom.html:111
+msgid ""
+"Simple form-based survey app. Best for straightforward question-and-"
+"answer\n"
+"                surveys."
+msgstr ""
+"Simpleng form-based survey app. Pinakamainam para sa tuwirang mga survey "
+"na tanong-at-sagot."
+
+#: app/templates/new_project_custom.html:120
+msgid "Where are you mapping?"
+msgstr "Handa para sa Mapping"
+
+#: app/templates/new_project_custom.html:122
+msgid "Draw the area mappers will cover. Smaller areas are easier to coordinate."
+msgstr ""
+"Iguhit ang lugar na sasaklawin ng mga mapper. Mas madaling i-coordinate "
+"ang mas maliliit na lugar."
+
+#: app/templates/new_project_custom.html:129
+msgid "Tags"
 msgstr "Mga Hashtag"
 
-#: app/templates/new_project.html:116
-msgid "Type hashtags and press Enter or comma"
+#: app/templates/new_project_custom.html:131
+msgid "optional"
+msgstr "opsiyonal"
+
+#: app/templates/new_project_custom.html:135
+msgid ""
+"Add tags so other people can find your project. Tags are like #buildings "
+"or\n"
+"          #campaign-2026."
+msgstr ""
+"Magdagdag ng mga tag para makita ng ibang tao ang proyekto mo. Ang mga "
+"tag ay tulad ng #buildings o #campaign-2026."
+
+#: app/templates/new_project_custom.html:141
+msgid "Type a tag and press Enter"
 msgstr "Mag-type ng mga hashtag at pindutin ang Enter o kuwit"
 
-#: app/templates/new_project.html:121
-msgid ""
-"Type hashtags and press Enter or comma to add them. Click the × on a tag "
-"to remove\n"
-"          it."
+#: app/templates/new_project_custom.html:146
+msgid "Press Enter or comma after each tag. Click × on a tag to remove it."
 msgstr ""
 "Mag-type ng mga hashtag at pindutin ang Enter o kuwit para idagdag ang "
 "mga ito. I-click ang × sa isang tag para alisin ito."
 
-#: app/templates/new_project.html:131
+#: app/templates/new_project_custom.html:152
+#: app/templates/partials/project_details/setup_steps/step2_form.html:82
+msgid "Continue"
+msgstr "Magpatuloy"
+
+#: app/templates/new_project_custom.html:154
 msgid "Creating..."
 msgstr "Lumilikha..."
 
-#: app/templates/new_project.html:141
+#: app/templates/new_project_custom.html:164
 msgid "Something went wrong. Please try again."
 msgstr "May nangyaring mali. Pakisubukan muli."
 
-#: app/templates/new_project.html:272
+#: app/templates/new_project_custom.html:295
 msgid "A project with this name already exists. Please choose a different name."
 msgstr ""
 "May umiiral nang proyekto na may ganitong pangalan. Mangyaring pumili ng "
 "ibang pangalan."
 
-#: app/templates/new_project.html:356
+#: app/templates/new_project_custom.html:379
 msgid "Description is required."
 msgstr "Kinakailangan ang paglalarawan."
 
-#: app/templates/new_project_simple.html:8
-msgid ""
-"This simple flow only needs your project area. We will auto-generate the "
-"project title,\n"
-"      description, and tags for OSM Buildings."
-msgstr ""
-"Ang simpleng daloy na ito ay nangangailangan lamang ng lugar ng iyong "
-"proyekto. Awtomatiko naming gagawin ang pamagat, paglalarawan, at mga tag"
-" ng proyekto para sa OSM Buildings."
+#: app/templates/new_project_simple.html:1
+msgid "Quick Setup — OSM Buildings"
+msgstr "Mga Gusali ng OSM"
 
-#: app/templates/new_project_simple.html:38
-msgid "Back to Standard Form"
-msgstr "Bumalik sa Karaniwang Form"
+#: app/templates/new_project_simple.html:9
+msgid ""
+"Just draw the area you want to map. We'll set everything up for you using"
+" building\n"
+"    outlines from OpenStreetMap and a ready-made survey for buildings."
+msgstr ""
+"Iguhit lang ang lugar na gusto mong i-map. Ise-set up namin ang lahat "
+"gamit ang mga outline ng gusali mula sa OpenStreetMap at handa nang "
+"survey para sa mga gusali."
+
+#: app/templates/new_project_simple.html:14
+msgid "This is only for mapping buildings."
+msgstr "Para lang ito sa pagmamapa ng mga gusali."
+
+#: app/templates/new_project_simple.html:15
+msgid ""
+"If you want to map something else (like roads or water points), use your "
+"own survey\n"
+"    questions, or bring your own map data,"
+msgstr ""
+"Kung gusto mong mag-map ng iba pa (tulad ng mga kalsada o punto ng "
+"tubig), gumamit ng sarili mong mga tanong sa survey, o magdala ng sarili "
+"mong datos ng mapa,"
+
+#: app/templates/new_project_simple.html:17
+msgid "set up a custom project instead"
+msgstr "mag-set up na lang ng custom na proyekto"
 
 #: app/templates/new_project_simple.html:46
+msgid "Switch to Custom Project"
+msgstr "Ikabit sa Proyektong QField"
+
+#: app/templates/new_project_simple.html:55
 msgid "Creating project and preparing map..."
 msgstr "Gumagawa ng proyekto at inihahanda ang mapa..."
 
@@ -1591,6 +1693,10 @@ msgstr "Ginawa"
 #: app/templates/project_details.html:84
 msgid "Last Updated"
 msgstr "Huling Na-update"
+
+#: app/templates/project_details.html:95
+msgid "Hashtags"
+msgstr "Mga Hashtag"
 
 #: app/templates/project_details.html:107
 msgid "External Project"
@@ -1735,9 +1841,7 @@ msgid "No GeoJSON returned from validation"
 msgstr "Walang GeoJSON na ibinalik mula sa pag-validate"
 
 #: app/templates/partials/new_project/map_script.html:11
-msgid ""
-"You must draw or upload an Area of Interest (AOI) on the map before "
-"submitting."
+msgid "You must draw or upload a project area on the map before submitting."
 msgstr ""
 "Dapat kang gumuhit o mag-upload ng Area of Interest (AOI) sa mapa bago "
 "magsumite."
@@ -1746,42 +1850,51 @@ msgstr ""
 msgid "Project Area"
 msgstr "Lugar ng Proyekto"
 
-#: app/templates/partials/new_project/map_section.html:12
+#: app/templates/partials/new_project/map_section.html:6
+msgid "Draw the area you want to map on the map below."
+msgstr "Iguhit ang lugar na gusto mong i-map sa mapa sa ibaba."
+
+#: app/templates/partials/new_project/map_section.html:15
 msgid "Draw Area"
 msgstr "Iguhit ang Lugar"
 
-#: app/templates/partials/new_project/map_section.html:20
-msgid "Upload GeoJSON"
-msgstr "Mag-upload ng GeoJSON"
-
-#: app/templates/partials/new_project/map_section.html:23
+#: app/templates/partials/new_project/map_section.html:18
 msgid "Clear"
 msgstr "I-clear"
 
-#: app/templates/partials/new_project/map_section.html:31
-msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area. Maximum\n"
-"    project size is 1,000 km². Areas over 100 km² will show a warning. "
-"The OSM data extract API is\n"
-"    limited to 200 km²."
-msgstr ""
-"Gumuhit ng polygon sa mapa o mag-upload ng GeoJSON file upang tukuyin ang"
-" lugar ng iyong proyekto. Ang pinakamataas na laki ng proyekto ay 1,000 "
-"km². Ang mga lugar na lampas sa 100 km² ay magpapakita ng babala. Ang OSM"
-" data extract API ay limitado sa 200 km²."
-
-#: app/templates/partials/new_project/map_section.html:42
-#: app/templates/partials/project_details/setup_steps/step2_form.html:124
-#: app/templates/partials/project_details/setup_steps/step3_data.html:69
+#: app/templates/partials/new_project/map_section.html:32
+#: app/templates/partials/project_details/setup_steps/step2_form.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:72
 #: app/templates/partials/project_details/setup_steps/step4_split.html:36
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:27
-msgid "Advanced Config"
-msgstr "Mas Pinalawak na Config"
+msgid "More options"
+msgstr "Mga opsyon sa form:"
+
+#: app/templates/partials/new_project/map_section.html:39
+msgid "Upload your own map file (GeoJSON)"
+msgstr "Mag-upload ng Custom GeoJSON"
+
+#: app/templates/partials/new_project/map_section.html:43
+msgid ""
+"If you already have a map file with your area boundary, upload it here "
+"instead of\n"
+"        drawing."
+msgstr ""
+"Kung mayroon ka nang map file na may hangganan ng iyong lugar, i-upload "
+"ito rito sa halip na iguhit."
 
 #: app/templates/partials/new_project/map_section.html:50
-msgid "Merge geometries (use convex hull for multipolygons)"
-msgstr "Pagsamahin ang mga geometry (gumamit ng convex hull para sa multipolygons)"
+msgid "Combine multiple shapes into one"
+msgstr "Pagsamahin ang maraming hugis sa isa"
+
+#: app/templates/partials/new_project/map_section.html:55
+msgid ""
+"Keep areas under 100 km² for best results. Very large areas (over 200 "
+"km²) may not\n"
+"        download all map data automatically."
+msgstr ""
+"Panatilihing mas mababa sa 100 km² ang mga lugar para sa pinakamagandang "
+"resulta. Ang napakalalaking lugar (mahigit 200 km²) ay maaaring hindi "
+"awtomatikong ma-download ang lahat ng datos ng mapa."
 
 #: app/templates/partials/project_details/basemap_section.html:2
 msgid "Offline Basemap"
@@ -1824,32 +1937,28 @@ msgid "Project Location"
 msgstr "Lokasyon ng Proyekto"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 2: Upload XLSForm"
-msgstr "Hakbang 2: Mag-upload ng XLSForm"
+#: app/templates/partials/project_details/setup_steps.html:53
+msgid "Survey Form"
+msgstr "Form ng Survey"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
-#: app/templates/partials/project_details/setup_steps/step2_form.html:12
-#: app/templates/partials/project_details/setup_steps/step3_data.html:13
-#: app/templates/partials/project_details/setup_steps/step4_split.html:13
 msgid "Complete"
 msgstr "Kumpleto"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps/step3_data.html:8
-msgid "Step 3: Get Data"
-msgstr "Hakbang 3: Kunin ang Data"
+msgid "Map Data"
+msgstr "Datos ng Mapa"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 4: Split into Tasks"
-msgstr "Hakbang 4: Hatiin sa mga Gawain"
+msgid "Tasks"
+msgstr "ID ng Gawain"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:4
-msgid "Step 5: Finalise Project"
-msgstr "Hakbang 5: I-finalize ang Proyekto"
+msgid "Project Created"
+msgstr "Mga Nalikha nang Proyekto"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1874,6 +1983,26 @@ msgstr "Nilo-load ang QR code..."
 msgid "Project Setup"
 msgstr "Setup ng Proyekto"
 
+#: app/templates/partials/project_details/setup_steps.html:44
+msgid "Project setup progress"
+msgstr "Setup ng Proyekto"
+
+#: app/templates/partials/project_details/setup_steps.html:47
+msgid "Project Details"
+msgstr "AOI ng Proyekto"
+
+#: app/templates/partials/project_details/setup_steps.html:59
+msgid "Get Data"
+msgstr "Hakbang 3: Kunin ang Data"
+
+#: app/templates/partials/project_details/setup_steps.html:65
+msgid "Split Tasks"
+msgstr "Hatiin ang AOI"
+
+#: app/templates/partials/project_details/setup_steps.html:69
+msgid "Finalise"
+msgstr "I-finalize ang Proyekto"
+
 #: app/templates/partials/project_details/style_and_scripts.html:8
 msgid "Select a survey type..."
 msgstr "Pumili ng uri ng survey..."
@@ -1883,14 +2012,16 @@ msgid "No survey types available"
 msgstr "Walang available na uri ng survey"
 
 #: app/templates/partials/project_details/style_and_scripts.html:10
-msgid "No survey forms are available. Upload a custom form in Advanced Config."
+msgid "No survey forms are available. Upload your own survey file above."
 msgstr ""
 "Walang available na survey form. Mag-upload ng custom form sa Advanced "
 "Config."
 
 #: app/templates/partials/project_details/style_and_scripts.html:11
-msgid "Select a survey type, or upload a custom form in Advanced Config."
-msgstr "Pumili ng uri ng survey, o mag-upload ng custom form sa Advanced Config."
+msgid "Pick a survey form, or upload your own."
+msgstr ""
+"Pumili ng uri ng survey at magpatuloy gamit ang mga inirerekomendang "
+"default."
 
 #: app/templates/partials/project_details/style_and_scripts.html:12
 msgid "Survey type selected."
@@ -1909,10 +2040,10 @@ msgid "Custom form selected."
 msgstr "Napili ang custom form."
 
 #: app/templates/partials/project_details/style_and_scripts.html:16
-msgid "Choose a survey type first, or upload a custom form in Advanced Config."
+msgid "Pick a survey form, or upload your own first."
 msgstr ""
-"Pumili muna ng uri ng survey, o mag-upload ng custom form sa Advanced "
-"Config."
+"Pumili ng uri ng survey at magpatuloy gamit ang mga inirerekomendang "
+"default."
 
 #: app/templates/partials/project_details/style_and_scripts.html:17
 msgid "polygons"
@@ -1932,8 +2063,8 @@ msgstr "mga feature"
 
 #: app/templates/partials/project_details/style_and_scripts.html:21
 msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use "
-"Advanced Config to upload your own GeoJSON or adjust download settings."
+"You uploaded a custom form, so this OSM download is optional. Upload your"
+" own map file below or open More options to adjust the source."
 msgstr ""
 "Nag-upload ka ng custom form, kaya opsyonal ang pag-download ng OSM na "
 "ito. Gamitin ang Advanced Config para mag-upload ng sarili mong GeoJSON o"
@@ -1942,8 +2073,8 @@ msgstr ""
 #: app/templates/partials/project_details/style_and_scripts.html:22
 #, python-format
 msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
-"map, then continue."
+"Recommended for your form: %(title)s (%(geom_label)s). Review the data on"
+" the map, then continue."
 msgstr ""
 "Inirerekomendang source: %(title)s (%(geom_label)s). Suriin ang data sa "
 "mapa, pagkatapos ay magpatuloy."
@@ -1951,8 +2082,8 @@ msgstr ""
 #: app/templates/partials/project_details/style_and_scripts.html:23
 #, python-format
 msgid ""
-"Recommended source updated (%(geom_label)s). Review the data on the map, "
-"then continue."
+"Source updated (%(geom_label)s). Review the data on the map, then "
+"continue."
 msgstr ""
 "Na-update ang inirerekomendang source (%(geom_label)s). Suriin ang data "
 "sa mapa, pagkatapos ay magpatuloy."
@@ -1961,28 +2092,27 @@ msgstr ""
 msgid "Downloading..."
 msgstr "Nagda-download..."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:33
+#: app/templates/partials/project_details/setup_steps/step3_data.html:27
 #: app/templates/partials/project_details/style_and_scripts.html:25
-msgid "Download OSM Data"
+msgid "Use OSM data"
 msgstr "I-download ang OSM Data"
 
 #: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Confirm No Splitting"
 msgstr "Kumpirmahin ang Walang Paghahati"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 #: app/templates/partials/project_details/style_and_scripts.html:28
-msgid "Split by Square"
+msgid "Split by grid"
 msgstr "Hatiin ayon sa Parisukat"
 
 #: app/templates/partials/project_details/style_and_scripts.html:29
-msgid "Split by Buildings"
+msgid "Split by buildings"
 msgstr "Hatiin ayon sa mga Gusali"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:175
+#: app/templates/partials/project_details/setup_steps/step4_split.html:164
 #: app/templates/partials/project_details/style_and_scripts.html:30
-msgid "Split AOI"
-msgstr "Hatiin ang AOI"
+msgid "Split area"
+msgstr "Hatiin Muli"
 
 #: app/templates/partials/project_details/style_and_scripts.html:31
 msgid "Select Option"
@@ -2253,40 +2383,45 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "Tanggapin ang mga Piniling Gawain"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:7
-msgid "Step 2: Select Survey Form"
-msgstr "Hakbang 2: Pumili ng Survey Form"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:4
+msgid "Survey form ready"
+msgstr "Handa na ang form ng survey"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:17
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr ""
-"Pumili ng uri ng survey at magpatuloy gamit ang mga inirerekomendang "
-"default."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:28
-msgid "Choose Survey Type:"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:9
+msgid "Choose Your Survey Form"
 msgstr "Pumili ng Uri ng Survey:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:30
+#: app/templates/partials/project_details/setup_steps/step2_form.html:12
+msgid ""
+"Pick a ready-made survey that matches what you're mapping. You can upload"
+" your own survey\n"
+"    file if none of these fit."
+msgstr ""
+"Pumili ng handa nang survey na tumutugma sa iyong mina-map. Maaari mong "
+"i-upload ang sarili mong survey file kung walang bagay sa mga ito."
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:25
+msgid "Survey form"
+msgstr "Form ng survey"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:28
 msgid "Loading survey types..."
 msgstr "Nilo-load ang mga uri ng survey..."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:46
-msgid "Or use your own form instead:"
-msgstr "O gamitin na lang ang sarili mong form:"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+msgid "or"
+msgstr "o"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:54
-msgid "Upload Custom XLSForm"
-msgstr "Mag-upload ng Custom Form"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:36
+msgid "upload your own survey file (.xls / .xlsx)"
+msgstr "i-upload ang sarili mong survey file (.xls / .xlsx)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:68
+#: app/templates/partials/project_details/setup_steps/step2_form.html:49
 msgid ""
-"Note: Field-TM will automatically inject additional fields into your form"
-" for task\n"
-"        division and feature selection. Your form should only contain the"
-" survey questions you want\n"
-"        to ask (do not include select_one_from_file fields for "
-"tasks/features)."
+"Heads up: Field-TM auto-adds fields for tasks and feature selection. Your"
+" form should\n"
+"        only contain the survey questions you want to ask."
 msgstr ""
 "Tandaan: Awtomatikong maglalagay ang Field-TM ng karagdagang fields sa "
 "iyong form para sa paghahati ng task at pagpili ng feature. Dapat "
@@ -2294,278 +2429,279 @@ msgstr ""
 "itanong (huwag isama ang select_one_from_file fields para sa "
 "tasks/features)."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:98
-msgid ""
-"Recommended defaults are active for ODK projects, including ODK Collect\n"
-"        compatibility."
-msgstr ""
-"Aktibo ang mga inirerekomendang default para sa ODK projects, kasama ang "
-"compatibility sa ODK Collect."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Form language"
+msgstr "Wika"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:105
-#, python-format
-msgid "Recommended defaults are active for %(app_name)s projects."
-msgstr ""
-"Aktibo ang mga inirerekomendang default para sa mga proyektong "
-"%(app_name)s."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:112
-msgid "Recommended defaults are active for this project."
-msgstr "Aktibo ang mga inirerekomendang default para sa proyektong ito."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:131
-msgid "Default Language:"
-msgstr "Default na Wika:"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:133
+#: app/templates/partials/project_details/setup_steps/step2_form.html:100
 msgid "English"
 msgstr "Ingles"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:134
+#: app/templates/partials/project_details/setup_steps/step2_form.html:101
 msgid "Spanish"
 msgstr "Espanyol"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:135
+#: app/templates/partials/project_details/setup_steps/step2_form.html:102
 msgid "French"
 msgstr "Pranses"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:136
+#: app/templates/partials/project_details/setup_steps/step2_form.html:103
 msgid "Portuguese"
 msgstr "Portuges"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:137
+#: app/templates/partials/project_details/setup_steps/step2_form.html:104
 msgid "Swahili"
-msgstr "Swahili"
+msgstr "Wikang Swahili"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:138
+#: app/templates/partials/project_details/setup_steps/step2_form.html:105
 msgid "Hindi"
-msgstr "Hindi"
+msgstr "Wikang Hindi"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:153
-msgid "Form Options:"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:109
+msgid "Form questions"
 msgstr "Mga opsyon sa form:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:163
-msgid "Include photo upload question"
-msgstr "Isama ang tanong sa pag-upload ng larawan"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:113
+msgid "Ask for a photo"
+msgstr "Humingi ng larawan"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:177
+#: app/templates/partials/project_details/setup_steps/step2_form.html:115
+msgid "Mappers will be asked to take a photo at the location."
+msgstr "Hinihiling sa gumagamit na kumuha ng larawan sa kanilang lokasyon."
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:128
 msgid "Make photo mandatory"
 msgstr "Gawing sapilitan ang larawan"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:182
-msgid "Asks the user to take a photo at their location."
-msgstr "Hinihiling sa gumagamit na kumuha ng larawan sa kanilang lokasyon."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:193
-msgid "Include digitisation verification question"
-msgstr "Isama ang tanong sa beripikasyon ng digitisation"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:197
-msgid "Asks the mapper to verify if existing features are correctly digitised."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:135
+msgid "Ask to verify existing features"
 msgstr ""
 "Hinihiling sa mapper na tiyakin kung tama ang pagkakadigitise ng mga "
 "umiiral na feature."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:220
-msgid "Continue"
-msgstr "Magpatuloy"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:224
-msgid "✓ Survey form uploaded successfully"
-msgstr "✓ Matagumpay na na-upload ang survey form"
-
-#: app/templates/partials/project_details/setup_steps/step3_data.html:18
-msgid "Download the recommended OSM data for your survey form."
-msgstr "I-download ang inirerekomendang OSM data para sa iyong survey form."
-
-#: app/templates/partials/project_details/setup_steps/step3_data.html:20
-msgid "Review the data on the map, then continue."
-msgstr "Suriin ang data sa mapa, pagkatapos ay magpatuloy."
-
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
-msgid "Collect New Data Only"
-msgstr "Mangolekta ng Bagong Data Lamang"
-
-#: app/templates/partials/project_details/setup_steps/step3_data.html:76
-msgid "Use custom data inputs or override the default OSM download options."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:137
+msgid "Mappers confirm whether existing OSM features are correctly digitised."
 msgstr ""
-"Gumamit ng custom na data input o palitan ang mga default na opsyon sa "
-"pag-download ng OSM."
+"Hinihiling sa mapper na tiyakin kung tama ang pagkakadigitise ng mga "
+"umiiral na feature."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:81
-msgid "OSM Category:"
-msgstr "Kategorya ng OSM:"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:4
+msgid "Data extract ready"
+msgstr "Handa na ang OSM data extract"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:83
+#: app/templates/partials/project_details/setup_steps/step3_data.html:9
+msgid "Add Your Data"
+msgstr "I-download ang OSM Data"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:12
+msgid ""
+"Pull existing features from OpenStreetMap for your project area, or start"
+" with an empty\n"
+"    map so mappers can collect everything from scratch."
+msgstr ""
+"Kunin ang mga kasalukuyang feature mula sa OpenStreetMap para sa lugar ng"
+" proyekto mo, o magsimula sa walang laman na mapa para makolekta ng mga "
+"mapper ang lahat mula sa simula."
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:53
+msgid "Start with empty map"
+msgstr "Magsimula sa walang laman na mapa"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:61
+msgid "upload your own map file (GeoJSON)"
+msgstr "Mag-upload ng Custom GeoJSON"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:79
+msgid "Override the default OSM source for this project."
+msgstr "Aktibo ang mga inirerekomendang default para sa proyektong ito."
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+msgid "What to download"
+msgstr "Ano ang ida-download"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:88
 msgid "OSM Buildings"
 msgstr "Mga Gusali ng OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:84
+#: app/templates/partials/project_details/setup_steps/step3_data.html:89
 msgid "OSM Highways"
 msgstr "Mga Kalsada ng OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+#: app/templates/partials/project_details/setup_steps/step3_data.html:90
 msgid "OSM Healthcare"
 msgstr "Pangkalusugang OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:86
+#: app/templates/partials/project_details/setup_steps/step3_data.html:91
 msgid "OSM Toilets"
 msgstr "Mga Palikuran ng OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:87
+#: app/templates/partials/project_details/setup_steps/step3_data.html:92
 msgid "OSM Religious"
 msgstr "Panrelihiyong OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:88
+#: app/templates/partials/project_details/setup_steps/step3_data.html:93
 msgid "OSM Landuse"
 msgstr "Paggamit ng Lupa sa OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:94
 msgid "OSM Waterways"
 msgstr "Mga Daluyan ng Tubig sa OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:90
+#: app/templates/partials/project_details/setup_steps/step3_data.html:95
 msgid "OSM Water Points"
 msgstr "Mga Water Point ng OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:91
+#: app/templates/partials/project_details/setup_steps/step3_data.html:96
 msgid "OSM Waste Disposal"
 msgstr "Pagtatapon ng Basura sa OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:92
+#: app/templates/partials/project_details/setup_steps/step3_data.html:97
 msgid "OSM Education"
 msgstr "Edukasyon sa OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:93
+#: app/templates/partials/project_details/setup_steps/step3_data.html:98
 msgid "OSM Cemeteries"
 msgstr "Mga Sementeryo ng OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:94
+#: app/templates/partials/project_details/setup_steps/step3_data.html:99
 msgid "OSM Amenities"
 msgstr "Mga Amenity ng OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:99
-msgid "Geometry Type:"
-msgstr "Uri ng Geometry:"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+msgid "Feature shape"
+msgstr "mga feature"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:102
-msgid "Polygon"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:107
+msgid "Polygon (area)"
 msgstr "Poligono"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:103
-msgid "Polyline"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:108
+msgid "Line"
 msgstr "Poliyolina"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+#: app/templates/partials/project_details/setup_steps/step3_data.html:109
 msgid "Point"
 msgstr "Punto"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:113
+#: app/templates/partials/project_details/setup_steps/step3_data.html:116
 msgid "Use centroids"
 msgstr "Gumamit ng centroid"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:125
-msgid "Upload Custom GeoJSON"
-msgstr "Mag-upload ng Custom GeoJSON"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+msgid "Convert polygons to single points."
+msgstr "Gawing iisang mga punto ang mga polygon."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:144
+#: app/templates/partials/project_details/setup_steps/step3_data.html:140
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "Binubuo ang OSM data extract... Maaaring tumagal ito nang kaunti."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:163
-msgid "OSM data extract ready"
-msgstr "Handa na ang OSM data extract"
-
-#: app/templates/partials/project_details/setup_steps/step4_split.html:8
-msgid "Step 4: Split into Tasks (Optional)"
-msgstr "Hakbang 3: Hatiin sa mga Gawain (Opsyonal)"
-
-#: app/templates/partials/project_details/setup_steps/step4_split.html:18
-msgid "✓ Task splitting is not relevant without existing data"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:6
+msgid ""
+"Task splitting skipped (no existing\n"
+"    data)"
 msgstr "✓ Hindi mahalaga ang paghahati ng gawain kung walang umiiral na data"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:24
+#: app/templates/partials/project_details/setup_steps/step4_split.html:7
+msgid "Task areas ready"
+msgstr "Handa na ang basemap."
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:13
+msgid "Split into Tasks"
+msgstr "Hakbang 4: Hatiin sa mga Gawain"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:14
+msgid "Optional"
+msgstr "Opsiyonal"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:17
 msgid ""
-"Generate task areas by splitting the Area of Interest (AOI). Choose an "
-"algorithm and\n"
-"    parameters, then split. Review the preview, and click \"Accept Task "
-"Areas\" to save. Or click"
+"Divide your area into smaller tasks so multiple mappers can work in "
+"parallel. Pick how to\n"
+"    split below, preview the result, then accept it. Or skip to use the "
+"whole area as one task."
 msgstr ""
-"Gumawa ng mga task area sa pamamagitan ng paghahati ng Area of Interest "
-"(AOI). Pumili ng algorithm at mga parameter, pagkatapos ay hatiin. Suriin"
-" ang preview, at i-click ang \"Accept Task Areas\" para i-save. O i-click"
+"Hatiin ang iyong lugar sa mas maliliit na gawain para makapagtrabaho nang"
+" sabay-sabay ang maraming mapper. Piliin sa ibaba kung paano hahatiin, "
+"i-preview ang resulta, pagkatapos tanggapin ito. O laktawan para gamitin "
+"ang buong lugar bilang isang gawain."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:27
-#: app/templates/partials/project_details/setup_steps/step4_split.html:46
-msgid "Skip"
-msgstr "Laktawan"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:29
+msgid "Skip splitting"
+msgstr "Hinahati..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:28
-msgid "to use the whole AOI as a single task."
-msgstr "para gamitin ang buong AOI bilang iisang gawain."
-
-#: app/templates/partials/project_details/setup_steps/step4_split.html:60
-msgid "Choose which linear features influence building-based task splitting."
+#: app/templates/partials/project_details/setup_steps/step4_split.html:50
+msgid ""
+"When splitting by building count, these linear features are used as "
+"natural task\n"
+"          boundaries."
 msgstr ""
-"Piliin kung aling mga linear feature ang makaaapekto sa paghahati ng "
-"gawain batay sa gusali."
+"Kapag hinahati ayon sa bilang ng gusali, ginagamit ang mga linear feature"
+" na ito bilang natural na hangganan ng gawain."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:84
+#: app/templates/partials/project_details/setup_steps/step4_split.html:75
 msgid "Include roads"
 msgstr "Isama ang mga kalsada"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:93
+#: app/templates/partials/project_details/setup_steps/step4_split.html:84
 msgid "Include rivers"
 msgstr "Isama ang mga ilog"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:102
+#: app/templates/partials/project_details/setup_steps/step4_split.html:93
 msgid "Include railways"
 msgstr "Isama ang mga riles"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+#: app/templates/partials/project_details/setup_steps/step4_split.html:102
 msgid "Include aeroways"
 msgstr "Isama ang mga daanang panghimpapawid"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:118
-msgid "Algorithm:"
-msgstr "Algoritmo:"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:109
+msgid "How to split"
+msgstr "Paano hatiin"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:120
-msgid "Select splitting option..."
-msgstr "Pumili ng opsyon sa paghahati..."
+#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+msgid "Choose a method..."
+msgstr "Pumili ng paraan..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:122
-msgid "Average Buildings v1 (Voronoi)"
-msgstr "Karaniwang Dami ng Gusali v1 (Voronoi)"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:112
+msgid "By number of buildings (faster)"
+msgstr "Ayon sa bilang ng gusali (mas mabilis)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:124
-msgid "Average Buildings v2 (Straight Skeleton)"
-msgstr "Karaniwang Dami ng Gusali v2 (Straight Skeleton)"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:114
+msgid "By number of buildings (cleaner shapes)"
+msgstr "Ayon sa bilang ng gusali (mas malinis na hugis)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:126
-msgid "Split by Specific Number of Tasks"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:116
+msgid "By a regular grid"
+msgstr "Ayon sa regular na grid"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+msgid "Into a fixed number of tasks"
 msgstr "Hatiin ayon sa Tiyak na Bilang ng Gawain (Malapit na)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:132
-msgid "Avg. Buildings per Task:"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:122
+msgid "Buildings per task"
 msgstr "Karaniwang Gusali bawat Gawain:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:144
-msgid "Number of Tasks:"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:133
+msgid "Number of tasks"
 msgstr "Bilang ng mga gawain:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:156
-msgid "Dimension (meters):"
-msgstr "Sukat (metro):"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:145
+msgid "Grid square size (metres)"
+msgstr "Laki ng parisukat ng grid (metro)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:175
+#: app/templates/partials/project_details/setup_steps/step4_split.html:164
 msgid "Split Again"
 msgstr "Hatiin Muli"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:211
-msgid "Splitting AOI into tasks... This may take a moment."
+#: app/templates/partials/project_details/setup_steps/step4_split.html:199
+msgid "Splitting area into tasks... This may take a moment."
 msgstr "Hinahati ang AOI sa mga gawain... Maaaring tumagal ito nang kaunti."
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:4
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:19
+msgid "Finalise Project"
+msgstr "I-finalize ang Proyekto"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:5
 msgid "Ready"
@@ -2573,15 +2709,15 @@ msgstr "Handa na"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:8
 msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
+"Everything's ready. Click below to create the project in your chosen "
+"mapping tool."
 msgstr ""
 "Kumpleto na ang lahat ng kinakailangan. Lumikha ng proyekto sa napili "
 "mong mapping tool."
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:19
-msgid "Finalise Project"
-msgstr "I-finalize ang Proyekto"
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:27
+msgid "Use custom credentials"
+msgstr "Custom na Mga Kredensyal"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:59
 msgid "Confirm Project Finalisation"

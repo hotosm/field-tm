@@ -53,12 +53,6 @@ def progress_fragment(
     basemap_maxzoom: int | None = None,
 ) -> Template:
     """Render progress fragment."""
-    is_initially_processing = (
-        project.basemap_attach_status == "in_progress"
-        if progress_scope == "attach"
-        else project.basemap_status == "generating"
-    )
-
     return Template(
         template_name="partials/project_details/fragments/basemap_progress.html",
         context={
@@ -69,7 +63,6 @@ def progress_fragment(
                 basemap_maxzoom=basemap_maxzoom,
             ),
             "progress_scope": progress_scope,
-            "is_initially_processing": is_initially_processing,
         },
         media_type="text/html",
         status_code=status.HTTP_200_OK,

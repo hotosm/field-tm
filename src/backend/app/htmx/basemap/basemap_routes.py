@@ -47,6 +47,7 @@ from app.qfield.qfield_crud import _outline_to_bbox_str
 from ..htmx_helpers import callout as _callout
 from .basemap_attach_flow import (
     attach_precondition_response,
+    enqueue_autostart_attach,
     start_basemap_attach,
 )
 from .basemap_formatting import (
@@ -269,17 +270,28 @@ async def basemap_status_htmx(
             project.basemap_stac_item_id
         )
 
+        resolved_url = download_url or project.basemap_url
+        is_ready_with_url = status_value == "ready" and bool(resolved_url)
+
         await DbProject.update(
             db,
             project_id,
             ProjectUpdate(
                 basemap_status=status_value,
-                basemap_url=download_url or project.basemap_url,
+                basemap_url=resolved_url,
                 basemap_minzoom=basemap_minzoom,
                 basemap_maxzoom=basemap_maxzoom,
             ),
         )
         await db.commit()
+
+        # If the simple-project autostart was waiting for the tilepack to be
+        # ready, queue the attach now that the URL is available.
+        if (
+            is_ready_with_url
+            and (project.basemap_attach_status or "") == "pending_autostart"
+        ):
+            await enqueue_autostart_attach(db, project_id, resolved_url)
 
         refreshed_project = await DbProject.one(db, project_id)
         return (
@@ -289,7 +301,7 @@ async def basemap_status_htmx(
                 basemap_minzoom=basemap_minzoom,
                 basemap_maxzoom=basemap_maxzoom,
             )
-            if status_value == "ready"
+            if is_ready_with_url
             else progress_fragment(
                 refreshed_project,
                 basemap_size_bytes=basemap_size_bytes,
@@ -329,7 +341,7 @@ async def basemap_attach_htmx(
     if not project or project.id != project_id:
         return project_not_found_response()
 
-    precondition_response = attach_precondition_response(project)
+    precondition_response = await attach_precondition_response(db, project)
     if precondition_response is not None:
         return precondition_response
 

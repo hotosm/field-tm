@@ -27,7 +27,10 @@ async def mark_basemap_autostart_failed(
     await DbProject.update(
         bg_db,
         project_id,
-        project_schemas.ProjectUpdate(basemap_status="failed"),
+        project_schemas.ProjectUpdate(
+            basemap_status="failed",
+            basemap_attach_status="idle",
+        ),
     )
     await bg_db.commit()
 
@@ -41,28 +44,32 @@ async def resume_simple_project_tilepack_if_needed(
         return False
 
     status_value, download_url = await check_tilepack_status(stac_item_id)
+    resolved_url = download_url or project.basemap_url
+    is_ready_with_url = status_value == "ready" and bool(resolved_url)
     now = datetime.now(timezone.utc)
+
+    if is_ready_with_url:
+        next_attach_status = "in_progress"
+    elif status_value == "generating":
+        next_attach_status = "pending_autostart"
+    else:
+        next_attach_status = "idle"
+
     await DbProject.update(
         bg_db,
         project.id,
         project_schemas.ProjectUpdate(
             basemap_status=status_value,
-            basemap_url=download_url or project.basemap_url,
-            basemap_attach_status=(
-                "in_progress" if status_value == "ready" else "idle"
-            ),
+            basemap_url=resolved_url,
+            basemap_attach_status=next_attach_status,
             basemap_attach_error=None,
-            basemap_attach_updated_at=(now if status_value == "ready" else None),
+            basemap_attach_updated_at=(now if is_ready_with_url else None),
         ),
     )
     await bg_db.commit()
 
-    if status_value == "ready" and (download_url or project.basemap_url):
-        asyncio.create_task(
-            run_basemap_attach_background(
-                project.id, download_url or project.basemap_url
-            )
-        )
+    if is_ready_with_url:
+        asyncio.create_task(run_basemap_attach_background(project.id, resolved_url))
 
     return True
 
@@ -117,25 +124,33 @@ async def start_simple_project_tilepack(
             basemap_url=None,
             basemap_minzoom=selected.get("minzoom"),
             basemap_maxzoom=selected.get("maxzoom"),
-            basemap_attach_status="idle",
+            basemap_attach_status="pending_autostart",
             basemap_attach_error=None,
             basemap_attach_updated_at=None,
         ),
     )
 
     status_value, download_url = await trigger_tilepack_generation(stac_item_id)
+    is_ready_with_url = status_value == "ready" and bool(download_url)
     now = datetime.now(timezone.utc)
+
+    if is_ready_with_url:
+        next_attach_status = "in_progress"
+    elif status_value == "generating":
+        next_attach_status = "pending_autostart"
+    else:
+        # status_value is "failed" or unexpected — there is nothing to autostart.
+        next_attach_status = "idle"
+
     await DbProject.update(
         bg_db,
         project_id,
         project_schemas.ProjectUpdate(
             basemap_status=status_value,
             basemap_url=download_url,
-            basemap_attach_status=(
-                "in_progress" if status_value == "ready" else "idle"
-            ),
+            basemap_attach_status=next_attach_status,
             basemap_attach_error=None,
-            basemap_attach_updated_at=(now if status_value == "ready" else None),
+            basemap_attach_updated_at=(now if is_ready_with_url else None),
         ),
     )
     await bg_db.commit()

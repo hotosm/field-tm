@@ -65,6 +65,7 @@
       wa-tag:not(:defined),
       wa-dialog:not(:defined),
       hot-header:not(:defined),
+      hot-announcement:not(:defined),
       hotosm-auth:not(:defined) {
         visibility: hidden;
       }
@@ -111,17 +112,17 @@
     <!-- HOT UI theme + components -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.0/dist/style-core.css"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.1/dist/style-core.css"
     />
     <!-- modulepreload: browser fetches, parses, and compiles the module eagerly  -->
     <!-- so custom elements are defined as soon as possible after the page loads. -->
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.0/dist/hotosm-ui.js"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.1/dist/hotosm-ui.js"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.0/dist/hotosm-ui.js"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.1/dist/hotosm-ui.js"
     ></script>
     {% if auth_enabled %}
     <link
@@ -164,6 +165,8 @@
   </head>
 
   <body>
+    <hot-announcement src="https://d33erh71igmru9.cloudfront.net/field-tm.json"></hot-announcement>
+
     <hot-header id="app-header" title="FieldTM" size="medium">
       <wa-dropdown slot="lang">
         <wa-button slot="trigger" variant="text" class="ftm-header-lang-trigger">

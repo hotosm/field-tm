@@ -7,27 +7,27 @@
     const i18nStrings = {
       selectSurveyTypePlaceholder: {{ _("Select a survey type...")|tojson }},
       noSurveyTypesAvailable: {{ _("No survey types available")|tojson }},
-      noSurveyFormsAvailable: {{ _("No survey forms are available. Upload a custom form in Advanced Config.")|tojson }},
-      selectSurveyTypeOrUpload: {{ _("Select a survey type, or upload a custom form in Advanced Config.")|tojson }},
+      noSurveyFormsAvailable: {{ _("No survey forms are available. Upload your own survey file above.")|tojson }},
+      selectSurveyTypeOrUpload: {{ _("Pick a survey form, or upload your own.")|tojson }},
       surveyTypeSelected: {{ _("Survey type selected.")|tojson }},
       invalidXlsformFileType: {{ _("Invalid file type. Please upload a .xls or .xlsx file.")|tojson }},
       selectedFilePrefix: {{ _("Selected file:")|tojson }},
       customFormSelected: {{ _("Custom form selected.")|tojson }},
-      chooseSurveyTypeFirst: {{ _("Choose a survey type first, or upload a custom form in Advanced Config.")|tojson }},
+      chooseSurveyTypeFirst: {{ _("Pick a survey form, or upload your own first.")|tojson }},
       polygons: {{ _("polygons")|tojson }},
       polylines: {{ _("polylines")|tojson }},
       points: {{ _("points")|tojson }},
       features: {{ _("features")|tojson }},
-      customFormDownloadNote: {{ _("You uploaded a custom form, so this OSM download is optional. Use Advanced Config to upload your own GeoJSON or adjust download settings.")|tojson }},
-      recommendedSourceFormat: {{ _("Recommended source: %(title)s (%(geom_label)s). Review the data on the map, then continue.")|tojson }},
-      recommendedSourceUpdatedFormat: {{ _("Recommended source updated (%(geom_label)s). Review the data on the map, then continue.")|tojson }},
+      customFormDownloadNote: {{ _("You uploaded a custom form, so this OSM download is optional. Upload your own map file below or open More options to adjust the source.")|tojson }},
+      recommendedSourceFormat: {{ _("Recommended for your form: %(title)s (%(geom_label)s). Review the data on the map, then continue.")|tojson }},
+      recommendedSourceUpdatedFormat: {{ _("Source updated (%(geom_label)s). Review the data on the map, then continue.")|tojson }},
       downloading: {{ _("Downloading...")|tojson }},
-      downloadOsmData: {{ _("Download OSM Data")|tojson }},
+      downloadOsmData: {{ _("Use OSM data")|tojson }},
       invalidGeojsonFileType: {{ _("Invalid file type. Please upload a .geojson or .json file.")|tojson }},
       confirmNoSplitting: {{ _("Confirm No Splitting")|tojson }},
-      splitBySquare: {{ _("Split by Square")|tojson }},
-      splitByBuildings: {{ _("Split by Buildings")|tojson }},
-      splitAoi: {{ _("Split AOI")|tojson }},
+      splitBySquare: {{ _("Split by grid")|tojson }},
+      splitByBuildings: {{ _("Split by buildings")|tojson }},
+      splitAoi: {{ _("Split area")|tojson }},
       selectOption: {{ _("Select Option")|tojson }},
       confirming: {{ _("Confirming...")|tojson }},
       splitting: {{ _("Splitting...")|tojson }},
@@ -74,7 +74,7 @@
             // Keep setup flow usable even if optional form/data script fails to load.
           });
 
-        // Step 4: Split AOI behavior is loaded from static module
+        // Step 4: Split area behavior is loaded from static module
         import('/static/js/project_setup_split.js')
           .then(({ initProjectSetupSplit }) => {
             initProjectSetupSplit({ i18nStrings });

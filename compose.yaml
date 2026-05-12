@@ -463,8 +463,9 @@ services:
         exec gunicorn qfieldcloud.wsgi:application \
           --bind 0.0.0.0:8000 \
           --timeout 300 \
-          --max-requests 300 \
-          --workers 1 \
+          --max-requests 3000 \
+          --max-requests-jitter 200 \
+          --workers 2 \
           --threads 4
 
   qfield-worker:

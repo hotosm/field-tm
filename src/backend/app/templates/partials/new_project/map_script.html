@@ -8,8 +8,33 @@
     myLocation: {{ _("My location")|tojson }},
     failedToValidateGeoJSON: {{ _("Failed to validate GeoJSON")|tojson }},
     noGeoJSONReturned: {{ _("No GeoJSON returned from validation")|tojson }},
-    mustDrawAOI: {{ _("You must draw or upload an Area of Interest (AOI) on the map before submitting.")|tojson }},
+    mustDrawAOI: {{ _("You must draw or upload a project area on the map before submitting.")|tojson }},
   };
+
+  // Stash drawn AOI in sessionStorage so users don't lose work if they
+  // navigate between /new/simple and /new/custom while setting up.
+  const DRAFT_AOI_STORAGE_KEY = "ftm-draft-aoi-outline";
+
+  function readDraftAoi() {
+    try {
+      const raw = window.sessionStorage.getItem(DRAFT_AOI_STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function writeDraftAoi(value) {
+    try {
+      if (value) {
+        window.sessionStorage.setItem(DRAFT_AOI_STORAGE_KEY, JSON.stringify(value));
+      } else {
+        window.sessionStorage.removeItem(DRAFT_AOI_STORAGE_KEY);
+      }
+    } catch (e) {
+      /* ignore - storage may be disabled */
+    }
+  }
 
   let map;
   let drawnLayers;
@@ -77,8 +102,10 @@
     if (geojson.features && geojson.features.length > 0) {
       const outline = geojson.features.length === 1 ? geojson.features[0] : geojson;
       outlineTextarea.value = JSON.stringify(outline, null, 2);
+      writeDraftAoi(outline);
     } else {
       outlineTextarea.value = "";
+      writeDraftAoi(null);
       showAreaInfo(null);
     }
   }
@@ -290,6 +317,18 @@
       activeDrawHandler = null;
       if (undoControl) undoControl.hide();
     });
+
+    // Restore a draft AOI saved by another project-create page in this session
+    // (so switching between simple/custom doesn't throw away the drawn area).
+    const savedAoi = readDraftAoi();
+    if (savedAoi) {
+      try {
+        loadGeoJSONOnMap(savedAoi);
+        validateAndShowAreaInfo();
+      } catch (e) {
+        writeDraftAoi(null);
+      }
+    }
   }
 
   function waitForLeaflet() {
@@ -420,6 +459,21 @@
       }
       setMapError("");
       return true;
+    });
+
+    // Clear the stashed draft AOI only after creation redirects to a project.
+    form.addEventListener("htmx:afterRequest", function (event) {
+      const xhr = event.detail && event.detail.xhr;
+      const redirectTarget =
+        xhr && xhr.getResponseHeader ? xhr.getResponseHeader("HX-Redirect") : "";
+      if (
+        xhr &&
+        xhr.status >= 200 &&
+        xhr.status < 300 &&
+        redirectTarget?.startsWith("/projects/")
+      ) {
+        writeDraftAoi(null);
+      }
     });
   });
 </script>

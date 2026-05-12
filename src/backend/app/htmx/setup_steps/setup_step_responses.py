@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING
 
 from litestar import status_codes as status
 from litestar.response import Response, Template
-from psycopg import AsyncConnection
 
 from app.db.models import DbProject
 from app.i18n import _
@@ -250,12 +249,13 @@ def is_fragment_mode(mode: str | None) -> bool:
     return (mode or "").strip().lower() == "fragment"
 
 
-async def step4_completion_response(
+def step4_completion_response(
     *,
-    db: AsyncConnection,
+    request: object,
     project_id: int,
     message: str,
     mode: str | None,
+    project: "DbProject | None" = None,
 ) -> Response:
     trigger_payload = {
         "projectId": project_id,
@@ -272,7 +272,6 @@ async def step4_completion_response(
             headers=_hx_trigger_header("project-setup:step4-complete", trigger_payload),
         )
 
-    project = await DbProject.one(db, project_id)
     return Template(
         template_name="partials/project_details/setup_steps.html",
         context={"project": project},

@@ -212,20 +212,18 @@ def test_sanitize_qfc_project_name_handles_unicode_and_symbols():
     assert sanitized == "FieldTM-Kathmandu-1"
 
 
-def test_build_qfc_service_account_email_uses_configured_domain():
+def test_build_qfc_service_account_email_uses_fieldtm_domain():
     """Provisioned QField users should always get a non-empty email."""
     email = _build_qfc_service_account_email("ftm_manager_14")
 
-    assert email == "ftm_manager_14@field.localhost"
+    assert email == "ftm_manager_14@fieldtm.org"
 
 
-def test_build_qfc_service_account_email_falls_back_for_invalid_domain(monkeypatch):
-    """Fallback to a safe local domain when FTM_DOMAIN is not email-safe."""
-    monkeypatch.setattr("app.qfield.qfield_crud.settings.FTM_DOMAIN", "localhost")
-
+def test_build_qfc_service_account_email_sanitizes_local_part():
+    """Usernames should be normalized into valid email local parts."""
     email = _build_qfc_service_account_email("ftm mapper 14")
 
-    assert email == "ftm-mapper-14@noreply.local"
+    assert email == "ftm-mapper-14@fieldtm.org"
 
 
 @pytest.mark.asyncio
@@ -256,7 +254,7 @@ async def test_create_qfc_user_passes_generated_email_to_sdk():
         {
             "username": "ftm_mapper_14",
             "password": "secret",
-            "email": "ftm_mapper_14@field.localhost",
+            "email": "ftm_mapper_14@fieldtm.org",
             "exist_ok": True,
         }
     ]

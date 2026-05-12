@@ -1,25 +1,19 @@
-{% if has_xlsform %}
-<div
-  id="step-3-container"
-  class="ftm-step {% if has_data_extract %}ftm-step--complete{% else %}ftm-step--pending{% endif %}"
->
+{% if has_xlsform %} {% if has_data_extract %}
+<div id="step-3-container" class="ftm-step--complete-compact">
+  <span class="ftm-step__check" aria-hidden="true">✓</span>
+  <p class="ftm-step--complete-compact-title">{{ _("Data extract ready") }}</p>
+</div>
+{% else %}
+<div id="step-3-container" class="ftm-step ftm-step--pending">
   <div class="ftm-step__header">
-    <h3 class="ftm-step__title">
-      {{ _("Step 3: Get Data") }} {% if has_data_extract %}
-      <span class="ftm-step__check">✓</span>
-      {% endif %}
-    </h3>
-    {% if has_data_extract %}
-    <wa-badge variant="success">{{ _("Complete") }}</wa-badge>
-    {% endif %}
+    <h3 class="ftm-step__title">{{ _("Add Your Data") }}</h3>
   </div>
-  {% if not has_data_extract %}
-  <p class="ftm-step__description">
-    {{ _("Download the recommended OSM data for your survey form.") }}
-    <span id="recommended-data-note-text"
-      >{{ _("Review the data on the map, then continue.") }}</span
-    >
+  <p class="ftm-step-intro">
+    {{ _("Pull existing features from OpenStreetMap for your project area, or start with an empty
+    map so mappers can collect everything from scratch.") }}
+    <span id="recommended-data-note-text"></span>
   </p>
+
   <div class="ftm-step__actions">
     <button
       id="download-osm-data-btn"
@@ -30,7 +24,7 @@
       class="wa-button wa-button--brand"
       style="min-width: 200px; position: relative"
     >
-      <span id="download-btn-text">{{ _("Download OSM Data") }}</span>
+      <span id="download-btn-text">{{ _("Use OSM data") }}</span>
       <span
         id="download-spinner"
         class="htmx-indicator"
@@ -56,29 +50,40 @@
       class="wa-button wa-button--default"
       style="min-width: 200px"
     >
-      {{ _("Collect New Data Only") }}
+      {{ _("Start with empty map") }}
     </button>
   </div>
 
-  <div class="ftm-step__actions" style="margin-top: 12px; margin-bottom: 8px">
+  <p class="ftm-step-secondary" style="margin-top: 14px">
+    <span class="ftm-step-secondary__divider" aria-hidden="true"></span>
+    <span>{{ _("or") }}</span>
+    <button id="upload-geojson-btn" type="button" class="ftm-soft-link">
+      {{ _("upload your own map file (GeoJSON)") }}
+    </button>
+    <span class="ftm-step-secondary__divider" aria-hidden="true"></span>
+  </p>
+
+  <div class="ftm-step__actions" style="margin-top: 6px; margin-bottom: 8px">
     <button
       id="data-advanced-config-toggle"
       type="button"
       class="wa-button wa-button--default ftm-advanced-toggle"
     >
-      {{ _("Advanced Config") }}
+      {{ _("More options") }}
     </button>
   </div>
 
   <div id="data-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
     <div class="ftm-advanced-config__content">
-      <p class="ftm-step__description" style="margin-bottom: 10px">
-        {{ _("Use custom data inputs or override the default OSM download options.") }}
+      <p class="ftm-step-field__hint" style="margin-bottom: 10px">
+        {{ _("Override the default OSM source for this project.") }}
       </p>
 
       <div class="ftm-split-grid ftm-split-grid--advanced">
-        <div>
-          <label for="osm-category-select" class="ftm-split-label">{{ _("OSM Category:") }}</label>
+        <div class="ftm-step-field">
+          <label for="osm-category-select" class="ftm-step-field__label"
+            >{{ _("What to download") }}</label
+          >
           <select id="osm-category-select" class="ftm-split-select">
             <option value="buildings">{{ _("OSM Buildings") }}</option>
             <option value="highways">{{ _("OSM Highways") }}</option>
@@ -94,36 +99,27 @@
             <option value="amenities">{{ _("OSM Amenities") }}</option>
           </select>
         </div>
-        <div>
-          <label for="osm-geom-type-select" class="ftm-split-label"
-            >{{ _("Geometry Type:") }}</label
+        <div class="ftm-step-field">
+          <label for="osm-geom-type-select" class="ftm-step-field__label"
+            >{{ _("Feature shape") }}</label
           >
           <select id="osm-geom-type-select" class="ftm-split-select">
-            <option value="POLYGON">{{ _("Polygon") }}</option>
-            <option value="POLYLINE">{{ _("Polyline") }}</option>
+            <option value="POLYGON">{{ _("Polygon (area)") }}</option>
+            <option value="POLYLINE">{{ _("Line") }}</option>
             <option value="POINT">{{ _("Point") }}</option>
           </select>
         </div>
         <div>
-          <label
-            class="ftm-checkbox-label"
-            style="display: flex; align-items: center; gap: 8px; margin-top: 28px"
-          >
-            <input type="checkbox" id="osm-centroid-checkbox" style="margin: 0; cursor: pointer" />
-            <span style="font-size: 0.95em">{{ _("Use centroids") }}</span>
+          <label class="ftm-step-option" style="margin-top: 28px">
+            <input type="checkbox" id="osm-centroid-checkbox" />
+            <span class="ftm-step-option__text">
+              <span class="ftm-step-option__title">{{ _("Use centroids") }}</span>
+              <span class="ftm-step-option__hint"
+                >{{ _("Convert polygons to single points.") }}</span
+              >
+            </span>
           </label>
         </div>
-      </div>
-
-      <div class="ftm-step__actions" style="margin-bottom: 0">
-        <button
-          id="upload-geojson-btn"
-          class="wa-button wa-button--default"
-          style="min-width: 220px"
-          type="button"
-        >
-          {{ _("Upload Custom GeoJSON") }}
-        </button>
       </div>
     </div>
   </div>
@@ -159,8 +155,5 @@
     <input type="file" name="data" id="geojson-file-input" accept=".geojson,.json" required />
   </form>
   <div id="geojson-preview-container" style="margin-top: 15px"></div>
-  {% else %}
-  <div class="ftm-step__success">✓ {{ _("OSM data extract ready") }}</div>
-  {% endif %}
 </div>
-{% endif %}
+{% endif %} {% endif %}

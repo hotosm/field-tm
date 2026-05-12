@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-05-10 03:59+0100\n"
+"POT-Creation-Date: 2026-05-11 22:06+0100\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: th\n"
@@ -28,34 +28,24 @@ msgstr "เกิดข้อผิดพลาดที่ไม่คาดค
 
 #: app/main.py:286
 msgid "Could not connect to database"
-msgstr ""
-"ไม่สามารถเชื่อมต่อกับฐานข้อมูลได้\n"
-"ผู้ใช้ที่ได้รับการรับรองความถูกต้องของ"
+msgstr "ไม่สามารถเชื่อมต่อกับฐานข้อมูลได้"
 
 #: app/auth/auth_deps.py:73
 msgid "Authenticated user is missing a valid identifier."
-msgstr ""
-"ไม่มีตัวระบุที่ถูกต้อง\n"
-"ผู้ใช้"
+msgstr "ไม่มีตัวระบุที่ถูกต้อง"
 
 #: app/auth/roles.py:142
 msgid "User must be an administrator"
-msgstr ""
-"ต้องเป็นผู้ดูแลระบบ\n"
-"ผู้ใช้"
+msgstr "ต้องเป็นผู้ดูแลระบบ"
 
 #: app/auth/roles.py:163
 msgid "User does not have permission to access the project."
-msgstr ""
-"ไม่มีสิทธิ์เข้าถึงโครงการ\n"
-"โครงการ"
+msgstr "ไม่มีสิทธิ์เข้าถึงโครงการ"
 
 #: app/auth/roles.py:234
 #, python-format
 msgid "Project is locked since it is in %(state)s state."
-msgstr ""
-"ถูกล็อคเนื่องจากอยู่ในสถานะ %(state)s\n"
-"ไม่สามารถแทรกผู้ใช้"
+msgstr "ถูกล็อคเนื่องจากอยู่ในสถานะ %(state)s"
 
 #: app/auth/user_crud.py:88
 #, python-format
@@ -65,19 +55,17 @@ msgstr "(%(user_sub)s) ใน db ได้"
 #: app/central/central_crud.py:151
 #, python-format
 msgid "Error listing projects on ODK Central: %(error)s"
-msgstr "เปิดโครงการใน ODK Central"
+msgstr "เกิดข้อผิดพลาดขณะเรียกรายการโครงการใน ODK Central: %(error)s"
 
 #: app/central/central_crud.py:182
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
-msgstr "เปิดโครงการใน ODK Central"
+msgstr "เกิดข้อผิดพลาดขณะสร้างโครงการใน ODK Central: %(error)s"
 
 #: app/central/central_crud.py:244
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
-msgstr ""
-"ไม่สามารถอัปโหลดแบบฟอร์มไปยัง ODK Central: %(error)s\n"
-"ต้องใช้"
+msgstr "ไม่สามารถอัปโหลดแบบฟอร์มไปยัง ODK Central: %(error)s"
 
 #: app/central/central_crud.py:259
 msgid "form_id is required to list submissions with pyodk."
@@ -90,15 +78,11 @@ msgstr "XLSForm ไม่ถูกต้อง: %(error)s"
 
 #: app/central/central_crud.py:429
 msgid "Conversion GeoJSON --> CSV failed"
-msgstr ""
-"การแปลง GeoJSON --> CSV ล้มเหลว\n"
-"โครงการ"
+msgstr "การแปลง GeoJSON --> CSV ล้มเหลว"
 
 #: app/central/central_crud.py:500
 msgid "Project contains no submissions yet"
-msgstr ""
-"ยังไม่มีการส่ง\n"
-"ต้องระบุฟิลด์ข้อมูล 'เรขาคณิต' ของ"
+msgstr "ยังไม่มีการส่ง"
 
 #: app/central/central_crud.py:562
 msgid "'geometry' data field is mandatory"
@@ -386,59 +370,47 @@ msgstr "ผู้ใช้นี้ไม่มีอยู่ โปรดส�
 msgid "This user is already a collaborator on this project."
 msgstr "ผู้ใช้นี้เป็นผู้ร่วมงานในโครงการนี้อยู่แล้ว"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1199
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1257
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "เพิ่มผู้ร่วมงานไม่สำเร็จ: %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:82
-#, python-format
-msgid ""
-"This project belongs to the %(organization)s organization. The user must "
-"be added to that organization before they can be added as a collaborator."
-" Your QFieldCloud account does not have permission to manage organization"
-" members."
-msgstr ""
-"โครงการนี้เป็นขององค์กร %(organization)s "
-"ต้องเพิ่มผู้ใช้เข้าองค์กรนั้นก่อนจึงจะเพิ่มเป็นผู้ร่วมงานได้ บัญชี "
-"QFieldCloud ของคุณไม่มีสิทธิ์จัดการสมาชิกองค์กร"
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:119
+#: app/htmx/qfc_admin/qfc_admin_routes.py:106
 msgid "All fields are required."
 msgstr "ต้องกรอกทุกช่อง"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:134
+#: app/htmx/qfc_admin/qfc_admin_routes.py:121
 msgid "Login succeeded but no token received."
 msgstr "เข้าสู่ระบบสำเร็จแต่ไม่ได้รับโทเค็น"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:142
+#: app/htmx/qfc_admin/qfc_admin_routes.py:129
 msgid "Login failed. Check your URL and credentials."
 msgstr "เข้าสู่ระบบไม่สำเร็จ โปรดตรวจสอบ URL และข้อมูลรับรองของคุณ"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:181
+#: app/htmx/qfc_admin/qfc_admin_routes.py:168
 msgid "Session expired. Please log in again."
 msgstr "เซสชันหมดอายุ โปรดเข้าสู่ระบบอีกครั้ง"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:196
+#: app/htmx/qfc_admin/qfc_admin_routes.py:183
 #, python-format
 msgid "Could not load collaborators: %(exc)s"
 msgstr "ไม่สามารถโหลดผู้ร่วมงานได้: %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:227
+#: app/htmx/qfc_admin/qfc_admin_routes.py:214
 msgid "Username is required."
 msgstr "ต้องระบุชื่อผู้ใช้"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:281
+#: app/htmx/qfc_admin/qfc_admin_routes.py:268
 #, python-format
 msgid "Failed to remove collaborator: %(exc)s"
 msgstr "ลบผู้ร่วมงานไม่สำเร็จ: %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:324
+#: app/htmx/qfc_admin/qfc_admin_routes.py:311
 #, python-format
 msgid "Failed to update collaborator: %(exc)s"
 msgstr "อัปเดตผู้ร่วมงานไม่สำเร็จ: %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:351
+#: app/htmx/qfc_admin/qfc_admin_routes.py:338
 #, python-format
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "รีเฟรชผู้ร่วมงานไม่สำเร็จ: %(exc)s"
@@ -509,7 +481,7 @@ msgid "Visibility"
 msgstr "การมองเห็น"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/new_project.html:58 app/templates/project_details.html:58
+#: app/templates/project_details.html:58
 msgid "Description"
 msgstr "คำอธิบาย"
 
@@ -532,7 +504,7 @@ msgid "from this project?"
 msgstr "ออกจากโครงการนี้หรือไม่"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
-#: app/templates/new_project.html:133
+#: app/templates/new_project_custom.html:156
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:66
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:156
 msgid "Cancel"
@@ -811,7 +783,6 @@ msgid "Invalid task areas data format."
 msgstr "รูปแบบข้อมูลพื้นที่งานไม่ถูกต้อง"
 
 #: app/htmx/setup_steps/setup_step_split_routes.py:357
-#: app/templates/partials/project_details/setup_steps/step4_split.html:21
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ บันทึกการแบ่งงานสำเร็จ"
 
@@ -847,9 +818,7 @@ msgstr "พื้นที่ที่เลือกใหญ่เกินไ
 
 #: app/projects/project_crud.py:147
 msgid "Failed to generate data extract from the raw data API."
-msgstr ""
-"ไม่สามารถสร้างการแยกข้อมูลจาก API ข้อมูลดิบ\n"
-"เนื้อหา XLSForm ของเทมเพลต"
+msgstr "ไม่สามารถสร้างการแยกข้อมูลจาก API ข้อมูลดิบ"
 
 #: app/projects/project_crud.py:901
 msgid "QField project ID not found."
@@ -893,101 +862,90 @@ msgstr "พื้นที่ {latitude:.4f}_{longitude:.4f}"
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:110
+#: app/qfield/qfield_crud.py:164
 msgid "Project outline is missing or has no geometry."
 msgstr "ขาดหายไปหรือไม่มีรูปทรงเรขาคณิต"
 
-#: app/qfield/qfield_crud.py:116
+#: app/qfield/qfield_crud.py:170
 msgid "Project outline geometry has no coordinates."
 msgstr "เรขาคณิตโครงร่างของโครงการไม่มีพิกัด"
 
-#: app/qfield/qfield_crud.py:425
+#: app/qfield/qfield_crud.py:479
 msgid "Project outline is required for QField project creation."
 msgstr "✓ การตั้งค่าโครงการนี้ไม่จำเป็นต้องแบ่งงาน"
 
-#: app/qfield/qfield_crud.py:430
+#: app/qfield/qfield_crud.py:484
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm จำเป็นสำหรับการสร้างโปรเจ็กต์ QField"
 
-#: app/qfield/qfield_crud.py:447
+#: app/qfield/qfield_crud.py:501
 msgid "Failed to modify XLSForm for QField."
-msgstr ""
-"ไม่สามารถแก้ไข XLSForm สำหรับ QField\n"
-"wrapper"
+msgstr "ไม่สามารถแก้ไข XLSForm สำหรับ QField"
 
-#: app/qfield/qfield_crud.py:488
+#: app/qfield/qfield_crud.py:542
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS เสร็จสมบูรณ์ แต่ไม่มีการเขียนไฟล์เอาต์พุต"
 
-#: app/qfield/qfield_crud.py:500
+#: app/qfield/qfield_crud.py:554
 msgid "QGIS wrapper completed but no .qgz file in output."
-msgstr ""
-"QGIS wrapper เสร็จสมบูรณ์ แต่ไม่มีไฟล์ .qgz ในเอาต์พุต\n"
-"รหัสโครงการ"
+msgstr "QGIS wrapper เสร็จสมบูรณ์ แต่ไม่มีไฟล์ .qgz ในเอาต์พุต"
 
-#: app/qfield/qfield_crud.py:530
+#: app/qfield/qfield_crud.py:584
 msgid "QField project ID is missing; cannot attach basemap."
-msgstr ""
-"QField หายไป ไม่สามารถแนบแผนที่ฐานได้\n"
-"การสร้างโครงการ"
+msgstr "QField หายไป ไม่สามารถแนบแผนที่ฐานได้"
 
-#: app/qfield/qfield_crud.py:564
+#: app/qfield/qfield_crud.py:618
 msgid "Basemap attach completed but produced no project files."
 msgstr "แผนที่ฐานถูกแนบเข้ากับโปรเจ็กต์ QField แล้ว"
 
-#: app/qfield/qfield_crud.py:713 app/qfield/qfield_crud.py:727
+#: app/qfield/qfield_crud.py:771 app/qfield/qfield_crud.py:785
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
-msgstr ""
-"QGIS ล้มเหลว: %(error)s\n"
-"wrapper"
+msgstr "QGIS ล้มเหลว: %(error)s"
 
-#: app/qfield/qfield_crud.py:720
+#: app/qfield/qfield_crud.py:778
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS ส่งคืน JSON ที่ไม่ถูกต้อง"
 
-#: app/qfield/qfield_crud.py:744
+#: app/qfield/qfield_crud.py:802
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "ไม่สามารถดาวน์โหลดแผนที่ฐาน MBTiles สำหรับการอัปโหลด (HTTP %(status)s)"
 
-#: app/qfield/qfield_crud.py:759
+#: app/qfield/qfield_crud.py:817
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "ดาวน์โหลดรหัส QR"
 
-#: app/qfield/qfield_crud.py:874
+#: app/qfield/qfield_crud.py:932
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
-msgstr ""
-"ไม่สามารถอัปโหลดไฟล์ไปยัง QFieldCloud: %(error)s\n"
-"โครงการ"
+msgstr "ไม่สามารถอัปโหลดไฟล์ไปยัง QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1148
+#: app/qfield/qfield_crud.py:1206
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "ไม่พบโครงการ (%(project_id)s)"
 
-#: app/qfield/qfield_crud.py:1168
+#: app/qfield/qfield_crud.py:1226
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
 " to the organization: %(error)s"
 msgstr ""
 "เป็นขององค์กร '%(owner)s' ไม่สามารถเพิ่ม '%(username)s' ให้กับองค์กร: "
-"%(error)s\n"
-"ผู้ใช้"
+"%(error)s"
 
-#: app/qfield/qfield_crud.py:1186
+#: app/qfield/qfield_crud.py:1244
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "'%(username)s' ไม่มีอยู่ใน QFieldCloud"
 
-#: app/qfield/qfield_crud.py:1193
+#: app/qfield/qfield_crud.py:1251
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
-msgstr "ผู้ใช้นี้เป็นผู้ร่วมงานในโครงการนี้อยู่แล้ว"
+msgstr "ผู้ใช้ '%(username)s' เป็นผู้ร่วมงานในโครงการนี้อยู่แล้ว"
 
-#: app/qfield/qfield_crud.py:1234
+#: app/qfield/qfield_crud.py:1292
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ ข้อมูลรับรองถูกต้อง"
 
@@ -1047,12 +1005,9 @@ msgstr "ค้นหา"
 msgid "Search projects…"
 msgstr "ค้นหาโครงการ…"
 
-#: app/templates/home.html:68 app/templates/landing.html:568
-#: app/templates/layout.html:235 app/templates/new_project.html:1
-#: app/templates/new_project.html:20 app/templates/new_project.html:128
-#: app/templates/new_project_simple.html:1
-#: app/templates/new_project_simple.html:4
-#: app/templates/new_project_simple.html:36
+#: app/templates/home.html:68 app/templates/landing.html:503
+#: app/templates/layout.html:280 app/templates/new_project_chooser.html:1
+#: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "สร้างโครงการ"
 
@@ -1103,29 +1058,29 @@ msgstr "ไม่มีข้อมูล"
 msgid "No projects found. Create your first project to get started!"
 msgstr "ไม่พบโครงการ สร้างโครงการแรกของคุณเพื่อเริ่มต้น"
 
-#: app/templates/landing.html:558
+#: app/templates/landing.html:493
 msgid "Coordinate field campaigns"
 msgstr "ประสานงานภาคสนาม"
 
-#: app/templates/landing.html:561
+#: app/templates/landing.html:496
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
 msgstr "เพิ่มประสิทธิภาพและความแม่นยำของการทำแผนที่ภาคสนามผ่านการประสานงานที่ราบรื่น"
 
-#: app/templates/landing.html:565
+#: app/templates/landing.html:500
 msgid "Explore Projects"
 msgstr "สำรวจโครงการ"
 
-#: app/templates/landing.html:578
+#: app/templates/landing.html:513
 msgid "Loading metrics..."
 msgstr "กำลังโหลดตัวชี้วัด..."
 
-#: app/templates/landing.html:586
+#: app/templates/landing.html:521
 msgid "What is it?"
 msgstr "นี่คืออะไร"
 
-#: app/templates/landing.html:588
+#: app/templates/landing.html:523
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
 "map features\n"
@@ -1134,7 +1089,7 @@ msgstr ""
 "Field Tasking Manager (Field-TM) "
 "ช่วยให้ทีมงานเพิ่มองค์ความรู้ท้องถิ่นให้กับฟีเจอร์บนแผนที่ผ่านการประสานงานการทำแผนที่ภาคสนาม"
 
-#: app/templates/landing.html:592
+#: app/templates/landing.html:527
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
 "mature tools\n"
@@ -1149,19 +1104,19 @@ msgstr ""
 "เป็นเวิร์กโฟลว์บนมือถือและเว็บแบบอิสระที่ช่วยให้ทีมเก็บข้อมูลภูมิสารสนเทศได้อย่างมีประสิทธิภาพด้วยอุปกรณ์"
 " Android ทั่วไป"
 
-#: app/templates/landing.html:599
+#: app/templates/landing.html:534
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr "ผู้จัดการโครงการสาธิตเวิร์กโฟลว์การทำแผนที่ของ FieldTM บนแล็ปท็อป"
 
-#: app/templates/landing.html:605
+#: app/templates/landing.html:540
 msgid "Main Features"
 msgstr "คุณสมบัติหลัก"
 
-#: app/templates/landing.html:608
+#: app/templates/landing.html:543
 msgid "Flexible Data Collection"
 msgstr "การเก็บข้อมูลที่ยืดหยุ่น"
 
-#: app/templates/landing.html:610
+#: app/templates/landing.html:545
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
 "workflows that\n"
@@ -1170,11 +1125,11 @@ msgstr ""
 "รองรับแบบสำรวจที่หลากหลาย รูปแบบข้อมูลหลายชนิด "
 "และเวิร์กโฟลว์ที่ปรับให้เหมาะกับความต้องการในการดำเนินงานที่แตกต่างกัน"
 
-#: app/templates/landing.html:615
+#: app/templates/landing.html:550
 msgid "Open Source and Customizable"
 msgstr "โอเพนซอร์สและปรับแต่งได้"
 
-#: app/templates/landing.html:617
+#: app/templates/landing.html:552
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
 "\n"
@@ -1183,30 +1138,30 @@ msgstr ""
 "ปรับ Field-TM ให้เหมาะกับตรรกะแบบสำรวจ โครงสร้างข้อมูล "
 "และความต้องการด้านการเชื่อมต่อของคุณ"
 
-#: app/templates/landing.html:622
+#: app/templates/landing.html:557
 msgid "Entity-Level Tracking"
 msgstr "การติดตามระดับเอนทิตี"
 
-#: app/templates/landing.html:624
+#: app/templates/landing.html:559
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed\n"
 "          decisions quickly."
 msgstr "ติดตามความคืบหน้าของการสำรวจในระดับงานและระดับฟีเจอร์เพื่อให้ผู้จัดการตัดสินใจได้อย่างรวดเร็วและมีข้อมูลรองรับ"
 
-#: app/templates/landing.html:632
+#: app/templates/landing.html:567
 msgid "Who is it for?"
 msgstr "เหมาะสำหรับใคร"
 
-#: app/templates/landing.html:635
+#: app/templates/landing.html:570
 msgid "Project Manager"
 msgstr "ผู้จัดการโครงการ"
 
-#: app/templates/landing.html:636
+#: app/templates/landing.html:571
 msgid "Create and coordinate field campaigns"
 msgstr "สร้างและประสานงานภาคสนาม"
 
-#: app/templates/landing.html:638
+#: app/templates/landing.html:573
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
 " interest,\n"
@@ -1215,31 +1170,31 @@ msgstr ""
 "ผู้จัดการโครงการใช้ Field-TM เพื่อตั้งค่าโครงการทำแผนที่ กำหนดพื้นที่สนใจ"
 " ออกแบบแบบสำรวจ และแบ่งงานออกเป็นส่วนที่จัดการได้"
 
-#: app/templates/landing.html:642
+#: app/templates/landing.html:577
 msgid "Define a project area and upload or choose a survey form"
 msgstr "กำหนดพื้นที่โครงการและอัปโหลดหรือเลือกแบบสำรวจ"
 
-#: app/templates/landing.html:643
+#: app/templates/landing.html:578
 msgid "Split the area into tasks and generate a data extract"
 msgstr "แบ่งพื้นที่เป็นงานและสร้างข้อมูลที่ดึงออก"
 
-#: app/templates/landing.html:644
+#: app/templates/landing.html:579
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "เผยแพร่โครงการไปยัง ODK Central หรือ QFieldCloud"
 
-#: app/templates/landing.html:645
+#: app/templates/landing.html:580
 msgid "Share a QR code so mappers can start collecting data"
 msgstr "แชร์รหัส QR เพื่อให้ผู้ทำแผนที่เริ่มเก็บข้อมูลได้"
 
-#: app/templates/landing.html:649
+#: app/templates/landing.html:584
 msgid "Field Mapper"
 msgstr "ผู้ทำแผนที่ภาคสนาม"
 
-#: app/templates/landing.html:650
+#: app/templates/landing.html:585
 msgid "Collect data in the field with your phone"
 msgstr "เก็บข้อมูลภาคสนามด้วยโทรศัพท์ของคุณ"
 
-#: app/templates/landing.html:652
+#: app/templates/landing.html:587
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
 "publishes a\n"
@@ -1250,35 +1205,35 @@ msgstr ""
 "เมื่อผู้จัดการโครงการเผยแพร่โครงการแล้ว "
 "ผู้ทำแผนที่จะเข้าถึงได้โดยตรงในแอปมือถือที่เลือกใช้"
 
-#: app/templates/landing.html:656
+#: app/templates/landing.html:591
 msgid "Scan the QR code shared by your project manager"
 msgstr "สแกนรหัส QR ที่ผู้จัดการโครงการแชร์ให้"
 
-#: app/templates/landing.html:657
+#: app/templates/landing.html:592
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "โครงการจะโหลดอัตโนมัติใน ODK Collect หรือ QField"
 
-#: app/templates/landing.html:658
+#: app/templates/landing.html:593
 msgid "Navigate to your assigned task area and collect data"
 msgstr "ไปยังพื้นที่งานที่ได้รับมอบหมายและเก็บข้อมูล"
 
-#: app/templates/landing.html:659
+#: app/templates/landing.html:594
 msgid "Submit your survey, which goes straight to the server"
 msgstr "ส่งแบบสำรวจของคุณ ซึ่งจะถูกส่งตรงไปยังเซิร์ฟเวอร์"
 
-#: app/templates/landing.html:666
+#: app/templates/landing.html:601
 msgid "Field-TM Use Cases"
 msgstr "กรณีใช้งานของ Field-TM"
 
-#: app/templates/landing.html:671
+#: app/templates/landing.html:606
 msgid "Field mapping in progress"
 msgstr "การทำแผนที่ภาคสนามที่กำลังดำเนินอยู่"
 
-#: app/templates/landing.html:676
+#: app/templates/landing.html:611
 msgid "1. Community Mapping"
 msgstr "1. การทำแผนที่ชุมชน"
 
-#: app/templates/landing.html:678
+#: app/templates/landing.html:613
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public\n"
@@ -1287,11 +1242,11 @@ msgstr ""
 "Field Tasking Manager ช่วยให้ชุมชนสามารถทำแผนที่ชุมชนแออัด "
 "สิ่งอำนวยความสะดวกสาธารณะ และบริการท้องถิ่นเพื่อการวางแผนที่ครอบคลุม"
 
-#: app/templates/landing.html:683
+#: app/templates/landing.html:618
 msgid "2. Urban Planning and Management"
 msgstr "2. การวางผังและการจัดการเมือง"
 
-#: app/templates/landing.html:685
+#: app/templates/landing.html:620
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities\n"
@@ -1300,11 +1255,11 @@ msgstr ""
 "สร้างเมืองที่ชาญฉลาดยิ่งขึ้นด้วยการสำรวจบ้าน ถนน "
 "และสาธารณูปโภคแบบประสานงานผ่านงานทำแผนที่ที่ชัดเจนและจัดการได้"
 
-#: app/templates/landing.html:690
+#: app/templates/landing.html:625
 msgid "3. Disaster Response and Recovery"
 msgstr "3. การตอบสนองและฟื้นฟูหลังภัยพิบัติ"
 
-#: app/templates/landing.html:692
+#: app/templates/landing.html:627
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
 "volunteers, and\n"
@@ -1314,69 +1269,65 @@ msgstr ""
 "ประสานงานอาสาสมัคร "
 "และส่งมอบข้อมูลที่เชื่อถือได้สำหรับปฏิบัติการบรรเทาทุกข์"
 
-#: app/templates/landing.html:701
+#: app/templates/landing.html:636
 msgid "Resources"
 msgstr "ทรัพยากร"
 
-#: app/templates/landing.html:709
+#: app/templates/landing.html:644
 msgid "Data Prep"
 msgstr "การเตรียมข้อมูล"
 
-#: app/templates/landing.html:710
+#: app/templates/landing.html:645
 msgid "HOT Export Tool"
 msgstr "เครื่องมือส่งออก HOT"
 
-#: app/templates/landing.html:712
+#: app/templates/landing.html:647
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr "ดาวน์โหลดข้อมูลภูมิสารสนเทศที่พร้อมใช้งานสำหรับพื้นที่โครงการของคุณ"
 
-#: app/templates/landing.html:721 app/templates/landing.html:733
+#: app/templates/landing.html:656 app/templates/landing.html:668
 msgid "Documentation"
 msgstr "เอกสาร"
 
-#: app/templates/landing.html:722
+#: app/templates/landing.html:657
 msgid "ODK Central Guide"
 msgstr "คู่มือ ODK Central"
 
-#: app/templates/landing.html:724
+#: app/templates/landing.html:659
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr "เรียนรู้วิธีจัดการแบบฟอร์ม ผู้ใช้แอป และการส่งข้อมูลภาคสนามใน ODK"
 
-#: app/templates/landing.html:734
+#: app/templates/landing.html:669
 msgid "QField Guide"
 msgstr "คู่มือ QField"
 
-#: app/templates/landing.html:736
+#: app/templates/landing.html:671
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "ตั้งค่าโครงการ QFieldCloud "
 "และเวิร์กโฟลว์บนมือถือสำหรับการทำแผนที่แบบออฟไลน์"
 
-#: app/templates/landing.html:746
+#: app/templates/landing.html:681
 msgid "Need assistance?"
 msgstr "ต้องการความช่วยเหลือหรือไม่"
 
-#: app/templates/landing.html:747
+#: app/templates/landing.html:682
 msgid "Email:"
 msgstr "อีเมล:"
-
-#: app/templates/landing.html:763
-msgid "Language"
-msgstr "ภาษา"
 
 #: app/templates/layout.html:13
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "การทำแผนที่ภาคสนามแบบประสานงานสำหรับแคมเปญ Open Mapping"
 
-#: app/templates/layout.html:168 app/templates/login.html:1
+#: app/templates/layout.html:195 app/templates/login.html:1
 msgid "Login"
 msgstr "เข้าสู่ระบบ"
 
-#: app/templates/layout.html:228
+#: app/templates/layout.html:273
 msgid "Projects"
 msgstr "โครงการ"
 
-#: app/templates/layout.html:242
+#: app/templates/layout.html:287
 msgid "QField Admin"
 msgstr "ผู้ดูแล QField"
 
@@ -1400,79 +1351,245 @@ msgstr "การยืนยันตัวตนถูกปิดใช้ง
 msgid "Back to home"
 msgstr "กลับหน้าหลัก"
 
-#: app/templates/new_project.html:4
-msgid "Create New Project"
-msgstr "สร้างโครงการใหม่"
+#: app/templates/new_project_chooser.html:4
+msgid "What do you want to map?"
+msgstr "คุณต้องการทำแผนที่อะไร?"
 
-#: app/templates/new_project.html:17
+#: app/templates/new_project_chooser.html:6
 msgid ""
-"If you are collecting OSM Buildings, use the simple workflow with AOI "
-"only."
-msgstr "หากคุณกำลังเก็บข้อมูล OSM Buildings ให้ใช้เวิร์กโฟลว์แบบง่ายที่มีเพียง AOI"
+"Pick the option that fits your project. You can change your mind later by"
+" starting over."
+msgstr ""
+"เลือกตัวเลือกที่เหมาะกับโครงการของคุณ "
+"คุณสามารถเปลี่ยนใจภายหลังได้โดยเริ่มใหม่"
 
-#: app/templates/new_project.html:45
-msgid "Project Name"
+#: app/templates/new_project_chooser.html:14
+#: app/templates/new_project_chooser.html:26
+#: app/templates/new_project_simple.html:7
+msgid "Map buildings"
+msgstr "อาคาร OSM"
+
+#: app/templates/new_project_chooser.html:17
+msgid "Quickest way to start. Just draw your area on the map and you're done."
+msgstr "วิธีเริ่มต้นที่เร็วที่สุด เพียงวาดพื้นที่ของคุณบนแผนที่ก็เสร็จแล้ว"
+
+#: app/templates/new_project_chooser.html:21
+msgid "We'll pre-fill the project for you"
+msgstr "เราจะกรอกโครงการล่วงหน้าให้คุณ"
+
+#: app/templates/new_project_chooser.html:22
+msgid "Uses building outlines already in OpenStreetMap"
+msgstr "ใช้ขอบเขตอาคารที่มีอยู่แล้วใน OpenStreetMap"
+
+#: app/templates/new_project_chooser.html:23
+msgid "Comes with a ready-made survey for buildings"
+msgstr "มาพร้อมแบบสำรวจสำเร็จรูปสำหรับอาคาร"
+
+#: app/templates/new_project_chooser.html:32
+msgid "Something else"
+msgstr "อย่างอื่น"
+
+#: app/templates/new_project_chooser.html:35
+msgid ""
+"Use this for anything that isn't buildings. You'll get more options to "
+"set things up\n"
+"        the way you want."
+msgstr ""
+"ใช้ตัวเลือกนี้สำหรับสิ่งที่ไม่ใช่อาคาร "
+"คุณจะมีตัวเลือกเพิ่มเติมในการตั้งค่าตามที่ต้องการ"
+
+#: app/templates/new_project_chooser.html:41
+msgid ""
+"Map roads, healthcare, water points, toilets, schools, and many other "
+"things"
+msgstr "ทำแผนที่ถนน บริการสุขภาพ จุดน้ำ ห้องน้ำ โรงเรียน และสิ่งอื่น ๆ อีกมากมาย"
+
+#: app/templates/new_project_chooser.html:43
+msgid "Bring your own survey questions"
+msgstr "นำคำถามแบบสำรวจของคุณเองมาใช้"
+
+#: app/templates/new_project_chooser.html:44
+msgid "Bring your own map data, or start with an empty map"
+msgstr "นำข้อมูลแผนที่ของคุณเองมาใช้ หรือเริ่มด้วยแผนที่ว่าง"
+
+#: app/templates/new_project_chooser.html:45
+msgid "Control how the area is divided up for mappers"
+msgstr "ควบคุมวิธีแบ่งพื้นที่สำหรับผู้ทำแผนที่"
+
+#: app/templates/new_project_chooser.html:48
+msgid "Set up a custom project"
+msgstr "ค้นหาโครงการ…"
+
+#: app/templates/new_project_custom.html:1
+msgid "Create Custom Project"
+msgstr "สร้างโครงการ"
+
+#: app/templates/new_project_custom.html:5
+#: app/templates/new_project_simple.html:5
+msgid "Back"
+msgstr "ย้อนกลับ"
+
+#: app/templates/new_project_custom.html:7
+msgid "Set up your project"
+msgstr "สำรวจโครงการ"
+
+#: app/templates/new_project_custom.html:9
+msgid ""
+"Just the basics on this page — what you're mapping, where, and which app "
+"mappers will use.\n"
+"    You'll pick your survey questions and map data on the next page."
+msgstr ""
+"หน้านี้มีเฉพาะข้อมูลพื้นฐาน: คุณกำลังทำแผนที่อะไร ที่ไหน "
+"และผู้ทำแผนที่จะใช้แอปใด "
+"คุณจะเลือกคำถามแบบสำรวจและข้อมูลแผนที่ในหน้าถัดไป"
+
+#: app/templates/new_project_custom.html:32
+msgid "About your project"
+msgstr "กลับไปยังโครงการ"
+
+#: app/templates/new_project_custom.html:34
+msgid ""
+"Give your project a clear name and a short summary so mappers know what "
+"it's\n"
+"          about."
+msgstr ""
+"ตั้งชื่อโครงการให้ชัดเจนและเขียนสรุปสั้น ๆ "
+"เพื่อให้ผู้ทำแผนที่รู้ว่าโครงการเกี่ยวกับอะไร"
+
+#: app/templates/new_project_custom.html:40
+msgid "Project name"
 msgstr "ชื่อโครงการ"
 
-#: app/templates/new_project.html:50
-msgid "Enter project name"
-msgstr "ป้อนชื่อโครงการ"
+#: app/templates/new_project_custom.html:45
+msgid "e.g. Buildings in West Nairobi"
+msgstr "เช่น อาคารในไนโรบีตะวันตก"
 
-#: app/templates/new_project.html:63
-msgid "Enter project description"
-msgstr "ป้อนคำอธิบายโครงการ"
+#: app/templates/new_project_custom.html:53
+msgid "What are you mapping?"
+msgstr "พร้อมสำหรับการทำแผนที่"
 
-#: app/templates/new_project.html:72
-msgid "Field Mapping App"
-msgstr "แอปทำแผนที่ภาคสนาม"
+#: app/templates/new_project_custom.html:58
+msgid ""
+"A short description. e.g. Mapping water points and toilets in informal "
+"settlements."
+msgstr "คำอธิบายสั้น ๆ เช่น การทำแผนที่จุดน้ำและห้องน้ำในชุมชนไม่เป็นทางการ"
 
-#: app/templates/new_project.html:113 app/templates/project_details.html:95
-msgid "Hashtags"
+#: app/templates/new_project_custom.html:67
+msgid "Which app will mappers use?"
+msgstr "ผู้ทำแผนที่จะใช้แอปใด?"
+
+#: app/templates/new_project_custom.html:69
+msgid "Pick the app you want mappers to install on their phone to do the survey."
+msgstr "เลือกแอปที่คุณต้องการให้ผู้ทำแผนที่ติดตั้งบนโทรศัพท์เพื่อทำแบบสำรวจ"
+
+#: app/templates/new_project_custom.html:89
+msgid ""
+"Powerful GIS-style mapping app, including geometry editing, but with a "
+"simple\n"
+"                mapping pathway enabled via our HOT plugin."
+msgstr ""
+"แอปทำแผนที่แบบ GIS ที่ทรงพลัง รวมถึงการแก้ไขเรขาคณิต "
+"แต่มีเส้นทางการทำแผนที่แบบง่ายที่เปิดใช้ผ่านปลั๊กอิน HOT ของเรา"
+
+#: app/templates/new_project_custom.html:111
+msgid ""
+"Simple form-based survey app. Best for straightforward question-and-"
+"answer\n"
+"                surveys."
+msgstr "แอปแบบสำรวจแบบฟอร์มที่เรียบง่าย เหมาะที่สุดสำหรับแบบสำรวจถามตอบตรงไปตรงมา"
+
+#: app/templates/new_project_custom.html:120
+msgid "Where are you mapping?"
+msgstr "พร้อมสำหรับการทำแผนที่"
+
+#: app/templates/new_project_custom.html:122
+msgid "Draw the area mappers will cover. Smaller areas are easier to coordinate."
+msgstr "วาดพื้นที่ที่ผู้ทำแผนที่จะครอบคลุม พื้นที่ขนาดเล็กประสานงานได้ง่ายกว่า"
+
+#: app/templates/new_project_custom.html:129
+msgid "Tags"
 msgstr "แฮชแท็ก"
 
-#: app/templates/new_project.html:116
-msgid "Type hashtags and press Enter or comma"
+#: app/templates/new_project_custom.html:131
+msgid "optional"
+msgstr "ไม่บังคับ"
+
+#: app/templates/new_project_custom.html:135
+msgid ""
+"Add tags so other people can find your project. Tags are like #buildings "
+"or\n"
+"          #campaign-2026."
+msgstr ""
+"เพิ่มแท็กเพื่อให้ผู้อื่นค้นหาโครงการของคุณได้ แท็กเช่น #buildings หรือ "
+"#campaign-2026"
+
+#: app/templates/new_project_custom.html:141
+msgid "Type a tag and press Enter"
 msgstr "พิมพ์แฮชแท็กแล้วกด Enter หรือเครื่องหมายจุลภาค"
 
-#: app/templates/new_project.html:121
-msgid ""
-"Type hashtags and press Enter or comma to add them. Click the × on a tag "
-"to remove\n"
-"          it."
+#: app/templates/new_project_custom.html:146
+msgid "Press Enter or comma after each tag. Click × on a tag to remove it."
 msgstr ""
 "พิมพ์แฮชแท็กแล้วกด Enter หรือเครื่องหมายจุลภาคเพื่อเพิ่ม คลิก × "
 "บนแท็กเพื่อลบ"
 
-#: app/templates/new_project.html:131
+#: app/templates/new_project_custom.html:152
+#: app/templates/partials/project_details/setup_steps/step2_form.html:82
+msgid "Continue"
+msgstr "ดำเนินการต่อ"
+
+#: app/templates/new_project_custom.html:154
 msgid "Creating..."
 msgstr "กำลังสร้าง..."
 
-#: app/templates/new_project.html:141
+#: app/templates/new_project_custom.html:164
 msgid "Something went wrong. Please try again."
 msgstr "มีบางอย่างผิดพลาด โปรดลองอีกครั้ง"
 
-#: app/templates/new_project.html:272
+#: app/templates/new_project_custom.html:295
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "มีโครงการที่ใช้ชื่อนี้อยู่แล้ว โปรดเลือกชื่ออื่น"
 
-#: app/templates/new_project.html:356
+#: app/templates/new_project_custom.html:379
 msgid "Description is required."
 msgstr "ต้องระบุคำอธิบาย"
 
-#: app/templates/new_project_simple.html:8
-msgid ""
-"This simple flow only needs your project area. We will auto-generate the "
-"project title,\n"
-"      description, and tags for OSM Buildings."
-msgstr ""
-"ขั้นตอนแบบง่ายนี้ต้องการเพียงพื้นที่โครงการของคุณ เราจะสร้างชื่อโครงการ "
-"คำอธิบาย และแท็กสำหรับ OSM Buildings ให้โดยอัตโนมัติ"
+#: app/templates/new_project_simple.html:1
+msgid "Quick Setup — OSM Buildings"
+msgstr "อาคาร OSM"
 
-#: app/templates/new_project_simple.html:38
-msgid "Back to Standard Form"
-msgstr "กลับไปยังแบบฟอร์มมาตรฐาน"
+#: app/templates/new_project_simple.html:9
+msgid ""
+"Just draw the area you want to map. We'll set everything up for you using"
+" building\n"
+"    outlines from OpenStreetMap and a ready-made survey for buildings."
+msgstr ""
+"เพียงวาดพื้นที่ที่คุณต้องการทำแผนที่ "
+"เราจะตั้งค่าทุกอย่างโดยใช้ขอบเขตอาคารจาก OpenStreetMap "
+"และแบบสำรวจสำเร็จรูปสำหรับอาคาร"
+
+#: app/templates/new_project_simple.html:14
+msgid "This is only for mapping buildings."
+msgstr "ตัวเลือกนี้ใช้สำหรับทำแผนที่อาคารเท่านั้น"
+
+#: app/templates/new_project_simple.html:15
+msgid ""
+"If you want to map something else (like roads or water points), use your "
+"own survey\n"
+"    questions, or bring your own map data,"
+msgstr ""
+"หากคุณต้องการทำแผนที่สิ่งอื่น (เช่น ถนนหรือจุดน้ำ) "
+"ใช้คำถามแบบสำรวจของคุณเอง หรือนำข้อมูลแผนที่ของคุณเองมาใช้,"
+
+#: app/templates/new_project_simple.html:17
+msgid "set up a custom project instead"
+msgstr "ให้ตั้งค่าโครงการแบบกำหนดเองแทน"
 
 #: app/templates/new_project_simple.html:46
+msgid "Switch to Custom Project"
+msgstr "เชื่อมกับโครงการ QField"
+
+#: app/templates/new_project_simple.html:55
 msgid "Creating project and preparing map..."
 msgstr "กำลังสร้างโครงการและเตรียมแผนที่..."
 
@@ -1500,6 +1617,10 @@ msgstr "สร้างแล้ว"
 #: app/templates/project_details.html:84
 msgid "Last Updated"
 msgstr "อัปเดตล่าสุด"
+
+#: app/templates/project_details.html:95
+msgid "Hashtags"
+msgstr "แฮชแท็ก"
 
 #: app/templates/project_details.html:107
 msgid "External Project"
@@ -1638,51 +1759,56 @@ msgid "No GeoJSON returned from validation"
 msgstr "ไม่มี GeoJSON ถูกส่งกลับจากการตรวจสอบ"
 
 #: app/templates/partials/new_project/map_script.html:11
-msgid ""
-"You must draw or upload an Area of Interest (AOI) on the map before "
-"submitting."
+msgid "You must draw or upload a project area on the map before submitting."
 msgstr "คุณต้องวาดหรืออัปโหลด Area of Interest (AOI) บนแผนที่ก่อนส่ง"
 
 #: app/templates/partials/new_project/map_section.html:3
 msgid "Project Area"
 msgstr "พื้นที่โครงการ"
 
-#: app/templates/partials/new_project/map_section.html:12
+#: app/templates/partials/new_project/map_section.html:6
+msgid "Draw the area you want to map on the map below."
+msgstr "วาดพื้นที่ที่คุณต้องการทำแผนที่บนแผนที่ด้านล่าง"
+
+#: app/templates/partials/new_project/map_section.html:15
 msgid "Draw Area"
 msgstr "วาดพื้นที่"
 
-#: app/templates/partials/new_project/map_section.html:20
-msgid "Upload GeoJSON"
-msgstr "อัปโหลด GeoJSON"
-
-#: app/templates/partials/new_project/map_section.html:23
+#: app/templates/partials/new_project/map_section.html:18
 msgid "Clear"
 msgstr "ล้าง"
 
-#: app/templates/partials/new_project/map_section.html:31
-msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area. Maximum\n"
-"    project size is 1,000 km². Areas over 100 km² will show a warning. "
-"The OSM data extract API is\n"
-"    limited to 200 km²."
-msgstr ""
-"วาดรูปหลายเหลี่ยมบนแผนที่หรืออัปโหลดไฟล์ GeoJSON "
-"เพื่อกำหนดพื้นที่โครงการของคุณ ขนาดสูงสุดของโครงการคือ 1,000 กม.² "
-"พื้นที่ที่เกิน 100 กม.² จะแสดงคำเตือน API สำหรับดึงข้อมูล OSM "
-"ถูกจำกัดไว้ที่ 200 กม.²"
-
-#: app/templates/partials/new_project/map_section.html:42
-#: app/templates/partials/project_details/setup_steps/step2_form.html:124
-#: app/templates/partials/project_details/setup_steps/step3_data.html:69
+#: app/templates/partials/new_project/map_section.html:32
+#: app/templates/partials/project_details/setup_steps/step2_form.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:72
 #: app/templates/partials/project_details/setup_steps/step4_split.html:36
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:27
-msgid "Advanced Config"
-msgstr "การตั้งค่าขั้นสูง"
+msgid "More options"
+msgstr "ตัวเลือกแบบฟอร์ม:"
+
+#: app/templates/partials/new_project/map_section.html:39
+msgid "Upload your own map file (GeoJSON)"
+msgstr "อัปโหลด GeoJSON แบบกำหนดเอง"
+
+#: app/templates/partials/new_project/map_section.html:43
+msgid ""
+"If you already have a map file with your area boundary, upload it here "
+"instead of\n"
+"        drawing."
+msgstr "หากคุณมีไฟล์แผนที่ที่มีขอบเขตพื้นที่อยู่แล้ว ให้อัปโหลดที่นี่แทนการวาด"
 
 #: app/templates/partials/new_project/map_section.html:50
-msgid "Merge geometries (use convex hull for multipolygons)"
-msgstr "รวมรูปทรงเรขาคณิต (ใช้ convex hull สำหรับ multipolygon)"
+msgid "Combine multiple shapes into one"
+msgstr "รวมหลายรูปทรงเป็นหนึ่งเดียว"
+
+#: app/templates/partials/new_project/map_section.html:55
+msgid ""
+"Keep areas under 100 km² for best results. Very large areas (over 200 "
+"km²) may not\n"
+"        download all map data automatically."
+msgstr ""
+"ควรรักษาพื้นที่ให้ต่ำกว่า 100 km² เพื่อผลลัพธ์ที่ดีที่สุด "
+"พื้นที่ขนาดใหญ่มาก (เกิน 200 km²) "
+"อาจไม่ดาวน์โหลดข้อมูลแผนที่ทั้งหมดโดยอัตโนมัติ"
 
 #: app/templates/partials/project_details/basemap_section.html:2
 msgid "Offline Basemap"
@@ -1719,32 +1845,28 @@ msgid "Project Location"
 msgstr "ตำแหน่งโครงการ"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 2: Upload XLSForm"
-msgstr "ขั้นตอนที่ 2: อัปโหลด XLSForm"
+#: app/templates/partials/project_details/setup_steps.html:53
+msgid "Survey Form"
+msgstr "แบบฟอร์มสำรวจ"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
-#: app/templates/partials/project_details/setup_steps/step2_form.html:12
-#: app/templates/partials/project_details/setup_steps/step3_data.html:13
-#: app/templates/partials/project_details/setup_steps/step4_split.html:13
 msgid "Complete"
 msgstr "เสร็จสมบูรณ์"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps/step3_data.html:8
-msgid "Step 3: Get Data"
-msgstr "ขั้นตอนที่ 3: รับข้อมูล"
+msgid "Map Data"
+msgstr "ข้อมูลแผนที่"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 4: Split into Tasks"
-msgstr "ขั้นตอนที่ 4: แบ่งเป็นงาน"
+msgid "Tasks"
+msgstr "รหัสงาน"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:4
-msgid "Step 5: Finalise Project"
-msgstr "ขั้นตอนที่ 5: ปิดงานโครงการ"
+msgid "Project Created"
+msgstr "โครงการที่สร้างแล้ว"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1768,6 +1890,26 @@ msgstr "กำลังโหลดรหัส QR..."
 msgid "Project Setup"
 msgstr "การตั้งค่าโครงการ"
 
+#: app/templates/partials/project_details/setup_steps.html:44
+msgid "Project setup progress"
+msgstr "การตั้งค่าโครงการ"
+
+#: app/templates/partials/project_details/setup_steps.html:47
+msgid "Project Details"
+msgstr "AOI ของโครงการ"
+
+#: app/templates/partials/project_details/setup_steps.html:59
+msgid "Get Data"
+msgstr "ขั้นตอนที่ 3: รับข้อมูล"
+
+#: app/templates/partials/project_details/setup_steps.html:65
+msgid "Split Tasks"
+msgstr "แบ่ง AOI"
+
+#: app/templates/partials/project_details/setup_steps.html:69
+msgid "Finalise"
+msgstr "ปิดงานโครงการ"
+
 #: app/templates/partials/project_details/style_and_scripts.html:8
 msgid "Select a survey type..."
 msgstr "เลือกประเภทแบบสำรวจ..."
@@ -1777,12 +1919,12 @@ msgid "No survey types available"
 msgstr "ไม่มีประเภทแบบสำรวจที่พร้อมใช้งาน"
 
 #: app/templates/partials/project_details/style_and_scripts.html:10
-msgid "No survey forms are available. Upload a custom form in Advanced Config."
+msgid "No survey forms are available. Upload your own survey file above."
 msgstr "ไม่มีแบบสำรวจที่พร้อมใช้งาน โปรดอัปโหลดแบบฟอร์มกำหนดเองใน Advanced Config"
 
 #: app/templates/partials/project_details/style_and_scripts.html:11
-msgid "Select a survey type, or upload a custom form in Advanced Config."
-msgstr "เลือกประเภทแบบสำรวจ หรืออัปโหลดแบบฟอร์มกำหนดเองใน Advanced Config"
+msgid "Pick a survey form, or upload your own."
+msgstr "เลือกประเภทแบบสำรวจและดำเนินการต่อด้วยค่าเริ่มต้นที่แนะนำ"
 
 #: app/templates/partials/project_details/style_and_scripts.html:12
 msgid "Survey type selected."
@@ -1801,8 +1943,8 @@ msgid "Custom form selected."
 msgstr "เลือกแบบฟอร์มกำหนดเองแล้ว"
 
 #: app/templates/partials/project_details/style_and_scripts.html:16
-msgid "Choose a survey type first, or upload a custom form in Advanced Config."
-msgstr "เลือกประเภทแบบสำรวจก่อน หรืออัปโหลดแบบฟอร์มกำหนดเองใน Advanced Config"
+msgid "Pick a survey form, or upload your own first."
+msgstr "เลือกประเภทแบบสำรวจและดำเนินการต่อด้วยค่าเริ่มต้นที่แนะนำ"
 
 #: app/templates/partials/project_details/style_and_scripts.html:17
 msgid "polygons"
@@ -1822,8 +1964,8 @@ msgstr "ฟีเจอร์"
 
 #: app/templates/partials/project_details/style_and_scripts.html:21
 msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use "
-"Advanced Config to upload your own GeoJSON or adjust download settings."
+"You uploaded a custom form, so this OSM download is optional. Upload your"
+" own map file below or open More options to adjust the source."
 msgstr ""
 "คุณได้อัปโหลดแบบฟอร์มกำหนดเองแล้ว ดังนั้นการดาวน์โหลด OSM "
 "นี้จึงเป็นทางเลือก ใช้ Advanced Config เพื่ออัปโหลด GeoJSON "
@@ -1832,8 +1974,8 @@ msgstr ""
 #: app/templates/partials/project_details/style_and_scripts.html:22
 #, python-format
 msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
-"map, then continue."
+"Recommended for your form: %(title)s (%(geom_label)s). Review the data on"
+" the map, then continue."
 msgstr ""
 "แหล่งข้อมูลที่แนะนำ: %(title)s (%(geom_label)s) "
 "ตรวจสอบข้อมูลบนแผนที่แล้วดำเนินการต่อ"
@@ -1841,8 +1983,8 @@ msgstr ""
 #: app/templates/partials/project_details/style_and_scripts.html:23
 #, python-format
 msgid ""
-"Recommended source updated (%(geom_label)s). Review the data on the map, "
-"then continue."
+"Source updated (%(geom_label)s). Review the data on the map, then "
+"continue."
 msgstr ""
 "อัปเดตแหล่งข้อมูลที่แนะนำแล้ว (%(geom_label)s) "
 "ตรวจสอบข้อมูลบนแผนที่แล้วดำเนินการต่อ"
@@ -1851,28 +1993,27 @@ msgstr ""
 msgid "Downloading..."
 msgstr "กำลังดาวน์โหลด..."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:33
+#: app/templates/partials/project_details/setup_steps/step3_data.html:27
 #: app/templates/partials/project_details/style_and_scripts.html:25
-msgid "Download OSM Data"
+msgid "Use OSM data"
 msgstr "ดาวน์โหลดข้อมูล OSM"
 
 #: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Confirm No Splitting"
 msgstr "ยืนยันไม่แบ่ง"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 #: app/templates/partials/project_details/style_and_scripts.html:28
-msgid "Split by Square"
+msgid "Split by grid"
 msgstr "แบ่งตามสี่เหลี่ยม"
 
 #: app/templates/partials/project_details/style_and_scripts.html:29
-msgid "Split by Buildings"
+msgid "Split by buildings"
 msgstr "แบ่งตามอาคาร"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:175
+#: app/templates/partials/project_details/setup_steps/step4_split.html:164
 #: app/templates/partials/project_details/style_and_scripts.html:30
-msgid "Split AOI"
-msgstr "แบ่ง AOI"
+msgid "Split area"
+msgstr "แบ่งอีกครั้ง"
 
 #: app/templates/partials/project_details/style_and_scripts.html:31
 msgid "Select Option"
@@ -2131,308 +2272,318 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "ยอมรับตัวเลือกงาน"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:7
-msgid "Step 2: Select Survey Form"
-msgstr "ขั้นตอนที่ 2: เลือกแบบสำรวจ"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:4
+msgid "Survey form ready"
+msgstr "แบบฟอร์มสำรวจพร้อมแล้ว"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:17
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "เลือกประเภทแบบสำรวจและดำเนินการต่อด้วยค่าเริ่มต้นที่แนะนำ"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:28
-msgid "Choose Survey Type:"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:9
+msgid "Choose Your Survey Form"
 msgstr "เลือกประเภทแบบสำรวจ:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:30
+#: app/templates/partials/project_details/setup_steps/step2_form.html:12
+msgid ""
+"Pick a ready-made survey that matches what you're mapping. You can upload"
+" your own survey\n"
+"    file if none of these fit."
+msgstr ""
+"เลือกแบบสำรวจสำเร็จรูปที่ตรงกับสิ่งที่คุณกำลังทำแผนที่ "
+"หากไม่มีตัวเลือกใดเหมาะสม คุณสามารถอัปโหลดไฟล์แบบสำรวจของคุณเองได้"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:25
+msgid "Survey form"
+msgstr "แบบฟอร์มสำรวจ"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:28
 msgid "Loading survey types..."
 msgstr "กำลังโหลดประเภทแบบสำรวจ..."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:46
-msgid "Or use your own form instead:"
-msgstr "หรือใช้แบบฟอร์มของคุณเองแทน:"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+msgid "or"
+msgstr "หรือ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:54
-msgid "Upload Custom XLSForm"
-msgstr "อัปโหลดแบบฟอร์มกำหนดเอง"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:36
+msgid "upload your own survey file (.xls / .xlsx)"
+msgstr "อัปโหลดไฟล์แบบสำรวจของคุณเอง (.xls / .xlsx)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:68
+#: app/templates/partials/project_details/setup_steps/step2_form.html:49
 msgid ""
-"Note: Field-TM will automatically inject additional fields into your form"
-" for task\n"
-"        division and feature selection. Your form should only contain the"
-" survey questions you want\n"
-"        to ask (do not include select_one_from_file fields for "
-"tasks/features)."
+"Heads up: Field-TM auto-adds fields for tasks and feature selection. Your"
+" form should\n"
+"        only contain the survey questions you want to ask."
 msgstr ""
 "หมายเหตุ: Field-TM "
 "จะแทรกฟิลด์เพิ่มเติมลงในฟอร์มของคุณโดยอัตโนมัติสำหรับการแบ่งงานและการเลือกฟีเจอร์"
 " ฟอร์มของคุณควรมีเฉพาะคำถามสำรวจที่คุณต้องการถามเท่านั้น (อย่าใส่ฟิลด์ "
 "select_one_from_file สำหรับงาน/ฟีเจอร์)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:98
-msgid ""
-"Recommended defaults are active for ODK projects, including ODK Collect\n"
-"        compatibility."
-msgstr ""
-"ค่าเริ่มต้นที่แนะนำเปิดใช้งานสำหรับโปรเจกต์ ODK รวมถึงความเข้ากันได้กับ "
-"ODK Collect"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Form language"
+msgstr "ภาษา"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:105
-#, python-format
-msgid "Recommended defaults are active for %(app_name)s projects."
-msgstr "ค่าเริ่มต้นที่แนะนำถูกเปิดใช้งานสำหรับโครงการ %(app_name)s"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:112
-msgid "Recommended defaults are active for this project."
-msgstr "ค่าเริ่มต้นที่แนะนำถูกเปิดใช้งานสำหรับโครงการนี้"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:131
-msgid "Default Language:"
-msgstr "ภาษาเริ่มต้น:"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:133
+#: app/templates/partials/project_details/setup_steps/step2_form.html:100
 msgid "English"
 msgstr "อังกฤษ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:134
+#: app/templates/partials/project_details/setup_steps/step2_form.html:101
 msgid "Spanish"
 msgstr "สเปน"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:135
+#: app/templates/partials/project_details/setup_steps/step2_form.html:102
 msgid "French"
 msgstr "ฝรั่งเศส"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:136
+#: app/templates/partials/project_details/setup_steps/step2_form.html:103
 msgid "Portuguese"
 msgstr "โปรตุเกส"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:137
+#: app/templates/partials/project_details/setup_steps/step2_form.html:104
 msgid "Swahili"
 msgstr "สวาฮีลี"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:138
+#: app/templates/partials/project_details/setup_steps/step2_form.html:105
 msgid "Hindi"
 msgstr "ฮินดี"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:153
-msgid "Form Options:"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:109
+msgid "Form questions"
 msgstr "ตัวเลือกแบบฟอร์ม:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:163
-msgid "Include photo upload question"
-msgstr "รวมคำถามอัปโหลดรูปถ่าย"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:113
+msgid "Ask for a photo"
+msgstr "ขอให้ถ่ายภาพ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:177
+#: app/templates/partials/project_details/setup_steps/step2_form.html:115
+msgid "Mappers will be asked to take a photo at the location."
+msgstr "ขอให้ผู้ใช้ถ่ายรูป ณ ตำแหน่งของตน"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:128
 msgid "Make photo mandatory"
 msgstr "กำหนดให้รูปถ่ายเป็นสิ่งบังคับ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:182
-msgid "Asks the user to take a photo at their location."
-msgstr "ขอให้ผู้ใช้ถ่ายรูป ณ ตำแหน่งของตน"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:193
-msgid "Include digitisation verification question"
-msgstr "รวมคำถามยืนยันการดิจิไทซ์"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:197
-msgid "Asks the mapper to verify if existing features are correctly digitised."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:135
+msgid "Ask to verify existing features"
 msgstr "ขอให้ผู้ทำแผนที่ยืนยันว่าองค์ประกอบที่มีอยู่ถูกดิจิไทซ์อย่างถูกต้องหรือไม่"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:220
-msgid "Continue"
-msgstr "ดำเนินการต่อ"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:137
+msgid "Mappers confirm whether existing OSM features are correctly digitised."
+msgstr "ขอให้ผู้ทำแผนที่ยืนยันว่าองค์ประกอบที่มีอยู่ถูกดิจิไทซ์อย่างถูกต้องหรือไม่"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:224
-msgid "✓ Survey form uploaded successfully"
-msgstr "✓ อัปโหลดแบบสำรวจสำเร็จแล้ว"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:4
+msgid "Data extract ready"
+msgstr "ข้อมูลที่ดึงออกจาก OSM พร้อมแล้ว"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:18
-msgid "Download the recommended OSM data for your survey form."
-msgstr "ดาวน์โหลดข้อมูล OSM ที่แนะนำสำหรับแบบสำรวจของคุณ"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:9
+msgid "Add Your Data"
+msgstr "ดาวน์โหลดข้อมูล OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:20
-msgid "Review the data on the map, then continue."
-msgstr "ตรวจสอบข้อมูลบนแผนที่แล้วดำเนินการต่อ"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:12
+msgid ""
+"Pull existing features from OpenStreetMap for your project area, or start"
+" with an empty\n"
+"    map so mappers can collect everything from scratch."
+msgstr ""
+"ดึงฟีเจอร์ที่มีอยู่จาก OpenStreetMap สำหรับพื้นที่โครงการของคุณ "
+"หรือเริ่มด้วยแผนที่ว่างเพื่อให้ผู้ทำแผนที่เก็บข้อมูลทุกอย่างตั้งแต่ต้น"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
-msgid "Collect New Data Only"
-msgstr "เก็บข้อมูลใหม่เท่านั้น"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:53
+msgid "Start with empty map"
+msgstr "เริ่มด้วยแผนที่ว่าง"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:76
-msgid "Use custom data inputs or override the default OSM download options."
-msgstr "ใช้ข้อมูลนำเข้าแบบกำหนดเองหรือแทนที่ตัวเลือกการดาวน์โหลด OSM เริ่มต้น"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:61
+msgid "upload your own map file (GeoJSON)"
+msgstr "อัปโหลด GeoJSON แบบกำหนดเอง"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:81
-msgid "OSM Category:"
-msgstr "หมวดหมู่ OSM:"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:79
+msgid "Override the default OSM source for this project."
+msgstr "ค่าเริ่มต้นที่แนะนำถูกเปิดใช้งานสำหรับโครงการนี้"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:83
+#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+msgid "What to download"
+msgstr "สิ่งที่จะดาวน์โหลด"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:88
 msgid "OSM Buildings"
 msgstr "อาคาร OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:84
+#: app/templates/partials/project_details/setup_steps/step3_data.html:89
 msgid "OSM Highways"
 msgstr "ทางหลวง OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+#: app/templates/partials/project_details/setup_steps/step3_data.html:90
 msgid "OSM Healthcare"
 msgstr "สถานพยาบาล OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:86
+#: app/templates/partials/project_details/setup_steps/step3_data.html:91
 msgid "OSM Toilets"
 msgstr "ห้องน้ำ OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:87
+#: app/templates/partials/project_details/setup_steps/step3_data.html:92
 msgid "OSM Religious"
 msgstr "ศาสนสถาน OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:88
+#: app/templates/partials/project_details/setup_steps/step3_data.html:93
 msgid "OSM Landuse"
 msgstr "การใช้ที่ดิน OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:94
 msgid "OSM Waterways"
 msgstr "ทางน้ำ OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:90
+#: app/templates/partials/project_details/setup_steps/step3_data.html:95
 msgid "OSM Water Points"
 msgstr "จุดน้ำ OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:91
+#: app/templates/partials/project_details/setup_steps/step3_data.html:96
 msgid "OSM Waste Disposal"
 msgstr "จุดกำจัดขยะ OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:92
+#: app/templates/partials/project_details/setup_steps/step3_data.html:97
 msgid "OSM Education"
 msgstr "การศึกษา OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:93
+#: app/templates/partials/project_details/setup_steps/step3_data.html:98
 msgid "OSM Cemeteries"
 msgstr "สุสาน OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:94
+#: app/templates/partials/project_details/setup_steps/step3_data.html:99
 msgid "OSM Amenities"
 msgstr "สิ่งอำนวยความสะดวก OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:99
-msgid "Geometry Type:"
-msgstr "ประเภทเรขาคณิต:"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+msgid "Feature shape"
+msgstr "ฟีเจอร์"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:102
-msgid "Polygon"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:107
+msgid "Polygon (area)"
 msgstr "รูปหลายเหลี่ยม"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:103
-msgid "Polyline"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:108
+msgid "Line"
 msgstr "เส้นหลายช่วง"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+#: app/templates/partials/project_details/setup_steps/step3_data.html:109
 msgid "Point"
 msgstr "จุด"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:113
+#: app/templates/partials/project_details/setup_steps/step3_data.html:116
 msgid "Use centroids"
 msgstr "ใช้จุดกึ่งกลาง"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:125
-msgid "Upload Custom GeoJSON"
-msgstr "อัปโหลด GeoJSON แบบกำหนดเอง"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+msgid "Convert polygons to single points."
+msgstr "แปลงโพลีกอนเป็นจุดเดี่ยว"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:144
+#: app/templates/partials/project_details/setup_steps/step3_data.html:140
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "กำลังสร้างข้อมูลที่ดึงออกจาก OSM... อาจใช้เวลาสักครู่"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:163
-msgid "OSM data extract ready"
-msgstr "ข้อมูลที่ดึงออกจาก OSM พร้อมแล้ว"
-
-#: app/templates/partials/project_details/setup_steps/step4_split.html:8
-msgid "Step 4: Split into Tasks (Optional)"
-msgstr "ขั้นตอนที่ 3: แบ่งเป็นงาน (ไม่บังคับ)"
-
-#: app/templates/partials/project_details/setup_steps/step4_split.html:18
-msgid "✓ Task splitting is not relevant without existing data"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:6
+msgid ""
+"Task splitting skipped (no existing\n"
+"    data)"
 msgstr "✓ การแบ่งงานไม่เกี่ยวข้องหากไม่มีข้อมูลที่มีอยู่"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:24
+#: app/templates/partials/project_details/setup_steps/step4_split.html:7
+msgid "Task areas ready"
+msgstr "แผนที่ฐานพร้อมแล้ว"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:13
+msgid "Split into Tasks"
+msgstr "ขั้นตอนที่ 4: แบ่งเป็นงาน"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:14
+msgid "Optional"
+msgstr "ไม่บังคับ"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:17
 msgid ""
-"Generate task areas by splitting the Area of Interest (AOI). Choose an "
-"algorithm and\n"
-"    parameters, then split. Review the preview, and click \"Accept Task "
-"Areas\" to save. Or click"
+"Divide your area into smaller tasks so multiple mappers can work in "
+"parallel. Pick how to\n"
+"    split below, preview the result, then accept it. Or skip to use the "
+"whole area as one task."
 msgstr ""
-"สร้างพื้นที่งานโดยแบ่ง Area of Interest (AOI) "
-"เลือกอัลกอริทึมและพารามิเตอร์ จากนั้นแบ่ง ตรวจสอบตัวอย่าง และคลิก "
-"\"Accept Task Areas\" เพื่อบันทึก หรือคลิก"
+"แบ่งพื้นที่ของคุณเป็นงานย่อยเพื่อให้ผู้ทำแผนที่หลายคนทำงานพร้อมกันได้ "
+"เลือกวิธีแบ่งด้านล่าง ดูตัวอย่างผลลัพธ์ แล้วจึงยอมรับ "
+"หรือข้ามเพื่อใช้ทั้งพื้นที่เป็นงานเดียว"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:27
-#: app/templates/partials/project_details/setup_steps/step4_split.html:46
-msgid "Skip"
-msgstr "ข้าม"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:29
+msgid "Skip splitting"
+msgstr "กำลังแบ่ง..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:28
-msgid "to use the whole AOI as a single task."
-msgstr "เพื่อใช้ AOI ทั้งหมดเป็นงานเดียว"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:50
+msgid ""
+"When splitting by building count, these linear features are used as "
+"natural task\n"
+"          boundaries."
+msgstr ""
+"เมื่อแบ่งตามจำนวนอาคาร "
+"ฟีเจอร์เชิงเส้นเหล่านี้จะใช้เป็นขอบเขตงานตามธรรมชาติ"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:60
-msgid "Choose which linear features influence building-based task splitting."
-msgstr "เลือกว่าฟีเจอร์เชิงเส้นใดจะมีผลต่อการแบ่งงานตามอาคาร"
-
-#: app/templates/partials/project_details/setup_steps/step4_split.html:84
+#: app/templates/partials/project_details/setup_steps/step4_split.html:75
 msgid "Include roads"
 msgstr "รวมถนน"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:93
+#: app/templates/partials/project_details/setup_steps/step4_split.html:84
 msgid "Include rivers"
 msgstr "รวมแม่น้ำ"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:102
+#: app/templates/partials/project_details/setup_steps/step4_split.html:93
 msgid "Include railways"
 msgstr "รวมทางรถไฟ"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+#: app/templates/partials/project_details/setup_steps/step4_split.html:102
 msgid "Include aeroways"
 msgstr "รวมเส้นทางการบิน"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:118
-msgid "Algorithm:"
-msgstr "อัลกอริทึม:"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:109
+msgid "How to split"
+msgstr "วิธีแบ่ง"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:120
-msgid "Select splitting option..."
-msgstr "เลือกตัวเลือกการแบ่ง..."
+#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+msgid "Choose a method..."
+msgstr "เลือกวิธี..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:122
-msgid "Average Buildings v1 (Voronoi)"
-msgstr "อาคารเฉลี่ย v1 (Voronoi)"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:112
+msgid "By number of buildings (faster)"
+msgstr "ตามจำนวนอาคาร (เร็วกว่า)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:124
-msgid "Average Buildings v2 (Straight Skeleton)"
-msgstr "อาคารเฉลี่ย v2 (Straight Skeleton)"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:114
+msgid "By number of buildings (cleaner shapes)"
+msgstr "ตามจำนวนอาคาร (รูปทรงเรียบร้อยกว่า)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:126
-msgid "Split by Specific Number of Tasks"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:116
+msgid "By a regular grid"
+msgstr "ตามกริดปกติ"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+msgid "Into a fixed number of tasks"
 msgstr "แบ่งตามจำนวนงานที่กำหนด (เร็ว ๆ นี้)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:132
-msgid "Avg. Buildings per Task:"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:122
+msgid "Buildings per task"
 msgstr "จำนวนอาคารเฉลี่ยต่องาน:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:144
-msgid "Number of Tasks:"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:133
+msgid "Number of tasks"
 msgstr "จำนวนงาน:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:156
-msgid "Dimension (meters):"
-msgstr "มิติ (เมตร):"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:145
+msgid "Grid square size (metres)"
+msgstr "ขนาดช่องกริด (เมตร)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:175
+#: app/templates/partials/project_details/setup_steps/step4_split.html:164
 msgid "Split Again"
 msgstr "แบ่งอีกครั้ง"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:211
-msgid "Splitting AOI into tasks... This may take a moment."
+#: app/templates/partials/project_details/setup_steps/step4_split.html:199
+msgid "Splitting area into tasks... This may take a moment."
 msgstr "กำลังแบ่ง AOI เป็นงาน... อาจใช้เวลาสักครู่"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:4
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:19
+msgid "Finalise Project"
+msgstr "ปิดงานโครงการ"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:5
 msgid "Ready"
@@ -2440,15 +2591,15 @@ msgstr "พร้อม"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:8
 msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
+"Everything's ready. Click below to create the project in your chosen "
+"mapping tool."
 msgstr ""
 "ข้อกำหนดเบื้องต้นทั้งหมดเสร็จสมบูรณ์แล้ว "
 "สร้างโครงการในเครื่องมือทำแผนที่ที่คุณเลือกได้เลย"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:19
-msgid "Finalise Project"
-msgstr "ปิดงานโครงการ"
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:27
+msgid "Use custom credentials"
+msgstr "ข้อมูลรับรองแบบกำหนดเอง"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:59
 msgid "Confirm Project Finalisation"

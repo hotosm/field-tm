@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-10 03:59+0100\n"
+"POT-Creation-Date: 2026-05-11 22:06+0100\n"
 "PO-Revision-Date: 2026-03-18 17:56+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
@@ -34,28 +34,20 @@ msgstr "Impossible de se connecter à la base de données"
 
 #: app/auth/auth_deps.py:73
 msgid "Authenticated user is missing a valid identifier."
-msgstr ""
-"Il manque un identifiant valide à l'utilisateur authentifié.\n"
-"L'utilisateur"
+msgstr "Il manque un identifiant valide à l'utilisateur authentifié."
 
 #: app/auth/roles.py:142
 msgid "User must be an administrator"
-msgstr ""
-"doit être un administrateur\n"
-"L'utilisateur"
+msgstr "doit être un administrateur"
 
 #: app/auth/roles.py:163
 msgid "User does not have permission to access the project."
-msgstr ""
-"n'est pas autorisé à accéder au projet.\n"
-"Le projet"
+msgstr "n'est pas autorisé à accéder au projet."
 
 #: app/auth/roles.py:234
 #, python-format
 msgid "Project is locked since it is in %(state)s state."
-msgstr ""
-"est verrouillé car il est dans l'état %(state)s.\n"
-"L'utilisateur"
+msgstr "est verrouillé car il est dans l'état %(state)s."
 
 #: app/auth/user_crud.py:88
 #, python-format
@@ -65,12 +57,12 @@ msgstr "(%(user_sub)s) n'a pas pu être inséré dans la base de données"
 #: app/central/central_crud.py:151
 #, python-format
 msgid "Error listing projects on ODK Central: %(error)s"
-msgstr "Ouvrir le projet dans ODK Central"
+msgstr "Erreur lors de la liste des projets dans ODK Central : %(error)s"
 
 #: app/central/central_crud.py:182
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
-msgstr "Ouvrir le projet dans ODK Central"
+msgstr "Erreur lors de la création du projet dans ODK Central : %(error)s"
 
 #: app/central/central_crud.py:244
 #, python-format
@@ -88,15 +80,11 @@ msgstr "XLSForm n'est pas valide : %(error)s"
 
 #: app/central/central_crud.py:429
 msgid "Conversion GeoJSON --> CSV failed"
-msgstr ""
-"Conversion GeoJSON --> CSV a échoué\n"
-"Le projet"
+msgstr "Conversion GeoJSON --> CSV a échoué"
 
 #: app/central/central_crud.py:500
 msgid "Project contains no submissions yet"
-msgstr ""
-"ne contient pas encore de soumissions\n"
-"Le champ de données 'géométrie'"
+msgstr "ne contient pas encore de soumissions"
 
 #: app/central/central_crud.py:562
 msgid "'geometry' data field is mandatory"
@@ -114,7 +102,9 @@ msgstr "Impossible de générer un jeton pour l'utilisateur de l'application."
 
 #: app/central/central_crud.py:995 app/central/central_crud.py:1001
 msgid "An error occurred while creating the app user token."
-msgstr "Une erreur inattendue s'est produite lors de la génération du code QR."
+msgstr ""
+"Une erreur est survenue lors de la création du jeton utilisateur de "
+"l’application."
 
 #: app/central/central_crud.py:1015
 #, python-format
@@ -154,9 +144,7 @@ msgstr "%(action)s a échoué avec HTTP %(status_code)s."
 #: app/helpers/basemap_services.py:40
 #, python-format
 msgid "%(action)s failed due to upstream connection error."
-msgstr ""
-"%(action)s a échoué en raison d'une erreur de connexion en amont.\n"
-"L'API"
+msgstr "%(action)s a échoué en raison d'une erreur de connexion en amont."
 
 #: app/helpers/basemap_services.py:178
 #, python-format
@@ -407,60 +395,47 @@ msgstr "Cet utilisateur n'existe pas. Veuillez d'abord le créer."
 msgid "This user is already a collaborator on this project."
 msgstr "Cet utilisateur est déjà collaborateur sur ce projet."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1199
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1257
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "Échec de l'ajout du collaborateur : %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:82
-#, python-format
-msgid ""
-"This project belongs to the %(organization)s organization. The user must "
-"be added to that organization before they can be added as a collaborator."
-" Your QFieldCloud account does not have permission to manage organization"
-" members."
-msgstr ""
-"Ce projet appartient à l'organisation %(organization)s. L'utilisateur "
-"doit être ajouté à cette organisation avant de pouvoir être ajouté comme "
-"collaborateur. Votre compte QFieldCloud n'a pas la permission de gérer "
-"les membres de l'organisation."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:119
+#: app/htmx/qfc_admin/qfc_admin_routes.py:106
 msgid "All fields are required."
 msgstr "Tous les champs sont requis."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:134
+#: app/htmx/qfc_admin/qfc_admin_routes.py:121
 msgid "Login succeeded but no token received."
 msgstr "Connexion réussie mais aucun jeton reçu."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:142
+#: app/htmx/qfc_admin/qfc_admin_routes.py:129
 msgid "Login failed. Check your URL and credentials."
 msgstr "Échec de la connexion. Vérifiez votre URL et vos identifiants."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:181
+#: app/htmx/qfc_admin/qfc_admin_routes.py:168
 msgid "Session expired. Please log in again."
 msgstr "Session expirée. Veuillez vous reconnecter."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:196
+#: app/htmx/qfc_admin/qfc_admin_routes.py:183
 #, python-format
 msgid "Could not load collaborators: %(exc)s"
 msgstr "Impossible de charger les collaborateurs : %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:227
+#: app/htmx/qfc_admin/qfc_admin_routes.py:214
 msgid "Username is required."
 msgstr "Le nom d'utilisateur est requis."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:281
+#: app/htmx/qfc_admin/qfc_admin_routes.py:268
 #, python-format
 msgid "Failed to remove collaborator: %(exc)s"
 msgstr "Échec de la suppression du collaborateur : %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:324
+#: app/htmx/qfc_admin/qfc_admin_routes.py:311
 #, python-format
 msgid "Failed to update collaborator: %(exc)s"
 msgstr "Échec de la mise à jour du collaborateur : %(exc)s"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:351
+#: app/htmx/qfc_admin/qfc_admin_routes.py:338
 #, python-format
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "Échec du rafraîchissement du collaborateur : %(exc)s"
@@ -508,7 +483,7 @@ msgstr "Aucun projet trouvé."
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:77
 msgid "Public"
-msgstr "Public"
+msgstr "Public visible"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:79
 msgid "Private"
@@ -531,9 +506,9 @@ msgid "Visibility"
 msgstr "Visibilité"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/new_project.html:58 app/templates/project_details.html:58
+#: app/templates/project_details.html:58
 msgid "Description"
-msgstr "Description"
+msgstr "Description du projet"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:175
 msgid "Update"
@@ -554,7 +529,7 @@ msgid "from this project?"
 msgstr "de ce projet ?"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
-#: app/templates/new_project.html:133
+#: app/templates/new_project_custom.html:156
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:66
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:156
 msgid "Cancel"
@@ -570,7 +545,7 @@ msgstr "Rôle"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:199
 msgid "Actions"
-msgstr "Actions"
+msgstr "Actions disponibles"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:205
 msgid "No collaborators yet."
@@ -851,7 +826,6 @@ msgid "Invalid task areas data format."
 msgstr "Format de données des zones de tâches invalide."
 
 #: app/htmx/setup_steps/setup_step_split_routes.py:357
-#: app/templates/partials/project_details/setup_steps/step4_split.html:21
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ Tâches divisées enregistrées avec succès"
 
@@ -893,8 +867,7 @@ msgstr ""
 msgid "Failed to generate data extract from the raw data API."
 msgstr ""
 "Échec de la génération de l'extrait de données à partir de l'API de "
-"données brutes.\n"
-"Le contenu du modèle XLSForm"
+"données brutes."
 
 #: app/projects/project_crud.py:901
 msgid "QField project ID not found."
@@ -938,86 +911,75 @@ msgstr "Zone {latitude:.4f}_{longitude:.4f}"
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:110
+#: app/qfield/qfield_crud.py:164
 msgid "Project outline is missing or has no geometry."
 msgstr "Le contour du projet est manquant ou n'a pas de géométrie."
 
-#: app/qfield/qfield_crud.py:116
+#: app/qfield/qfield_crud.py:170
 msgid "Project outline geometry has no coordinates."
-msgstr ""
-"La géométrie du contour du projet n'a pas de coordonnées.\n"
-"Un aperçu du projet"
+msgstr "La géométrie du contour du projet n'a pas de coordonnées."
 
-#: app/qfield/qfield_crud.py:425
+#: app/qfield/qfield_crud.py:479
 msgid "Project outline is required for QField project creation."
 msgstr "est requis pour la création d'un projet QField."
 
-#: app/qfield/qfield_crud.py:430
+#: app/qfield/qfield_crud.py:484
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm est requis pour la création de projets QField."
 
-#: app/qfield/qfield_crud.py:447
+#: app/qfield/qfield_crud.py:501
 msgid "Failed to modify XLSForm for QField."
-msgstr ""
-"Échec de la modification de XLSForm pour QField.\n"
-"Le wrapper"
+msgstr "Échec de la modification de XLSForm pour QField."
 
-#: app/qfield/qfield_crud.py:488
+#: app/qfield/qfield_crud.py:542
 msgid "QGIS wrapper completed but wrote no output files."
-msgstr ""
-"QGIS est terminé mais n'écrit aucun fichier de sortie.\n"
-"Le wrapper QGIS"
+msgstr "QGIS est terminé mais n'écrit aucun fichier de sortie."
 
-#: app/qfield/qfield_crud.py:500
+#: app/qfield/qfield_crud.py:554
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "est terminé mais aucun fichier .qgz en sortie."
 
-#: app/qfield/qfield_crud.py:530
+#: app/qfield/qfield_crud.py:584
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr ""
 "L'ID du projet QField est manquant ; Impossible de joindre un fond de "
-"carte.\n"
-"Échec de la génération du projet"
+"carte."
 
-#: app/qfield/qfield_crud.py:564
+#: app/qfield/qfield_crud.py:618
 msgid "Basemap attach completed but produced no project files."
 msgstr "Le fond de carte a été joint au projet QField."
 
-#: app/qfield/qfield_crud.py:713 app/qfield/qfield_crud.py:727
+#: app/qfield/qfield_crud.py:771 app/qfield/qfield_crud.py:785
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
-msgstr ""
-"QGIS : %(error)s\n"
-"Le wrapper QGIS"
+msgstr "QGIS : %(error)s"
 
-#: app/qfield/qfield_crud.py:720
+#: app/qfield/qfield_crud.py:778
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "a renvoyé un JSON non valide."
 
-#: app/qfield/qfield_crud.py:744
+#: app/qfield/qfield_crud.py:802
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr ""
 "Échec du téléchargement des MBTiles du fond de carte pour le "
 "téléchargement (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:759
+#: app/qfield/qfield_crud.py:817
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "Télécharger le code QR"
 
-#: app/qfield/qfield_crud.py:874
+#: app/qfield/qfield_crud.py:932
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
-msgstr ""
-"Échec du téléchargement des fichiers vers QFieldCloud : %(error)s\n"
-"Le projet"
+msgstr "Échec du téléchargement des fichiers vers QFieldCloud : %(error)s"
 
-#: app/qfield/qfield_crud.py:1148
+#: app/qfield/qfield_crud.py:1206
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "Projet (%(project_id)s) introuvable."
 
-#: app/qfield/qfield_crud.py:1168
+#: app/qfield/qfield_crud.py:1226
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -1026,17 +988,17 @@ msgstr ""
 "appartient à l'organisation '%(owner)s'. Impossible d'ajouter « "
 "%(username)s » à l'organisation : %(error)s"
 
-#: app/qfield/qfield_crud.py:1186
+#: app/qfield/qfield_crud.py:1244
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "L'utilisateur « %(username)s » n'existe pas sur QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1193
+#: app/qfield/qfield_crud.py:1251
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
-msgstr "Cet utilisateur est déjà collaborateur sur ce projet."
+msgstr "L'utilisateur '%(username)s' est déjà collaborateur sur ce projet."
 
-#: app/qfield/qfield_crud.py:1234
+#: app/qfield/qfield_crud.py:1292
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Les identifiants sont valides !"
 
@@ -1096,12 +1058,9 @@ msgstr "Rechercher"
 msgid "Search projects…"
 msgstr "Rechercher des projets…"
 
-#: app/templates/home.html:68 app/templates/landing.html:568
-#: app/templates/layout.html:235 app/templates/new_project.html:1
-#: app/templates/new_project.html:20 app/templates/new_project.html:128
-#: app/templates/new_project_simple.html:1
-#: app/templates/new_project_simple.html:4
-#: app/templates/new_project_simple.html:36
+#: app/templates/home.html:68 app/templates/landing.html:503
+#: app/templates/layout.html:280 app/templates/new_project_chooser.html:1
+#: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "Créer un projet"
 
@@ -1152,11 +1111,11 @@ msgstr "N/D"
 msgid "No projects found. Create your first project to get started!"
 msgstr "Aucun projet trouvé. Créez votre premier projet pour commencer !"
 
-#: app/templates/landing.html:558
+#: app/templates/landing.html:493
 msgid "Coordinate field campaigns"
 msgstr "Coordonner les campagnes de terrain"
 
-#: app/templates/landing.html:561
+#: app/templates/landing.html:496
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
@@ -1164,19 +1123,19 @@ msgstr ""
 "Améliorer l'efficacité et la précision de la cartographie de terrain "
 "grâce à une coordination fluide."
 
-#: app/templates/landing.html:565
+#: app/templates/landing.html:500
 msgid "Explore Projects"
 msgstr "Explorer les projets"
 
-#: app/templates/landing.html:578
+#: app/templates/landing.html:513
 msgid "Loading metrics..."
 msgstr "Chargement des indicateurs..."
 
-#: app/templates/landing.html:586
+#: app/templates/landing.html:521
 msgid "What is it?"
 msgstr "Qu'est-ce que c'est ?"
 
-#: app/templates/landing.html:588
+#: app/templates/landing.html:523
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
 "map features\n"
@@ -1186,7 +1145,7 @@ msgstr ""
 "connaissances locales aux éléments cartographiques en coordonnant la "
 "cartographie sur le terrain."
 
-#: app/templates/landing.html:592
+#: app/templates/landing.html:527
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
 "mature tools\n"
@@ -1201,21 +1160,21 @@ msgstr ""
 "efficacement des données géospatiales avec des appareils Android "
 "courants."
 
-#: app/templates/landing.html:599
+#: app/templates/landing.html:534
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr ""
 "Un gestionnaire de projet présente le flux de travail de cartographie "
 "FieldTM sur un ordinateur portable"
 
-#: app/templates/landing.html:605
+#: app/templates/landing.html:540
 msgid "Main Features"
 msgstr "Fonctionnalités principales"
 
-#: app/templates/landing.html:608
+#: app/templates/landing.html:543
 msgid "Flexible Data Collection"
 msgstr "Collecte de données flexible"
 
-#: app/templates/landing.html:610
+#: app/templates/landing.html:545
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
 "workflows that\n"
@@ -1225,11 +1184,11 @@ msgstr ""
 "données et de flux de travail adaptables aux différents besoins "
 "opérationnels."
 
-#: app/templates/landing.html:615
+#: app/templates/landing.html:550
 msgid "Open Source and Customizable"
 msgstr "Open source et personnalisable"
 
-#: app/templates/landing.html:617
+#: app/templates/landing.html:552
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
 "\n"
@@ -1238,11 +1197,11 @@ msgstr ""
 "Adaptez Field-TM à votre propre logique d'enquête, structures de données "
 "et exigences d'intégration."
 
-#: app/templates/landing.html:622
+#: app/templates/landing.html:557
 msgid "Entity-Level Tracking"
 msgstr "Suivi au niveau des éléments"
 
-#: app/templates/landing.html:624
+#: app/templates/landing.html:559
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed\n"
@@ -1252,19 +1211,19 @@ msgstr ""
 "afin que les gestionnaires puissent prendre des décisions éclairées "
 "rapidement."
 
-#: app/templates/landing.html:632
+#: app/templates/landing.html:567
 msgid "Who is it for?"
 msgstr "À qui s'adresse-t-il ?"
 
-#: app/templates/landing.html:635
+#: app/templates/landing.html:570
 msgid "Project Manager"
 msgstr "Gestionnaire de projet"
 
-#: app/templates/landing.html:636
+#: app/templates/landing.html:571
 msgid "Create and coordinate field campaigns"
 msgstr "Créer et coordonner des campagnes de terrain"
 
-#: app/templates/landing.html:638
+#: app/templates/landing.html:573
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
 " interest,\n"
@@ -1274,35 +1233,35 @@ msgstr ""
 "projets de cartographie, définir des zones d'intérêt, concevoir des "
 "formulaires d'enquête et diviser le travail en tâches gérables."
 
-#: app/templates/landing.html:642
+#: app/templates/landing.html:577
 msgid "Define a project area and upload or choose a survey form"
 msgstr ""
 "Définir une zone de projet et téléverser ou choisir un formulaire "
 "d'enquête"
 
-#: app/templates/landing.html:643
+#: app/templates/landing.html:578
 msgid "Split the area into tasks and generate a data extract"
 msgstr "Diviser la zone en tâches et générer une extraction de données"
 
-#: app/templates/landing.html:644
+#: app/templates/landing.html:579
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "Publier le projet sur ODK Central ou QFieldCloud"
 
-#: app/templates/landing.html:645
+#: app/templates/landing.html:580
 msgid "Share a QR code so mappers can start collecting data"
 msgstr ""
 "Partager un code QR pour que les cartographes puissent commencer à "
 "collecter des données"
 
-#: app/templates/landing.html:649
+#: app/templates/landing.html:584
 msgid "Field Mapper"
 msgstr "Cartographe de terrain"
 
-#: app/templates/landing.html:650
+#: app/templates/landing.html:585
 msgid "Collect data in the field with your phone"
 msgstr "Collecter des données sur le terrain avec votre téléphone"
 
-#: app/templates/landing.html:652
+#: app/templates/landing.html:587
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
 "publishes a\n"
@@ -1313,37 +1272,37 @@ msgstr ""
 "qu'un gestionnaire de projet publie un projet, les cartographes y "
 "accèdent directement dans l'application mobile de leur choix."
 
-#: app/templates/landing.html:656
+#: app/templates/landing.html:591
 msgid "Scan the QR code shared by your project manager"
 msgstr "Scannez le code QR partagé par votre gestionnaire de projet"
 
-#: app/templates/landing.html:657
+#: app/templates/landing.html:592
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "Le projet se charge automatiquement dans ODK Collect ou QField"
 
-#: app/templates/landing.html:658
+#: app/templates/landing.html:593
 msgid "Navigate to your assigned task area and collect data"
 msgstr ""
 "Naviguez vers la zone de tâche qui vous est assignée et collectez des "
 "données"
 
-#: app/templates/landing.html:659
+#: app/templates/landing.html:594
 msgid "Submit your survey, which goes straight to the server"
 msgstr "Soumettez votre enquête, qui va directement au serveur"
 
-#: app/templates/landing.html:666
+#: app/templates/landing.html:601
 msgid "Field-TM Use Cases"
 msgstr "Cas d'utilisation de Field-TM"
 
-#: app/templates/landing.html:671
+#: app/templates/landing.html:606
 msgid "Field mapping in progress"
 msgstr "Cartographie de terrain en cours"
 
-#: app/templates/landing.html:676
+#: app/templates/landing.html:611
 msgid "1. Community Mapping"
 msgstr "1. Cartographie communautaire"
 
-#: app/templates/landing.html:678
+#: app/templates/landing.html:613
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public\n"
@@ -1353,11 +1312,11 @@ msgstr ""
 "habitats informels, les équipements publics et les services locaux pour "
 "une planification inclusive."
 
-#: app/templates/landing.html:683
+#: app/templates/landing.html:618
 msgid "2. Urban Planning and Management"
 msgstr "2. Urbanisme et gestion urbaine"
 
-#: app/templates/landing.html:685
+#: app/templates/landing.html:620
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities\n"
@@ -1367,11 +1326,11 @@ msgstr ""
 "sur les maisons, les routes et les services publics grâce à des tâches de"
 " cartographie claires et gérables."
 
-#: app/templates/landing.html:690
+#: app/templates/landing.html:625
 msgid "3. Disaster Response and Recovery"
 msgstr "3. Réponse aux catastrophes et reconstruction"
 
-#: app/templates/landing.html:692
+#: app/templates/landing.html:627
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
 "volunteers, and\n"
@@ -1381,73 +1340,69 @@ msgstr ""
 "catastrophes, coordonnez les bénévoles et fournissez des données fiables "
 "pour les opérations de secours."
 
-#: app/templates/landing.html:701
+#: app/templates/landing.html:636
 msgid "Resources"
 msgstr "Ressources"
 
-#: app/templates/landing.html:709
+#: app/templates/landing.html:644
 msgid "Data Prep"
 msgstr "Préparation des données"
 
-#: app/templates/landing.html:710
+#: app/templates/landing.html:645
 msgid "HOT Export Tool"
 msgstr "HOT Export Tool"
 
-#: app/templates/landing.html:712
+#: app/templates/landing.html:647
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr ""
 "Téléchargez des extractions de données géospatiales prêtes à l'emploi "
 "pour votre zone de projet."
 
-#: app/templates/landing.html:721 app/templates/landing.html:733
+#: app/templates/landing.html:656 app/templates/landing.html:668
 msgid "Documentation"
-msgstr "Documentation"
+msgstr "Documentation du projet"
 
-#: app/templates/landing.html:722
+#: app/templates/landing.html:657
 msgid "ODK Central Guide"
 msgstr "Guide ODK Central"
 
-#: app/templates/landing.html:724
+#: app/templates/landing.html:659
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr ""
 "Apprenez à gérer les formulaires, les utilisateurs de l'application et "
 "les soumissions de terrain dans ODK."
 
-#: app/templates/landing.html:734
+#: app/templates/landing.html:669
 msgid "QField Guide"
 msgstr "Guide QField"
 
-#: app/templates/landing.html:736
+#: app/templates/landing.html:671
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "Configurez des projets QFieldCloud et des flux de travail mobiles pour la"
 " cartographie hors ligne."
 
-#: app/templates/landing.html:746
+#: app/templates/landing.html:681
 msgid "Need assistance?"
 msgstr "Besoin d'aide ?"
 
-#: app/templates/landing.html:747
+#: app/templates/landing.html:682
 msgid "Email:"
 msgstr "E-mail :"
-
-#: app/templates/landing.html:763
-msgid "Language"
-msgstr "Gérer"
 
 #: app/templates/layout.html:13
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Cartographie de terrain coordonnée pour les campagnes Open Mapping."
 
-#: app/templates/layout.html:168 app/templates/login.html:1
+#: app/templates/layout.html:195 app/templates/login.html:1
 msgid "Login"
 msgstr "Connexion"
 
-#: app/templates/layout.html:228
+#: app/templates/layout.html:273
 msgid "Projects"
 msgstr "Projets"
 
-#: app/templates/layout.html:242
+#: app/templates/layout.html:287
 msgid "QField Admin"
 msgstr "Administration QField"
 
@@ -1471,82 +1426,262 @@ msgstr "L'authentification est désactivée sur ce déploiement."
 msgid "Back to home"
 msgstr "Retour à l'accueil"
 
-#: app/templates/new_project.html:4
-msgid "Create New Project"
-msgstr "Créer un nouveau projet"
+#: app/templates/new_project_chooser.html:4
+msgid "What do you want to map?"
+msgstr "Que voulez-vous cartographier ?"
 
-#: app/templates/new_project.html:17
+#: app/templates/new_project_chooser.html:6
 msgid ""
-"If you are collecting OSM Buildings, use the simple workflow with AOI "
-"only."
+"Pick the option that fits your project. You can change your mind later by"
+" starting over."
 msgstr ""
-"Si vous collectez des données OSM Buildings, utilisez le flux simplifié "
-"avec AOI uniquement."
+"Choisissez l’option qui correspond à votre projet. Vous pourrez changer "
+"d’avis plus tard en recommençant."
 
-#: app/templates/new_project.html:45
-msgid "Project Name"
+#: app/templates/new_project_chooser.html:14
+#: app/templates/new_project_chooser.html:26
+#: app/templates/new_project_simple.html:7
+msgid "Map buildings"
+msgstr "Bâtiments OSM"
+
+#: app/templates/new_project_chooser.html:17
+msgid "Quickest way to start. Just draw your area on the map and you're done."
+msgstr ""
+"La façon la plus rapide de commencer. Dessinez simplement votre zone sur "
+"la carte, et c’est terminé."
+
+#: app/templates/new_project_chooser.html:21
+msgid "We'll pre-fill the project for you"
+msgstr "Nous préremplirons le projet pour vous"
+
+#: app/templates/new_project_chooser.html:22
+msgid "Uses building outlines already in OpenStreetMap"
+msgstr "Utilise les contours de bâtiments déjà présents dans OpenStreetMap"
+
+#: app/templates/new_project_chooser.html:23
+msgid "Comes with a ready-made survey for buildings"
+msgstr "Inclut une enquête prête à l’emploi pour les bâtiments"
+
+#: app/templates/new_project_chooser.html:32
+msgid "Something else"
+msgstr "Autre chose"
+
+#: app/templates/new_project_chooser.html:35
+msgid ""
+"Use this for anything that isn't buildings. You'll get more options to "
+"set things up\n"
+"        the way you want."
+msgstr ""
+"Utilisez cette option pour tout ce qui n’est pas des bâtiments. Vous "
+"aurez plus d’options pour le configurer comme vous le souhaitez."
+
+#: app/templates/new_project_chooser.html:41
+msgid ""
+"Map roads, healthcare, water points, toilets, schools, and many other "
+"things"
+msgstr ""
+"Cartographier les routes, les services de santé, les points d’eau, les "
+"toilettes, les écoles et bien d’autres choses"
+
+#: app/templates/new_project_chooser.html:43
+msgid "Bring your own survey questions"
+msgstr "Apporter vos propres questions d’enquête"
+
+#: app/templates/new_project_chooser.html:44
+msgid "Bring your own map data, or start with an empty map"
+msgstr ""
+"Apporter vos propres données cartographiques, ou commencer avec une carte"
+" vide"
+
+#: app/templates/new_project_chooser.html:45
+msgid "Control how the area is divided up for mappers"
+msgstr "Contrôler la façon dont la zone est divisée pour les cartographes"
+
+#: app/templates/new_project_chooser.html:48
+msgid "Set up a custom project"
+msgstr "Rechercher des projets…"
+
+#: app/templates/new_project_custom.html:1
+msgid "Create Custom Project"
+msgstr "Créer un projet"
+
+#: app/templates/new_project_custom.html:5
+#: app/templates/new_project_simple.html:5
+msgid "Back"
+msgstr "Retour"
+
+#: app/templates/new_project_custom.html:7
+msgid "Set up your project"
+msgstr "Explorer les projets"
+
+#: app/templates/new_project_custom.html:9
+msgid ""
+"Just the basics on this page — what you're mapping, where, and which app "
+"mappers will use.\n"
+"    You'll pick your survey questions and map data on the next page."
+msgstr ""
+"Seulement les informations de base sur cette page : ce que vous "
+"cartographiez, où, et quelle application les cartographes utiliseront. "
+"Vous choisirez vos questions d’enquête et vos données cartographiques à "
+"la page suivante."
+
+#: app/templates/new_project_custom.html:32
+msgid "About your project"
+msgstr "Retour aux projets"
+
+#: app/templates/new_project_custom.html:34
+msgid ""
+"Give your project a clear name and a short summary so mappers know what "
+"it's\n"
+"          about."
+msgstr ""
+"Donnez à votre projet un nom clair et un bref résumé afin que les "
+"cartographes sachent de quoi il s’agit."
+
+#: app/templates/new_project_custom.html:40
+msgid "Project name"
 msgstr "Nom du projet"
 
-#: app/templates/new_project.html:50
-msgid "Enter project name"
-msgstr "Entrez le nom du projet"
+#: app/templates/new_project_custom.html:45
+msgid "e.g. Buildings in West Nairobi"
+msgstr "p. ex. Bâtiments à l’ouest de Nairobi"
 
-#: app/templates/new_project.html:63
-msgid "Enter project description"
-msgstr "Entrez la description du projet"
+#: app/templates/new_project_custom.html:53
+msgid "What are you mapping?"
+msgstr "Prêt pour la cartographie"
 
-#: app/templates/new_project.html:72
-msgid "Field Mapping App"
-msgstr "Application de cartographie terrain"
+#: app/templates/new_project_custom.html:58
+msgid ""
+"A short description. e.g. Mapping water points and toilets in informal "
+"settlements."
+msgstr ""
+"Une courte description. p. ex. Cartographie des points d’eau et des "
+"toilettes dans des quartiers informels."
 
-#: app/templates/new_project.html:113 app/templates/project_details.html:95
-msgid "Hashtags"
+#: app/templates/new_project_custom.html:67
+msgid "Which app will mappers use?"
+msgstr "Quelle application les cartographes utiliseront-ils ?"
+
+#: app/templates/new_project_custom.html:69
+msgid "Pick the app you want mappers to install on their phone to do the survey."
+msgstr ""
+"Choisissez l’application que les cartographes installeront sur leur "
+"téléphone pour réaliser l’enquête."
+
+#: app/templates/new_project_custom.html:89
+msgid ""
+"Powerful GIS-style mapping app, including geometry editing, but with a "
+"simple\n"
+"                mapping pathway enabled via our HOT plugin."
+msgstr ""
+"Application de cartographie puissante de type SIG, avec modification de "
+"géométrie, mais avec un parcours de cartographie simple activé via notre "
+"plugin HOT."
+
+#: app/templates/new_project_custom.html:111
+msgid ""
+"Simple form-based survey app. Best for straightforward question-and-"
+"answer\n"
+"                surveys."
+msgstr ""
+"Application d’enquête simple basée sur des formulaires. Idéale pour les "
+"enquêtes directes de questions-réponses."
+
+#: app/templates/new_project_custom.html:120
+msgid "Where are you mapping?"
+msgstr "Prêt pour la cartographie"
+
+#: app/templates/new_project_custom.html:122
+msgid "Draw the area mappers will cover. Smaller areas are easier to coordinate."
+msgstr ""
+"Dessinez la zone que les cartographes couvriront. Les zones plus petites "
+"sont plus faciles à coordonner."
+
+#: app/templates/new_project_custom.html:129
+msgid "Tags"
 msgstr "Hashtags"
 
-#: app/templates/new_project.html:116
-msgid "Type hashtags and press Enter or comma"
+#: app/templates/new_project_custom.html:131
+msgid "optional"
+msgstr "facultatif"
+
+#: app/templates/new_project_custom.html:135
+msgid ""
+"Add tags so other people can find your project. Tags are like #buildings "
+"or\n"
+"          #campaign-2026."
+msgstr ""
+"Ajoutez des étiquettes pour aider les autres à trouver votre projet. Les "
+"étiquettes ressemblent à #buildings ou #campaign-2026."
+
+#: app/templates/new_project_custom.html:141
+msgid "Type a tag and press Enter"
 msgstr "Saisissez des hashtags et appuyez sur Entrée ou virgule"
 
-#: app/templates/new_project.html:121
-msgid ""
-"Type hashtags and press Enter or comma to add them. Click the × on a tag "
-"to remove\n"
-"          it."
+#: app/templates/new_project_custom.html:146
+msgid "Press Enter or comma after each tag. Click × on a tag to remove it."
 msgstr ""
 "Saisissez des hashtags et appuyez sur Entrée ou virgule pour les ajouter."
 " Cliquez sur le × d'un tag pour le supprimer."
 
-#: app/templates/new_project.html:131
+#: app/templates/new_project_custom.html:152
+#: app/templates/partials/project_details/setup_steps/step2_form.html:82
+msgid "Continue"
+msgstr "Continuer"
+
+#: app/templates/new_project_custom.html:154
 msgid "Creating..."
 msgstr "Création en cours..."
 
-#: app/templates/new_project.html:141
+#: app/templates/new_project_custom.html:164
 msgid "Something went wrong. Please try again."
 msgstr "Un problème est survenu. Veuillez réessayer."
 
-#: app/templates/new_project.html:272
+#: app/templates/new_project_custom.html:295
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Un projet avec ce nom existe déjà. Veuillez choisir un nom différent."
 
-#: app/templates/new_project.html:356
+#: app/templates/new_project_custom.html:379
 msgid "Description is required."
 msgstr "La description est requise."
 
-#: app/templates/new_project_simple.html:8
-msgid ""
-"This simple flow only needs your project area. We will auto-generate the "
-"project title,\n"
-"      description, and tags for OSM Buildings."
-msgstr ""
-"Ce flux simplifié n’a besoin que de la zone de votre projet. Nous "
-"générerons automatiquement le titre, la description et les tags du projet"
-" pour OSM Buildings."
+#: app/templates/new_project_simple.html:1
+msgid "Quick Setup — OSM Buildings"
+msgstr "Bâtiments OSM"
 
-#: app/templates/new_project_simple.html:38
-msgid "Back to Standard Form"
-msgstr "Retour au formulaire standard"
+#: app/templates/new_project_simple.html:9
+msgid ""
+"Just draw the area you want to map. We'll set everything up for you using"
+" building\n"
+"    outlines from OpenStreetMap and a ready-made survey for buildings."
+msgstr ""
+"Dessinez simplement la zone à cartographier. Nous configurerons tout avec"
+" les contours de bâtiments d’OpenStreetMap et une enquête prête à "
+"l’emploi pour les bâtiments."
+
+#: app/templates/new_project_simple.html:14
+msgid "This is only for mapping buildings."
+msgstr "Ceci sert uniquement à cartographier des bâtiments."
+
+#: app/templates/new_project_simple.html:15
+msgid ""
+"If you want to map something else (like roads or water points), use your "
+"own survey\n"
+"    questions, or bring your own map data,"
+msgstr ""
+"Si vous voulez cartographier autre chose (comme des routes ou des points "
+"d’eau), utiliser vos propres questions d’enquête, ou apporter vos propres"
+" données cartographiques,"
+
+#: app/templates/new_project_simple.html:17
+msgid "set up a custom project instead"
+msgstr "configurez plutôt un projet personnalisé"
 
 #: app/templates/new_project_simple.html:46
+msgid "Switch to Custom Project"
+msgstr "Attacher au projet QField"
+
+#: app/templates/new_project_simple.html:55
 msgid "Creating project and preparing map..."
 msgstr "Création du projet et préparation de la carte..."
 
@@ -1576,6 +1711,10 @@ msgstr "Créé"
 #: app/templates/project_details.html:84
 msgid "Last Updated"
 msgstr "Dernière mise à jour"
+
+#: app/templates/project_details.html:95
+msgid "Hashtags"
+msgstr "Mots-dièse"
 
 #: app/templates/project_details.html:107
 msgid "External Project"
@@ -1718,9 +1857,7 @@ msgid "No GeoJSON returned from validation"
 msgstr "Aucun GeoJSON renvoyé par la validation"
 
 #: app/templates/partials/new_project/map_script.html:11
-msgid ""
-"You must draw or upload an Area of Interest (AOI) on the map before "
-"submitting."
+msgid "You must draw or upload a project area on the map before submitting."
 msgstr ""
 "Vous devez dessiner ou téléverser une zone d'intérêt (AOI) sur la carte "
 "avant de soumettre."
@@ -1729,44 +1866,51 @@ msgstr ""
 msgid "Project Area"
 msgstr "Zone du projet"
 
-#: app/templates/partials/new_project/map_section.html:12
+#: app/templates/partials/new_project/map_section.html:6
+msgid "Draw the area you want to map on the map below."
+msgstr "Dessinez la zone que vous voulez cartographier sur la carte ci-dessous."
+
+#: app/templates/partials/new_project/map_section.html:15
 msgid "Draw Area"
 msgstr "Dessiner la zone"
 
-#: app/templates/partials/new_project/map_section.html:20
-msgid "Upload GeoJSON"
-msgstr "Téléverser un GeoJSON"
-
-#: app/templates/partials/new_project/map_section.html:23
+#: app/templates/partials/new_project/map_section.html:18
 msgid "Clear"
 msgstr "Effacer"
 
-#: app/templates/partials/new_project/map_section.html:31
-msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area. Maximum\n"
-"    project size is 1,000 km². Areas over 100 km² will show a warning. "
-"The OSM data extract API is\n"
-"    limited to 200 km²."
-msgstr ""
-"Dessinez un polygone sur la carte ou téléversez un fichier GeoJSON pour "
-"définir la zone de votre projet. La taille maximale du projet est de 1 "
-"000 km². Les zones de plus de 100 km² afficheront un avertissement. L’API"
-" d’extraction des données OSM est limitée à 200 km²."
-
-#: app/templates/partials/new_project/map_section.html:42
-#: app/templates/partials/project_details/setup_steps/step2_form.html:124
-#: app/templates/partials/project_details/setup_steps/step3_data.html:69
+#: app/templates/partials/new_project/map_section.html:32
+#: app/templates/partials/project_details/setup_steps/step2_form.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:72
 #: app/templates/partials/project_details/setup_steps/step4_split.html:36
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:27
-msgid "Advanced Config"
-msgstr "Configuration avancée"
+msgid "More options"
+msgstr "Options du formulaire :"
+
+#: app/templates/partials/new_project/map_section.html:39
+msgid "Upload your own map file (GeoJSON)"
+msgstr "Téléverser un GeoJSON personnalisé"
+
+#: app/templates/partials/new_project/map_section.html:43
+msgid ""
+"If you already have a map file with your area boundary, upload it here "
+"instead of\n"
+"        drawing."
+msgstr ""
+"Si vous disposez déjà d’un fichier cartographique contenant la limite de "
+"votre zone, téléversez-le ici au lieu de la dessiner."
 
 #: app/templates/partials/new_project/map_section.html:50
-msgid "Merge geometries (use convex hull for multipolygons)"
+msgid "Combine multiple shapes into one"
+msgstr "Combiner plusieurs formes en une seule"
+
+#: app/templates/partials/new_project/map_section.html:55
+msgid ""
+"Keep areas under 100 km² for best results. Very large areas (over 200 "
+"km²) may not\n"
+"        download all map data automatically."
 msgstr ""
-"Fusionner les géométries (utiliser l'enveloppe convexe pour les "
-"multipolygones)"
+"Gardez les zones sous 100 km² pour de meilleurs résultats. Les très "
+"grandes zones (plus de 200 km²) peuvent ne pas télécharger "
+"automatiquement toutes les données cartographiques."
 
 #: app/templates/partials/project_details/basemap_section.html:2
 msgid "Offline Basemap"
@@ -1809,32 +1953,28 @@ msgid "Project Location"
 msgstr "Emplacement du projet"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 2: Upload XLSForm"
-msgstr "Étape 2 : Téléverser le XLSForm"
+#: app/templates/partials/project_details/setup_steps.html:53
+msgid "Survey Form"
+msgstr "Formulaire d’enquête"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
-#: app/templates/partials/project_details/setup_steps/step2_form.html:12
-#: app/templates/partials/project_details/setup_steps/step3_data.html:13
-#: app/templates/partials/project_details/setup_steps/step4_split.html:13
 msgid "Complete"
 msgstr "Terminé"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps/step3_data.html:8
-msgid "Step 3: Get Data"
-msgstr "Étape 3 : Obtenir les données"
+msgid "Map Data"
+msgstr "Données cartographiques"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 4: Split into Tasks"
-msgstr "Étape 4 : Diviser en tâches"
+msgid "Tasks"
+msgstr "ID de la tâche"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:4
-msgid "Step 5: Finalise Project"
-msgstr "Étape 5 : Finaliser le projet"
+msgid "Project Created"
+msgstr "Projets créés"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1859,6 +1999,26 @@ msgstr "Chargement du code QR..."
 msgid "Project Setup"
 msgstr "Configuration du projet"
 
+#: app/templates/partials/project_details/setup_steps.html:44
+msgid "Project setup progress"
+msgstr "Configuration du projet"
+
+#: app/templates/partials/project_details/setup_steps.html:47
+msgid "Project Details"
+msgstr "Zone d'intérêt du projet"
+
+#: app/templates/partials/project_details/setup_steps.html:59
+msgid "Get Data"
+msgstr "Étape 3 : Obtenir les données"
+
+#: app/templates/partials/project_details/setup_steps.html:65
+msgid "Split Tasks"
+msgstr "Diviser la zone d'intérêt"
+
+#: app/templates/partials/project_details/setup_steps.html:69
+msgid "Finalise"
+msgstr "Finaliser le projet"
+
 #: app/templates/partials/project_details/style_and_scripts.html:8
 msgid "Select a survey type..."
 msgstr "Sélectionnez un type d'enquête..."
@@ -1868,16 +2028,16 @@ msgid "No survey types available"
 msgstr "Aucun type d'enquête disponible"
 
 #: app/templates/partials/project_details/style_and_scripts.html:10
-msgid "No survey forms are available. Upload a custom form in Advanced Config."
+msgid "No survey forms are available. Upload your own survey file above."
 msgstr ""
 "Aucun formulaire d'enquête disponible. Téléversez un formulaire "
 "personnalisé dans la configuration avancée."
 
 #: app/templates/partials/project_details/style_and_scripts.html:11
-msgid "Select a survey type, or upload a custom form in Advanced Config."
+msgid "Pick a survey form, or upload your own."
 msgstr ""
-"Sélectionnez un type d'enquête ou téléversez un formulaire personnalisé "
-"dans la configuration avancée."
+"Choisissez un type d'enquête et continuez avec les paramètres par défaut "
+"recommandés."
 
 #: app/templates/partials/project_details/style_and_scripts.html:12
 msgid "Survey type selected."
@@ -1896,10 +2056,10 @@ msgid "Custom form selected."
 msgstr "Formulaire personnalisé sélectionné."
 
 #: app/templates/partials/project_details/style_and_scripts.html:16
-msgid "Choose a survey type first, or upload a custom form in Advanced Config."
+msgid "Pick a survey form, or upload your own first."
 msgstr ""
-"Choisissez d'abord un type d'enquête ou téléversez un formulaire "
-"personnalisé dans la configuration avancée."
+"Choisissez un type d'enquête et continuez avec les paramètres par défaut "
+"recommandés."
 
 #: app/templates/partials/project_details/style_and_scripts.html:17
 msgid "polygons"
@@ -1911,7 +2071,7 @@ msgstr "polylignes"
 
 #: app/templates/partials/project_details/style_and_scripts.html:19
 msgid "points"
-msgstr "points"
+msgstr "points géographiques"
 
 #: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
@@ -1919,8 +2079,8 @@ msgstr "éléments"
 
 #: app/templates/partials/project_details/style_and_scripts.html:21
 msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use "
-"Advanced Config to upload your own GeoJSON or adjust download settings."
+"You uploaded a custom form, so this OSM download is optional. Upload your"
+" own map file below or open More options to adjust the source."
 msgstr ""
 "Vous avez téléversé un formulaire personnalisé, donc ce téléchargement "
 "OSM est facultatif. Utilisez la configuration avancée pour téléverser "
@@ -1929,8 +2089,8 @@ msgstr ""
 #: app/templates/partials/project_details/style_and_scripts.html:22
 #, python-format
 msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
-"map, then continue."
+"Recommended for your form: %(title)s (%(geom_label)s). Review the data on"
+" the map, then continue."
 msgstr ""
 "Source recommandée : %(title)s (%(geom_label)s). Examinez les données sur"
 " la carte, puis continuez."
@@ -1938,8 +2098,8 @@ msgstr ""
 #: app/templates/partials/project_details/style_and_scripts.html:23
 #, python-format
 msgid ""
-"Recommended source updated (%(geom_label)s). Review the data on the map, "
-"then continue."
+"Source updated (%(geom_label)s). Review the data on the map, then "
+"continue."
 msgstr ""
 "Source recommandée mise à jour (%(geom_label)s). Examinez les données sur"
 " la carte, puis continuez."
@@ -1948,28 +2108,27 @@ msgstr ""
 msgid "Downloading..."
 msgstr "Téléchargement en cours..."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:33
+#: app/templates/partials/project_details/setup_steps/step3_data.html:27
 #: app/templates/partials/project_details/style_and_scripts.html:25
-msgid "Download OSM Data"
+msgid "Use OSM data"
 msgstr "Télécharger les données OSM"
 
 #: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Confirm No Splitting"
 msgstr "Confirmer sans division"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 #: app/templates/partials/project_details/style_and_scripts.html:28
-msgid "Split by Square"
+msgid "Split by grid"
 msgstr "Diviser par carré"
 
 #: app/templates/partials/project_details/style_and_scripts.html:29
-msgid "Split by Buildings"
+msgid "Split by buildings"
 msgstr "Diviser par bâtiments"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:175
+#: app/templates/partials/project_details/setup_steps/step4_split.html:164
 #: app/templates/partials/project_details/style_and_scripts.html:30
-msgid "Split AOI"
-msgstr "Diviser la zone d'intérêt"
+msgid "Split area"
+msgstr "Diviser à nouveau"
 
 #: app/templates/partials/project_details/style_and_scripts.html:31
 msgid "Select Option"
@@ -2111,7 +2270,7 @@ msgstr "Élément STAC"
 #: app/templates/partials/project_details/fragments/basemap_progress.html:71
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:15
 msgid "Zoom"
-msgstr "Zoom"
+msgstr "Zoomer"
 
 #: app/templates/partials/project_details/fragments/basemap_ready.html:3
 msgid ""
@@ -2238,40 +2397,46 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "Accepter les choix de tâches"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:7
-msgid "Step 2: Select Survey Form"
-msgstr "Étape 2 : Sélectionner le formulaire d'enquête"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:4
+msgid "Survey form ready"
+msgstr "Formulaire d’enquête prêt"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:17
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr ""
-"Choisissez un type d'enquête et continuez avec les paramètres par défaut "
-"recommandés."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:28
-msgid "Choose Survey Type:"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:9
+msgid "Choose Your Survey Form"
 msgstr "Choisissez le type d'enquête :"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:30
+#: app/templates/partials/project_details/setup_steps/step2_form.html:12
+msgid ""
+"Pick a ready-made survey that matches what you're mapping. You can upload"
+" your own survey\n"
+"    file if none of these fit."
+msgstr ""
+"Choisissez une enquête prête à l’emploi qui correspond à ce que vous "
+"cartographiez. Vous pouvez téléverser votre propre fichier d’enquête si "
+"aucune ne convient."
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:25
+msgid "Survey form"
+msgstr "Formulaire d’enquête"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:28
 msgid "Loading survey types..."
 msgstr "Chargement des types d'enquête..."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:46
-msgid "Or use your own form instead:"
-msgstr "Ou utilisez plutôt votre propre formulaire :"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+msgid "or"
+msgstr "ou"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:54
-msgid "Upload Custom XLSForm"
-msgstr "Téléverser un formulaire personnalisé"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:36
+msgid "upload your own survey file (.xls / .xlsx)"
+msgstr "téléverser votre propre fichier d’enquête (.xls / .xlsx)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:68
+#: app/templates/partials/project_details/setup_steps/step2_form.html:49
 msgid ""
-"Note: Field-TM will automatically inject additional fields into your form"
-" for task\n"
-"        division and feature selection. Your form should only contain the"
-" survey questions you want\n"
-"        to ask (do not include select_one_from_file fields for "
-"tasks/features)."
+"Heads up: Field-TM auto-adds fields for tasks and feature selection. Your"
+" form should\n"
+"        only contain the survey questions you want to ask."
 msgstr ""
 "Remarque : Field-TM ajoutera automatiquement des champs supplémentaires à"
 " votre formulaire pour la division des tâches et la sélection des "
@@ -2279,279 +2444,279 @@ msgstr ""
 "que vous souhaitez poser (n’incluez pas de champs select_one_from_file "
 "pour les tâches/entités)."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:98
-msgid ""
-"Recommended defaults are active for ODK projects, including ODK Collect\n"
-"        compatibility."
-msgstr ""
-"Les paramètres recommandés par défaut sont actifs pour les projets ODK, y"
-" compris la compatibilité avec ODK Collect."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Form language"
+msgstr "Gérer"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:105
-#, python-format
-msgid "Recommended defaults are active for %(app_name)s projects."
-msgstr ""
-"Les paramètres par défaut recommandés sont actifs pour les projets "
-"%(app_name)s."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:112
-msgid "Recommended defaults are active for this project."
-msgstr "Les paramètres par défaut recommandés sont actifs pour ce projet."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:131
-msgid "Default Language:"
-msgstr "Langue par défaut :"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:133
+#: app/templates/partials/project_details/setup_steps/step2_form.html:100
 msgid "English"
 msgstr "Anglais"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:134
+#: app/templates/partials/project_details/setup_steps/step2_form.html:101
 msgid "Spanish"
 msgstr "Espagnol"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:135
+#: app/templates/partials/project_details/setup_steps/step2_form.html:102
 msgid "French"
 msgstr "Français"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:136
+#: app/templates/partials/project_details/setup_steps/step2_form.html:103
 msgid "Portuguese"
 msgstr "Portugais"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:137
+#: app/templates/partials/project_details/setup_steps/step2_form.html:104
 msgid "Swahili"
-msgstr "Swahili"
+msgstr "swahili"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:138
+#: app/templates/partials/project_details/setup_steps/step2_form.html:105
 msgid "Hindi"
-msgstr "Hindi"
+msgstr "hindi"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:153
-msgid "Form Options:"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:109
+msgid "Form questions"
 msgstr "Options du formulaire :"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:163
-msgid "Include photo upload question"
-msgstr "Inclure une question d’envoi de photo"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:113
+msgid "Ask for a photo"
+msgstr "Demander une photo"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:177
+#: app/templates/partials/project_details/setup_steps/step2_form.html:115
+msgid "Mappers will be asked to take a photo at the location."
+msgstr "Demande à l’utilisateur de prendre une photo à son emplacement."
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:128
 msgid "Make photo mandatory"
 msgstr "Rendre la photo obligatoire"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:182
-msgid "Asks the user to take a photo at their location."
-msgstr "Demande à l’utilisateur de prendre une photo à son emplacement."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:193
-msgid "Include digitisation verification question"
-msgstr "Inclure une question de vérification de la numérisation"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:197
-msgid "Asks the mapper to verify if existing features are correctly digitised."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:135
+msgid "Ask to verify existing features"
 msgstr ""
 "Demande au cartographe de vérifier si les entités existantes sont "
 "correctement numérisées."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:220
-msgid "Continue"
-msgstr "Continuer"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:224
-msgid "✓ Survey form uploaded successfully"
-msgstr "✓ Formulaire d'enquête téléversé avec succès"
-
-#: app/templates/partials/project_details/setup_steps/step3_data.html:18
-msgid "Download the recommended OSM data for your survey form."
-msgstr "Téléchargez les données OSM recommandées pour votre formulaire d'enquête."
-
-#: app/templates/partials/project_details/setup_steps/step3_data.html:20
-msgid "Review the data on the map, then continue."
-msgstr "Examinez les données sur la carte, puis continuez."
-
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
-msgid "Collect New Data Only"
-msgstr "Collecter uniquement de nouvelles données"
-
-#: app/templates/partials/project_details/setup_steps/step3_data.html:76
-msgid "Use custom data inputs or override the default OSM download options."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:137
+msgid "Mappers confirm whether existing OSM features are correctly digitised."
 msgstr ""
-"Utilisez des entrées de données personnalisées ou remplacez les options "
-"de téléchargement OSM par défaut."
+"Demande au cartographe de vérifier si les entités existantes sont "
+"correctement numérisées."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:81
-msgid "OSM Category:"
-msgstr "Catégorie OSM :"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:4
+msgid "Data extract ready"
+msgstr "Extraction de données OSM prête"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:83
+#: app/templates/partials/project_details/setup_steps/step3_data.html:9
+msgid "Add Your Data"
+msgstr "Télécharger les données OSM"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:12
+msgid ""
+"Pull existing features from OpenStreetMap for your project area, or start"
+" with an empty\n"
+"    map so mappers can collect everything from scratch."
+msgstr ""
+"Extraire les objets existants d’OpenStreetMap pour la zone de votre "
+"projet, ou commencer avec une carte vide afin que les cartographes "
+"collectent tout depuis le début."
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:53
+msgid "Start with empty map"
+msgstr "Commencer avec une carte vide"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:61
+msgid "upload your own map file (GeoJSON)"
+msgstr "Téléverser un GeoJSON personnalisé"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:79
+msgid "Override the default OSM source for this project."
+msgstr "Les paramètres par défaut recommandés sont actifs pour ce projet."
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+msgid "What to download"
+msgstr "Que télécharger"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:88
 msgid "OSM Buildings"
 msgstr "Bâtiments OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:84
+#: app/templates/partials/project_details/setup_steps/step3_data.html:89
 msgid "OSM Highways"
 msgstr "Routes OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+#: app/templates/partials/project_details/setup_steps/step3_data.html:90
 msgid "OSM Healthcare"
 msgstr "Santé OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:86
+#: app/templates/partials/project_details/setup_steps/step3_data.html:91
 msgid "OSM Toilets"
 msgstr "Toilettes OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:87
+#: app/templates/partials/project_details/setup_steps/step3_data.html:92
 msgid "OSM Religious"
 msgstr "Lieux religieux OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:88
+#: app/templates/partials/project_details/setup_steps/step3_data.html:93
 msgid "OSM Landuse"
 msgstr "Occupation du sol OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:94
 msgid "OSM Waterways"
 msgstr "Cours d'eau OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:90
+#: app/templates/partials/project_details/setup_steps/step3_data.html:95
 msgid "OSM Water Points"
 msgstr "Points d'eau OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:91
+#: app/templates/partials/project_details/setup_steps/step3_data.html:96
 msgid "OSM Waste Disposal"
 msgstr "Élimination des déchets OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:92
+#: app/templates/partials/project_details/setup_steps/step3_data.html:97
 msgid "OSM Education"
 msgstr "Éducation OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:93
+#: app/templates/partials/project_details/setup_steps/step3_data.html:98
 msgid "OSM Cemeteries"
 msgstr "Cimetières OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:94
+#: app/templates/partials/project_details/setup_steps/step3_data.html:99
 msgid "OSM Amenities"
 msgstr "Équipements OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:99
-msgid "Geometry Type:"
-msgstr "Type de géométrie :"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+msgid "Feature shape"
+msgstr "éléments"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:102
-msgid "Polygon"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:107
+msgid "Polygon (area)"
 msgstr "Polygone"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:103
-msgid "Polyline"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:108
+msgid "Line"
 msgstr "Polyligne"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+#: app/templates/partials/project_details/setup_steps/step3_data.html:109
 msgid "Point"
-msgstr "Point"
+msgstr "Point géographique"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:113
+#: app/templates/partials/project_details/setup_steps/step3_data.html:116
 msgid "Use centroids"
 msgstr "Utiliser les centroïdes"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:125
-msgid "Upload Custom GeoJSON"
-msgstr "Téléverser un GeoJSON personnalisé"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+msgid "Convert polygons to single points."
+msgstr "Convertir les polygones en points uniques."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:144
+#: app/templates/partials/project_details/setup_steps/step3_data.html:140
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "Génération de l'extraction de données OSM... Cela peut prendre un moment."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:163
-msgid "OSM data extract ready"
-msgstr "Extraction de données OSM prête"
-
-#: app/templates/partials/project_details/setup_steps/step4_split.html:8
-msgid "Step 4: Split into Tasks (Optional)"
-msgstr "Étape 3 : Diviser en tâches (facultatif)"
-
-#: app/templates/partials/project_details/setup_steps/step4_split.html:18
-msgid "✓ Task splitting is not relevant without existing data"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:6
+msgid ""
+"Task splitting skipped (no existing\n"
+"    data)"
 msgstr "✓ La division en tâches n'est pas pertinente sans données existantes"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:24
+#: app/templates/partials/project_details/setup_steps/step4_split.html:7
+msgid "Task areas ready"
+msgstr "Le fond de carte est prêt."
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:13
+msgid "Split into Tasks"
+msgstr "Étape 4 : Diviser en tâches"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:14
+msgid "Optional"
+msgstr "Facultatif"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:17
 msgid ""
-"Generate task areas by splitting the Area of Interest (AOI). Choose an "
-"algorithm and\n"
-"    parameters, then split. Review the preview, and click \"Accept Task "
-"Areas\" to save. Or click"
+"Divide your area into smaller tasks so multiple mappers can work in "
+"parallel. Pick how to\n"
+"    split below, preview the result, then accept it. Or skip to use the "
+"whole area as one task."
 msgstr ""
-"Générez des zones de tâches en divisant la zone d’intérêt (AOI). "
-"Choisissez un algorithme et des paramètres, puis divisez. Vérifiez "
-"l’aperçu et cliquez sur \"Accept Task Areas\" pour enregistrer. Ou "
-"cliquez sur"
+"Divisez votre zone en tâches plus petites afin que plusieurs cartographes"
+" puissent travailler en parallèle. Choisissez comment la diviser ci-"
+"dessous, prévisualisez le résultat, puis acceptez-le. Vous pouvez aussi "
+"ignorer cette étape pour utiliser toute la zone comme une seule tâche."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:27
-#: app/templates/partials/project_details/setup_steps/step4_split.html:46
-msgid "Skip"
-msgstr "Passer"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:29
+msgid "Skip splitting"
+msgstr "Division en cours..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:28
-msgid "to use the whole AOI as a single task."
-msgstr "pour utiliser toute la zone d'intérêt comme une seule tâche."
-
-#: app/templates/partials/project_details/setup_steps/step4_split.html:60
-msgid "Choose which linear features influence building-based task splitting."
+#: app/templates/partials/project_details/setup_steps/step4_split.html:50
+msgid ""
+"When splitting by building count, these linear features are used as "
+"natural task\n"
+"          boundaries."
 msgstr ""
-"Choisissez quels éléments linéaires influencent la division des tâches "
-"basée sur les bâtiments."
+"Lors d’une division par nombre de bâtiments, ces éléments linéaires sont "
+"utilisés comme limites naturelles des tâches."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:84
+#: app/templates/partials/project_details/setup_steps/step4_split.html:75
 msgid "Include roads"
 msgstr "Inclure les routes"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:93
+#: app/templates/partials/project_details/setup_steps/step4_split.html:84
 msgid "Include rivers"
 msgstr "Inclure les rivières"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:102
+#: app/templates/partials/project_details/setup_steps/step4_split.html:93
 msgid "Include railways"
 msgstr "Inclure les voies ferrées"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+#: app/templates/partials/project_details/setup_steps/step4_split.html:102
 msgid "Include aeroways"
 msgstr "Inclure les voies aériennes"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:118
-msgid "Algorithm:"
-msgstr "Algorithme :"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:109
+msgid "How to split"
+msgstr "Méthode de division"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:120
-msgid "Select splitting option..."
-msgstr "Sélectionner l'option de division..."
+#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+msgid "Choose a method..."
+msgstr "Choisissez une méthode..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:122
-msgid "Average Buildings v1 (Voronoi)"
-msgstr "Bâtiments moyens v1 (Voronoi)"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:112
+msgid "By number of buildings (faster)"
+msgstr "Par nombre de bâtiments (plus rapide)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:124
-msgid "Average Buildings v2 (Straight Skeleton)"
-msgstr "Bâtiments moyens v2 (Squelette droit)"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:114
+msgid "By number of buildings (cleaner shapes)"
+msgstr "Par nombre de bâtiments (formes plus nettes)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:126
-msgid "Split by Specific Number of Tasks"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:116
+msgid "By a regular grid"
+msgstr "Par grille régulière"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+msgid "Into a fixed number of tasks"
 msgstr "Diviser par nombre spécifique de tâches (bientôt disponible)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:132
-msgid "Avg. Buildings per Task:"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:122
+msgid "Buildings per task"
 msgstr "Bâtiments moy. par tâche :"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:144
-msgid "Number of Tasks:"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:133
+msgid "Number of tasks"
 msgstr "Nombre de tâches :"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:156
-msgid "Dimension (meters):"
-msgstr "Dimension (mètres) :"
+#: app/templates/partials/project_details/setup_steps/step4_split.html:145
+msgid "Grid square size (metres)"
+msgstr "Taille du carré de la grille (mètres)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:175
+#: app/templates/partials/project_details/setup_steps/step4_split.html:164
 msgid "Split Again"
 msgstr "Diviser à nouveau"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:211
-msgid "Splitting AOI into tasks... This may take a moment."
+#: app/templates/partials/project_details/setup_steps/step4_split.html:199
+msgid "Splitting area into tasks... This may take a moment."
 msgstr "Division de la zone d'intérêt en tâches... Cela peut prendre un moment."
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:4
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:19
+msgid "Finalise Project"
+msgstr "Finaliser le projet"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:5
 msgid "Ready"
@@ -2559,15 +2724,15 @@ msgstr "Prêt"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:8
 msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
+"Everything's ready. Click below to create the project in your chosen "
+"mapping tool."
 msgstr ""
 "Tous les prérequis sont remplis ! Créez le projet dans l'outil de "
 "cartographie de votre choix."
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:19
-msgid "Finalise Project"
-msgstr "Finaliser le projet"
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:27
+msgid "Use custom credentials"
+msgstr "Identifiants personnalisés"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:59
 msgid "Confirm Project Finalisation"

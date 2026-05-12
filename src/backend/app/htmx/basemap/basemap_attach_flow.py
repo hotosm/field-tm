@@ -12,6 +12,7 @@ from psycopg import AsyncConnection
 from app.config import settings
 from app.db.enums import FieldMappingApp, ProjectStatus
 from app.db.models import DbProject
+from app.helpers.basemap_services import check_tilepack_status
 from app.i18n import _
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_crud import (
@@ -79,8 +80,42 @@ def attach_error_text(exc: Exception) -> str:
     return fallback_message
 
 
-def attach_precondition_response(project: DbProject) -> Response | None:
-    """Return the first attach precondition failure response, if any."""
+async def reconcile_missing_basemap_url(
+    db: AsyncConnection, project: DbProject
+) -> str | None:
+    """Re-poll tilepack status when stored state lacks a URL; persist if found."""
+    stac_item_id = str(project.basemap_stac_item_id or "").strip()
+    if not stac_item_id:
+        return None
+
+    try:
+        status_value, download_url = await check_tilepack_status(stac_item_id)
+    except Exception:
+        log.exception("Tilepack status reconcile failed for project %s", project.id)
+        return None
+
+    if not (status_value == "ready" and download_url):
+        return None
+
+    await DbProject.update(
+        db,
+        project.id,
+        ProjectUpdate(basemap_status="ready", basemap_url=download_url),
+    )
+    await db.commit()
+    return download_url
+
+
+async def attach_precondition_response(
+    db: AsyncConnection, project: DbProject
+) -> Response | None:
+    """Return the first attach precondition failure response, if any.
+
+    When the stored project has ``basemap_status='ready'`` but no
+    ``basemap_url`` (a stale state that can arise from older buggy parsing
+    of the upstream tilepack API), this also re-polls the upstream API once
+    to self-heal before returning a failure response.
+    """
     if project.status != ProjectStatus.PUBLISHED:
         return Response(
             content=_callout(
@@ -110,13 +145,21 @@ def attach_precondition_response(project: DbProject) -> Response | None:
         )
 
     if not project.basemap_url:
-        return Response(
-            content=_callout(
-                "warning", _("No generated basemap download URL is available yet.")
-            ),
-            media_type="text/html",
-            status_code=status.HTTP_400_BAD_REQUEST,
-        )
+        recovered_url = await reconcile_missing_basemap_url(db, project)
+        if recovered_url:
+            project.basemap_url = recovered_url
+        else:
+            return Response(
+                content=_callout(
+                    "warning",
+                    _(
+                        "Basemap download URL is not available yet. "
+                        "Please refresh status and try again shortly."
+                    ),
+                ),
+                media_type="text/html",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
 
     missing_config = get_missing_basemap_attach_config(project)
     if not missing_config:
@@ -203,6 +246,28 @@ async def start_basemap_attach(
 
     refreshed_project = await DbProject.one(db, project_id)
     return progress_fragment(refreshed_project, progress_scope="attach")
+
+
+async def enqueue_autostart_attach(
+    db: AsyncConnection, project_id: int, basemap_url: str
+) -> None:
+    """Flip a pending-autostart project to in-progress and enqueue attach.
+
+    Used when a manual basemap status poll discovers the tilepack is ready
+    and the project was reserved for simple-flow autostart attach.
+    """
+    await DbProject.update(
+        db,
+        project_id,
+        ProjectUpdate(
+            basemap_attach_status="in_progress",
+            basemap_attach_error=None,
+            basemap_attach_updated_at=datetime.now(timezone.utc),
+        ),
+    )
+    await db.commit()
+
+    asyncio.create_task(run_basemap_attach_background(project_id, basemap_url))
 
 
 _TRANSIENT_ATTACH_FRAGMENTS = (

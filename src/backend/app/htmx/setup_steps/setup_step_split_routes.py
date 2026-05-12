@@ -51,6 +51,9 @@ from ..setup_steps.setup_step_responses import (
     html_error_response as _html_error_response,
 )
 from ..setup_steps.setup_step_responses import (
+    is_fragment_mode as _is_fragment_mode,
+)
+from ..setup_steps.setup_step_responses import (
     service_error_response as _service_error_response,
 )
 from ..setup_steps.setup_step_responses import (
@@ -202,14 +205,18 @@ async def skip_task_split_htmx(
             "Will use whole AOI as single task."
         )
 
-        return await _step4_completion_response(
-            db=db,
+        refreshed_project = (
+            await DbProject.one(db, project_id) if _is_fragment_mode(mode) else None
+        )
+        return _step4_completion_response(
+            request=request,
             project_id=project_id,
             message=_(
                 "✓ Task splitting skipped. The whole AOI will be used as "
                 "a single task. You can proceed to Step 5."
             ),
             mode=mode,
+            project=refreshed_project,
         )
 
     except Exception as e:
@@ -278,11 +285,15 @@ async def split_aoi_htmx(
         )
 
         if tasks_featcol == {}:
-            return await _step4_completion_response(
-                db=db,
+            refreshed_project = (
+                await DbProject.one(db, project_id) if _is_fragment_mode(mode) else None
+            )
+            return _step4_completion_response(
+                request=request,
                 project_id=project_id,
                 message=_("✓ Task splitting is not required for this project setup."),
                 mode=mode,
+                project=refreshed_project,
             )
 
         project = await DbProject.one(db, project_id)
@@ -351,11 +362,15 @@ async def accept_split_htmx(
             f"Accepted and saved task areas for project {project_id} "
             f"(empty: {is_empty_task_areas}, count: {task_count})"
         )
-        return await _step4_completion_response(
-            db=db,
+        refreshed_project = (
+            await DbProject.one(db, project_id) if _is_fragment_mode(mode) else None
+        )
+        return _step4_completion_response(
+            request=request,
             project_id=project_id,
             message=_("✓ Split tasks saved successfully"),
             mode=mode,
+            project=refreshed_project,
         )
 
     except ServiceError as e:

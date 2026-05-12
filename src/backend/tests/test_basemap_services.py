@@ -211,6 +211,26 @@ def test_parse_tilepack_status_429_maps_to_generating():
     assert download_url is None
 
 
+def test_parse_tilepack_status_200_without_url_stays_generating():
+    """200 OK without a download URL should remain in generating state."""
+    status_value, download_url = basemap_services._parse_tilepack_status(
+        200, {"status": "ready"}
+    )
+
+    assert status_value == "generating"
+    assert download_url is None
+
+
+def test_parse_tilepack_status_200_with_url_is_ready():
+    """200 OK with a download URL should resolve to ready state."""
+    status_value, download_url = basemap_services._parse_tilepack_status(
+        200, {"url": "https://tiles/x.mbtiles"}
+    )
+
+    assert status_value == "ready"
+    assert download_url == "https://tiles/x.mbtiles"
+
+
 def test_parse_tilepack_status_raises_for_upstream_http_failure():
     """Tilepack parsing should map upstream HTTP failures to a gateway error."""
     with pytest.raises(HTTPException) as exc:

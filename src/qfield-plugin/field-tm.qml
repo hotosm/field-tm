@@ -105,7 +105,7 @@ Item {
 
           text: {
             if (fieldTM.outdated) {
-              return qsTranslate("FieldTM", "Data coordinate occurred over half an hour ago, synchronizing is recommended.");
+              return qsTranslate("FieldTM", "Data sync occurred over half an hour ago, synchronizing is recommended.");
             }
             return "";
           }

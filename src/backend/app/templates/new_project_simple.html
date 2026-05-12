@@ -1,13 +1,20 @@
-{% extends "layout.html" %} {% block title %}{{ _("Create Project") }} — Field Tasking Manager{%
-endblock %} {% block content %}
+{% extends "layout.html" %} {% block title %}{{ _("Quick Setup — OSM Buildings") }} — Field Tasking
+Manager{% endblock %} {% block content %}
 <div class="ftm-page ftm-page--narrow">
-  <h1 style="margin-bottom: 20px">{{ _("Create Project") }}</h1>
+  <div style="margin-bottom: 16px">
+    <wa-button href="/new" variant="default" size="small">← {{ _("Back") }}</wa-button>
+  </div>
+  <h1 style="margin-bottom: 8px"><span aria-hidden="true">🏠</span> {{ _("Map buildings") }}</h1>
+  <p class="ftm-chooser-intro" style="margin-bottom: 18px">
+    {{ _("Just draw the area you want to map. We'll set everything up for you using building
+    outlines from OpenStreetMap and a ready-made survey for buildings.") }}
+  </p>
 
-  <wa-callout variant="brand" style="margin-bottom: 16px">
-    <span>
-      {{ _("This simple flow only needs your project area. We will auto-generate the project title,
-      description, and tags for OSM Buildings.") }}
-    </span>
+  <wa-callout variant="warning" style="margin-bottom: 20px">
+    <strong>{{ _("This is only for mapping buildings.") }}</strong>
+    {{ _("If you want to map something else (like roads or water points), use your own survey
+    questions, or bring your own map data,") }}
+    <a href="/new/custom" class="ftm-link--brand">{{ _("set up a custom project instead") }} →</a>
   </wa-callout>
 
   <wa-card>
@@ -35,7 +42,9 @@ endblock %} {% block content %}
         <wa-button type="submit" variant="brand" id="submit-btn">
           <span id="submit-btn-label">{{ _("Create Project") }}</span>
         </wa-button>
-        <wa-button href="/new" variant="default">{{ _("Back to Standard Form") }}</wa-button>
+        <wa-button href="/new/custom" variant="default"
+          >{{ _("Switch to Custom Project") }}</wa-button
+        >
       </div>
       <div
         id="submit-indicator"

@@ -1,0 +1,52 @@
+{% extends "layout.html" %} {% block title %}{{ _("Create Project") }} — Field Tasking Manager{%
+endblock %} {% block content %}
+<div class="ftm-page ftm-page--narrow">
+  <h1 style="margin-bottom: 8px">{{ _("What do you want to map?") }}</h1>
+  <p class="ftm-chooser-intro">
+    {{ _("Pick the option that fits your project. You can change your mind later by starting over.")
+    }}
+  </p>
+
+  <div class="ftm-chooser-grid">
+    <a href="/new/simple" class="ftm-chooser-card" id="chooser-simple">
+      <div class="ftm-chooser-card__head">
+        <span class="ftm-chooser-card__icon" aria-hidden="true">🏠</span>
+        <h2 class="ftm-chooser-card__title">{{ _("Map buildings") }}</h2>
+      </div>
+      <p class="ftm-chooser-card__tagline">
+        {{ _("Quickest way to start. Just draw your area on the map and you're done.") }}
+      </p>
+
+      <ul class="ftm-chooser-card__list">
+        <li>{{ _("We'll pre-fill the project for you") }}</li>
+        <li>{{ _("Uses building outlines already in OpenStreetMap") }}</li>
+        <li>{{ _("Comes with a ready-made survey for buildings") }}</li>
+      </ul>
+
+      <span class="ftm-chooser-card__cta">{{ _("Map buildings") }} →</span>
+    </a>
+
+    <a href="/new/custom" class="ftm-chooser-card ftm-chooser-card--secondary" id="chooser-custom">
+      <div class="ftm-chooser-card__head">
+        <span class="ftm-chooser-card__icon" aria-hidden="true">⚙️</span>
+        <h2 class="ftm-chooser-card__title">{{ _("Something else") }}</h2>
+      </div>
+      <p class="ftm-chooser-card__tagline">
+        {{ _("Use this for anything that isn't buildings. You'll get more options to set things up
+        the way you want.") }}
+      </p>
+
+      <ul class="ftm-chooser-card__list">
+        <li>
+          {{ _("Map roads, healthcare, water points, toilets, schools, and many other things") }}
+        </li>
+        <li>{{ _("Bring your own survey questions") }}</li>
+        <li>{{ _("Bring your own map data, or start with an empty map") }}</li>
+        <li>{{ _("Control how the area is divided up for mappers") }}</li>
+      </ul>
+
+      <span class="ftm-chooser-card__cta">{{ _("Set up a custom project") }} →</span>
+    </a>
+  </div>
+</div>
+{% endblock %}

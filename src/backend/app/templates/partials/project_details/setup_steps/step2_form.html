@@ -1,74 +1,54 @@
-<div
-  id="step-2-container"
-  class="ftm-step {% if has_xlsform %}ftm-step--complete{% else %}ftm-step--pending{% endif %}"
->
+{% if has_xlsform %}
+<div id="step-2-container" class="ftm-step--complete-compact">
+  <span class="ftm-step__check" aria-hidden="true">✓</span>
+  <p class="ftm-step--complete-compact-title">{{ _("Survey form ready") }}</p>
+</div>
+{% else %}
+<div id="step-2-container" class="ftm-step ftm-step--pending">
   <div class="ftm-step__header">
-    <h3 class="ftm-step__title">
-      {{ _("Step 2: Select Survey Form") }} {% if has_xlsform %}
-      <span class="ftm-step__check">✓</span>
-      {% endif %}
-    </h3>
-    {% if has_xlsform %}
-    <wa-badge variant="success">{{ _("Complete") }}</wa-badge>
-    {% endif %}
+    <h3 class="ftm-step__title">{{ _("Choose Your Survey Form") }}</h3>
   </div>
-  {% if not has_xlsform %}
-  <p class="ftm-step__description">
-    {{ _("Choose a preset survey type, or upload your own custom XLSForm.") }}
+  <p class="ftm-step-intro">
+    {{ _("Pick a ready-made survey that matches what you're mapping. You can upload your own survey
+    file if none of these fit.") }}
   </p>
+
   <form
     id="upload-xlsform-form"
     hx-post="/upload-xlsform-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
     hx-target="#xlsform-status"
     hx-swap="innerHTML"
     hx-encoding="multipart/form-data"
-    style="display: flex; flex-direction: column; gap: 12px"
   >
-    <div class="ftm-step__status">
-      <label for="xlsform-select" class="ftm-split-label"> {{ _("Choose Survey Type:") }} </label>
+    <div class="ftm-step-field">
+      <label for="xlsform-select" class="ftm-step-field__label">
+        {{ _("Survey form") }} <span class="ftm-form-required">*</span>
+      </label>
       <select id="xlsform-select" class="ftm-split-select" disabled>
         <option value="">{{ _("Loading survey types...") }}</option>
       </select>
     </div>
 
-    <div
-      style="
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 14px;
-        background: #f0f7ff;
-        border: 1px dashed #4a90d9;
-        border-radius: 8px;
-      "
-    >
-      <span style="font-size: 0.95em; color: #333; white-space: nowrap"
-        >{{ _("Or use your own form instead:") }}</span
-      >
-      <button
-        type="button"
-        id="upload-xlsform-btn"
-        class="wa-button wa-button--default"
-        style="min-width: 200px"
-      >
-        {{ _("Upload Custom XLSForm") }}
+    <p class="ftm-step-secondary">
+      <span class="ftm-step-secondary__divider" aria-hidden="true"></span>
+      <span>{{ _("or") }}</span>
+      <button type="button" id="upload-xlsform-btn" class="ftm-soft-link">
+        {{ _("upload your own survey file (.xls / .xlsx)") }}
       </button>
-      <small
-        id="selected-xlsform-name"
-        class="ftm-form-help"
-        style="color: #2a6ab0; font-weight: 500"
-      ></small>
-    </div>
+      <span class="ftm-step-secondary__divider" aria-hidden="true"></span>
+    </p>
+
+    <small id="selected-xlsform-name" class="ftm-form-help" style="margin-top: -8px"></small>
+
     <div
       id="custom-form-disclaimer"
       class="ftm-config-note ftm-config-note--muted"
-      style="display: none; margin-top: -4px"
+      style="display: none; margin: 4px 0 12px"
     >
-      <span style="font-size: 0.88em"
-        >{{ _("Note: Field-TM will automatically inject additional fields into your form for task
-        division and feature selection. Your form should only contain the survey questions you want
-        to ask (do not include select_one_from_file fields for tasks/features).") }}</span
-      >
+      <span>
+        {{ _("Heads up: Field-TM auto-adds fields for tasks and feature selection. Your form should
+        only contain the survey questions you want to ask.") }}
+      </span>
     </div>
 
     <input
@@ -89,46 +69,33 @@
       name="include_photo_upload"
       value="true"
     />
-    {% if field_mapping_app_value %} {% set app_name = field_mapping_app_value %} {% set is_odk =
-    field_mapping_app_upper == 'ODK' %}
+    {% if field_mapping_app_value %} {% set is_odk = field_mapping_app_upper == 'ODK' %}
     <input type="hidden" name="use_odk_collect" value="{{ 'true' if is_odk else 'false' }}" />
-    {% if is_odk %}
-    <div class="ftm-config-note ftm-config-note--info">
-      <span
-        >{{ _("Recommended defaults are active for ODK projects, including ODK Collect
-        compatibility.") }}</span
-      >
-    </div>
     {% else %}
-    <div class="ftm-config-note ftm-config-note--muted">
-      <span
-        >{{ _("Recommended defaults are active for %(app_name)s projects.") % {"app_name": app_name}
-        }}</span
-      >
-    </div>
-    {% endif %} {% else %}
     <input type="hidden" name="use_odk_collect" value="false" />
-    <div class="ftm-config-note ftm-config-note--muted">
-      <span>{{ _("Recommended defaults are active for this project.") }}</span>
-    </div>
     {% endif %}
 
     <div id="xlsform-status" class="ftm-step__status"></div>
 
-    <div class="ftm-step__actions" style="margin-bottom: 8px">
+    <div class="ftm-step__actions" style="margin: 14px 0 8px">
+      <wa-button id="upload-xlsform-submit-btn" type="submit" variant="brand" disabled>
+        {{ _("Continue") }}
+      </wa-button>
       <button
         type="button"
         id="form-advanced-config-toggle"
         class="wa-button wa-button--default ftm-advanced-toggle"
       >
-        {{ _("Advanced Config") }}
+        {{ _("More options") }}
       </button>
     </div>
 
     <div id="form-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
       <div class="ftm-advanced-config__content">
-        <div style="margin-top: 4px">
-          <label class="ftm-split-label">{{ _("Default Language:") }}</label>
+        <div class="ftm-step-field">
+          <label for="default-language-select" class="ftm-step-field__label">
+            {{ _("Form language") }}
+          </label>
           <select id="default-language-select" name="default_language" class="ftm-split-select">
             <option value="english">{{ _("English") }}</option>
             <option value="spanish">{{ _("Spanish") }}</option>
@@ -138,65 +105,39 @@
             <option value="hindi">{{ _("Hindi") }}</option>
           </select>
         </div>
-        <div
-          style="
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 12px;
-            padding: 10px 14px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            background: #fafafa;
-          "
-        >
-          <span class="ftm-split-label" style="margin-bottom: 2px">{{ _("Form Options:") }}</span>
 
-          <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
-            <label class="ftm-checkbox-label" style="display: flex; align-items: center; gap: 8px">
-              <input
-                type="checkbox"
-                id="include-photo-upload-checkbox"
-                checked
-                style="margin: 0; cursor: pointer"
-              />
-              <span style="font-size: 0.95em">{{ _("Include photo upload question") }}</span>
-            </label>
-            <label
-              class="ftm-checkbox-label"
-              id="mandatory-photo-label"
-              style="display: flex; align-items: center; gap: 8px"
-            >
-              <input
-                type="checkbox"
-                name="mandatory_photo_upload"
-                id="mandatory-photo-checkbox"
-                value="true"
-                style="margin: 0; cursor: pointer"
-              />
-              <span style="font-size: 0.95em; color: #666">{{ _("Make photo mandatory") }}</span>
-            </label>
-          </div>
+        <div class="ftm-step-options" role="group" aria-label="{{ _('Form questions') }}">
+          <label class="ftm-step-option">
+            <input type="checkbox" id="include-photo-upload-checkbox" checked />
+            <span class="ftm-step-option__text">
+              <span class="ftm-step-option__title">{{ _("Ask for a photo") }}</span>
+              <span class="ftm-step-option__hint">
+                {{ _("Mappers will be asked to take a photo at the location.") }}
+              </span>
+            </span>
+          </label>
 
-          <small style="color: #888; font-size: 0.85em; margin-top: -4px"
-            >{{ _("Asks the user to take a photo at their location.") }}</small
-          >
-
-          <label class="ftm-checkbox-label" style="display: flex; align-items: center; gap: 8px">
+          <label class="ftm-step-option ftm-step-option--child" id="mandatory-photo-label">
             <input
               type="checkbox"
-              id="verification-fields-checkbox"
-              checked
-              style="margin: 0; cursor: pointer"
+              name="mandatory_photo_upload"
+              id="mandatory-photo-checkbox"
+              value="true"
             />
-            <span style="font-size: 0.95em"
-              >{{ _("Include digitisation verification question") }}</span
-            >
+            <span class="ftm-step-option__text">
+              <span class="ftm-step-option__title">{{ _("Make photo mandatory") }}</span>
+            </span>
           </label>
-          <small style="color: #888; font-size: 0.85em; margin-top: -4px"
-            >{{ _("Asks the mapper to verify if existing features are correctly digitised.")
-            }}</small
-          >
+
+          <label class="ftm-step-option">
+            <input type="checkbox" id="verification-fields-checkbox" checked />
+            <span class="ftm-step-option__text">
+              <span class="ftm-step-option__title">{{ _("Ask to verify existing features") }}</span>
+              <span class="ftm-step-option__hint">
+                {{ _("Mappers confirm whether existing OSM features are correctly digitised.") }}
+              </span>
+            </span>
+          </label>
         </div>
       </div>
     </div>
@@ -209,18 +150,6 @@
       style="display: none"
     />
     <input type="hidden" name="template_form_id" id="template-form-id" value="" />
-
-    <wa-button
-      id="upload-xlsform-submit-btn"
-      type="submit"
-      variant="brand"
-      style="margin-top: 4px"
-      disabled
-    >
-      {{ _("Continue") }}
-    </wa-button>
   </form>
-  {% else %}
-  <div class="ftm-step__success">{{ _("✓ Survey form uploaded successfully") }}</div>
-  {% endif %}
 </div>
+{% endif %}

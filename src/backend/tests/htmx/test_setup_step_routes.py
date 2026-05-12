@@ -50,13 +50,10 @@ async def test_project_setup_shows_step1_advanced_config_toggle(client, stub_pro
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert "Choose Survey Type:" in response.text
-    assert "Use Selected Survey Type" not in response.text
+    assert "Choose Your Survey Form" in response.text
     assert "Continue" in response.text
-    assert "Advanced Config" in response.text
-    assert response.text.index("Default Language:") < response.text.index(
-        "Form Options:"
-    )
+    assert "More options" in response.text
+    assert response.text.index("Form language") < response.text.index("Form questions")
 
 
 async def test_project_setup_shows_step2_advanced_config_options(client, db, project):
@@ -74,9 +71,9 @@ async def test_project_setup_shows_step2_advanced_config_options(client, db, pro
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert "Download OSM Data" in response.text
-    assert "Collect New Data Only" in response.text
-    assert "Upload Custom GeoJSON" in response.text
+    assert "Use OSM data" in response.text
+    assert "Start with empty map" in response.text
+    assert "upload your own map file (GeoJSON)" in response.text
     assert response.text.index("data-advanced-config-toggle") < response.text.index(
         'id="osm-data-status"'
     )
@@ -102,7 +99,7 @@ async def test_project_setup_hides_step2_actions_when_data_extract_is_complete(
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert "✓ OSM data extract ready" in response.text
+    assert "Data extract ready" in response.text
     assert 'id="download-osm-data-btn"' not in response.text
     assert 'id="collect-new-data-btn"' not in response.text
     assert 'id="upload-geojson-btn"' not in response.text
@@ -311,7 +308,7 @@ def test_build_odk_finalize_success_html_includes_manager_credentials():
     """ODK finalize helper should return template context with manager credentials."""
     result = ODKFinalizeResult(
         odk_url="https://central.example.org/#/projects/17",
-        manager_username="field-tm-manager@example.org",
+        manager_username="field-tm-manager@fieldtm.org",
         manager_password="StrongPass123!",
     )
 
@@ -323,7 +320,7 @@ def test_build_odk_finalize_success_html_includes_manager_credentials():
     assert trigger_payload is not None
     assert trigger_payload["projectId"] == 17
     assert response_template.context["result"].manager_username == (
-        "field-tm-manager@example.org"
+        "field-tm-manager@fieldtm.org"
     )
     assert response_template.context["result"].manager_password == "StrongPass123!"
 
@@ -332,7 +329,7 @@ def test_build_odk_finalize_success_html_does_not_render_qr_markup():
     """ODK finalize helper should use ODK success fragment, not QField QR fragment."""
     result = ODKFinalizeResult(
         odk_url="https://central.example.org/#/projects/17",
-        manager_username="field-tm-manager@example.org",
+        manager_username="field-tm-manager@fieldtm.org",
         manager_password="StrongPass123!",
     )
 
@@ -350,7 +347,7 @@ def test_build_qfield_finalize_success_html_emits_finalize_event():
     """QField finalize helper should emit explicit finalize-complete trigger."""
     result = SimpleNamespace(
         qfield_url="https://app.qfield.cloud/projects/99",
-        manager_username="manager@example.org",
+        manager_username="manager@fieldtm.org",
         manager_password="Pass123!",
     )
 

@@ -1,11 +1,11 @@
 {% if has_xlsform and has_data_extract and has_task_areas %}
-<div id="step-5-container" class="ftm-step ftm-step--complete">
+<div id="step-5-container" class="ftm-step ftm-step--pending">
   <div class="ftm-step__header">
-    <h3 class="ftm-step__title">{{ _("Step 5: Finalise Project") }}</h3>
+    <h3 class="ftm-step__title">{{ _("Finalise Project") }}</h3>
     <wa-badge variant="success">{{ _("Ready") }}</wa-badge>
   </div>
-  <p class="ftm-step__description">
-    {{ _("All prerequisites are complete! Create the project in your chosen mapping tool.") }}
+  <p class="ftm-step-intro">
+    {{ _("Everything's ready. Click below to create the project in your chosen mapping tool.") }}
   </p>
 
   <form
@@ -24,7 +24,7 @@
         class="wa-button wa-button--default ftm-advanced-toggle"
         style="min-width: 200px"
       >
-        {{ _("Advanced Config") }}
+        {{ _("Use custom credentials") }}
       </button>
     </div>
 

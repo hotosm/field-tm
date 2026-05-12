@@ -39,8 +39,8 @@ extract:
 update:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
-  uv run --group dev pybabel update -D field_tm -i app/locales/field_tm.pot -d app/locales
-  uv run --group dev pybabel update -D osm_fieldwork -i app/locales/osm_fieldwork.pot -d app/locales
+  uv run --group dev pybabel update -N --ignore-obsolete -D field_tm -i app/locales/field_tm.pot -d app/locales
+  uv run --group dev pybabel update -N --ignore-obsolete -D osm_fieldwork -i app/locales/osm_fieldwork.pot -d app/locales
 
 # Compile .po files into .mo files for runtime use
 compile:

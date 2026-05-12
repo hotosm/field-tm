@@ -1,26 +1,14 @@
-{% extends "layout.html" %} {% block title %}{{ _("Create Project") }} — Field Tasking Manager{%
-endblock %} {% block content %}
+{% extends "layout.html" %} {% block title %}{{ _("Create Custom Project") }} — Field Tasking
+Manager{% endblock %} {% block content %}
 <div class="ftm-page ftm-page--narrow">
-  <h1 style="margin-bottom: 30px">{{ _("Create New Project") }}</h1>
-
-  <wa-callout variant="brand" style="margin-bottom: 16px">
-    <div
-      style="
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-      "
-    >
-      <span>
-        {{ _("If you are collecting OSM Buildings, use the simple workflow with AOI only.") }}
-      </span>
-      <wa-button href="/new/simple" variant="brand" size="small" id="open-simple-workflow-btn">
-        {{ _("Create Project") }}
-      </wa-button>
-    </div>
-  </wa-callout>
+  <div style="margin-bottom: 16px">
+    <wa-button href="/new" variant="default" size="small">← {{ _("Back") }}</wa-button>
+  </div>
+  <h1 style="margin-bottom: 8px">{{ _("Set up your project") }}</h1>
+  <p class="ftm-chooser-intro" style="margin-bottom: 24px">
+    {{ _("Just the basics on this page — what you're mapping, where, and which app mappers will use.
+    You'll pick your survey questions and map data on the next page.") }}
+  </p>
 
   <wa-card>
     <form
@@ -40,37 +28,46 @@ endblock %} {% block content %}
         </div>
       </div>
 
-      <div class="ftm-form-group">
-        <label for="project_name_input" class="ftm-form-label">
-          {{ _("Project Name") }} <span class="ftm-form-required">*</span>
-        </label>
-        <wa-input
-          name="project_name"
-          id="project_name_input"
-          placeholder="{{ _('Enter project name') }}"
-          style="width: 100%"
-        ></wa-input>
-        <div id="project-name-error" style="margin-top: 8px"></div>
-      </div>
+      <section class="ftm-custom-section">
+        <h2 class="ftm-custom-section__title">{{ _("About your project") }}</h2>
+        <p class="ftm-custom-section__hint">
+          {{ _("Give your project a clear name and a short summary so mappers know what it's
+          about.") }}
+        </p>
 
-      <div class="ftm-form-group">
-        <label for="description_input" class="ftm-form-label">
-          {{ _("Description") }} <span class="ftm-form-required">*</span>
-        </label>
-        <wa-textarea
-          name="description"
-          id="description_input"
-          placeholder="{{ _('Enter project description') }}"
-          rows="4"
-          style="width: 100%"
-        ></wa-textarea>
-        <div id="description-error" style="margin-top: 8px"></div>
-      </div>
+        <div class="ftm-form-group">
+          <label for="project_name_input" class="ftm-form-label">
+            {{ _("Project name") }} <span class="ftm-form-required">*</span>
+          </label>
+          <wa-input
+            name="project_name"
+            id="project_name_input"
+            placeholder="{{ _('e.g. Buildings in West Nairobi') }}"
+            style="width: 100%"
+          ></wa-input>
+          <div id="project-name-error" style="margin-top: 8px"></div>
+        </div>
 
-      <div class="ftm-form-group">
-        <label class="ftm-form-label">
-          {{ _("Field Mapping App") }} <span class="ftm-form-required">*</span>
-        </label>
+        <div class="ftm-form-group">
+          <label for="description_input" class="ftm-form-label">
+            {{ _("What are you mapping?") }} <span class="ftm-form-required">*</span>
+          </label>
+          <wa-textarea
+            name="description"
+            id="description_input"
+            placeholder="{{ _('A short description. e.g. Mapping water points and toilets in informal settlements.') }}"
+            rows="4"
+            style="width: 100%"
+          ></wa-textarea>
+          <div id="description-error" style="margin-top: 8px"></div>
+        </div>
+      </section>
+
+      <section class="ftm-custom-section">
+        <h2 class="ftm-custom-section__title">{{ _("Which app will mappers use?") }}</h2>
+        <p class="ftm-custom-section__hint">
+          {{ _("Pick the app you want mappers to install on their phone to do the survey.") }}
+        </p>
         <div id="field-mapping-app-container" class="ftm-radio-group">
           <label class="app-radio-label ftm-radio-card">
             <input
@@ -86,7 +83,13 @@ endblock %} {% block content %}
               class="ftm-app-logo"
               onerror="this.style.display = 'none'"
             />
-            <span style="font-weight: 500">QField</span>
+            <span class="ftm-radio-card__text">
+              <span style="font-weight: 600">QField</span>
+              <small class="ftm-form-help" style="margin: 0">
+                {{ _("Powerful GIS-style mapping app, including geometry editing, but with a simple
+                mapping pathway enabled via our HOT plugin.") }}
+              </small>
+            </span>
           </label>
           <label class="app-radio-label ftm-radio-card">
             <input
@@ -102,31 +105,51 @@ endblock %} {% block content %}
               class="ftm-app-logo"
               onerror="this.style.display = 'none'"
             />
-            <span style="font-weight: 500">ODK</span>
+            <span class="ftm-radio-card__text">
+              <span style="font-weight: 600">ODK Collect</span>
+              <small class="ftm-form-help" style="margin: 0">
+                {{ _("Simple form-based survey app. Best for straightforward question-and-answer
+                surveys.") }}
+              </small>
+            </span>
           </label>
         </div>
-      </div>
+      </section>
 
-      {% include "partials/new_project/map_section.html" %}
+      <section class="ftm-custom-section">
+        <h2 class="ftm-custom-section__title">{{ _("Where are you mapping?") }}</h2>
+        <p class="ftm-custom-section__hint">
+          {{ _("Draw the area mappers will cover. Smaller areas are easier to coordinate.") }}
+        </p>
+        {% include "partials/new_project/map_section.html" %}
+      </section>
 
-      <div class="ftm-form-group">
-        <label class="ftm-form-label">{{ _("Hashtags") }}</label>
-        <wa-input
-          id="hashtag-input"
-          placeholder='{{ _("Type hashtags and press Enter or comma") }}'
-          style="width: 100%"
-        ></wa-input>
-        <div id="hashtags-container" class="ftm-hashtags-container"></div>
-        <small class="ftm-form-help">
-          {{ _("Type hashtags and press Enter or comma to add them. Click the × on a tag to remove
-          it.") }}
-        </small>
-      </div>
+      <section class="ftm-custom-section">
+        <h2 class="ftm-custom-section__title">
+          {{ _("Tags") }}
+          <span style="font-weight: 400; color: var(--ftm-text-muted); font-size: 0.85em"
+            >({{ _("optional") }})</span
+          >
+        </h2>
+        <p class="ftm-custom-section__hint">
+          {{ _("Add tags so other people can find your project. Tags are like #buildings or
+          #campaign-2026.") }}
+        </p>
+        <div class="ftm-form-group" style="margin-bottom: 0">
+          <wa-input
+            id="hashtag-input"
+            placeholder='{{ _("Type a tag and press Enter") }}'
+            style="width: 100%"
+          ></wa-input>
+          <div id="hashtags-container" class="ftm-hashtags-container"></div>
+          <small class="ftm-form-help">
+            {{ _("Press Enter or comma after each tag. Click × on a tag to remove it.") }}
+          </small>
+        </div>
+      </section>
 
       <div class="ftm-form-actions">
-        <wa-button type="submit" variant="brand" id="submit-btn"
-          >{{ _("Create Project") }}</wa-button
-        >
+        <wa-button type="submit" variant="brand" id="submit-btn">{{ _("Continue") }}</wa-button>
         <span id="submit-indicator" style="display: none; margin-inline-start: 10px"
           >{{ _("Creating...") }}</span
         >

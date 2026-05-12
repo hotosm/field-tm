@@ -166,7 +166,10 @@ def _parse_tilepack_status(
     state = str(payload.get("status") or payload.get("state") or "").lower()
 
     if status_code == status.HTTP_200_OK:
-        return "ready", direct_url
+        # Treat 200 OK without a URL as still generating: the tilepack is not
+        # actually downloadable yet, and persisting "ready" would strand the
+        # project in a state where attach cannot proceed.
+        return ("ready", direct_url) if direct_url else ("generating", None)
     if status_code == status.HTTP_202_ACCEPTED:
         return "generating", None
     if status_code == status.HTTP_429_TOO_MANY_REQUESTS:
@@ -180,7 +183,7 @@ def _parse_tilepack_status(
         )
 
     if state in {"ready", "completed", "success"}:
-        return "ready", direct_url
+        return ("ready", direct_url) if direct_url else ("generating", None)
     if state in {"queued", "running", "processing", "generating"}:
         return "generating", None
 

@@ -80,7 +80,7 @@ async def test_create_project_manager_user_returns_credentials(odk_project):
         odk_credentials=None,
     )
     assert username.startswith("field-tm-manager-")
-    assert username.endswith("@example.org")
+    assert username.endswith("@fieldtm.org")
     assert len(password) == 20
     assert password.isalnum()
 
@@ -316,13 +316,13 @@ async def test_create_project_manager_user_fallback_email_on_conflict():
         )
 
     assert username.startswith("field-tm-manager-17")
-    assert username.endswith("@example.org")
-    assert username != "field-tm-manager-17@example.org"
+    assert username.endswith("@fieldtm.org")
+    assert username != "field-tm-manager-17@fieldtm.org"
     assert len(password) == 20
     assert fake_client.session.post_calls[0][0] == "users"
     assert (
         fake_client.session.post_calls[0][1]["email"]
-        == "field-tm-manager-17@example.org"
+        == "field-tm-manager-17@fieldtm.org"
     )
     assert fake_client.session.post_calls[1][0] == "users"
     assert fake_client.session.post_calls[2][0] == "projects/17/assignments/7/999"
@@ -444,7 +444,7 @@ async def test_create_project_manager_user_display_name_failure_non_fatal():
             odk_credentials=None,
         )
 
-    assert username == "field-tm-manager-25@example.org"
+    assert username == "field-tm-manager-25@fieldtm.org"
     assert len(password) == 20
     assert len(fake_client.session.patch_calls) == 1
     assert fake_client.session.patch_calls[0][0] == "users/555"
@@ -492,6 +492,6 @@ async def test_create_project_manager_user_assignment_conflict_idempotent():
             odk_credentials=None,
         )
 
-    assert username == "field-tm-manager-42@example.org"
+    assert username == "field-tm-manager-42@fieldtm.org"
     assert len(password) == 20
     assert fake_client.session.post_calls[1][0] == "projects/42/assignments/7/333"

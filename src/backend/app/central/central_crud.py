@@ -1018,7 +1018,7 @@ def _assign_appuser_role(client, path: str, scope: str) -> None:
 
 def _build_manager_user_email(project_odk_id: int) -> str:
     """Create the default manager email for a project."""
-    return f"field-tm-manager-{project_odk_id}@example.org"
+    return f"field-tm-manager-{project_odk_id}@fieldtm.org"
 
 
 def _build_manager_user_password() -> str:
@@ -1031,7 +1031,7 @@ def _build_manager_user_password() -> str:
 def _build_manager_user_email_fallback(project_odk_id: int) -> str:
     """Create a fallback manager email variant when the primary is already taken."""
     suffix = secrets.token_hex(4)
-    return f"field-tm-manager-{project_odk_id}-{suffix}@example.org"
+    return f"field-tm-manager-{project_odk_id}-{suffix}@fieldtm.org"
 
 
 def _get_project_manager_role_id(client) -> int:

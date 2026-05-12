@@ -227,7 +227,7 @@ async def claim_simple_project_basemap_generation(
         SET
             basemap_status = 'generating',
             basemap_url = NULL,
-            basemap_attach_status = 'idle',
+            basemap_attach_status = 'pending_autostart',
             basemap_attach_error = NULL,
             basemap_attach_updated_at = NULL,
             updated_at = NOW()
