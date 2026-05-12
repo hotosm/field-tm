@@ -969,6 +969,7 @@ async def test_resume_simple_project_tilepack_if_needed_updates_status(
         id=202,
         basemap_stac_item_id="item-202",
         basemap_url=None,
+        basemap_status="generating",
     )
 
     check_status_mock = AsyncMock(return_value=("generating", None))
@@ -1016,6 +1017,7 @@ async def test_resume_simple_project_tilepack_if_needed_starts_attach_when_ready
         id=303,
         basemap_stac_item_id="item-303",
         basemap_url=None,
+        basemap_status="generating",
     )
 
     check_status_mock = AsyncMock(
