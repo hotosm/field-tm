@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026.3.0 (2026-05-12)
+
+### Feat
+
+- hook up bundling of field-tm plugin + styles for qfield project creation
+- add qfield plugin code based on work from @nirvn at opengisch
+
+### Fix
+
+- **frontend**: correct wa imports for qfield custom creds modal + translations
+- **osm-fieldwork**: add missed 'offset' option for digitisation correct question
+- **backend**: logic to check is basemap generation is complete
+- **qfield**: allow specify custom instance, users username on official instance, or hot instance
+- **backend**: improve qfield client login/logout functionality
+- **qfield**: layer config using old qgis api + survey layer style name
+- **deps**: update dependency cryptography to v46.0.7 (#3070)
+
+### Refactor
+
+- big update to project creation experience to make more user friendly
+- **frontend**: move the language selector into the hot-header lang slot
+- large refactor to improve code modularity, simplicity, maintainability
+
 ## 2026.2.0 (2026-04-24)
 
 ### Feat
