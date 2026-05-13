@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.3.1 (2026-05-13)
+
+### Fix
+
+- implement background task creation for /simple-project with poll
+
 ## 2026.3.0 (2026-05-12)
 
 ### Feat

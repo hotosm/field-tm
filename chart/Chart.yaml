@@ -3,7 +3,7 @@ type: application
 name: field-tm
 description: Field Tasking Manager - coordinated field mapping.
 version: "2026.3.0"
-appVersion: "2026.3.0"
+appVersion: "2026.3.1"
 maintainers:
 - email: sam.woodcock@hotosm.org
   name: Sam Woodcock
