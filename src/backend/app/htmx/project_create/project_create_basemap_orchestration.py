@@ -1,6 +1,5 @@
 """Basemap autostart helpers for project-create HTMX routes."""
 
-import asyncio
 import logging
 from datetime import datetime, timezone
 
@@ -9,6 +8,7 @@ from psycopg import AsyncConnection
 from app.config import settings
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
+from app.helpers.background_tasks import spawn as _spawn_bg_task
 from app.helpers.basemap_services import (
     check_tilepack_status,
     search_oam_imagery,
@@ -76,7 +76,10 @@ async def resume_simple_project_tilepack_if_needed(
     await bg_db.commit()
 
     if is_ready_with_url:
-        asyncio.create_task(run_basemap_attach_background(project.id, resolved_url))
+        _spawn_bg_task(
+            run_basemap_attach_background(project.id, resolved_url),
+            name=f"basemap-attach:{project.id}",
+        )
 
     return True
 
@@ -136,6 +139,7 @@ async def start_simple_project_tilepack(
             basemap_attach_updated_at=None,
         ),
     )
+    await bg_db.commit()
 
     status_value, download_url = await trigger_tilepack_generation(stac_item_id)
     is_ready_with_url = status_value == "ready" and bool(download_url)
@@ -199,7 +203,10 @@ def enqueue_simple_project_basemap_attach(
     if not download_url:
         return
 
-    asyncio.create_task(run_basemap_attach_background(project_id, download_url))
+    _spawn_bg_task(
+        run_basemap_attach_background(project_id, download_url),
+        name=f"basemap-attach:{project_id}",
+    )
 
 
 async def run_simple_project_basemap_autostart(
@@ -207,6 +214,10 @@ async def run_simple_project_basemap_autostart(
 ) -> None:
     """Drive simple-project basemap autostart from project state to enqueue."""
     project = await DbProject.one(bg_db, project_id)
+    # Close the implicit read transaction so the upcoming HTTP calls
+    # (check_tilepack_status / trigger_tilepack_generation) don't run while
+    # this connection holds locks on the projects table.
+    await bg_db.commit()
     if not project:
         return
 

@@ -2,7 +2,6 @@
 
 # ruff: noqa: D103
 
-import asyncio
 import json
 import logging
 from datetime import datetime, timezone
@@ -19,6 +18,7 @@ from psycopg import AsyncConnection
 from app.auth.auth_deps import get_user_sub, login_required
 from app.db.database import db_conn
 from app.db.models import DbProject
+from app.helpers.background_tasks import spawn as _spawn_bg_task
 from app.i18n import _
 from app.projects import project_schemas
 from app.projects.project_services import (
@@ -189,8 +189,9 @@ async def create_simple_project_htmx(
         )
         await db.commit()
 
-        asyncio.create_task(
-            _run_simple_project_creation_background(project.id, outline)
+        _spawn_bg_task(
+            _run_simple_project_creation_background(project.id, outline),
+            name=f"simple-project-create:{project.id}",
         )
 
         return _hx_redirect_response(f"/projects/{project.id}/creating")

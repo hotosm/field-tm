@@ -533,6 +533,7 @@ async def create_qfield_project(
 
         # ── Step 2: Read outputs from DB, upload to QFieldCloud ──────
         output_files = await _read_qgis_job_outputs(db, job_id)
+        await db.commit()
         if not output_files:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -609,6 +610,7 @@ async def attach_basemap_to_qfield_project(
         )
 
         output_files = await _read_qgis_job_outputs(db, job_id)
+        await db.commit()
         if not output_files:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

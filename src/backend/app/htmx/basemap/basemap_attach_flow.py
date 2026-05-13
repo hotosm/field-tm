@@ -12,6 +12,7 @@ from psycopg import AsyncConnection
 from app.config import settings
 from app.db.enums import FieldMappingApp, ProjectStatus
 from app.db.models import DbProject
+from app.helpers.background_tasks import spawn as _spawn_bg_task
 from app.helpers.basemap_services import check_tilepack_status
 from app.i18n import _
 from app.projects.project_schemas import ProjectUpdate
@@ -242,7 +243,10 @@ async def start_basemap_attach(
     )
     await db.commit()
 
-    asyncio.create_task(run_basemap_attach_background(project_id, basemap_url))
+    _spawn_bg_task(
+        run_basemap_attach_background(project_id, basemap_url),
+        name=f"basemap-attach:{project_id}",
+    )
 
     refreshed_project = await DbProject.one(db, project_id)
     return progress_fragment(refreshed_project, progress_scope="attach")
@@ -267,7 +271,10 @@ async def enqueue_autostart_attach(
     )
     await db.commit()
 
-    asyncio.create_task(run_basemap_attach_background(project_id, basemap_url))
+    _spawn_bg_task(
+        run_basemap_attach_background(project_id, basemap_url),
+        name=f"basemap-attach:{project_id}",
+    )
 
 
 _TRANSIENT_ATTACH_FRAGMENTS = (

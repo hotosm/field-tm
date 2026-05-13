@@ -712,7 +712,7 @@ async def test_basemap_status_auto_attaches_for_pending_autostart_project(
         basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
     )
     create_task_mock = Mock()
-    monkeypatch.setattr(basemap_attach_flow.asyncio, "create_task", create_task_mock)
+    monkeypatch.setattr(basemap_attach_flow, "_spawn_bg_task", create_task_mock)
 
     response = await basemap_routes.basemap_status_htmx.fn(
         request=Mock(query_params={}),
@@ -760,7 +760,7 @@ async def test_basemap_status_does_not_auto_attach_for_manual_flow(monkeypatch):
         basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
     )
     create_task_mock = Mock()
-    monkeypatch.setattr(basemap_attach_flow.asyncio, "create_task", create_task_mock)
+    monkeypatch.setattr(basemap_attach_flow, "_spawn_bg_task", create_task_mock)
 
     response = await basemap_routes.basemap_status_htmx.fn(
         request=Mock(query_params={}),
@@ -1016,7 +1016,7 @@ async def test_basemap_attach_self_heals_missing_url_from_upstream(monkeypatch):
     monkeypatch.setattr(
         basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
     )
-    monkeypatch.setattr(basemap_attach_flow.asyncio, "create_task", Mock())
+    monkeypatch.setattr(basemap_attach_flow, "_spawn_bg_task", Mock())
 
     response = await basemap_routes.basemap_attach_htmx.fn(
         request=Mock(),
@@ -1097,13 +1097,13 @@ async def test_basemap_attach_first_click_returns_in_progress(monkeypatch):
 
     captured_coro = None
 
-    def _capture_task(coro):
+    def _capture_task(coro, *, name=None):
         nonlocal captured_coro
         captured_coro = coro
         coro.close()
         return Mock()
 
-    monkeypatch.setattr(basemap_attach_flow.asyncio, "create_task", _capture_task)
+    monkeypatch.setattr(basemap_attach_flow, "_spawn_bg_task", _capture_task)
 
     response = await basemap_routes.basemap_attach_htmx.fn(
         request=Mock(),
@@ -1140,7 +1140,7 @@ async def test_basemap_attach_repeat_click_is_idempotent_in_progress(monkeypatch
     update_mock = AsyncMock()
     monkeypatch.setattr(basemap_routes.DbProject, "update", update_mock)
     create_task_mock = Mock()
-    monkeypatch.setattr(basemap_attach_flow.asyncio, "create_task", create_task_mock)
+    monkeypatch.setattr(basemap_attach_flow, "_spawn_bg_task", create_task_mock)
 
     response = await basemap_routes.basemap_attach_htmx.fn(
         request=Mock(),

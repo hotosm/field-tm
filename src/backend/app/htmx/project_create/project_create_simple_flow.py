@@ -1,6 +1,5 @@
 """Simple-flow orchestration helpers for project-create HTMX routes."""
 
-import asyncio
 import json
 import logging
 from datetime import datetime, timezone
@@ -13,6 +12,7 @@ from app.auth.auth_deps import get_user_sub
 from app.config import settings
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
+from app.helpers.background_tasks import spawn as _spawn_bg_task
 from app.i18n import _
 from app.projects import project_schemas
 from app.projects.project_crud import claim_simple_project_basemap_generation
@@ -196,7 +196,10 @@ async def finalize_simple_project_creation(
         db=db, project_id=project_id
     )
     if claimed:
-        asyncio.create_task(autostart_callback(project_id, outline))
+        _spawn_bg_task(
+            autostart_callback(project_id, outline),
+            name=f"basemap-autostart:{project_id}",
+        )
 
     headers = {"HX-Redirect": f"/projects/{project_id}"}
     if not has_features:

@@ -90,7 +90,7 @@ async def test_create_simple_project_htmx_success(monkeypatch):
     async def fake_run_background(project_id, outline):
         captured["background_call"] = (project_id, outline)
 
-    def fake_create_task(coro):
+    def fake_create_task(coro, *, name=None):
         captured["enqueued_coro"] = coro
         coro.close()
         return Mock()
@@ -114,7 +114,7 @@ async def test_create_simple_project_htmx_success(monkeypatch):
         fake_run_background,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes.asyncio.create_task",
+        "app.htmx.project_create.project_create_submit_routes._spawn_bg_task",
         fake_create_task,
     )
 
@@ -215,8 +215,8 @@ async def test_create_simple_project_htmx_handles_conflict(monkeypatch):
         AsyncMock(),
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes.asyncio.create_task",
-        lambda coro: (coro.close(), Mock())[1],
+        "app.htmx.project_create.project_create_submit_routes._spawn_bg_task",
+        lambda coro, *, name=None: (coro.close(), Mock())[1],
     )
 
     response = await create_simple_project_htmx.fn(
@@ -277,8 +277,8 @@ async def test_create_simple_project_htmx_uses_deterministic_fallback_name(monke
         AsyncMock(),
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes.asyncio.create_task",
-        lambda coro: (coro.close(), Mock())[1],
+        "app.htmx.project_create.project_create_submit_routes._spawn_bg_task",
+        lambda coro, *, name=None: (coro.close(), Mock())[1],
     )
 
     response = await create_simple_project_htmx.fn(
@@ -538,7 +538,7 @@ async def test_resume_simple_project_tilepack_if_needed_updates_status(
 
     create_task_mock = Mock()
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.asyncio.create_task",
+        "app.htmx.project_create.project_create_basemap_orchestration._spawn_bg_task",
         create_task_mock,
     )
 
@@ -596,7 +596,7 @@ async def test_resume_simple_project_tilepack_if_needed_starts_attach_when_ready
 
     captured_attach_calls: list[tuple[int, str]] = []
 
-    def fake_create_task(coro):
+    def fake_create_task(coro, *, name=None):
         captured_attach_calls.append(
             (
                 coro.cr_frame.f_locals["project_id"],
@@ -607,7 +607,7 @@ async def test_resume_simple_project_tilepack_if_needed_starts_attach_when_ready
         return Mock()
 
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.asyncio.create_task",
+        "app.htmx.project_create.project_create_basemap_orchestration._spawn_bg_task",
         fake_create_task,
     )
 
