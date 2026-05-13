@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.3.2 (2026-05-13)
+
+### Fix
+
+- **backend**: small fixes to the db + bg task usage, avoid db locking
+
 ## 2026.3.1 (2026-05-13)
 
 ### Fix
