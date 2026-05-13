@@ -129,6 +129,7 @@ version_provider = "uv"
 version_files = [
     "pyproject.toml:version",
     "app/__version__.py",
+    "../../chart/Chart.yaml:version",
     "../../chart/Chart.yaml:appVersion",
 ]
 changelog_file = "../../CHANGELOG.md"
