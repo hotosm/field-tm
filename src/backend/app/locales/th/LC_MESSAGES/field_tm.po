@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-05-11 22:06+0100\n"
+"POT-Creation-Date: 2026-05-13 04:50+0100\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: th\n"
@@ -140,7 +140,7 @@ msgstr "%(action)s ล้มเหลวด้วย HTTP %(status_code)s"
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s ล้มเหลวเนื่องจากข้อผิดพลาดการเชื่อมต่ออัปสตรีม"
 
-#: app/helpers/basemap_services.py:178
+#: app/helpers/basemap_services.py:181
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack API ส่งคืน HTTP %(status_code)s"
@@ -248,12 +248,12 @@ msgid "Project not found."
 msgstr "ไม่พบโครงการ"
 
 #: app/htmx/project_detail_routes.py:321
-#: app/htmx/setup_steps/setup_step_responses.py:71
+#: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "ข้อผิดพลาด: %(error_msg)s"
 
-#: app/htmx/basemap/basemap_attach_flow.py:67
+#: app/htmx/basemap/basemap_attach_flow.py:68
 msgid ""
 "Basemap attach failed for now. Your project is ready to use. Please retry"
 " attach."
@@ -261,7 +261,7 @@ msgstr ""
 "การแนบแผนที่ฐานล้มเหลวในขณะนี้ โปรเจกต์ของคุณพร้อมใช้งานแล้ว "
 "โปรดลองแนบอีกครั้ง"
 
-#: app/htmx/basemap/basemap_attach_flow.py:72
+#: app/htmx/basemap/basemap_attach_flow.py:73
 msgid ""
 "Basemap attach could not complete due to a temporary network issue. Your "
 "project is ready to use. Please retry attach."
@@ -269,23 +269,27 @@ msgstr ""
 "ไม่สามารถแนบแผนที่ฐานให้เสร็จสมบูรณ์ได้เนื่องจากปัญหาเครือข่ายชั่วคราว "
 "โปรเจกต์ของคุณพร้อมใช้งานแล้ว โปรดลองแนบอีกครั้ง"
 
-#: app/htmx/basemap/basemap_attach_flow.py:87
+#: app/htmx/basemap/basemap_attach_flow.py:122
 msgid "Basemap attach is available after publication."
 msgstr "การแนบแผนที่ฐานจะใช้งานได้หลังจากเผยแพร่แล้ว"
 
-#: app/htmx/basemap/basemap_attach_flow.py:96
+#: app/htmx/basemap/basemap_attach_flow.py:131
 msgid "Basemap attach is only available for QField projects."
 msgstr "การแนบแผนที่ฐานใช้ได้เฉพาะกับโครงการ QField เท่านั้น"
 
-#: app/htmx/basemap/basemap_attach_flow.py:106
+#: app/htmx/basemap/basemap_attach_flow.py:141
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "แผนที่ฐานยังไม่พร้อม โปรดรอให้การสร้างเสร็จสิ้น"
 
-#: app/htmx/basemap/basemap_attach_flow.py:115
-msgid "No generated basemap download URL is available yet."
-msgstr "ยังไม่มี URL สำหรับดาวน์โหลดแผนที่ฐานที่สร้างแล้ว"
+#: app/htmx/basemap/basemap_attach_flow.py:156
+msgid ""
+"Basemap download URL is not available yet. Please refresh status and try "
+"again shortly."
+msgstr ""
+"URL ดาวน์โหลดแผนที่ฐานยังไม่พร้อมใช้งาน "
+"โปรดรีเฟรชสถานะแล้วลองอีกครั้งในอีกสักครู่"
 
-#: app/htmx/basemap/basemap_attach_flow.py:129
+#: app/htmx/basemap/basemap_attach_flow.py:172
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -293,35 +297,35 @@ msgid ""
 msgstr "ยังไม่ได้ตั้งค่าการแนบแผนที่ฐานของ QField ในการติดตั้งนี้ ขาด %(config)s"
 
 #: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:91
+#: app/htmx/setup_steps/setup_step_responses.py:90
 msgid "Project not found or access denied."
 msgstr "ไม่พบโครงการหรือถูกปฏิเสธการเข้าถึง"
 
-#: app/htmx/basemap/basemap_fragments.py:112
+#: app/htmx/basemap/basemap_fragments.py:105
 msgid "Basemap attached to QField project successfully."
 msgstr "แนบแผนที่ฐานเข้ากับโครงการ QField สำเร็จแล้ว"
 
-#: app/htmx/basemap/basemap_fragments.py:122
+#: app/htmx/basemap/basemap_fragments.py:115
 msgid "Basemap attach has not started yet."
 msgstr "ยังไม่ได้เริ่มแนบแผนที่ฐาน"
 
-#: app/htmx/basemap/basemap_fragments.py:133
+#: app/htmx/basemap/basemap_fragments.py:126
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr "ไม่สามารถค้นหาภาพถ่ายได้ในขณะนี้ โปรดลองอีกครั้งในอีกสักครู่"
 
-#: app/htmx/basemap/basemap_fragments.py:146
+#: app/htmx/basemap/basemap_fragments.py:139
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr "ไม่สามารถเริ่มสร้างแผนที่ฐานได้ในขณะนี้ โปรดลองอีกครั้งในอีกสักครู่"
 
-#: app/htmx/basemap/basemap_fragments.py:160
+#: app/htmx/basemap/basemap_fragments.py:153
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr "ไม่สามารถรีเฟรชสถานะแผนที่ฐานได้ในขณะนี้ โปรดลองอีกครั้งในอีกสักครู่"
 
-#: app/htmx/basemap/basemap_routes.py:93
+#: app/htmx/basemap/basemap_routes.py:113
 msgid "Basemap tools are available after publication."
 msgstr "เครื่องมือแผนที่ฐานจะพร้อมใช้งานหลังจากเผยแพร่แล้ว"
 
-#: app/htmx/basemap/basemap_routes.py:253
+#: app/htmx/basemap/basemap_routes.py:273
 msgid "No basemap generation in progress."
 msgstr "การทำแผนที่ภาคสนามที่กำลังดำเนินอยู่"
 
@@ -333,20 +337,21 @@ msgstr ""
 "พื้นที่โครงการต้องเป็น JSON ที่ถูกต้อง (GeoJSON Polygon, MultiPolygon, "
 "Feature หรือ FeatureCollection)"
 
-#: app/htmx/project_create/project_create_simple_flow.py:55
+#: app/htmx/project_create/project_create_simple_flow.py:60
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
 msgstr "ไม่พบอาคาร OSM ที่มีอยู่ในพื้นที่นี้ ดำเนินการทำแผนที่ตั้งแต่ต้นต่อไป"
 
-#: app/htmx/project_create/project_create_simple_flow.py:152
+#: app/htmx/project_create/project_create_simple_flow.py:157
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 "ไม่สามารถโหลดแบบฟอร์ม OSM Buildings "
 "เริ่มต้นสำหรับการสร้างโครงการแบบง่ายได้"
 
-#: app/htmx/project_create/project_create_submit_routes.py:139
-#: app/htmx/project_create/project_create_submit_routes.py:200
+#: app/htmx/project_create/project_create_simple_flow.py:269
+#: app/htmx/project_create/project_create_submit_routes.py:140
+#: app/htmx/project_create/project_create_submit_routes.py:209
 msgid "An unexpected error occurred. Please try again."
 msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิด โปรดลองอีกครั้ง"
 
@@ -370,7 +375,7 @@ msgstr "ผู้ใช้นี้ไม่มีอยู่ โปรดส�
 msgid "This user is already a collaborator on this project."
 msgstr "ผู้ใช้นี้เป็นผู้ร่วมงานในโครงการนี้อยู่แล้ว"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1257
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1360
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "เพิ่มผู้ร่วมงานไม่สำเร็จ: %(exc)s"
@@ -505,8 +510,8 @@ msgstr "ออกจากโครงการนี้หรือไม่"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
 #: app/templates/new_project_custom.html:156
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:66
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:156
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:177
 msgid "Cancel"
 msgstr "ยกเลิก"
 
@@ -527,9 +532,9 @@ msgid "No collaborators yet."
 msgstr "ยังไม่มีผู้ร่วมงาน"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:218
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:90
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:96
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:129
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:91
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:97
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:140
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "ชื่อผู้ใช้"
@@ -716,11 +721,11 @@ msgstr ""
 "ตรวจสอบผลลัพธ์ด้านล่าง หากพอใจให้คลิก \"Accept Task Choices\" เพื่อบันทึก"
 " มิฉะนั้นให้ปรับพารามิเตอร์ด้านบนแล้วคลิก \"Split Again\" เพื่อสร้างใหม่"
 
-#: app/htmx/setup_steps/setup_step_responses.py:86
+#: app/htmx/setup_steps/setup_step_responses.py:85
 msgid "An unexpected error occurred"
 msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิด"
 
-#: app/htmx/setup_steps/setup_step_responses.py:161
+#: app/htmx/setup_steps/setup_step_responses.py:160
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -730,13 +735,13 @@ msgstr ""
 "หากยังเกิดปัญหา "
 "โปรดส่งรายละเอียดทางเทคนิคด้านล่างให้ผู้ดูแลระบบหรือทีมสนับสนุนของคุณ"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:96
+#: app/htmx/setup_steps/setup_step_split_routes.py:99
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr "ไม่พบข้อมูลที่ดึงออก โปรดดาวน์โหลดข้อมูล OSM หรืออัปโหลดไฟล์ GeoJSON ก่อน"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:127
+#: app/htmx/setup_steps/setup_step_split_routes.py:130
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -745,7 +750,7 @@ msgstr ""
 "กำลังแสดงตัวอย่าง AOI ทั้งหมด (ไม่แบ่ง) พร้อมฟีเจอร์ข้อมูล "
 "%(data_feature_count)s รายการ โดยจะใช้ AOI ทั้งหมดเป็นงานเดียว"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:134
+#: app/htmx/setup_steps/setup_step_split_routes.py:137
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -754,11 +759,11 @@ msgstr ""
 "กำลังแสดงตัวอย่างขอบเขตงาน %(task_count)s รายการและฟีเจอร์ข้อมูล "
 "%(data_feature_count)s รายการร่วมกัน"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:187
+#: app/htmx/setup_steps/setup_step_split_routes.py:190
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "ไม่พบขอบเขตโครงการ จึงไม่สามารถข้ามการแบ่งงานได้"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:209
+#: app/htmx/setup_steps/setup_step_split_routes.py:215
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
@@ -766,23 +771,23 @@ msgstr ""
 "✓ ข้ามการแบ่งงานแล้ว โดยจะใช้ AOI ทั้งหมดเป็นงานเดียว "
 "คุณสามารถไปยังขั้นตอนที่ 5 ได้"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:263
+#: app/htmx/setup_steps/setup_step_split_routes.py:270
 msgid "Please select a splitting option."
 msgstr "โปรดเลือกตัวเลือกการแบ่งงาน"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:284
+#: app/htmx/setup_steps/setup_step_split_routes.py:294
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ การตั้งค่าโครงการนี้ไม่จำเป็นต้องแบ่งงาน"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:333
+#: app/htmx/setup_steps/setup_step_split_routes.py:344
 msgid "No task areas data provided."
 msgstr "ไม่ได้ระบุข้อมูลพื้นที่งาน"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:337
+#: app/htmx/setup_steps/setup_step_split_routes.py:348
 msgid "Invalid task areas data format."
 msgstr "รูปแบบข้อมูลพื้นที่งานไม่ถูกต้อง"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:357
+#: app/htmx/setup_steps/setup_step_split_routes.py:371
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ บันทึกการแบ่งงานสำเร็จ"
 
@@ -862,71 +867,80 @@ msgstr "พื้นที่ {latitude:.4f}_{longitude:.4f}"
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:164
+#: app/qfield/qfield_crud.py:166
 msgid "Project outline is missing or has no geometry."
 msgstr "ขาดหายไปหรือไม่มีรูปทรงเรขาคณิต"
 
-#: app/qfield/qfield_crud.py:170
+#: app/qfield/qfield_crud.py:172
 msgid "Project outline geometry has no coordinates."
 msgstr "เรขาคณิตโครงร่างของโครงการไม่มีพิกัด"
 
-#: app/qfield/qfield_crud.py:479
+#: app/qfield/qfield_crud.py:476
 msgid "Project outline is required for QField project creation."
 msgstr "✓ การตั้งค่าโครงการนี้ไม่จำเป็นต้องแบ่งงาน"
 
-#: app/qfield/qfield_crud.py:484
+#: app/qfield/qfield_crud.py:481
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm จำเป็นสำหรับการสร้างโปรเจ็กต์ QField"
 
-#: app/qfield/qfield_crud.py:501
+#: app/qfield/qfield_crud.py:498
 msgid "Failed to modify XLSForm for QField."
 msgstr "ไม่สามารถแก้ไข XLSForm สำหรับ QField"
 
-#: app/qfield/qfield_crud.py:542
+#: app/qfield/qfield_crud.py:539
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS เสร็จสมบูรณ์ แต่ไม่มีการเขียนไฟล์เอาต์พุต"
 
-#: app/qfield/qfield_crud.py:554
+#: app/qfield/qfield_crud.py:551
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS wrapper เสร็จสมบูรณ์ แต่ไม่มีไฟล์ .qgz ในเอาต์พุต"
 
-#: app/qfield/qfield_crud.py:584
+#: app/qfield/qfield_crud.py:581
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField หายไป ไม่สามารถแนบแผนที่ฐานได้"
 
-#: app/qfield/qfield_crud.py:618
+#: app/qfield/qfield_crud.py:615
 msgid "Basemap attach completed but produced no project files."
 msgstr "แผนที่ฐานถูกแนบเข้ากับโปรเจ็กต์ QField แล้ว"
 
-#: app/qfield/qfield_crud.py:771 app/qfield/qfield_crud.py:785
+#: app/qfield/qfield_crud.py:801
+#, python-format
+msgid ""
+"QFieldCloud did not finish processing the project file after %(attempts)d"
+" attempts (last status: %(status)s)."
+msgstr ""
+"QFieldCloud ยังประมวลผลไฟล์โปรเจกต์ไม่เสร็จหลังจากลอง %(attempts)d ครั้ง "
+"(สถานะล่าสุด: %(status)s)"
+
+#: app/qfield/qfield_crud.py:855 app/qfield/qfield_crud.py:869
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS ล้มเหลว: %(error)s"
 
-#: app/qfield/qfield_crud.py:778
+#: app/qfield/qfield_crud.py:862
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS ส่งคืน JSON ที่ไม่ถูกต้อง"
 
-#: app/qfield/qfield_crud.py:802
+#: app/qfield/qfield_crud.py:886
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "ไม่สามารถดาวน์โหลดแผนที่ฐาน MBTiles สำหรับการอัปโหลด (HTTP %(status)s)"
 
-#: app/qfield/qfield_crud.py:817
+#: app/qfield/qfield_crud.py:901
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "ดาวน์โหลดรหัส QR"
 
-#: app/qfield/qfield_crud.py:932
+#: app/qfield/qfield_crud.py:1027
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "ไม่สามารถอัปโหลดไฟล์ไปยัง QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1206
+#: app/qfield/qfield_crud.py:1309
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "ไม่พบโครงการ (%(project_id)s)"
 
-#: app/qfield/qfield_crud.py:1226
+#: app/qfield/qfield_crud.py:1329
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -935,17 +949,17 @@ msgstr ""
 "เป็นขององค์กร '%(owner)s' ไม่สามารถเพิ่ม '%(username)s' ให้กับองค์กร: "
 "%(error)s"
 
-#: app/qfield/qfield_crud.py:1244
+#: app/qfield/qfield_crud.py:1347
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "'%(username)s' ไม่มีอยู่ใน QFieldCloud"
 
-#: app/qfield/qfield_crud.py:1251
+#: app/qfield/qfield_crud.py:1354
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "ผู้ใช้ '%(username)s' เป็นผู้ร่วมงานในโครงการนี้อยู่แล้ว"
 
-#: app/qfield/qfield_crud.py:1292
+#: app/qfield/qfield_crud.py:1395
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ ข้อมูลรับรองถูกต้อง"
 
@@ -1006,7 +1020,7 @@ msgid "Search projects…"
 msgstr "ค้นหาโครงการ…"
 
 #: app/templates/home.html:68 app/templates/landing.html:503
-#: app/templates/layout.html:280 app/templates/new_project_chooser.html:1
+#: app/templates/layout.html:281 app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "สร้างโครงการ"
@@ -1319,15 +1333,15 @@ msgstr "อีเมล:"
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "การทำแผนที่ภาคสนามแบบประสานงานสำหรับแคมเปญ Open Mapping"
 
-#: app/templates/layout.html:195 app/templates/login.html:1
+#: app/templates/layout.html:196 app/templates/login.html:1
 msgid "Login"
 msgstr "เข้าสู่ระบบ"
 
-#: app/templates/layout.html:273
+#: app/templates/layout.html:274
 msgid "Projects"
 msgstr "โครงการ"
 
-#: app/templates/layout.html:287
+#: app/templates/layout.html:288
 msgid "QField Admin"
 msgstr "ผู้ดูแล QField"
 
@@ -1555,8 +1569,8 @@ msgid "Description is required."
 msgstr "ต้องระบุคำอธิบาย"
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup - OSM Buildings"
-msgstr "อาคาร OSM"
+msgid "Quick Setup — OSM Buildings"
+msgstr "ตั้งค่าด่วน — อาคาร OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""
@@ -1593,6 +1607,11 @@ msgstr "เชื่อมกับโครงการ QField"
 msgid "Creating project and preparing map..."
 msgstr "กำลังสร้างโครงการและเตรียมแผนที่..."
 
+#: app/templates/new_project_simple_creating.html:2
+msgid "Creating Project"
+msgstr "กำลังสร้างโปรเจกต์"
+
+#: app/templates/partials/new_project/creating_fragment.html:11
 #: app/templates/project_details.html:6 app/templates/project_details.html:166
 #: app/templates/project_details.html:177
 msgid "Back to Projects"
@@ -1678,7 +1697,7 @@ msgstr "หน้านี้ใช้สำหรับจัดการผู
 msgid "Enter your QFieldCloud credentials to manage collaborators."
 msgstr "ป้อนข้อมูลรับรอง QFieldCloud ของคุณเพื่อจัดการผู้ร่วมงาน"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:117
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:128
 #: app/templates/qfc_admin.html:36
 msgid "QField Cloud URL"
 msgstr "URL ของ QField Cloud"
@@ -1691,9 +1710,9 @@ msgstr "URL พื้นฐานของอินสแตนซ์ QFieldClou
 msgid "admin"
 msgstr "ผู้ดูแลระบบ"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:102
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:108
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:141
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:103
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:109
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:152
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "รหัสผ่าน"
@@ -1725,6 +1744,32 @@ msgstr "ผู้ใช้ที่ลงทะเบียน"
 #: app/templates/partials/metrics.html:33
 msgid "Supported Mapping Apps"
 msgstr "แอปทำแผนที่ที่รองรับ"
+
+#: app/templates/partials/new_project/creating_fragment.html:4
+msgid "Project creation failed."
+msgstr "สร้างโปรเจกต์ไม่สำเร็จ"
+
+#: app/templates/partials/new_project/creating_fragment.html:6
+msgid "An unexpected error occurred."
+msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิด"
+
+#: app/templates/partials/new_project/creating_fragment.html:10
+msgid "Try Again"
+msgstr "ลองอีกครั้ง"
+
+#: app/templates/partials/new_project/creating_fragment.html:23
+msgid "Setting up your project..."
+msgstr "กำลังตั้งค่าโปรเจกต์ของคุณ..."
+
+#: app/templates/partials/new_project/creating_fragment.html:25
+msgid ""
+"Downloading map data, splitting tasks, and preparing the QField project.\n"
+"    This can take a minute or two - this page will redirect automatically"
+" when ready."
+msgstr ""
+"กำลังดาวน์โหลดข้อมูลแผนที่ แบ่งงาน และเตรียมโปรเจกต์ QField\n"
+"    ขั้นตอนนี้อาจใช้เวลาหนึ่งหรือสองนาที - "
+"หน้านี้จะเปลี่ยนเส้นทางอัตโนมัติเมื่อพร้อม"
 
 #: app/templates/partials/new_project/map_script.html:3
 msgid "Area"
@@ -1820,15 +1865,25 @@ msgid ""
 "basemap."
 msgstr "ค้นหาภาพ HOT OpenAerialMap สำหรับ AOI นี้และสร้างแผนที่ฐานแบบ MBTiles"
 
-#: app/templates/partials/project_details/basemap_section.html:26
+#: app/templates/partials/project_details/basemap_section.html:32
+msgid ""
+"A basemap job is currently in progress. Wait for it to finish before "
+"starting a new search."
+msgstr "ขณะนี้มีงานแผนที่ฐานกำลังดำเนินการอยู่ โปรดรอให้เสร็จก่อนเริ่มค้นหาใหม่"
+
+#: app/templates/partials/project_details/basemap_section.html:37
 msgid "Search OAM Imagery"
 msgstr "ค้นหาภาพ OAM"
 
-#: app/templates/partials/project_details/basemap_section.html:37
+#: app/templates/partials/project_details/basemap_section.html:41
+msgid "Search is disabled while a basemap job is running."
+msgstr "การค้นหาถูกปิดใช้งานระหว่างที่งานแผนที่ฐานกำลังทำงาน"
+
+#: app/templates/partials/project_details/basemap_section.html:56
 msgid "Basemap generation previously failed. Please search again and retry."
 msgstr "การสร้างแผนที่ฐานล้มเหลวก่อนหน้านี้ โปรดค้นหาอีกครั้งแล้วลองใหม่"
 
-#: app/templates/partials/project_details/basemap_section.html:41
+#: app/templates/partials/project_details/basemap_section.html:60
 msgid "No basemap selected yet."
 msgstr "ยังไม่ได้เลือกแผนที่ฐาน"
 
@@ -2086,7 +2141,7 @@ msgstr "ข้อมูลรับรองไม่ถูกต้อง โ�
 msgid "Error testing credentials: %(message)s"
 msgstr "เกิดข้อผิดพลาดขณะทดสอบข้อมูลรับรอง: %(message)s"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:159
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:180
 #: app/templates/partials/project_details/style_and_scripts.html:47
 msgid "Test Credentials"
 msgstr "ทดสอบข้อมูลรับรอง"
@@ -2104,7 +2159,7 @@ msgstr "กำลังสร้างโครงการใน %(project_type
 msgid "Error:"
 msgstr "ข้อผิดพลาด:"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:8
+#: app/templates/partials/project_details/fragments/basemap_progress.html:5
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
 "      use. Please retry attach."
@@ -2112,90 +2167,108 @@ msgstr ""
 "การแนบแผนที่ฐานล้มเหลวในขณะนี้ โปรเจกต์ของคุณพร้อมใช้งานแล้ว "
 "โปรดลองแนบอีกครั้ง"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:23
+#: app/templates/partials/project_details/fragments/basemap_progress.html:20
 msgid "Retry Attach"
 msgstr "ลองแนบอีกครั้ง"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:29
+#: app/templates/partials/project_details/fragments/basemap_progress.html:26
 msgid ""
-"Basemap attach is in progress. Use the button below to check the latest "
-"status."
-msgstr "กำลังแนบแผนที่ฐาน ใช้ปุ่มด้านล่างเพื่อตรวจสอบสถานะล่าสุด"
+"Basemap is attaching to the QField project. This can take a minute; click"
+" below to check\n"
+"      the latest status."
+msgstr ""
+"กำลังแนบแผนที่ฐานเข้ากับโปรเจกต์ QField ขั้นตอนนี้อาจใช้เวลาหนึ่งนาที "
+"คลิกด้านล่างเพื่อตรวจสอบสถานะล่าสุด"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:48
-#: app/templates/partials/project_details/fragments/basemap_progress.html:111
-#: app/templates/partials/project_details/fragments/basemap_progress.html:116
+#: app/templates/partials/project_details/fragments/basemap_progress.html:41
+#: app/templates/partials/project_details/fragments/basemap_progress.html:104
 msgid "Checking..."
 msgstr "กำลังตรวจสอบ..."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:44
-#: app/templates/partials/project_details/fragments/basemap_progress.html:48
-#: app/templates/partials/project_details/fragments/basemap_progress.html:112
-#: app/templates/partials/project_details/fragments/basemap_progress.html:116
+#: app/templates/partials/project_details/fragments/basemap_progress.html:42
+#: app/templates/partials/project_details/fragments/basemap_progress.html:45
+#: app/templates/partials/project_details/fragments/basemap_progress.html:105
+#: app/templates/partials/project_details/fragments/basemap_progress.html:108
 msgid "Check Status"
 msgstr "สถานะโครงการ"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:69
+#: app/templates/partials/project_details/fragments/basemap_progress.html:62
 msgid ""
-"Basemap generation is in progress. Use the button below to check the "
-"latest status."
-msgstr "กำลังสร้างแผนที่ฐาน ใช้ปุ่มด้านล่างเพื่อตรวจสอบสถานะล่าสุด"
+"Basemap generation is in progress on the imagery server. Click below to "
+"check whether\n"
+"      it's ready."
+msgstr ""
+"กำลังสร้างแผนที่ฐานบนเซิร์ฟเวอร์ภาพ "
+"คลิกด้านล่างเพื่อตรวจสอบว่าพร้อมแล้วหรือไม่"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:70
+#: app/templates/partials/project_details/fragments/basemap_progress.html:63
 msgid "STAC item"
 msgstr "รายการ STAC"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:71
+#: app/templates/partials/project_details/fragments/basemap_progress.html:64
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:15
 msgid "Zoom"
 msgstr "ซูม"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:3
+#: app/templates/partials/project_details/fragments/basemap_ready.html:4
 msgid ""
 "Basemap attached to\n"
 "    QField project."
 msgstr "แนบแผนที่ฐานกับโปรเจกต์ QField แล้ว"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:4
+#: app/templates/partials/project_details/fragments/basemap_ready.html:5
 msgid ""
 "Basemap is\n"
 "    ready. Attaching to QField project in progress."
 msgstr "แผนที่ฐานพร้อมแล้ว ขณะนี้กำลังเชื่อมเข้ากับโครงการ QField"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:5
+#: app/templates/partials/project_details/fragments/basemap_ready.html:7
 msgid ""
-"Basemap is ready. Not yet\n"
-"    attached to QField project."
-msgstr "แผนที่ฐานพร้อมแล้ว แต่ยังไม่ได้เชื่อมเข้ากับโครงการ QField"
+"Basemap is ready, but attach to the QField project failed.\n"
+"    Please retry attach."
+msgstr ""
+"แผนที่ฐานพร้อมแล้ว แต่แนบเข้ากับโปรเจกต์ QField ไม่สำเร็จ\n"
+"    โปรดลองแนบอีกครั้ง"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:6
+#: app/templates/partials/project_details/fragments/basemap_ready.html:8
+msgid ""
+"Basemap is ready. Not yet attached to QField\n"
+"    project."
+msgstr ""
+"แผนที่ฐานพร้อมแล้ว ยังไม่ได้แนบเข้ากับโปรเจกต์\n"
+"    QField"
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:9
 msgid "Basemap is ready."
 msgstr "แผนที่ฐานพร้อมแล้ว"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:8
-msgid "Total size"
-msgstr "ขนาดรวม"
+#: app/templates/partials/project_details/fragments/basemap_ready.html:10
+msgid ""
+"Total\n"
+"    size"
+msgstr ""
+"ขนาด\n"
+"    รวม"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:9
+#: app/templates/partials/project_details/fragments/basemap_ready.html:12
 msgid "Available Zoom"
 msgstr "ระดับซูมที่ใช้ได้"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:21
+#: app/templates/partials/project_details/fragments/basemap_ready.html:24
 msgid "Download MBTiles"
 msgstr "ดาวน์โหลด MBTiles"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:30
+#: app/templates/partials/project_details/fragments/basemap_ready.html:33
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:26
 msgid "View Metadata"
 msgstr "ดูข้อมูลเมตา"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:43
-#: app/templates/partials/project_details/fragments/basemap_ready.html:54
+#: app/templates/partials/project_details/fragments/basemap_ready.html:46
+#: app/templates/partials/project_details/fragments/basemap_ready.html:57
 msgid "Attach to QField Project"
 msgstr "เชื่อมกับโครงการ QField"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:61
+#: app/templates/partials/project_details/fragments/basemap_ready.html:64
 msgid ""
 "Use the ODK offline maps documentation to configure this MBTiles file in "
 "Collect."
@@ -2601,43 +2674,63 @@ msgstr ""
 msgid "Use custom credentials"
 msgstr "ข้อมูลรับรองแบบกำหนดเอง"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:59
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:60
 msgid "Confirm Project Finalisation"
 msgstr "ยืนยันการปิดงานโครงการ"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:63
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:64
 msgid "Are you sure you want to finalise this project?"
 msgstr "คุณแน่ใจหรือไม่ว่าต้องการปิดงานโครงการนี้"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:68
 msgid "Confirm & Finalise"
 msgstr "ยืนยันและปิดงาน"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:73
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:74
 msgid "Custom Credentials"
 msgstr "ข้อมูลรับรองแบบกำหนดเอง"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:78
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:79
 msgid "ODK Central URL"
 msgstr "URL ของ ODK Central"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:84
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:85
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:118
+msgid "Where should this project live?"
+msgstr "โปรเจกต์นี้ควรอยู่ที่ไหน?"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:122
+msgid "Use my account on app.qfield.cloud"
+msgstr "ใช้บัญชีของฉันบน app.qfield.cloud"
+
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:123
+msgid "Use a custom-hosted QFieldCloud instance"
+msgstr "ใช้อินสแตนซ์ QFieldCloud ที่โฮสต์เอง"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:134
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:135
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:146
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:147
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:158
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:162
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:163
+msgid "Organisation name"
+msgstr "ชื่อองค์กร"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:168
+msgid "Optional - leave blank to create under your username"
+msgstr "ไม่บังคับ - เว้นว่างไว้เพื่อสร้างภายใต้ชื่อผู้ใช้ของคุณ"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "บันทึกและดำเนินการต่อ"
 

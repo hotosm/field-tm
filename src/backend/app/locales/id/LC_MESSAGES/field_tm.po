@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-05-11 22:06+0100\n"
+"POT-Creation-Date: 2026-05-13 04:50+0100\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: id\n"
@@ -142,7 +142,7 @@ msgstr "%(action)s gagal dengan HTTP %(status_code)s."
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s gagal karena kesalahan koneksi upstream."
 
-#: app/helpers/basemap_services.py:178
+#: app/helpers/basemap_services.py:181
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "mengembalikan HTTP %(status_code)s."
@@ -250,12 +250,12 @@ msgid "Project not found."
 msgstr "Proyek tidak ditemukan."
 
 #: app/htmx/project_detail_routes.py:321
-#: app/htmx/setup_steps/setup_step_responses.py:71
+#: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Kesalahan: %(error_msg)s"
 
-#: app/htmx/basemap/basemap_attach_flow.py:67
+#: app/htmx/basemap/basemap_attach_flow.py:68
 msgid ""
 "Basemap attach failed for now. Your project is ready to use. Please retry"
 " attach."
@@ -263,7 +263,7 @@ msgstr ""
 "Lampiran basemap gagal untuk saat ini. Proyek Anda siap digunakan. "
 "Silakan coba lampirkan lagi."
 
-#: app/htmx/basemap/basemap_attach_flow.py:72
+#: app/htmx/basemap/basemap_attach_flow.py:73
 msgid ""
 "Basemap attach could not complete due to a temporary network issue. Your "
 "project is ready to use. Please retry attach."
@@ -271,23 +271,27 @@ msgstr ""
 "Lampiran basemap tidak dapat diselesaikan karena masalah jaringan "
 "sementara. Proyek Anda siap digunakan. Silakan coba lampirkan lagi."
 
-#: app/htmx/basemap/basemap_attach_flow.py:87
+#: app/htmx/basemap/basemap_attach_flow.py:122
 msgid "Basemap attach is available after publication."
 msgstr "Pelampiran peta dasar tersedia setelah publikasi."
 
-#: app/htmx/basemap/basemap_attach_flow.py:96
+#: app/htmx/basemap/basemap_attach_flow.py:131
 msgid "Basemap attach is only available for QField projects."
 msgstr "Pelampiran peta dasar hanya tersedia untuk proyek QField."
 
-#: app/htmx/basemap/basemap_attach_flow.py:106
+#: app/htmx/basemap/basemap_attach_flow.py:141
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "Peta dasar belum siap. Harap tunggu hingga pembuatan selesai."
 
-#: app/htmx/basemap/basemap_attach_flow.py:115
-msgid "No generated basemap download URL is available yet."
-msgstr "URL unduhan peta dasar yang dihasilkan belum tersedia."
+#: app/htmx/basemap/basemap_attach_flow.py:156
+msgid ""
+"Basemap download URL is not available yet. Please refresh status and try "
+"again shortly."
+msgstr ""
+"URL unduhan peta dasar belum tersedia. Segarkan status dan coba lagi "
+"sebentar lagi."
 
-#: app/htmx/basemap/basemap_attach_flow.py:129
+#: app/htmx/basemap/basemap_attach_flow.py:172
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -297,39 +301,39 @@ msgstr ""
 "%(config)s tidak ada."
 
 #: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:91
+#: app/htmx/setup_steps/setup_step_responses.py:90
 msgid "Project not found or access denied."
 msgstr "Proyek tidak ditemukan atau akses ditolak."
 
-#: app/htmx/basemap/basemap_fragments.py:112
+#: app/htmx/basemap/basemap_fragments.py:105
 msgid "Basemap attached to QField project successfully."
 msgstr "Peta dasar berhasil dilampirkan ke proyek QField."
 
-#: app/htmx/basemap/basemap_fragments.py:122
+#: app/htmx/basemap/basemap_fragments.py:115
 msgid "Basemap attach has not started yet."
 msgstr "Pelampiran peta dasar belum dimulai."
 
-#: app/htmx/basemap/basemap_fragments.py:133
+#: app/htmx/basemap/basemap_fragments.py:126
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr "Gagal mencari citra saat ini. Silakan coba lagi sebentar lagi."
 
-#: app/htmx/basemap/basemap_fragments.py:146
+#: app/htmx/basemap/basemap_fragments.py:139
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr ""
 "Gagal memulai pembuatan peta dasar saat ini. Silakan coba lagi sebentar "
 "lagi."
 
-#: app/htmx/basemap/basemap_fragments.py:160
+#: app/htmx/basemap/basemap_fragments.py:153
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr ""
 "Gagal menyegarkan status peta dasar saat ini. Silakan coba lagi sebentar "
 "lagi."
 
-#: app/htmx/basemap/basemap_routes.py:93
+#: app/htmx/basemap/basemap_routes.py:113
 msgid "Basemap tools are available after publication."
 msgstr "Peralatan peta dasar tersedia setelah publikasi."
 
-#: app/htmx/basemap/basemap_routes.py:253
+#: app/htmx/basemap/basemap_routes.py:273
 msgid "No basemap generation in progress."
 msgstr "Pemetaan lapangan sedang berlangsung"
 
@@ -341,7 +345,7 @@ msgstr ""
 "Area proyek harus berupa JSON yang valid (GeoJSON Polygon, MultiPolygon, "
 "Feature, atau FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:55
+#: app/htmx/project_create/project_create_simple_flow.py:60
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -349,14 +353,15 @@ msgstr ""
 "Tidak ditemukan bangunan OSM yang sudah ada di area ini. Lanjutkan "
 "pemetaan dari awal."
 
-#: app/htmx/project_create/project_create_simple_flow.py:152
+#: app/htmx/project_create/project_create_simple_flow.py:157
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 "Tidak dapat memuat formulir bawaan OSM Buildings untuk pembuatan proyek "
 "sederhana."
 
-#: app/htmx/project_create/project_create_submit_routes.py:139
-#: app/htmx/project_create/project_create_submit_routes.py:200
+#: app/htmx/project_create/project_create_simple_flow.py:269
+#: app/htmx/project_create/project_create_submit_routes.py:140
+#: app/htmx/project_create/project_create_submit_routes.py:209
 msgid "An unexpected error occurred. Please try again."
 msgstr "Terjadi kesalahan tak terduga. Silakan coba lagi."
 
@@ -380,7 +385,7 @@ msgstr "Pengguna ini tidak ada. Silakan buat terlebih dahulu."
 msgid "This user is already a collaborator on this project."
 msgstr "Pengguna ini sudah menjadi kolaborator pada proyek ini."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1257
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1360
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "Gagal menambahkan kolaborator: %(exc)s"
@@ -515,8 +520,8 @@ msgstr "dari proyek ini?"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
 #: app/templates/new_project_custom.html:156
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:66
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:156
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:177
 msgid "Cancel"
 msgstr "Batal"
 
@@ -537,9 +542,9 @@ msgid "No collaborators yet."
 msgstr "Belum ada kolaborator."
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:218
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:90
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:96
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:129
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:91
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:97
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:140
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "Nama pengguna"
@@ -731,11 +736,11 @@ msgstr ""
 "menyimpan. Jika tidak, sesuaikan parameter di atas dan klik \"Split "
 "Again\" untuk membuat ulang."
 
-#: app/htmx/setup_steps/setup_step_responses.py:86
+#: app/htmx/setup_steps/setup_step_responses.py:85
 msgid "An unexpected error occurred"
 msgstr "Terjadi kesalahan yang tidak terduga"
 
-#: app/htmx/setup_steps/setup_step_responses.py:161
+#: app/htmx/setup_steps/setup_step_responses.py:160
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -745,7 +750,7 @@ msgstr ""
 "Jika masih berlanjut, kirimkan rincian teknis di bawah ini kepada "
 "administrator instans atau tim dukungan Anda."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:96
+#: app/htmx/setup_steps/setup_step_split_routes.py:99
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -753,7 +758,7 @@ msgstr ""
 "Tidak ditemukan ekstrak data. Silakan unduh data OSM atau unggah file "
 "GeoJSON terlebih dahulu."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:127
+#: app/htmx/setup_steps/setup_step_split_routes.py:130
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -763,7 +768,7 @@ msgstr ""
 "%(data_feature_count)s fitur data. Seluruh AOI akan digunakan sebagai "
 "satu tugas."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:134
+#: app/htmx/setup_steps/setup_step_split_routes.py:137
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -772,11 +777,11 @@ msgstr ""
 "Menampilkan pratinjau %(task_count)s batas tugas dan "
 "%(data_feature_count)s fitur data bersama-sama."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:187
+#: app/htmx/setup_steps/setup_step_split_routes.py:190
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "Batas proyek tidak ditemukan. Tidak dapat melewati pembagian tugas."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:209
+#: app/htmx/setup_steps/setup_step_split_routes.py:215
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
@@ -784,23 +789,23 @@ msgstr ""
 "✓ Pembagian tugas dilewati. Seluruh AOI akan digunakan sebagai satu "
 "tugas. Anda dapat melanjutkan ke Langkah 5."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:263
+#: app/htmx/setup_steps/setup_step_split_routes.py:270
 msgid "Please select a splitting option."
 msgstr "Silakan pilih opsi pembagian."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:284
+#: app/htmx/setup_steps/setup_step_split_routes.py:294
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ Pembagian tugas tidak diperlukan untuk pengaturan proyek ini."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:333
+#: app/htmx/setup_steps/setup_step_split_routes.py:344
 msgid "No task areas data provided."
 msgstr "Tidak ada data area tugas yang diberikan."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:337
+#: app/htmx/setup_steps/setup_step_split_routes.py:348
 msgid "Invalid task areas data format."
 msgstr "Format data area tugas tidak valid."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:357
+#: app/htmx/setup_steps/setup_step_split_routes.py:371
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ Tugas yang dibagi berhasil disimpan"
 
@@ -883,71 +888,80 @@ msgstr "Wilayah {latitude:.4f}_{longitude:.4f}"
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:164
+#: app/qfield/qfield_crud.py:166
 msgid "Project outline is missing or has no geometry."
 msgstr "Garis besar proyek tidak ada atau tidak memiliki geometri."
 
-#: app/qfield/qfield_crud.py:170
+#: app/qfield/qfield_crud.py:172
 msgid "Project outline geometry has no coordinates."
 msgstr "Geometri garis besar proyek tidak memiliki koordinat."
 
-#: app/qfield/qfield_crud.py:479
+#: app/qfield/qfield_crud.py:476
 msgid "Project outline is required for QField project creation."
 msgstr "✓ Pembagian tugas tidak diperlukan untuk pengaturan proyek ini."
 
-#: app/qfield/qfield_crud.py:484
+#: app/qfield/qfield_crud.py:481
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm diperlukan untuk pembuatan proyek QField."
 
-#: app/qfield/qfield_crud.py:501
+#: app/qfield/qfield_crud.py:498
 msgid "Failed to modify XLSForm for QField."
 msgstr "Gagal memodifikasi XLSForm untuk QField."
 
-#: app/qfield/qfield_crud.py:542
+#: app/qfield/qfield_crud.py:539
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS selesai tetapi tidak menulis file keluaran."
 
-#: app/qfield/qfield_crud.py:554
+#: app/qfield/qfield_crud.py:551
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS selesai tetapi tidak ada file .qgz dalam output."
 
-#: app/qfield/qfield_crud.py:584
+#: app/qfield/qfield_crud.py:581
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "tidak ada; tidak dapat melampirkan peta dasar."
 
-#: app/qfield/qfield_crud.py:618
+#: app/qfield/qfield_crud.py:615
 msgid "Basemap attach completed but produced no project files."
 msgstr "Peta dasar telah dilampirkan ke proyek QField."
 
-#: app/qfield/qfield_crud.py:771 app/qfield/qfield_crud.py:785
+#: app/qfield/qfield_crud.py:801
+#, python-format
+msgid ""
+"QFieldCloud did not finish processing the project file after %(attempts)d"
+" attempts (last status: %(status)s)."
+msgstr ""
+"QFieldCloud belum selesai memproses berkas proyek setelah %(attempts)d "
+"percobaan (status terakhir: %(status)s)."
+
+#: app/qfield/qfield_crud.py:855 app/qfield/qfield_crud.py:869
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS gagal: %(error)s"
 
-#: app/qfield/qfield_crud.py:778
+#: app/qfield/qfield_crud.py:862
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS mengembalikan JSON yang tidak valid."
 
-#: app/qfield/qfield_crud.py:802
+#: app/qfield/qfield_crud.py:886
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "Gagal mengunduh MBTiles peta dasar untuk diunggah (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:817
+#: app/qfield/qfield_crud.py:901
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "Unduh Kode QR"
 
-#: app/qfield/qfield_crud.py:932
+#: app/qfield/qfield_crud.py:1027
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "Gagal mengunggah file ke QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1206
+#: app/qfield/qfield_crud.py:1309
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "Proyek (%(project_id)s) tidak ditemukan."
 
-#: app/qfield/qfield_crud.py:1226
+#: app/qfield/qfield_crud.py:1329
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -956,17 +970,17 @@ msgstr ""
 "milik organisasi '%(owner)s'. Tidak dapat menambahkan '%(username)s' ke "
 "organisasi: %(error)s"
 
-#: app/qfield/qfield_crud.py:1244
+#: app/qfield/qfield_crud.py:1347
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "'%(username)s' tidak ada di QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1251
+#: app/qfield/qfield_crud.py:1354
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "Pengguna '%(username)s' sudah menjadi kolaborator pada proyek ini."
 
-#: app/qfield/qfield_crud.py:1292
+#: app/qfield/qfield_crud.py:1395
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Kredensial valid!"
 
@@ -1027,7 +1041,7 @@ msgid "Search projects…"
 msgstr "Cari proyek…"
 
 #: app/templates/home.html:68 app/templates/landing.html:503
-#: app/templates/layout.html:280 app/templates/new_project_chooser.html:1
+#: app/templates/layout.html:281 app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "Buat Proyek"
@@ -1347,15 +1361,15 @@ msgstr "Surel:"
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Pemetaan lapangan terkoordinasi untuk kampanye Open Mapping."
 
-#: app/templates/layout.html:195 app/templates/login.html:1
+#: app/templates/layout.html:196 app/templates/login.html:1
 msgid "Login"
 msgstr "Masuk"
 
-#: app/templates/layout.html:273
+#: app/templates/layout.html:274
 msgid "Projects"
 msgstr "Proyek"
 
-#: app/templates/layout.html:287
+#: app/templates/layout.html:288
 msgid "QField Admin"
 msgstr "Admin QField"
 
@@ -1594,8 +1608,8 @@ msgid "Description is required."
 msgstr "Deskripsi wajib diisi."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup - OSM Buildings"
-msgstr "Bangunan OSM"
+msgid "Quick Setup — OSM Buildings"
+msgstr "Penyiapan Cepat — Bangunan OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""
@@ -1632,6 +1646,11 @@ msgstr "Pasang ke Proyek QField"
 msgid "Creating project and preparing map..."
 msgstr "Sedang membuat proyek dan menyiapkan peta..."
 
+#: app/templates/new_project_simple_creating.html:2
+msgid "Creating Project"
+msgstr "Membuat Proyek"
+
+#: app/templates/partials/new_project/creating_fragment.html:11
 #: app/templates/project_details.html:6 app/templates/project_details.html:166
 #: app/templates/project_details.html:177
 msgid "Back to Projects"
@@ -1721,7 +1740,7 @@ msgstr ""
 msgid "Enter your QFieldCloud credentials to manage collaborators."
 msgstr "Masukkan kredensial QFieldCloud Anda untuk mengelola kolaborator."
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:117
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:128
 #: app/templates/qfc_admin.html:36
 msgid "QField Cloud URL"
 msgstr "URL QField Cloud"
@@ -1734,9 +1753,9 @@ msgstr "URL dasar instans QFieldCloud Anda (tanpa /api/v1)."
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:102
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:108
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:141
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:103
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:109
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:152
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "Kata sandi"
@@ -1768,6 +1787,32 @@ msgstr "Pengguna Terdaftar"
 #: app/templates/partials/metrics.html:33
 msgid "Supported Mapping Apps"
 msgstr "Aplikasi Pemetaan yang Didukung"
+
+#: app/templates/partials/new_project/creating_fragment.html:4
+msgid "Project creation failed."
+msgstr "Pembuatan proyek gagal."
+
+#: app/templates/partials/new_project/creating_fragment.html:6
+msgid "An unexpected error occurred."
+msgstr "Terjadi kesalahan yang tidak terduga."
+
+#: app/templates/partials/new_project/creating_fragment.html:10
+msgid "Try Again"
+msgstr "Coba Lagi"
+
+#: app/templates/partials/new_project/creating_fragment.html:23
+msgid "Setting up your project..."
+msgstr "Menyiapkan proyek Anda..."
+
+#: app/templates/partials/new_project/creating_fragment.html:25
+msgid ""
+"Downloading map data, splitting tasks, and preparing the QField project.\n"
+"    This can take a minute or two - this page will redirect automatically"
+" when ready."
+msgstr ""
+"Mengunduh data peta, membagi tugas, dan menyiapkan proyek QField.\n"
+"    Ini dapat memakan waktu satu atau dua menit - halaman ini akan "
+"dialihkan secara otomatis saat siap."
 
 #: app/templates/partials/new_project/map_script.html:3
 msgid "Area"
@@ -1867,15 +1912,27 @@ msgid ""
 "basemap."
 msgstr "Cari citra HOT OpenAerialMap untuk AOI ini dan buat peta dasar MBTiles."
 
-#: app/templates/partials/project_details/basemap_section.html:26
+#: app/templates/partials/project_details/basemap_section.html:32
+msgid ""
+"A basemap job is currently in progress. Wait for it to finish before "
+"starting a new search."
+msgstr ""
+"Pekerjaan peta dasar sedang berlangsung. Tunggu sampai selesai sebelum "
+"memulai pencarian baru."
+
+#: app/templates/partials/project_details/basemap_section.html:37
 msgid "Search OAM Imagery"
 msgstr "Cari Citra OAM"
 
-#: app/templates/partials/project_details/basemap_section.html:37
+#: app/templates/partials/project_details/basemap_section.html:41
+msgid "Search is disabled while a basemap job is running."
+msgstr "Pencarian dinonaktifkan saat pekerjaan peta dasar berjalan."
+
+#: app/templates/partials/project_details/basemap_section.html:56
 msgid "Basemap generation previously failed. Please search again and retry."
 msgstr "Pembuatan peta dasar sebelumnya gagal. Silakan cari lagi dan coba ulangi."
 
-#: app/templates/partials/project_details/basemap_section.html:41
+#: app/templates/partials/project_details/basemap_section.html:60
 msgid "No basemap selected yet."
 msgstr "Belum ada peta dasar yang dipilih."
 
@@ -2140,7 +2197,7 @@ msgstr "Kredensial tidak valid. Harap periksa dan coba lagi."
 msgid "Error testing credentials: %(message)s"
 msgstr "Kesalahan saat menguji kredensial: %(message)s"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:159
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:180
 #: app/templates/partials/project_details/style_and_scripts.html:47
 msgid "Test Credentials"
 msgstr "Uji Kredensial"
@@ -2160,7 +2217,7 @@ msgstr ""
 msgid "Error:"
 msgstr "Kesalahan:"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:8
+#: app/templates/partials/project_details/fragments/basemap_progress.html:5
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
 "      use. Please retry attach."
@@ -2168,94 +2225,110 @@ msgstr ""
 "Lampiran basemap gagal untuk saat ini. Proyek Anda siap digunakan. "
 "Silakan coba lampirkan lagi."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:23
+#: app/templates/partials/project_details/fragments/basemap_progress.html:20
 msgid "Retry Attach"
 msgstr "Coba Lampirkan Lagi"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:29
+#: app/templates/partials/project_details/fragments/basemap_progress.html:26
 msgid ""
-"Basemap attach is in progress. Use the button below to check the latest "
-"status."
+"Basemap is attaching to the QField project. This can take a minute; click"
+" below to check\n"
+"      the latest status."
 msgstr ""
-"Pelampiran peta dasar sedang berlangsung. Gunakan tombol di bawah untuk "
-"memeriksa status terbaru."
+"Peta dasar sedang dilampirkan ke proyek QField. Ini dapat memakan waktu "
+"satu menit; klik di bawah untuk memeriksa\n"
+"      status terbaru."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:48
-#: app/templates/partials/project_details/fragments/basemap_progress.html:111
-#: app/templates/partials/project_details/fragments/basemap_progress.html:116
+#: app/templates/partials/project_details/fragments/basemap_progress.html:41
+#: app/templates/partials/project_details/fragments/basemap_progress.html:104
 msgid "Checking..."
 msgstr "Memeriksa..."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:44
-#: app/templates/partials/project_details/fragments/basemap_progress.html:48
-#: app/templates/partials/project_details/fragments/basemap_progress.html:112
-#: app/templates/partials/project_details/fragments/basemap_progress.html:116
+#: app/templates/partials/project_details/fragments/basemap_progress.html:42
+#: app/templates/partials/project_details/fragments/basemap_progress.html:45
+#: app/templates/partials/project_details/fragments/basemap_progress.html:105
+#: app/templates/partials/project_details/fragments/basemap_progress.html:108
 msgid "Check Status"
 msgstr "Status Proyek"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:69
+#: app/templates/partials/project_details/fragments/basemap_progress.html:62
 msgid ""
-"Basemap generation is in progress. Use the button below to check the "
-"latest status."
+"Basemap generation is in progress on the imagery server. Click below to "
+"check whether\n"
+"      it's ready."
 msgstr ""
-"Pembuatan basemap sedang berlangsung. Gunakan tombol di bawah ini untuk "
-"memeriksa status terbaru."
+"Pembuatan peta dasar sedang berlangsung di server citra. Klik di bawah "
+"untuk memeriksa apakah\n"
+"      sudah siap."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:70
+#: app/templates/partials/project_details/fragments/basemap_progress.html:63
 msgid "STAC item"
 msgstr "Item STAC"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:71
+#: app/templates/partials/project_details/fragments/basemap_progress.html:64
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:15
 msgid "Zoom"
 msgstr "Perbesar"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:3
+#: app/templates/partials/project_details/fragments/basemap_ready.html:4
 msgid ""
 "Basemap attached to\n"
 "    QField project."
 msgstr "Basemap dilampirkan ke proyek QField."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:4
+#: app/templates/partials/project_details/fragments/basemap_ready.html:5
 msgid ""
 "Basemap is\n"
 "    ready. Attaching to QField project in progress."
 msgstr "Basemap siap. Proses pemasangan ke proyek QField sedang berlangsung."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:5
+#: app/templates/partials/project_details/fragments/basemap_ready.html:7
 msgid ""
-"Basemap is ready. Not yet\n"
-"    attached to QField project."
-msgstr "Basemap siap. Namun belum dipasang ke proyek QField."
+"Basemap is ready, but attach to the QField project failed.\n"
+"    Please retry attach."
+msgstr ""
+"Peta dasar sudah siap, tetapi gagal dilampirkan ke proyek QField.\n"
+"    Coba lampirkan lagi."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:6
+#: app/templates/partials/project_details/fragments/basemap_ready.html:8
+msgid ""
+"Basemap is ready. Not yet attached to QField\n"
+"    project."
+msgstr ""
+"Peta dasar sudah siap. Belum dilampirkan ke proyek\n"
+"    QField."
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:9
 msgid "Basemap is ready."
 msgstr "Basemap siap."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:8
-msgid "Total size"
-msgstr "Ukuran total"
+#: app/templates/partials/project_details/fragments/basemap_ready.html:10
+msgid ""
+"Total\n"
+"    size"
+msgstr ""
+"Ukuran\n"
+"    total"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:9
+#: app/templates/partials/project_details/fragments/basemap_ready.html:12
 msgid "Available Zoom"
 msgstr "Zoom tersedia"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:21
+#: app/templates/partials/project_details/fragments/basemap_ready.html:24
 msgid "Download MBTiles"
 msgstr "Unduh MBTiles"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:30
+#: app/templates/partials/project_details/fragments/basemap_ready.html:33
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:26
 msgid "View Metadata"
 msgstr "Lihat metadata"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:43
-#: app/templates/partials/project_details/fragments/basemap_ready.html:54
+#: app/templates/partials/project_details/fragments/basemap_ready.html:46
+#: app/templates/partials/project_details/fragments/basemap_ready.html:57
 msgid "Attach to QField Project"
 msgstr "Pasang ke Proyek QField"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:61
+#: app/templates/partials/project_details/fragments/basemap_ready.html:64
 msgid ""
 "Use the ODK offline maps documentation to configure this MBTiles file in "
 "Collect."
@@ -2667,43 +2740,63 @@ msgstr "Semua prasyarat telah lengkap! Buat proyek di alat pemetaan pilihan Anda
 msgid "Use custom credentials"
 msgstr "Kredensial Kustom"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:59
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:60
 msgid "Confirm Project Finalisation"
 msgstr "Konfirmasi Finalisasi Proyek"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:63
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:64
 msgid "Are you sure you want to finalise this project?"
 msgstr "Apakah Anda yakin ingin memfinalisasi proyek ini?"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:68
 msgid "Confirm & Finalise"
 msgstr "Konfirmasi & Finalisasi"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:73
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:74
 msgid "Custom Credentials"
 msgstr "Kredensial Kustom"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:78
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:79
 msgid "ODK Central URL"
 msgstr "URL ODK Central"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:84
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:85
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:118
+msgid "Where should this project live?"
+msgstr "Di mana proyek ini harus berada?"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:122
+msgid "Use my account on app.qfield.cloud"
+msgstr "Gunakan akun saya di app.qfield.cloud"
+
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:123
+msgid "Use a custom-hosted QFieldCloud instance"
+msgstr "Gunakan instans QFieldCloud yang dihosting sendiri"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:134
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:135
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:146
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:147
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:158
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:162
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:163
+msgid "Organisation name"
+msgstr "Nama organisasi"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:168
+msgid "Optional - leave blank to create under your username"
+msgstr "Opsional - biarkan kosong untuk membuat di bawah nama pengguna Anda"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "Simpan & Lanjutkan"
 

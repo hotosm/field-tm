@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-05-11 22:06+0100\n"
+"POT-Creation-Date: 2026-05-13 04:50+0100\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: ta\n"
@@ -140,7 +140,7 @@ msgstr "%(action)s HTTP %(status_code)s உடன் தோல்வியடை
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s தோல்வியடைந்தது."
 
-#: app/helpers/basemap_services.py:178
+#: app/helpers/basemap_services.py:181
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack API ஆனது HTTP %(status_code)sஐ வழங்கியது."
@@ -252,12 +252,12 @@ msgid "Project not found."
 msgstr "திட்டம் கிடைக்கவில்லை."
 
 #: app/htmx/project_detail_routes.py:321
-#: app/htmx/setup_steps/setup_step_responses.py:71
+#: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "பிழை: %(error_msg)s"
 
-#: app/htmx/basemap/basemap_attach_flow.py:67
+#: app/htmx/basemap/basemap_attach_flow.py:68
 msgid ""
 "Basemap attach failed for now. Your project is ready to use. Please retry"
 " attach."
@@ -265,7 +265,7 @@ msgstr ""
 "அடிப்படை வரைபடத்தை இணைப்பது இப்போது தோல்வியடைந்தது. உங்கள் திட்டம் "
 "பயன்படுத்தத் தயாராக உள்ளது. மீண்டும் இணைக்க முயற்சிக்கவும்."
 
-#: app/htmx/basemap/basemap_attach_flow.py:72
+#: app/htmx/basemap/basemap_attach_flow.py:73
 msgid ""
 "Basemap attach could not complete due to a temporary network issue. Your "
 "project is ready to use. Please retry attach."
@@ -274,27 +274,29 @@ msgstr ""
 "முடியவில்லை. உங்கள் திட்டம் பயன்படுத்தத் தயாராக உள்ளது. மீண்டும் இணைக்க "
 "முயற்சிக்கவும்."
 
-#: app/htmx/basemap/basemap_attach_flow.py:87
+#: app/htmx/basemap/basemap_attach_flow.py:122
 msgid "Basemap attach is available after publication."
 msgstr "வெளியீட்டிற்குப் பிறகு அடிப்படை வரைபட இணைப்பு கிடைக்கும்."
 
-#: app/htmx/basemap/basemap_attach_flow.py:96
+#: app/htmx/basemap/basemap_attach_flow.py:131
 msgid "Basemap attach is only available for QField projects."
 msgstr "அடிப்படை வரைபட இணைப்பு QField திட்டங்களுக்கு மட்டுமே கிடைக்கும்."
 
-#: app/htmx/basemap/basemap_attach_flow.py:106
+#: app/htmx/basemap/basemap_attach_flow.py:141
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr ""
 "அடிப்படை வரைபடம் இன்னும் தயாராகவில்லை. உருவாக்கம் முடியும் வரை "
 "காத்திருக்கவும்."
 
-#: app/htmx/basemap/basemap_attach_flow.py:115
-msgid "No generated basemap download URL is available yet."
+#: app/htmx/basemap/basemap_attach_flow.py:156
+msgid ""
+"Basemap download URL is not available yet. Please refresh status and try "
+"again shortly."
 msgstr ""
-"உருவாக்கப்பட்ட அடிப்படை வரைபடத்திற்கான பதிவிறக்க URL இன்னும் "
-"கிடைக்கவில்லை."
+"அடிப்படை வரைபடப் பதிவிறக்க URL இன்னும் கிடைக்கவில்லை. நிலையை புதுப்பித்து"
+" சிறிது நேரத்தில் மீண்டும் முயற்சிக்கவும்."
 
-#: app/htmx/basemap/basemap_attach_flow.py:129
+#: app/htmx/basemap/basemap_attach_flow.py:172
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -304,41 +306,41 @@ msgstr ""
 "%(config)s இல்லை."
 
 #: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:91
+#: app/htmx/setup_steps/setup_step_responses.py:90
 msgid "Project not found or access denied."
 msgstr "திட்டம் கிடைக்கவில்லை அல்லது அணுகல் மறுக்கப்பட்டது."
 
-#: app/htmx/basemap/basemap_fragments.py:112
+#: app/htmx/basemap/basemap_fragments.py:105
 msgid "Basemap attached to QField project successfully."
 msgstr "அடிப்படை வரைபடம் QField திட்டத்துடன் வெற்றிகரமாக இணைக்கப்பட்டது."
 
-#: app/htmx/basemap/basemap_fragments.py:122
+#: app/htmx/basemap/basemap_fragments.py:115
 msgid "Basemap attach has not started yet."
 msgstr "அடிப்படை வரைபட இணைப்பு இன்னும் தொடங்கவில்லை."
 
-#: app/htmx/basemap/basemap_fragments.py:133
+#: app/htmx/basemap/basemap_fragments.py:126
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr ""
 "இப்போது படங்களைத் தேட முடியவில்லை. சிறிது நேரத்தில் மீண்டும் "
 "முயற்சிக்கவும்."
 
-#: app/htmx/basemap/basemap_fragments.py:146
+#: app/htmx/basemap/basemap_fragments.py:139
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr ""
 "இப்போது அடிப்படை வரைபட உருவாக்கத்தைத் தொடங்க முடியவில்லை. சிறிது "
 "நேரத்தில் மீண்டும் முயற்சிக்கவும்."
 
-#: app/htmx/basemap/basemap_fragments.py:160
+#: app/htmx/basemap/basemap_fragments.py:153
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr ""
 "இப்போது அடிப்படை வரைபட நிலையைப் புதுப்பிக்க முடியவில்லை. சிறிது நேரத்தில்"
 " மீண்டும் முயற்சிக்கவும்."
 
-#: app/htmx/basemap/basemap_routes.py:93
+#: app/htmx/basemap/basemap_routes.py:113
 msgid "Basemap tools are available after publication."
 msgstr "வெளியீட்டிற்குப் பிறகு அடிப்படை வரைபட கருவிகள் கிடைக்கும்."
 
-#: app/htmx/basemap/basemap_routes.py:253
+#: app/htmx/basemap/basemap_routes.py:273
 msgid "No basemap generation in progress."
 msgstr "புல வரைபடப் பணி நடைபெறுகிறது"
 
@@ -350,7 +352,7 @@ msgstr ""
 "திட்டப் பகுதி செல்லுபடியான JSON ஆக இருக்க வேண்டும் (GeoJSON Polygon, "
 "MultiPolygon, Feature அல்லது FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:55
+#: app/htmx/project_create/project_create_simple_flow.py:60
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -358,14 +360,15 @@ msgstr ""
 "இந்த பகுதியில் ஏற்கனவே உள்ள OSM கட்டிடங்கள் எதுவும் காணப்படவில்லை. "
 "புதிதாக வரைபடமிடலைத் தொடரவும்."
 
-#: app/htmx/project_create/project_create_simple_flow.py:152
+#: app/htmx/project_create/project_create_simple_flow.py:157
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 "எளிய திட்ட உருவாக்கத்திற்கான இயல்புநிலை OSM Buildings படிவத்தை ஏற்ற "
 "முடியவில்லை."
 
-#: app/htmx/project_create/project_create_submit_routes.py:139
-#: app/htmx/project_create/project_create_submit_routes.py:200
+#: app/htmx/project_create/project_create_simple_flow.py:269
+#: app/htmx/project_create/project_create_submit_routes.py:140
+#: app/htmx/project_create/project_create_submit_routes.py:209
 msgid "An unexpected error occurred. Please try again."
 msgstr "எதிர்பாராத பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்."
 
@@ -391,7 +394,7 @@ msgstr "இந்த பயனர் இல்லை. தயவுசெய்�
 msgid "This user is already a collaborator on this project."
 msgstr "இந்த பயனர் ஏற்கனவே இந்த திட்டத்தில் இணை பணியாளராக உள்ளார்."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1257
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1360
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "இணை பணியாளரை சேர்க்க முடியவில்லை: %(exc)s"
@@ -526,8 +529,8 @@ msgstr "இந்த திட்டத்திலிருந்து?"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
 #: app/templates/new_project_custom.html:156
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:66
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:156
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:177
 msgid "Cancel"
 msgstr "ரத்து செய்"
 
@@ -548,9 +551,9 @@ msgid "No collaborators yet."
 msgstr "இன்னும் இணை பணியாளர்கள் இல்லை."
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:218
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:90
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:96
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:129
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:91
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:97
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:140
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "பயனர் பெயர்"
@@ -751,11 +754,11 @@ msgstr ""
 "மேலுள்ள அளவுருக்களை மாற்றி மீண்டும் உருவாக்க \"Split Again\" ஐ "
 "அழுத்தவும்."
 
-#: app/htmx/setup_steps/setup_step_responses.py:86
+#: app/htmx/setup_steps/setup_step_responses.py:85
 msgid "An unexpected error occurred"
 msgstr "எதிர்பாராத பிழை ஏற்பட்டது"
 
-#: app/htmx/setup_steps/setup_step_responses.py:161
+#: app/htmx/setup_steps/setup_step_responses.py:160
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -766,7 +769,7 @@ msgstr ""
 "தொழில்நுட்ப விவரங்களை உங்கள் instance நிர்வாகி அல்லது ஆதரவு அணிக்கு "
 "அனுப்பவும்."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:96
+#: app/htmx/setup_steps/setup_step_split_routes.py:99
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -774,7 +777,7 @@ msgstr ""
 "தரவு எடுப்பு எதுவும் கிடைக்கவில்லை. தயவுசெய்து முதலில் OSM தரவை "
 "பதிவிறக்கவும் அல்லது GeoJSON கோப்பை பதிவேற்றவும்."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:127
+#: app/htmx/setup_steps/setup_step_split_routes.py:130
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -783,7 +786,7 @@ msgstr ""
 "%(data_feature_count)s தரவு அம்சங்களுடன் முழு AOI (பிரிப்பு இன்றி) "
 "முன்பார்வையில் காட்டப்படுகிறது. முழு AOI ஒரு பணியாக பயன்படுத்தப்படும்."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:134
+#: app/htmx/setup_steps/setup_step_split_routes.py:137
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -792,11 +795,11 @@ msgstr ""
 "%(task_count)s பணி எல்லைகளும் %(data_feature_count)s தரவு அம்சங்களும் "
 "ஒன்றாக முன்பார்வையில் காட்டப்படுகின்றன."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:187
+#: app/htmx/setup_steps/setup_step_split_routes.py:190
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "திட்ட வரம்பு கிடைக்கவில்லை. பணி பிரிப்பைத் தவிர்க்க முடியாது."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:209
+#: app/htmx/setup_steps/setup_step_split_routes.py:215
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
@@ -804,23 +807,23 @@ msgstr ""
 "✓ பணி பிரிப்பு தவிர்க்கப்பட்டது. முழு AOI ஒரு பணியாக பயன்படுத்தப்படும். "
 "நீங்கள் படி 5-க்கு செல்லலாம்."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:263
+#: app/htmx/setup_steps/setup_step_split_routes.py:270
 msgid "Please select a splitting option."
 msgstr "தயவுசெய்து ஒரு பிரிப்பு விருப்பத்தைத் தேர்ந்தெடுக்கவும்."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:284
+#: app/htmx/setup_steps/setup_step_split_routes.py:294
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ இந்த திட்ட அமைப்பிற்கு பணி பிரிப்பு தேவையில்லை."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:333
+#: app/htmx/setup_steps/setup_step_split_routes.py:344
 msgid "No task areas data provided."
 msgstr "பணி பகுதிகளுக்கான தரவு வழங்கப்படவில்லை."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:337
+#: app/htmx/setup_steps/setup_step_split_routes.py:348
 msgid "Invalid task areas data format."
 msgstr "பணி பகுதி தரவு வடிவம் தவறானது."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:357
+#: app/htmx/setup_steps/setup_step_split_routes.py:371
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ பிரிக்கப்பட்ட பணிகள் வெற்றிகரமாகச் சேமிக்கப்பட்டன"
 
@@ -903,73 +906,82 @@ msgstr "பகுதி {latitude:.4f}_{longitude:.4f}"
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:164
+#: app/qfield/qfield_crud.py:166
 msgid "Project outline is missing or has no geometry."
 msgstr "திட்ட அவுட்லைன் காணவில்லை அல்லது வடிவியல் இல்லை."
 
-#: app/qfield/qfield_crud.py:170
+#: app/qfield/qfield_crud.py:172
 msgid "Project outline geometry has no coordinates."
 msgstr "திட்ட அவுட்லைன் வடிவவியலுக்கு ஆயங்கள் இல்லை."
 
-#: app/qfield/qfield_crud.py:479
+#: app/qfield/qfield_crud.py:476
 msgid "Project outline is required for QField project creation."
 msgstr "✓ இந்த திட்ட அமைப்பிற்கு பணி பிரிப்பு தேவையில்லை."
 
-#: app/qfield/qfield_crud.py:484
+#: app/qfield/qfield_crud.py:481
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm தேவை."
 
-#: app/qfield/qfield_crud.py:501
+#: app/qfield/qfield_crud.py:498
 msgid "Failed to modify XLSForm for QField."
 msgstr "QFieldக்கான XLSForm ஐ மாற்ற முடியவில்லை."
 
-#: app/qfield/qfield_crud.py:542
+#: app/qfield/qfield_crud.py:539
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS ரேப்பர் முடிந்தது ஆனால் எந்த வெளியீட்டு கோப்புகளையும் எழுதவில்லை."
 
-#: app/qfield/qfield_crud.py:554
+#: app/qfield/qfield_crud.py:551
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS ரேப்பர் முடிந்தது ஆனால் வெளியீட்டில் .qgz கோப்பு இல்லை."
 
-#: app/qfield/qfield_crud.py:584
+#: app/qfield/qfield_crud.py:581
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField திட்ட ஐடி காணவில்லை; அடிப்படை வரைபடத்தை இணைக்க முடியாது."
 
-#: app/qfield/qfield_crud.py:618
+#: app/qfield/qfield_crud.py:615
 msgid "Basemap attach completed but produced no project files."
 msgstr "அடிப்படை வரைபடம் QField திட்டத்துடன் இணைக்கப்பட்டுள்ளது."
 
-#: app/qfield/qfield_crud.py:771 app/qfield/qfield_crud.py:785
+#: app/qfield/qfield_crud.py:801
+#, python-format
+msgid ""
+"QFieldCloud did not finish processing the project file after %(attempts)d"
+" attempts (last status: %(status)s)."
+msgstr ""
+"%(attempts)d முயற்சிகளுக்குப் பிறகும் QFieldCloud திட்டக் கோப்பை "
+"செயலாக்கி முடிக்கவில்லை (கடைசி நிலை: %(status)s)."
+
+#: app/qfield/qfield_crud.py:855 app/qfield/qfield_crud.py:869
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS திட்ட உருவாக்கம் தோல்வியடைந்தது: %(error)s"
 
-#: app/qfield/qfield_crud.py:778
+#: app/qfield/qfield_crud.py:862
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS ரேப்பர் தவறான JSON திரும்பியது."
 
-#: app/qfield/qfield_crud.py:802
+#: app/qfield/qfield_crud.py:886
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr ""
 "பதிவேற்றத்திற்கான அடிப்படை வரைபட MBTiles ஐ பதிவிறக்கம் செய்ய முடியவில்லை "
 "(HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:817
+#: app/qfield/qfield_crud.py:901
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "QR குறியீட்டை பதிவிறக்கவும்"
 
-#: app/qfield/qfield_crud.py:932
+#: app/qfield/qfield_crud.py:1027
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "கோப்புகளை QFieldCloud இல் பதிவேற்ற முடியவில்லை: %(error)s"
 
-#: app/qfield/qfield_crud.py:1206
+#: app/qfield/qfield_crud.py:1309
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "திட்டம் (%(project_id)s) கிடைக்கவில்லை."
 
-#: app/qfield/qfield_crud.py:1226
+#: app/qfield/qfield_crud.py:1329
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -978,17 +990,17 @@ msgstr ""
 "திட்டம் '%(owner)s' நிறுவனத்தைச் சேர்ந்தது. நிறுவனத்தில் '%(username)s' "
 "ஐச் சேர்க்க முடியவில்லை: %(error)s"
 
-#: app/qfield/qfield_crud.py:1244
+#: app/qfield/qfield_crud.py:1347
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "பயனர் '%(username)s' QFieldCloud இல் இல்லை."
 
-#: app/qfield/qfield_crud.py:1251
+#: app/qfield/qfield_crud.py:1354
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "பயனர் '%(username)s' ஏற்கனவே இந்த திட்டத்தில் இணை பணியாளராக உள்ளார்."
 
-#: app/qfield/qfield_crud.py:1292
+#: app/qfield/qfield_crud.py:1395
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ சான்றுகள் செல்லுபடியாகும்!"
 
@@ -1049,7 +1061,7 @@ msgid "Search projects…"
 msgstr "திட்டங்களைத் தேடுக…"
 
 #: app/templates/home.html:68 app/templates/landing.html:503
-#: app/templates/layout.html:280 app/templates/new_project_chooser.html:1
+#: app/templates/layout.html:281 app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "திட்டம் உருவாக்கு"
@@ -1376,15 +1388,15 @@ msgstr "மின்னஞ்சல்:"
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Open Mapping இயக்கங்களுக்கான ஒருங்கிணைந்த புல வரைபடம்."
 
-#: app/templates/layout.html:195 app/templates/login.html:1
+#: app/templates/layout.html:196 app/templates/login.html:1
 msgid "Login"
 msgstr "உள்நுழை"
 
-#: app/templates/layout.html:273
+#: app/templates/layout.html:274
 msgid "Projects"
 msgstr "திட்டங்கள்"
 
-#: app/templates/layout.html:287
+#: app/templates/layout.html:288
 msgid "QField Admin"
 msgstr "QField நிர்வாகி"
 
@@ -1629,8 +1641,8 @@ msgid "Description is required."
 msgstr "விளக்கம் அவசியம்."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup - OSM Buildings"
-msgstr "OSM கட்டிடங்கள்"
+msgid "Quick Setup — OSM Buildings"
+msgstr "விரைவு அமைப்பு — OSM கட்டிடங்கள்"
 
 #: app/templates/new_project_simple.html:9
 msgid ""
@@ -1668,6 +1680,11 @@ msgstr "QField திட்டத்தில் இணைக்கவும்"
 msgid "Creating project and preparing map..."
 msgstr "திட்டம் உருவாக்கப்பட்டு, வரைபடம் தயார் செய்யப்படுகிறது..."
 
+#: app/templates/new_project_simple_creating.html:2
+msgid "Creating Project"
+msgstr "திட்டம் உருவாக்கப்படுகிறது"
+
+#: app/templates/partials/new_project/creating_fragment.html:11
 #: app/templates/project_details.html:6 app/templates/project_details.html:166
 #: app/templates/project_details.html:177
 msgid "Back to Projects"
@@ -1755,7 +1772,7 @@ msgstr ""
 msgid "Enter your QFieldCloud credentials to manage collaborators."
 msgstr "இணைபணியாளர்களை நிர்வகிக்க உங்கள் QFieldCloud சான்றுகளை உள்ளிடவும்."
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:117
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:128
 #: app/templates/qfc_admin.html:36
 msgid "QField Cloud URL"
 msgstr "QField Cloud URL முகவரி"
@@ -1768,9 +1785,9 @@ msgstr "உங்கள் QFieldCloud இன்ஸ்டன்ஸின் அ�
 msgid "admin"
 msgstr "நிர்வாகி"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:102
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:108
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:141
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:103
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:109
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:152
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "கடவுச்சொல்"
@@ -1802,6 +1819,33 @@ msgstr "பதிவு செய்யப்பட்ட பயனர்கள�
 #: app/templates/partials/metrics.html:33
 msgid "Supported Mapping Apps"
 msgstr "ஆதரிக்கப்படும் வரைபட பயன்பாடுகள்"
+
+#: app/templates/partials/new_project/creating_fragment.html:4
+msgid "Project creation failed."
+msgstr "திட்டத்தை உருவாக்க முடியவில்லை."
+
+#: app/templates/partials/new_project/creating_fragment.html:6
+msgid "An unexpected error occurred."
+msgstr "எதிர்பாராத பிழை ஏற்பட்டது."
+
+#: app/templates/partials/new_project/creating_fragment.html:10
+msgid "Try Again"
+msgstr "மீண்டும் முயற்சிக்கவும்"
+
+#: app/templates/partials/new_project/creating_fragment.html:23
+msgid "Setting up your project..."
+msgstr "உங்கள் திட்டம் அமைக்கப்படுகிறது..."
+
+#: app/templates/partials/new_project/creating_fragment.html:25
+msgid ""
+"Downloading map data, splitting tasks, and preparing the QField project.\n"
+"    This can take a minute or two - this page will redirect automatically"
+" when ready."
+msgstr ""
+"வரைபடத் தரவு பதிவிறக்கப்படுகிறது, பணிகள் பிரிக்கப்படுகின்றன, மற்றும் "
+"QField திட்டம் தயாரிக்கப்படுகிறது.\n"
+"    இதற்கு ஒரு அல்லது இரண்டு நிமிடங்கள் ஆகலாம் - தயாரானதும் இந்தப் பக்கம்"
+" தானாகவே திருப்பிவிடப்படும்."
 
 #: app/templates/partials/new_project/map_script.html:3
 msgid "Area"
@@ -1903,17 +1947,29 @@ msgstr ""
 "இந்த AOI-க்கு HOT OpenAerialMap படங்களைத் தேடி MBTiles அடிப்படை வரைபடம் "
 "உருவாக்குங்கள்."
 
-#: app/templates/partials/project_details/basemap_section.html:26
+#: app/templates/partials/project_details/basemap_section.html:32
+msgid ""
+"A basemap job is currently in progress. Wait for it to finish before "
+"starting a new search."
+msgstr ""
+"அடிப்படை வரைபடப் பணி தற்போது நடைபெறுகிறது. புதிய தேடலைத் தொடங்குவதற்கு "
+"முன் அது முடிவதற்காக காத்திருக்கவும்."
+
+#: app/templates/partials/project_details/basemap_section.html:37
 msgid "Search OAM Imagery"
 msgstr "OAM படங்களைத் தேடுக"
 
-#: app/templates/partials/project_details/basemap_section.html:37
+#: app/templates/partials/project_details/basemap_section.html:41
+msgid "Search is disabled while a basemap job is running."
+msgstr "அடிப்படை வரைபடப் பணி நடைபெறும்போது தேடல் முடக்கப்பட்டுள்ளது."
+
+#: app/templates/partials/project_details/basemap_section.html:56
 msgid "Basemap generation previously failed. Please search again and retry."
 msgstr ""
 "முன்பு அடிப்படை வரைபட உருவாக்கம் தோல்வியடைந்தது. மீண்டும் தேடி மறுமுயற்சி"
 " செய்யவும்."
 
-#: app/templates/partials/project_details/basemap_section.html:41
+#: app/templates/partials/project_details/basemap_section.html:60
 msgid "No basemap selected yet."
 msgstr "இன்னும் எந்த அடிப்படை வரைபடமும் தேர்ந்தெடுக்கப்படவில்லை."
 
@@ -2178,7 +2234,7 @@ msgstr "தவறான சான்றுகள். தயவுசெய்த
 msgid "Error testing credentials: %(message)s"
 msgstr "சான்றுகளைச் சோதிக்கும் போது பிழை: %(message)s"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:159
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:180
 #: app/templates/partials/project_details/style_and_scripts.html:47
 msgid "Test Credentials"
 msgstr "சான்றுகளைச் சோதிக்கவும்"
@@ -2198,7 +2254,7 @@ msgstr ""
 msgid "Error:"
 msgstr "பிழை:"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:8
+#: app/templates/partials/project_details/fragments/basemap_progress.html:5
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
 "      use. Please retry attach."
@@ -2206,56 +2262,56 @@ msgstr ""
 "அடிப்படை வரைபடத்தை இணைப்பது இப்போது தோல்வியடைந்தது. உங்கள் திட்டம் "
 "பயன்படுத்தத் தயாராக உள்ளது. மீண்டும் இணைக்க முயற்சிக்கவும்."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:23
+#: app/templates/partials/project_details/fragments/basemap_progress.html:20
 msgid "Retry Attach"
 msgstr "இணைப்பை மீண்டும் முயற்சிக்கவும்"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:29
+#: app/templates/partials/project_details/fragments/basemap_progress.html:26
 msgid ""
-"Basemap attach is in progress. Use the button below to check the latest "
-"status."
+"Basemap is attaching to the QField project. This can take a minute; click"
+" below to check\n"
+"      the latest status."
 msgstr ""
-"அடிப்படை வரைபட இணைப்பு நடைபெற்று வருகிறது. சமீபத்திய நிலையைப் பார்க்க "
-"கீழே உள்ள பொத்தானைப் பயன்படுத்தவும்."
+"அடிப்படை வரைபடம் QField திட்டத்துடன் இணைக்கப்படுகிறது. இதற்கு ஒரு நிமிடம்"
+" ஆகலாம்; சமீபத்திய நிலையை பார்க்க கீழே கிளிக் செய்யவும்."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:48
-#: app/templates/partials/project_details/fragments/basemap_progress.html:111
-#: app/templates/partials/project_details/fragments/basemap_progress.html:116
+#: app/templates/partials/project_details/fragments/basemap_progress.html:41
+#: app/templates/partials/project_details/fragments/basemap_progress.html:104
 msgid "Checking..."
 msgstr "சரிபார்க்கப்படுகிறது..."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:44
-#: app/templates/partials/project_details/fragments/basemap_progress.html:48
-#: app/templates/partials/project_details/fragments/basemap_progress.html:112
-#: app/templates/partials/project_details/fragments/basemap_progress.html:116
+#: app/templates/partials/project_details/fragments/basemap_progress.html:42
+#: app/templates/partials/project_details/fragments/basemap_progress.html:45
+#: app/templates/partials/project_details/fragments/basemap_progress.html:105
+#: app/templates/partials/project_details/fragments/basemap_progress.html:108
 msgid "Check Status"
 msgstr "திட்ட நிலை"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:69
+#: app/templates/partials/project_details/fragments/basemap_progress.html:62
 msgid ""
-"Basemap generation is in progress. Use the button below to check the "
-"latest status."
+"Basemap generation is in progress on the imagery server. Click below to "
+"check whether\n"
+"      it's ready."
 msgstr ""
-"அடிப்படை வரைபடம் உருவாக்கப்பட்டு வருகிறது. சமீபத்திய நிலையை பார்க்க "
-"கீழேயுள்ள பொத்தானைப் பயன்படுத்தவும்."
+"படச் சேவையகத்தில் அடிப்படை வரைபடம் உருவாக்கப்படுகிறது. அது தயாரா என்பதை "
+"பார்க்க கீழே கிளிக் செய்யவும்."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:70
+#: app/templates/partials/project_details/fragments/basemap_progress.html:63
 msgid "STAC item"
 msgstr "STAC உருப்பு"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:71
+#: app/templates/partials/project_details/fragments/basemap_progress.html:64
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:15
 msgid "Zoom"
 msgstr "ஜூம்"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:3
+#: app/templates/partials/project_details/fragments/basemap_ready.html:4
 msgid ""
 "Basemap attached to\n"
 "    QField project."
 msgstr "அடிப்படை வரைபடம் QField திட்டத்துடன் இணைக்கப்பட்டது."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:4
+#: app/templates/partials/project_details/fragments/basemap_ready.html:5
 msgid ""
 "Basemap is\n"
 "    ready. Attaching to QField project in progress."
@@ -2263,41 +2319,54 @@ msgstr ""
 "அடிப்படை வரைபடம் தயாராக உள்ளது. அதை QField திட்டத்தில் இணைக்கும் செயல் "
 "நடைபெற்று வருகிறது."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:5
+#: app/templates/partials/project_details/fragments/basemap_ready.html:7
 msgid ""
-"Basemap is ready. Not yet\n"
-"    attached to QField project."
+"Basemap is ready, but attach to the QField project failed.\n"
+"    Please retry attach."
 msgstr ""
-"அடிப்படை வரைபடம் தயாராக உள்ளது. ஆனால் இது இன்னும் QField திட்டத்தில் "
-"இணைக்கப்படவில்லை."
+"அடிப்படை வரைபடம் தயாராக உள்ளது, ஆனால் QField திட்டத்துடன் இணைப்பது "
+"தோல்வியடைந்தது.\n"
+"    மீண்டும் இணைக்க முயற்சிக்கவும்."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:6
+#: app/templates/partials/project_details/fragments/basemap_ready.html:8
+msgid ""
+"Basemap is ready. Not yet attached to QField\n"
+"    project."
+msgstr ""
+"அடிப்படை வரைபடம் தயாராக உள்ளது. இன்னும் QField\n"
+"    திட்டத்துடன் இணைக்கப்படவில்லை."
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:9
 msgid "Basemap is ready."
 msgstr "அடிப்படை வரைபடம் தயாராக உள்ளது."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:8
-msgid "Total size"
-msgstr "மொத்த அளவு"
+#: app/templates/partials/project_details/fragments/basemap_ready.html:10
+msgid ""
+"Total\n"
+"    size"
+msgstr ""
+"மொத்த\n"
+"    அளவு"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:9
+#: app/templates/partials/project_details/fragments/basemap_ready.html:12
 msgid "Available Zoom"
 msgstr "கிடைக்கும் பெரிதாக்கம்"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:21
+#: app/templates/partials/project_details/fragments/basemap_ready.html:24
 msgid "Download MBTiles"
 msgstr "MBTiles பதிவிறக்கு"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:30
+#: app/templates/partials/project_details/fragments/basemap_ready.html:33
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:26
 msgid "View Metadata"
 msgstr "மேட்டாடேட்டாவைக் காண்க"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:43
-#: app/templates/partials/project_details/fragments/basemap_ready.html:54
+#: app/templates/partials/project_details/fragments/basemap_ready.html:46
+#: app/templates/partials/project_details/fragments/basemap_ready.html:57
 msgid "Attach to QField Project"
 msgstr "QField திட்டத்தில் இணைக்கவும்"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:61
+#: app/templates/partials/project_details/fragments/basemap_ready.html:64
 msgid ""
 "Use the ODK offline maps documentation to configure this MBTiles file in "
 "Collect."
@@ -2712,43 +2781,63 @@ msgstr ""
 msgid "Use custom credentials"
 msgstr "தனிப்பயன் சான்றுகள்"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:59
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:60
 msgid "Confirm Project Finalisation"
 msgstr "திட்ட இறுதிப்படுத்தலை உறுதிசெய்"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:63
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:64
 msgid "Are you sure you want to finalise this project?"
 msgstr "இந்த திட்டத்தை இறுதிப்படுத்த விரும்புகிறீர்களா?"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:68
 msgid "Confirm & Finalise"
 msgstr "உறுதிசெய்து இறுதிப்படுத்து"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:73
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:74
 msgid "Custom Credentials"
 msgstr "தனிப்பயன் சான்றுகள்"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:78
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:79
 msgid "ODK Central URL"
 msgstr "ODK Central URL முகவரி"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:84
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:85
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:118
+msgid "Where should this project live?"
+msgstr "இந்தத் திட்டம் எங்கு இருக்க வேண்டும்?"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:122
+msgid "Use my account on app.qfield.cloud"
+msgstr "app.qfield.cloud இல் உள்ள எனது கணக்கைப் பயன்படுத்தவும்"
+
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:123
+msgid "Use a custom-hosted QFieldCloud instance"
+msgstr "சுயமாக ஹோஸ்ட் செய்யப்பட்ட QFieldCloud நிகழ்வைப் பயன்படுத்தவும்"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:134
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:135
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:146
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:147
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:158
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:162
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:163
+msgid "Organisation name"
+msgstr "அமைப்பின் பெயர்"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:168
+msgid "Optional - leave blank to create under your username"
+msgstr "விருப்பம் - உங்கள் பயனர்பெயரின் கீழ் உருவாக்க காலியாக விடவும்"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "சேமித்து தொடரவும்"
 

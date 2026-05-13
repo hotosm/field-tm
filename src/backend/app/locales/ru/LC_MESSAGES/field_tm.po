@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-11 22:06+0100\n"
+"POT-Creation-Date: 2026-05-13 04:50+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -147,7 +147,7 @@ msgstr "%(action)s не удалось выполнить HTTP %(status_code)s."
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s не удалось выполнить из-за ошибки восходящего соединения."
 
-#: app/helpers/basemap_services.py:178
+#: app/helpers/basemap_services.py:181
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack вернул HTTP %(status_code)s."
@@ -259,12 +259,12 @@ msgid "Project not found."
 msgstr "Проект не найден."
 
 #: app/htmx/project_detail_routes.py:321
-#: app/htmx/setup_steps/setup_step_responses.py:71
+#: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Ошибка: %(error_msg)s"
 
-#: app/htmx/basemap/basemap_attach_flow.py:67
+#: app/htmx/basemap/basemap_attach_flow.py:68
 msgid ""
 "Basemap attach failed for now. Your project is ready to use. Please retry"
 " attach."
@@ -272,7 +272,7 @@ msgstr ""
 "Прикрепить базовую карту пока не удалось. Проект готов к использованию. "
 "Повторите попытку прикрепления."
 
-#: app/htmx/basemap/basemap_attach_flow.py:72
+#: app/htmx/basemap/basemap_attach_flow.py:73
 msgid ""
 "Basemap attach could not complete due to a temporary network issue. Your "
 "project is ready to use. Please retry attach."
@@ -280,23 +280,27 @@ msgstr ""
 "Не удалось завершить прикрепление базовой карты из-за временной сетевой "
 "проблемы. Проект готов к использованию. Повторите попытку прикрепления."
 
-#: app/htmx/basemap/basemap_attach_flow.py:87
+#: app/htmx/basemap/basemap_attach_flow.py:122
 msgid "Basemap attach is available after publication."
 msgstr "Прикрепление базовой карты доступно после публикации."
 
-#: app/htmx/basemap/basemap_attach_flow.py:96
+#: app/htmx/basemap/basemap_attach_flow.py:131
 msgid "Basemap attach is only available for QField projects."
 msgstr "Прикрепление базовой карты доступно только для проектов QField."
 
-#: app/htmx/basemap/basemap_attach_flow.py:106
+#: app/htmx/basemap/basemap_attach_flow.py:141
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "Базовая карта ещё не готова. Дождитесь завершения создания."
 
-#: app/htmx/basemap/basemap_attach_flow.py:115
-msgid "No generated basemap download URL is available yet."
-msgstr "URL для скачивания созданной базовой карты пока недоступен."
+#: app/htmx/basemap/basemap_attach_flow.py:156
+msgid ""
+"Basemap download URL is not available yet. Please refresh status and try "
+"again shortly."
+msgstr ""
+"URL для скачивания базовой карты пока недоступен. Обновите статус и "
+"повторите попытку чуть позже."
 
-#: app/htmx/basemap/basemap_attach_flow.py:129
+#: app/htmx/basemap/basemap_attach_flow.py:172
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -306,39 +310,39 @@ msgstr ""
 "Отсутствует %(config)s."
 
 #: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:91
+#: app/htmx/setup_steps/setup_step_responses.py:90
 msgid "Project not found or access denied."
 msgstr "Проект не найден или доступ запрещён."
 
-#: app/htmx/basemap/basemap_fragments.py:112
+#: app/htmx/basemap/basemap_fragments.py:105
 msgid "Basemap attached to QField project successfully."
 msgstr "Базовая карта успешно прикреплена к проекту QField."
 
-#: app/htmx/basemap/basemap_fragments.py:122
+#: app/htmx/basemap/basemap_fragments.py:115
 msgid "Basemap attach has not started yet."
 msgstr "Прикрепление базовой карты ещё не началось."
 
-#: app/htmx/basemap/basemap_fragments.py:133
+#: app/htmx/basemap/basemap_fragments.py:126
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr "Не удалось выполнить поиск снимков. Попробуйте ещё раз немного позже."
 
-#: app/htmx/basemap/basemap_fragments.py:146
+#: app/htmx/basemap/basemap_fragments.py:139
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr ""
 "Не удалось запустить создание базовой карты. Попробуйте ещё раз немного "
 "позже."
 
-#: app/htmx/basemap/basemap_fragments.py:160
+#: app/htmx/basemap/basemap_fragments.py:153
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr ""
 "Не удалось обновить состояние базовой карты. Попробуйте ещё раз немного "
 "позже."
 
-#: app/htmx/basemap/basemap_routes.py:93
+#: app/htmx/basemap/basemap_routes.py:113
 msgid "Basemap tools are available after publication."
 msgstr "Инструменты базовой карты доступны после публикации."
 
-#: app/htmx/basemap/basemap_routes.py:253
+#: app/htmx/basemap/basemap_routes.py:273
 msgid "No basemap generation in progress."
 msgstr "Полевое картографирование в процессе"
 
@@ -350,7 +354,7 @@ msgstr ""
 "Область проекта должна быть корректным JSON (GeoJSON Polygon, "
 "MultiPolygon, Feature или FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:55
+#: app/htmx/project_create/project_create_simple_flow.py:60
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -358,14 +362,15 @@ msgstr ""
 "В этой области не найдены существующие здания OSM. Продолжайте "
 "картографирование с нуля."
 
-#: app/htmx/project_create/project_create_simple_flow.py:152
+#: app/htmx/project_create/project_create_simple_flow.py:157
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 "Не удалось загрузить форму OSM Buildings по умолчанию для упрощённого "
 "создания проекта."
 
-#: app/htmx/project_create/project_create_submit_routes.py:139
-#: app/htmx/project_create/project_create_submit_routes.py:200
+#: app/htmx/project_create/project_create_simple_flow.py:269
+#: app/htmx/project_create/project_create_submit_routes.py:140
+#: app/htmx/project_create/project_create_submit_routes.py:209
 msgid "An unexpected error occurred. Please try again."
 msgstr "Произошла непредвиденная ошибка. Пожалуйста, попробуйте ещё раз."
 
@@ -389,7 +394,7 @@ msgstr "Такого пользователя не существует. Сна�
 msgid "This user is already a collaborator on this project."
 msgstr "Этот пользователь уже является участником проекта."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1257
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1360
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "Не удалось добавить участника: %(exc)s"
@@ -524,8 +529,8 @@ msgstr "из этого проекта?"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
 #: app/templates/new_project_custom.html:156
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:66
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:156
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:177
 msgid "Cancel"
 msgstr "Отмена"
 
@@ -546,9 +551,9 @@ msgid "No collaborators yet."
 msgstr "Участников пока нет."
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:218
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:90
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:96
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:129
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:91
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:97
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:140
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "Имя пользователя"
@@ -740,11 +745,11 @@ msgstr ""
 "сохранения. Иначе измените параметры выше и нажмите \"Split Again\" для "
 "повторной генерации."
 
-#: app/htmx/setup_steps/setup_step_responses.py:86
+#: app/htmx/setup_steps/setup_step_responses.py:85
 msgid "An unexpected error occurred"
 msgstr "Произошла непредвиденная ошибка"
 
-#: app/htmx/setup_steps/setup_step_responses.py:161
+#: app/htmx/setup_steps/setup_step_responses.py:160
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -754,7 +759,7 @@ msgstr ""
 " проблема сохраняется, отправьте приведённые ниже технические сведения "
 "администратору экземпляра или в службу поддержки."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:96
+#: app/htmx/setup_steps/setup_step_split_routes.py:99
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -762,7 +767,7 @@ msgstr ""
 "Выгрузка данных не найдена. Сначала скачайте данные OSM или загрузите "
 "файл GeoJSON."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:127
+#: app/htmx/setup_steps/setup_step_split_routes.py:130
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -772,7 +777,7 @@ msgstr ""
 "%(data_feature_count)s объектами данных. Вся область будет использоваться"
 " как одна задача."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:134
+#: app/htmx/setup_steps/setup_step_split_routes.py:137
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -781,11 +786,11 @@ msgstr ""
 "Предпросмотр %(task_count)s границ задач и %(data_feature_count)s "
 "объектов данных вместе."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:187
+#: app/htmx/setup_steps/setup_step_split_routes.py:190
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "Контур проекта не найден. Нельзя пропустить разделение на задачи."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:209
+#: app/htmx/setup_steps/setup_step_split_routes.py:215
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
@@ -793,23 +798,23 @@ msgstr ""
 "✓ Разделение на задачи пропущено. Вся область интереса будет "
 "использоваться как одна задача. Можно перейти к шагу 5."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:263
+#: app/htmx/setup_steps/setup_step_split_routes.py:270
 msgid "Please select a splitting option."
 msgstr "Выберите вариант разделения."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:284
+#: app/htmx/setup_steps/setup_step_split_routes.py:294
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ Для этой конфигурации проекта разделение на задачи не требуется."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:333
+#: app/htmx/setup_steps/setup_step_split_routes.py:344
 msgid "No task areas data provided."
 msgstr "Данные областей задач не предоставлены."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:337
+#: app/htmx/setup_steps/setup_step_split_routes.py:348
 msgid "Invalid task areas data format."
 msgstr "Неверный формат данных областей задач."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:357
+#: app/htmx/setup_steps/setup_step_split_routes.py:371
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ Разделённые задачи успешно сохранены"
 
@@ -892,73 +897,82 @@ msgstr "Область {latitude:.4f}_{longitude:.4f}"
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:164
+#: app/qfield/qfield_crud.py:166
 msgid "Project outline is missing or has no geometry."
 msgstr "Контур проекта отсутствует или не имеет геометрии."
 
-#: app/qfield/qfield_crud.py:170
+#: app/qfield/qfield_crud.py:172
 msgid "Project outline geometry has no coordinates."
 msgstr "Геометрия контура проекта не имеет координат."
 
-#: app/qfield/qfield_crud.py:479
+#: app/qfield/qfield_crud.py:476
 msgid "Project outline is required for QField project creation."
 msgstr "✓ Для этой конфигурации проекта разделение на задачи не требуется."
 
-#: app/qfield/qfield_crud.py:484
+#: app/qfield/qfield_crud.py:481
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm необходим для создания проекта QField."
 
-#: app/qfield/qfield_crud.py:501
+#: app/qfield/qfield_crud.py:498
 msgid "Failed to modify XLSForm for QField."
 msgstr "Не удалось изменить XLSForm для QField."
 
-#: app/qfield/qfield_crud.py:542
+#: app/qfield/qfield_crud.py:539
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS завершена, но выходные файлы не записаны."
 
-#: app/qfield/qfield_crud.py:554
+#: app/qfield/qfield_crud.py:551
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS завершена, но на выходе нет файла .qgz."
 
-#: app/qfield/qfield_crud.py:584
+#: app/qfield/qfield_crud.py:581
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr ""
 "Идентификатор проекта QField отсутствует; не могу прикрепить базовую "
 "карту."
 
-#: app/qfield/qfield_crud.py:618
+#: app/qfield/qfield_crud.py:615
 msgid "Basemap attach completed but produced no project files."
 msgstr "Базовая карта прикреплена к проекту QField."
 
-#: app/qfield/qfield_crud.py:771 app/qfield/qfield_crud.py:785
+#: app/qfield/qfield_crud.py:801
+#, python-format
+msgid ""
+"QFieldCloud did not finish processing the project file after %(attempts)d"
+" attempts (last status: %(status)s)."
+msgstr ""
+"QFieldCloud не завершил обработку файла проекта после %(attempts)d "
+"попыток (последний статус: %(status)s)."
+
+#: app/qfield/qfield_crud.py:855 app/qfield/qfield_crud.py:869
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS: %(error)s"
 
-#: app/qfield/qfield_crud.py:778
+#: app/qfield/qfield_crud.py:862
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "вернула неверный JSON."
 
-#: app/qfield/qfield_crud.py:802
+#: app/qfield/qfield_crud.py:886
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "Не удалось загрузить базовую карту MBTiles для загрузки (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:817
+#: app/qfield/qfield_crud.py:901
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "Скачать QR-код"
 
-#: app/qfield/qfield_crud.py:932
+#: app/qfield/qfield_crud.py:1027
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "Не удалось загрузить файлы в QFieldCloud: %(error)s."
 
-#: app/qfield/qfield_crud.py:1206
+#: app/qfield/qfield_crud.py:1309
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "Проект (%(project_id)s) не найден."
 
-#: app/qfield/qfield_crud.py:1226
+#: app/qfield/qfield_crud.py:1329
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -967,17 +981,17 @@ msgstr ""
 "принадлежит организации %(owner)s. Не удалось добавить %(username)s в "
 "организацию: %(error)s."
 
-#: app/qfield/qfield_crud.py:1244
+#: app/qfield/qfield_crud.py:1347
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "Пользователь «%(username)s» не существует в QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1251
+#: app/qfield/qfield_crud.py:1354
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "Пользователь '%(username)s' уже является участником этого проекта."
 
-#: app/qfield/qfield_crud.py:1292
+#: app/qfield/qfield_crud.py:1395
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Учетные данные действительны."
 
@@ -1038,7 +1052,7 @@ msgid "Search projects…"
 msgstr "Искать проекты…"
 
 #: app/templates/home.html:68 app/templates/landing.html:503
-#: app/templates/layout.html:280 app/templates/new_project_chooser.html:1
+#: app/templates/layout.html:281 app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "Создать проект"
@@ -1364,15 +1378,15 @@ msgstr "Эл. почта:"
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Координированное полевое картографирование для кампаний Open Mapping."
 
-#: app/templates/layout.html:195 app/templates/login.html:1
+#: app/templates/layout.html:196 app/templates/login.html:1
 msgid "Login"
 msgstr "Войти"
 
-#: app/templates/layout.html:273
+#: app/templates/layout.html:274
 msgid "Projects"
 msgstr "Проекты"
 
-#: app/templates/layout.html:287
+#: app/templates/layout.html:288
 msgid "QField Admin"
 msgstr "Администрирование QField"
 
@@ -1612,8 +1626,8 @@ msgid "Description is required."
 msgstr "Описание обязательно."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup - OSM Buildings"
-msgstr "Здания OSM"
+msgid "Quick Setup — OSM Buildings"
+msgstr "Быстрая настройка — Здания OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""
@@ -1650,6 +1664,11 @@ msgstr "Прикрепить к проекту QField"
 msgid "Creating project and preparing map..."
 msgstr "Проект создаётся, карта подготавливается..."
 
+#: app/templates/new_project_simple_creating.html:2
+msgid "Creating Project"
+msgstr "Создание проекта"
+
+#: app/templates/partials/new_project/creating_fragment.html:11
 #: app/templates/project_details.html:6 app/templates/project_details.html:166
 #: app/templates/project_details.html:177
 msgid "Back to Projects"
@@ -1737,7 +1756,7 @@ msgstr ""
 msgid "Enter your QFieldCloud credentials to manage collaborators."
 msgstr "Введите учетные данные QFieldCloud для управления участниками."
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:117
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:128
 #: app/templates/qfc_admin.html:36
 msgid "QField Cloud URL"
 msgstr "URL QField Cloud"
@@ -1750,9 +1769,9 @@ msgstr "Базовый URL вашего экземпляра QFieldCloud (без
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:102
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:108
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:141
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:103
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:109
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:152
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "Пароль"
@@ -1784,6 +1803,33 @@ msgstr "Зарегистрировано пользователей"
 #: app/templates/partials/metrics.html:33
 msgid "Supported Mapping Apps"
 msgstr "Поддерживаемые приложения для картографирования"
+
+#: app/templates/partials/new_project/creating_fragment.html:4
+msgid "Project creation failed."
+msgstr "Не удалось создать проект."
+
+#: app/templates/partials/new_project/creating_fragment.html:6
+msgid "An unexpected error occurred."
+msgstr "Произошла непредвиденная ошибка."
+
+#: app/templates/partials/new_project/creating_fragment.html:10
+msgid "Try Again"
+msgstr "Попробовать снова"
+
+#: app/templates/partials/new_project/creating_fragment.html:23
+msgid "Setting up your project..."
+msgstr "Настройка вашего проекта..."
+
+#: app/templates/partials/new_project/creating_fragment.html:25
+msgid ""
+"Downloading map data, splitting tasks, and preparing the QField project.\n"
+"    This can take a minute or two - this page will redirect automatically"
+" when ready."
+msgstr ""
+"Загрузка картографических данных, разделение задач и подготовка проекта "
+"QField.\n"
+"    Это может занять одну-две минуты - страница автоматически "
+"перенаправит вас, когда всё будет готово."
 
 #: app/templates/partials/new_project/map_script.html:3
 msgid "Area"
@@ -1885,17 +1931,29 @@ msgstr ""
 "Найдите снимки HOT OpenAerialMap для этой области и создайте базовую "
 "карту MBTiles."
 
-#: app/templates/partials/project_details/basemap_section.html:26
+#: app/templates/partials/project_details/basemap_section.html:32
+msgid ""
+"A basemap job is currently in progress. Wait for it to finish before "
+"starting a new search."
+msgstr ""
+"Сейчас выполняется задание базовой карты. Дождитесь его завершения перед "
+"новым поиском."
+
+#: app/templates/partials/project_details/basemap_section.html:37
 msgid "Search OAM Imagery"
 msgstr "Искать снимки OAM"
 
-#: app/templates/partials/project_details/basemap_section.html:37
+#: app/templates/partials/project_details/basemap_section.html:41
+msgid "Search is disabled while a basemap job is running."
+msgstr "Поиск отключен, пока выполняется задание базовой карты."
+
+#: app/templates/partials/project_details/basemap_section.html:56
 msgid "Basemap generation previously failed. Please search again and retry."
 msgstr ""
 "Создание базовой карты ранее завершилось ошибкой. Выполните поиск ещё раз"
 " и повторите попытку."
 
-#: app/templates/partials/project_details/basemap_section.html:41
+#: app/templates/partials/project_details/basemap_section.html:60
 msgid "No basemap selected yet."
 msgstr "Базовая карта ещё не выбрана."
 
@@ -2161,7 +2219,7 @@ msgstr "Неверные учетные данные. Проверьте и по
 msgid "Error testing credentials: %(message)s"
 msgstr "Ошибка при проверке учетных данных: %(message)s"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:159
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:180
 #: app/templates/partials/project_details/style_and_scripts.html:47
 msgid "Test Credentials"
 msgstr "Проверить учетные данные"
@@ -2179,7 +2237,7 @@ msgstr "Создание проекта в %(project_type)s... Это может
 msgid "Error:"
 msgstr "Ошибка:"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:8
+#: app/templates/partials/project_details/fragments/basemap_progress.html:5
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
 "      use. Please retry attach."
@@ -2187,94 +2245,110 @@ msgstr ""
 "Прикрепить базовую карту пока не удалось. Проект готов к использованию. "
 "Повторите попытку прикрепления."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:23
+#: app/templates/partials/project_details/fragments/basemap_progress.html:20
 msgid "Retry Attach"
 msgstr "Повторить прикрепление"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:29
+#: app/templates/partials/project_details/fragments/basemap_progress.html:26
 msgid ""
-"Basemap attach is in progress. Use the button below to check the latest "
-"status."
+"Basemap is attaching to the QField project. This can take a minute; click"
+" below to check\n"
+"      the latest status."
 msgstr ""
-"Идёт прикрепление базовой карты. Используйте кнопку ниже, чтобы проверить"
-" последнее состояние."
+"Базовая карта прикрепляется к проекту QField. Это может занять минуту; "
+"нажмите ниже, чтобы проверить\n"
+"      последний статус."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:48
-#: app/templates/partials/project_details/fragments/basemap_progress.html:111
-#: app/templates/partials/project_details/fragments/basemap_progress.html:116
+#: app/templates/partials/project_details/fragments/basemap_progress.html:41
+#: app/templates/partials/project_details/fragments/basemap_progress.html:104
 msgid "Checking..."
 msgstr "Проверка..."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:44
-#: app/templates/partials/project_details/fragments/basemap_progress.html:48
-#: app/templates/partials/project_details/fragments/basemap_progress.html:112
-#: app/templates/partials/project_details/fragments/basemap_progress.html:116
+#: app/templates/partials/project_details/fragments/basemap_progress.html:42
+#: app/templates/partials/project_details/fragments/basemap_progress.html:45
+#: app/templates/partials/project_details/fragments/basemap_progress.html:105
+#: app/templates/partials/project_details/fragments/basemap_progress.html:108
 msgid "Check Status"
 msgstr "Статус проекта"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:69
+#: app/templates/partials/project_details/fragments/basemap_progress.html:62
 msgid ""
-"Basemap generation is in progress. Use the button below to check the "
-"latest status."
+"Basemap generation is in progress on the imagery server. Click below to "
+"check whether\n"
+"      it's ready."
 msgstr ""
-"Идёт создание базовой карты. Используйте кнопку ниже, чтобы проверить "
-"последний статус."
+"На сервере изображений выполняется генерация базовой карты. Нажмите ниже,"
+" чтобы проверить,\n"
+"      готова ли она."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:70
+#: app/templates/partials/project_details/fragments/basemap_progress.html:63
 msgid "STAC item"
 msgstr "Элемент STAC"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:71
+#: app/templates/partials/project_details/fragments/basemap_progress.html:64
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:15
 msgid "Zoom"
 msgstr "Масштаб"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:3
+#: app/templates/partials/project_details/fragments/basemap_ready.html:4
 msgid ""
 "Basemap attached to\n"
 "    QField project."
 msgstr "Базовая карта прикреплена к проекту QField."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:4
+#: app/templates/partials/project_details/fragments/basemap_ready.html:5
 msgid ""
 "Basemap is\n"
 "    ready. Attaching to QField project in progress."
 msgstr "Базовая карта готова. Идёт прикрепление к проекту QField."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:5
+#: app/templates/partials/project_details/fragments/basemap_ready.html:7
 msgid ""
-"Basemap is ready. Not yet\n"
-"    attached to QField project."
-msgstr "Базовая карта готова. Но она ещё не прикреплена к проекту QField."
+"Basemap is ready, but attach to the QField project failed.\n"
+"    Please retry attach."
+msgstr ""
+"Базовая карта готова, но прикрепить ее к проекту QField не удалось.\n"
+"    Повторите прикрепление."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:6
+#: app/templates/partials/project_details/fragments/basemap_ready.html:8
+msgid ""
+"Basemap is ready. Not yet attached to QField\n"
+"    project."
+msgstr ""
+"Базовая карта готова. Она еще не прикреплена к проекту\n"
+"    QField."
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:9
 msgid "Basemap is ready."
 msgstr "Базовая карта готова."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:8
-msgid "Total size"
-msgstr "Общий размер"
+#: app/templates/partials/project_details/fragments/basemap_ready.html:10
+msgid ""
+"Total\n"
+"    size"
+msgstr ""
+"Общий\n"
+"    размер"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:9
+#: app/templates/partials/project_details/fragments/basemap_ready.html:12
 msgid "Available Zoom"
 msgstr "Доступный масштаб"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:21
+#: app/templates/partials/project_details/fragments/basemap_ready.html:24
 msgid "Download MBTiles"
 msgstr "Скачать MBTiles"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:30
+#: app/templates/partials/project_details/fragments/basemap_ready.html:33
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:26
 msgid "View Metadata"
 msgstr "Просмотреть метаданные"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:43
-#: app/templates/partials/project_details/fragments/basemap_ready.html:54
+#: app/templates/partials/project_details/fragments/basemap_ready.html:46
+#: app/templates/partials/project_details/fragments/basemap_ready.html:57
 msgid "Attach to QField Project"
 msgstr "Прикрепить к проекту QField"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:61
+#: app/templates/partials/project_details/fragments/basemap_ready.html:64
 msgid ""
 "Use the ODK offline maps documentation to configure this MBTiles file in "
 "Collect."
@@ -2683,43 +2757,65 @@ msgstr ""
 msgid "Use custom credentials"
 msgstr "Пользовательские учетные данные"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:59
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:60
 msgid "Confirm Project Finalisation"
 msgstr "Подтвердить завершение проекта"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:63
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:64
 msgid "Are you sure you want to finalise this project?"
 msgstr "Вы уверены, что хотите завершить этот проект?"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:68
 msgid "Confirm & Finalise"
 msgstr "Подтвердить и завершить"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:73
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:74
 msgid "Custom Credentials"
 msgstr "Пользовательские учетные данные"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:78
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:79
 msgid "ODK Central URL"
 msgstr "URL ODK Central"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:84
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:85
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:118
+msgid "Where should this project live?"
+msgstr "Где должен находиться этот проект?"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:122
+msgid "Use my account on app.qfield.cloud"
+msgstr "Использовать мою учетную запись на app.qfield.cloud"
+
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:123
+msgid "Use a custom-hosted QFieldCloud instance"
+msgstr "Использовать собственный экземпляр QFieldCloud"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:134
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:135
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:146
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:147
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:158
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:162
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:163
+msgid "Organisation name"
+msgstr "Название организации"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:168
+msgid "Optional - leave blank to create under your username"
+msgstr ""
+"Необязательно - оставьте пустым, чтобы создать под вашим именем "
+"пользователя"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "Сохранить и продолжить"
 

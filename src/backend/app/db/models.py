@@ -409,6 +409,9 @@ class DbProject:
     basemap_attach_status: Optional[str] = None
     basemap_attach_error: Optional[str] = None
     basemap_attach_updated_at: Optional[AwareDatetime] = None
+    creation_status: Optional[str] = None
+    creation_error: Optional[str] = None
+    creation_updated_at: Optional[AwareDatetime] = None
     created_at: Optional[AwareDatetime] = None
     updated_at: Optional[AwareDatetime] = None
     # Encrypted ODK appuser token (may be null until generated)

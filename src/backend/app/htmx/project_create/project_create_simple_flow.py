@@ -3,12 +3,14 @@
 import asyncio
 import json
 import logging
+from datetime import datetime, timezone
 from io import BytesIO
 
 from area_splitter import SplittingAlgorithm
 from psycopg import AsyncConnection
 
 from app.auth.auth_deps import get_user_sub
+from app.config import settings
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
 from app.i18n import _
@@ -28,6 +30,9 @@ from app.projects.project_services import (
 )
 from app.projects.project_services import ValidationError as SvcValidationError
 
+from .project_create_basemap_orchestration import (
+    autostart_basemap_for_simple_project,
+)
 from .project_create_parsing import build_unique_simple_project_name
 from .project_create_templates import get_default_buildings_template_bytes
 
@@ -198,3 +203,71 @@ async def finalize_simple_project_creation(
         headers["HX-Trigger"] = simple_empty_extract_hx_trigger()
 
     return has_features, headers
+
+
+async def _persist_creation_terminal_state(
+    project_id: int,
+    *,
+    status_value: str,
+    error_message: str | None,
+) -> None:
+    """Update creation_status on a fresh connection (parent may be in error)."""
+    try:
+        async with await AsyncConnection.connect(settings.FTM_DB_URL) as bg_db:
+            await DbProject.update(
+                bg_db,
+                project_id,
+                project_schemas.ProjectUpdate(
+                    creation_status=status_value,
+                    creation_error=error_message,
+                    creation_updated_at=datetime.now(timezone.utc),
+                ),
+            )
+            await bg_db.commit()
+    except Exception:
+        log.exception(
+            "Failed to persist creation_status=%s for project %s",
+            status_value,
+            project_id,
+        )
+
+
+async def run_simple_project_creation_background(
+    project_id: int, outline: dict
+) -> None:
+    """Run simple-flow finalize in the background and persist terminal state.
+
+    Reuses a single DB connection for the happy path; on failure, opens a
+    fresh connection to persist the error so a poisoned transaction on the
+    original connection can't block the update.
+    """
+    try:
+        async with await AsyncConnection.connect(settings.FTM_DB_URL) as db:
+            await finalize_simple_project_creation(
+                db=db,
+                project_id=project_id,
+                outline=outline,
+                autostart_callback=autostart_basemap_for_simple_project,
+            )
+            await DbProject.update(
+                db,
+                project_id,
+                project_schemas.ProjectUpdate(
+                    creation_status="ready",
+                    creation_error=None,
+                    creation_updated_at=datetime.now(timezone.utc),
+                ),
+            )
+            await db.commit()
+            return
+    except (SvcValidationError, ConflictError, ServiceError) as exc:
+        error_message = exc.message
+    except Exception:
+        log.exception("Unexpected error finalizing simple project %s", project_id)
+        error_message = _("An unexpected error occurred. Please try again.")
+
+    await _persist_creation_terminal_state(
+        project_id,
+        status_value="failed",
+        error_message=error_message,
+    )

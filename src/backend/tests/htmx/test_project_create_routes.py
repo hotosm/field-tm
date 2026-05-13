@@ -7,11 +7,11 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from area_splitter import SplittingAlgorithm
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from litestar import status_codes as status
 
 from app.config import AuthProvider, settings
+from app.htmx.project_create import project_create_simple_flow
 from app.htmx.project_create.project_create_page_routes import (
     new_project_chooser,
     new_project_custom,
@@ -25,6 +25,8 @@ from app.htmx.project_create.project_create_simple_flow import (
 )
 from app.htmx.project_create.project_create_submit_routes import (
     create_simple_project_htmx,
+    project_creating_page,
+    project_creation_status,
 )
 from app.htmx.project_create.project_create_xlsform_routes import upload_xlsform_htmx
 from app.projects.project_services import (
@@ -70,7 +72,7 @@ async def test_create_project_htmx_returns_inline_error_for_missing_description(
 
 
 async def test_create_simple_project_htmx_success(monkeypatch):
-    """Simple HTMX creation should auto-complete setup, split tasks, and redirect."""
+    """Simple HTMX creation stamps creation_status, enqueues background, redirects."""
 
     async def fake_derive_simple_project_metadata(*, db, outline):
         return (
@@ -85,63 +87,15 @@ async def test_create_simple_project_htmx_success(monkeypatch):
 
     captured: dict = {}
 
-    async def fake_process_xlsform(**kwargs):
-        captured["process_xlsform"] = kwargs
-
-    async def fake_prepare_simple_project_data_extract(*, db, project_id):
-        captured["prepare_extract"] = {"db": db, "project_id": project_id}
-
-    async def fake_split_aoi(db, project_id, options):
-        captured["split_aoi"] = {
-            "db": db,
-            "project_id": project_id,
-            "options": options,
-        }
-        return {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "properties": {"task_id": 1},
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [
-                            [
-                                [85.0, 27.0],
-                                [85.1, 27.0],
-                                [85.1, 27.1],
-                                [85.0, 27.1],
-                                [85.0, 27.0],
-                            ]
-                        ],
-                    },
-                }
-            ],
-        }
-
-    async def fake_save_task_areas(db, project_id, tasks_geojson):
-        captured["save_task_areas"] = {
-            "db": db,
-            "project_id": project_id,
-            "tasks_geojson": tasks_geojson,
-        }
-        return 1
-
-    async def fake_finalize_qfield_project(*, db, project_id):
-        captured["finalize_qfield"] = {"db": db, "project_id": project_id}
-        return SimpleNamespace(qfield_url="https://example.com/p/321")
-
-    async def fake_claim_simple_project_basemap_generation(*, db, project_id):
-        captured["claim_generation"] = {"db": db, "project_id": project_id}
-        return True
-
-    async def fake_autostart_basemap_for_simple_project(project_id, outline):
-        return None
+    async def fake_run_background(project_id, outline):
+        captured["background_call"] = (project_id, outline)
 
     def fake_create_task(coro):
-        captured["autostart_coro"] = coro
+        captured["enqueued_coro"] = coro
         coro.close()
         return Mock()
+
+    update_mock = AsyncMock()
 
     monkeypatch.setattr(
         "app.htmx.project_create.project_create_submit_routes.derive_simple_project_metadata",
@@ -152,54 +106,16 @@ async def test_create_simple_project_htmx_success(monkeypatch):
         fake_create_project_stub,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_default_buildings_template_bytes",
-        AsyncMock(return_value=b"xlsx-bytes"),
+        "app.htmx.project_create.project_create_submit_routes.DbProject.update",
+        update_mock,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.process_xlsform",
-        fake_process_xlsform,
+        "app.htmx.project_create.project_create_submit_routes._run_simple_project_creation_background",
+        fake_run_background,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.prepare_simple_project_data_extract",
-        fake_prepare_simple_project_data_extract,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.DbProject.one",
-        AsyncMock(
-            return_value=SimpleNamespace(
-                data_extract_geojson={
-                    "type": "FeatureCollection",
-                    "features": [{"type": "Feature"}],
-                }
-            )
-        ),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.split_aoi", fake_split_aoi
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.save_task_areas",
-        fake_save_task_areas,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.finalize_qfield_project",
-        fake_finalize_qfield_project,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.claim_simple_project_basemap_generation",
-        fake_claim_simple_project_basemap_generation,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._autostart_basemap_for_simple_project",
-        fake_autostart_basemap_for_simple_project,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.asyncio.create_task",
+        "app.htmx.project_create.project_create_submit_routes.asyncio.create_task",
         fake_create_task,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_user_sub",
-        lambda _auth_user: "user-sub-1",
     )
 
     db = AsyncMock()
@@ -211,348 +127,14 @@ async def test_create_simple_project_htmx_success(monkeypatch):
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.headers["HX-Redirect"] == "/projects/321"
-    assert captured["process_xlsform"]["project_id"] == 321
-    assert isinstance(captured["process_xlsform"]["xlsform_bytes"], BytesIO)
-    assert captured["prepare_extract"]["project_id"] == 321
-    assert captured["split_aoi"]["project_id"] == 321
-    assert (
-        captured["split_aoi"]["options"].algorithm
-        == SplittingAlgorithm.AVG_BUILDING_SKELETON.value
-    )
-    assert captured["split_aoi"]["options"].no_of_buildings == 10
-    assert captured["save_task_areas"]["project_id"] == 321
-    assert captured["finalize_qfield"]["project_id"] == 321
-    assert captured["claim_generation"]["project_id"] == 321
-    assert "autostart_coro" in captured
-
-
-async def test_create_simple_project_htmx_skips_split_for_empty_extract(monkeypatch):
-    """Empty extract should skip splitting and show collect-new-data mode."""
-
-    async def fake_derive_simple_project_metadata(*, db, outline):
-        return (
-            "Kathmandu OSM Buildings",
-            "Simple workflow project",
-            ["#osm", "#buildings", "#simple"],
-            "Kathmandu, Nepal",
-        )
-
-    async def fake_create_project_stub(**kwargs):
-        return SimpleNamespace(id=323)
-
-    captured: dict = {}
-
-    async def fake_claim_simple_project_basemap_generation(*, db, project_id):
-        captured["claim_generation"] = {"db": db, "project_id": project_id}
-        return True
-
-    def fake_create_task(coro):
-        captured["autostart_coro"] = coro
-        coro.close()
-        return Mock()
-
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes.derive_simple_project_metadata",
-        fake_derive_simple_project_metadata,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._create_simple_project_stub",
-        fake_create_project_stub,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_default_buildings_template_bytes",
-        AsyncMock(return_value=b"xlsx-bytes"),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.process_xlsform",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.prepare_simple_project_data_extract",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.DbProject.one",
-        AsyncMock(
-            return_value=SimpleNamespace(
-                data_extract_geojson={"type": "FeatureCollection", "features": []}
-            )
-        ),
-    )
-    split_aoi_mock = AsyncMock()
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.split_aoi", split_aoi_mock
-    )
-    save_task_areas_mock = AsyncMock()
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.save_task_areas",
-        save_task_areas_mock,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.finalize_qfield_project",
-        AsyncMock(return_value=SimpleNamespace(qfield_url="https://example.com/p/323")),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.claim_simple_project_basemap_generation",
-        fake_claim_simple_project_basemap_generation,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._autostart_basemap_for_simple_project",
-        AsyncMock(return_value=None),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.asyncio.create_task",
-        fake_create_task,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_user_sub",
-        lambda _auth_user: "user-sub-1",
-    )
-
-    response = await create_simple_project_htmx.fn(
-        request=Mock(),
-        db=AsyncMock(),
-        auth_user=Mock(),
-        data={"outline": json.dumps({"type": "Polygon", "coordinates": []})},
-    )
-
-    assert response.status_code == status.HTTP_200_OK
-    assert response.headers["HX-Redirect"] == "/projects/323"
-    assert "HX-Trigger" in response.headers
-    trigger_payload = json.loads(response.headers["HX-Trigger"])
-    assert "simpleCollectNewDataNotice" in trigger_payload
-    assert "No existing OSM buildings" in trigger_payload["simpleCollectNewDataNotice"]
-    split_aoi_mock.assert_not_awaited()
-    save_task_areas_mock.assert_not_awaited()
-    assert captured["claim_generation"]["project_id"] == 323
-
-
-async def test_create_simple_project_htmx_returns_inline_error_when_split_fails(
-    monkeypatch,
-):
-    """Non-empty extract split failures should return inline form errors."""
-
-    async def fake_derive_simple_project_metadata(*, db, outline):
-        return (
-            "Kathmandu OSM Buildings",
-            "Simple workflow project",
-            ["#osm", "#buildings", "#simple"],
-            "Kathmandu, Nepal",
-        )
-
-    async def fake_create_project_stub(**kwargs):
-        return SimpleNamespace(id=324)
-
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes.derive_simple_project_metadata",
-        fake_derive_simple_project_metadata,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._create_simple_project_stub",
-        fake_create_project_stub,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_default_buildings_template_bytes",
-        AsyncMock(return_value=b"xlsx-bytes"),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.process_xlsform",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.prepare_simple_project_data_extract",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.DbProject.one",
-        AsyncMock(
-            return_value=SimpleNamespace(
-                data_extract_geojson={
-                    "type": "FeatureCollection",
-                    "features": [{"type": "Feature"}],
-                }
-            )
-        ),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.split_aoi",
-        AsyncMock(side_effect=SvcValidationError("Split failed for AOI")),
-    )
-    finalize_mock = AsyncMock()
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.finalize_qfield_project",
-        finalize_mock,
-    )
-    claim_generation_mock = AsyncMock(return_value=True)
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.claim_simple_project_basemap_generation",
-        claim_generation_mock,
-    )
-    create_task_mock = Mock()
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.asyncio.create_task",
-        create_task_mock,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_user_sub",
-        lambda _auth_user: "user-sub-1",
-    )
-
-    response = await create_simple_project_htmx.fn(
-        request=Mock(),
-        db=AsyncMock(),
-        auth_user=Mock(),
-        data={"outline": json.dumps({"type": "Polygon", "coordinates": []})},
-    )
-
-    assert response.status_code == status.HTTP_200_OK
-    assert "Split failed for AOI" in response.content
-    assert "HX-Redirect" not in response.headers
-    finalize_mock.assert_not_awaited()
-    claim_generation_mock.assert_not_awaited()
-    create_task_mock.assert_not_called()
-
-
-async def test_create_simple_project_htmx_success_even_if_autostart_will_fail(
-    monkeypatch,
-):
-    """Simple creation should still redirect successfully even if later attach fails."""
-
-    async def fake_derive_simple_project_metadata(*, db, outline):
-        return (
-            "Kathmandu OSM Buildings",
-            "Simple workflow project",
-            ["#osm", "#buildings", "#simple"],
-            "Kathmandu, Nepal",
-        )
-
-    async def fake_create_project_stub(**kwargs):
-        return SimpleNamespace(id=322)
-
-    captured: dict = {}
-
-    async def fake_autostart_basemap_for_simple_project(project_id, outline):
-        raise RuntimeError("temporary DNS lookup failure")
-
-    async def fake_claim_simple_project_basemap_generation(*, db, project_id):
-        captured["claim_generation"] = {"db": db, "project_id": project_id}
-        return True
-
-    def fake_create_task(coro):
-        captured["autostart_coro"] = coro
-        coro.close()
-        return Mock()
-
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes.derive_simple_project_metadata",
-        fake_derive_simple_project_metadata,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._create_simple_project_stub",
-        fake_create_project_stub,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_default_buildings_template_bytes",
-        AsyncMock(return_value=b"xlsx-bytes"),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.process_xlsform",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.prepare_simple_project_data_extract",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.DbProject.one",
-        AsyncMock(
-            return_value=SimpleNamespace(
-                data_extract_geojson={
-                    "type": "FeatureCollection",
-                    "features": [{"type": "Feature"}],
-                }
-            )
-        ),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.split_aoi",
-        AsyncMock(return_value={"type": "FeatureCollection", "features": []}),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.save_task_areas",
-        AsyncMock(return_value=0),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.finalize_qfield_project",
-        AsyncMock(return_value=SimpleNamespace(qfield_url="https://example.com/p/322")),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.claim_simple_project_basemap_generation",
-        fake_claim_simple_project_basemap_generation,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._autostart_basemap_for_simple_project",
-        fake_autostart_basemap_for_simple_project,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.asyncio.create_task",
-        fake_create_task,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_user_sub",
-        lambda _auth_user: "user-sub-1",
-    )
-
-    response = await create_simple_project_htmx.fn(
-        request=Mock(),
-        db=AsyncMock(),
-        auth_user=Mock(),
-        data={"outline": json.dumps({"type": "Polygon", "coordinates": []})},
-    )
-
-    assert response.status_code == status.HTTP_200_OK
-    assert response.headers["HX-Redirect"] == "/projects/322"
-    assert captured["claim_generation"]["project_id"] == 322
-    assert "autostart_coro" in captured
-
-
-async def test_create_simple_project_htmx_requires_default_form(monkeypatch):
-    """Missing default OSM Buildings template should return inline error."""
-
-    async def fake_derive_simple_project_metadata(*, db, outline):
-        return (
-            "Kathmandu OSM Buildings",
-            "Simple workflow project",
-            ["#osm", "#buildings", "#simple"],
-            "Kathmandu, Nepal",
-        )
-
-    async def fake_create_project_stub(**kwargs):
-        return SimpleNamespace(id=321)
-
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes.derive_simple_project_metadata",
-        fake_derive_simple_project_metadata,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._create_simple_project_stub",
-        fake_create_project_stub,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_default_buildings_template_bytes",
-        AsyncMock(return_value=None),
-    )
-
-    response = await create_simple_project_htmx.fn(
-        request=Mock(),
-        db=AsyncMock(),
-        auth_user=Mock(),
-        data={"outline": json.dumps({"type": "Polygon", "coordinates": []})},
-    )
-
-    assert response.status_code == status.HTTP_200_OK
-    assert "Could not load default OSM Buildings form" in response.content
+    assert response.headers["HX-Redirect"] == "/projects/321/creating"
+    update_mock.assert_awaited_once()
+    project_update = update_mock.await_args.args[2]
+    assert project_update.creation_status == "in_progress"
+    assert project_update.creation_error is None
+    assert project_update.creation_updated_at is not None
+    db.commit.assert_awaited_once()
+    assert "enqueued_coro" in captured
 
 
 async def test_create_simple_project_htmx_rejects_invalid_outline():
@@ -621,55 +203,20 @@ async def test_create_simple_project_htmx_handles_conflict(monkeypatch):
         fake_create_project_stub,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_default_buildings_template_bytes",
-        AsyncMock(return_value=b"xlsx-bytes"),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.process_xlsform",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.prepare_simple_project_data_extract",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.DbProject.one",
-        AsyncMock(
-            return_value=SimpleNamespace(
-                data_extract_geojson={
-                    "type": "FeatureCollection",
-                    "features": [{"type": "Feature"}],
-                }
-            )
-        ),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.split_aoi",
-        AsyncMock(return_value={"type": "FeatureCollection", "features": []}),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.save_task_areas",
-        AsyncMock(return_value=0),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.finalize_qfield_project",
-        AsyncMock(return_value=SimpleNamespace(qfield_url="https://example.com/p/654")),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.claim_simple_project_basemap_generation",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._autostart_basemap_for_simple_project",
-        AsyncMock(return_value=None),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.asyncio.create_task",
-        lambda coro: (coro.close(), Mock())[1],
-    )
-    monkeypatch.setattr(
         "app.htmx.project_create.project_create_simple_flow.get_user_sub",
         lambda _auth_user: "user-sub-1",
+    )
+    monkeypatch.setattr(
+        "app.htmx.project_create.project_create_submit_routes.DbProject.update",
+        AsyncMock(),
+    )
+    monkeypatch.setattr(
+        "app.htmx.project_create.project_create_submit_routes._run_simple_project_creation_background",
+        AsyncMock(),
+    )
+    monkeypatch.setattr(
+        "app.htmx.project_create.project_create_submit_routes.asyncio.create_task",
+        lambda coro: (coro.close(), Mock())[1],
     )
 
     response = await create_simple_project_htmx.fn(
@@ -680,7 +227,7 @@ async def test_create_simple_project_htmx_handles_conflict(monkeypatch):
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.headers["HX-Redirect"] == "/projects/654"
+    assert response.headers["HX-Redirect"] == "/projects/654/creating"
     assert len(captured_names) == 2
     assert captured_names[0] == "Kathmandu OSM Buildings"
     assert captured_names[1].startswith("Kathmandu OSM Buildings ")
@@ -718,55 +265,20 @@ async def test_create_simple_project_htmx_uses_deterministic_fallback_name(monke
         fake_create_project_stub,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_default_buildings_template_bytes",
-        AsyncMock(return_value=b"xlsx-bytes"),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.process_xlsform",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.prepare_simple_project_data_extract",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.DbProject.one",
-        AsyncMock(
-            return_value=SimpleNamespace(
-                data_extract_geojson={
-                    "type": "FeatureCollection",
-                    "features": [{"type": "Feature"}],
-                }
-            )
-        ),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.split_aoi",
-        AsyncMock(return_value={"type": "FeatureCollection", "features": []}),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.save_task_areas",
-        AsyncMock(return_value=0),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.finalize_qfield_project",
-        AsyncMock(return_value=SimpleNamespace(qfield_url="https://example.com/p/777")),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.claim_simple_project_basemap_generation",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._autostart_basemap_for_simple_project",
-        AsyncMock(return_value=None),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.asyncio.create_task",
-        lambda coro: (coro.close(), Mock())[1],
-    )
-    monkeypatch.setattr(
         "app.htmx.project_create.project_create_simple_flow.get_user_sub",
         lambda _auth_user: "user-sub-1",
+    )
+    monkeypatch.setattr(
+        "app.htmx.project_create.project_create_submit_routes.DbProject.update",
+        AsyncMock(),
+    )
+    monkeypatch.setattr(
+        "app.htmx.project_create.project_create_submit_routes._run_simple_project_creation_background",
+        AsyncMock(),
+    )
+    monkeypatch.setattr(
+        "app.htmx.project_create.project_create_submit_routes.asyncio.create_task",
+        lambda coro: (coro.close(), Mock())[1],
     )
 
     response = await create_simple_project_htmx.fn(
@@ -777,95 +289,10 @@ async def test_create_simple_project_htmx_uses_deterministic_fallback_name(monke
     )
 
     assert response.status_code == status.HTTP_200_OK
-    assert response.headers["HX-Redirect"] == "/projects/777"
+    assert response.headers["HX-Redirect"] == "/projects/777/creating"
     assert captured["project_name_1"].startswith("Area 27.7050_85.3050")
     assert captured["project_name_1"] != "Unnamed Area OSM Buildings"
     assert captured["project_name_2"].startswith("Area 27.7050_85.3050 OSM Buildings ")
-
-
-async def test_create_simple_project_htmx_skips_autostart_when_claim_not_acquired(
-    monkeypatch,
-):
-    """Simple creation should not enqueue autostart when claim is already held."""
-
-    async def fake_derive_simple_project_metadata(*, db, outline):
-        return (
-            "Kathmandu OSM Buildings",
-            "Simple workflow project",
-            ["#osm", "#buildings", "#simple"],
-            "Kathmandu, Nepal",
-        )
-
-    async def fake_create_project_stub(**kwargs):
-        return SimpleNamespace(id=333)
-
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes.derive_simple_project_metadata",
-        fake_derive_simple_project_metadata,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._create_simple_project_stub",
-        fake_create_project_stub,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_default_buildings_template_bytes",
-        AsyncMock(return_value=b"xlsx-bytes"),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.process_xlsform",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.prepare_simple_project_data_extract",
-        AsyncMock(),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.DbProject.one",
-        AsyncMock(
-            return_value=SimpleNamespace(
-                data_extract_geojson={
-                    "type": "FeatureCollection",
-                    "features": [{"type": "Feature"}],
-                }
-            )
-        ),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.split_aoi",
-        AsyncMock(return_value={"type": "FeatureCollection", "features": []}),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.save_task_areas",
-        AsyncMock(return_value=0),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.finalize_qfield_project",
-        AsyncMock(return_value=SimpleNamespace(qfield_url="https://example.com/p/333")),
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.claim_simple_project_basemap_generation",
-        AsyncMock(return_value=False),
-    )
-    create_task_mock = Mock()
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.asyncio.create_task",
-        create_task_mock,
-    )
-    monkeypatch.setattr(
-        "app.htmx.project_create.project_create_simple_flow.get_user_sub",
-        lambda _auth_user: "user-sub-1",
-    )
-
-    response = await create_simple_project_htmx.fn(
-        request=Mock(),
-        db=AsyncMock(),
-        auth_user=Mock(),
-        data={"outline": json.dumps({"type": "Polygon", "coordinates": []})},
-    )
-
-    assert response.status_code == status.HTTP_200_OK
-    assert response.headers["HX-Redirect"] == "/projects/333"
-    create_task_mock.assert_not_called()
 
 
 async def test_create_simple_project_htmx_handles_service_error(monkeypatch):
@@ -888,6 +315,131 @@ async def test_create_simple_project_htmx_handles_service_error(monkeypatch):
 
     assert response.status_code == status.HTTP_200_OK
     assert "Failed to create simple project" in response.content
+
+
+class _ConnCtx:
+    """Async context manager that hands back a single mock DB connection."""
+
+    def __init__(self, db):
+        self._db = db
+
+    async def __aenter__(self):
+        return self._db
+
+    async def __aexit__(self, exc_type, exc, tb):
+        return False
+
+
+async def test_run_simple_project_creation_background_marks_ready(monkeypatch):
+    """Background runner should persist creation_status='ready' after finalize."""
+    db = Mock()
+    db.commit = AsyncMock()
+
+    async def _connect(_):
+        return _ConnCtx(db)
+
+    monkeypatch.setattr(project_create_simple_flow.AsyncConnection, "connect", _connect)
+    finalize_mock = AsyncMock(return_value=(True, {}))
+    monkeypatch.setattr(
+        project_create_simple_flow,
+        "finalize_simple_project_creation",
+        finalize_mock,
+    )
+    update_mock = AsyncMock()
+    monkeypatch.setattr(project_create_simple_flow.DbProject, "update", update_mock)
+
+    await project_create_simple_flow.run_simple_project_creation_background(
+        42, {"type": "Polygon", "coordinates": []}
+    )
+
+    finalize_mock.assert_awaited_once()
+    assert update_mock.await_count == 1
+    project_update = update_mock.await_args.args[2]
+    assert project_update.creation_status == "ready"
+    assert project_update.creation_error is None
+    assert project_update.creation_updated_at is not None
+    db.commit.assert_awaited_once()
+
+
+async def test_run_simple_project_creation_background_marks_failed(monkeypatch):
+    """Finalize errors should land as creation_status='failed' with the message."""
+    happy_db = Mock()
+    happy_db.commit = AsyncMock()
+    failure_db = Mock()
+    failure_db.commit = AsyncMock()
+    contexts = [_ConnCtx(happy_db), _ConnCtx(failure_db)]
+
+    async def _connect(_):
+        return contexts.pop(0)
+
+    monkeypatch.setattr(project_create_simple_flow.AsyncConnection, "connect", _connect)
+    monkeypatch.setattr(
+        project_create_simple_flow,
+        "finalize_simple_project_creation",
+        AsyncMock(side_effect=SvcValidationError("Split failed for AOI")),
+    )
+    update_mock = AsyncMock()
+    monkeypatch.setattr(project_create_simple_flow.DbProject, "update", update_mock)
+
+    await project_create_simple_flow.run_simple_project_creation_background(
+        99, {"type": "Polygon", "coordinates": []}
+    )
+
+    assert update_mock.await_count == 1
+    project_update = update_mock.await_args.args[2]
+    assert project_update.creation_status == "failed"
+    assert project_update.creation_error == "Split failed for AOI"
+    failure_db.commit.assert_awaited_once()
+    happy_db.commit.assert_not_awaited()
+
+
+async def test_project_creation_status_returns_hx_redirect_when_ready(monkeypatch):
+    """Polling fragment should respond with HX-Redirect once creation completes."""
+    ready_project = SimpleNamespace(id=10, creation_status="ready")
+    monkeypatch.setattr(
+        "app.htmx.project_create.project_create_submit_routes.DbProject.one",
+        AsyncMock(return_value=ready_project),
+    )
+
+    response = await project_creation_status.fn(
+        request=Mock(), db=AsyncMock(), auth_user=Mock(), project_id=10
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.headers["HX-Redirect"] == "/projects/10"
+
+
+async def test_project_creation_status_renders_fragment_when_in_progress(monkeypatch):
+    """Polling fragment should re-render while creation is still in progress."""
+    pending_project = SimpleNamespace(id=11, creation_status="in_progress")
+    monkeypatch.setattr(
+        "app.htmx.project_create.project_create_submit_routes.DbProject.one",
+        AsyncMock(return_value=pending_project),
+    )
+
+    response = await project_creation_status.fn(
+        request=Mock(), db=AsyncMock(), auth_user=Mock(), project_id=11
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.template_name.endswith("creating_fragment.html")
+    assert response.context["project"] is pending_project
+
+
+async def test_project_creating_page_redirects_when_already_ready(monkeypatch):
+    """Hitting /creating after finalize finishes should redirect to the project."""
+    ready_project = SimpleNamespace(id=12, creation_status="ready")
+    monkeypatch.setattr(
+        "app.htmx.project_create.project_create_submit_routes.DbProject.one",
+        AsyncMock(return_value=ready_project),
+    )
+
+    response = await project_creating_page.fn(
+        request=Mock(), db=AsyncMock(), auth_user=Mock(), project_id=12
+    )
+
+    assert response.headers["Location"] == "/projects/12"
+    assert response.status_code == status.HTTP_303_SEE_OTHER
 
 
 async def test_prepare_simple_project_data_extract_falls_back_on_no_valid_geometries(

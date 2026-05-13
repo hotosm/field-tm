@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-11 22:06+0100\n"
+"POT-Creation-Date: 2026-05-13 04:50+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: yo\n"
@@ -140,7 +140,7 @@ msgstr "%(action)s kuna pẹlu HTTP %(status_code)s."
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s kuna nitori aṣiṣe asopọ oke."
 
-#: app/helpers/basemap_services.py:178
+#: app/helpers/basemap_services.py:181
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack API da HTTP %(status_code)s pada."
@@ -248,12 +248,12 @@ msgid "Project not found."
 msgstr "A kò rí iṣẹ́ náà."
 
 #: app/htmx/project_detail_routes.py:321
-#: app/htmx/setup_steps/setup_step_responses.py:71
+#: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Aṣiṣe: %(error_msg)s"
 
-#: app/htmx/basemap/basemap_attach_flow.py:67
+#: app/htmx/basemap/basemap_attach_flow.py:68
 msgid ""
 "Basemap attach failed for now. Your project is ready to use. Please retry"
 " attach."
@@ -261,7 +261,7 @@ msgstr ""
 "Fifi basemap mọ́ iṣẹ́ kuna fun báyìí. Iṣẹ́ akanṣe rẹ ti ṣetan fun lilo. "
 "Jọwọ tún gbiyanju lati fi i mọ́."
 
-#: app/htmx/basemap/basemap_attach_flow.py:72
+#: app/htmx/basemap/basemap_attach_flow.py:73
 msgid ""
 "Basemap attach could not complete due to a temporary network issue. Your "
 "project is ready to use. Please retry attach."
@@ -269,23 +269,27 @@ msgstr ""
 "A ko le pari fifi basemap mọ́ nitori iṣoro nẹ́tíwọ́ọ̀kì igba diẹ. Iṣẹ́ "
 "akanṣe rẹ ti ṣetan fun lilo. Jọwọ tún gbiyanju lati fi i mọ́."
 
-#: app/htmx/basemap/basemap_attach_flow.py:87
+#: app/htmx/basemap/basemap_attach_flow.py:122
 msgid "Basemap attach is available after publication."
 msgstr "Fifi basemap pọ wà lẹ́yìn ìtẹ̀jáde."
 
-#: app/htmx/basemap/basemap_attach_flow.py:96
+#: app/htmx/basemap/basemap_attach_flow.py:131
 msgid "Basemap attach is only available for QField projects."
 msgstr "Fifi basemap pọ wà fún àwọn iṣẹ́ QField nìkan."
 
-#: app/htmx/basemap/basemap_attach_flow.py:106
+#: app/htmx/basemap/basemap_attach_flow.py:141
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "Basemap kò tíì ṣetán. Jọ̀wọ́ dúró kí ìṣelọpọ parí."
 
-#: app/htmx/basemap/basemap_attach_flow.py:115
-msgid "No generated basemap download URL is available yet."
-msgstr "Kò sí URL ìgbàkalẹ̀ basemap tí a ṣe tó wà báyìí."
+#: app/htmx/basemap/basemap_attach_flow.py:156
+msgid ""
+"Basemap download URL is not available yet. Please refresh status and try "
+"again shortly."
+msgstr ""
+"URL ìgbasilẹ basemap kò tíì sí. Jọ̀wọ́ tún ipo ṣe kí o sì gbìyànjú "
+"lẹ́ẹ̀kansi laipẹ."
 
-#: app/htmx/basemap/basemap_attach_flow.py:129
+#: app/htmx/basemap/basemap_attach_flow.py:172
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -293,35 +297,35 @@ msgid ""
 msgstr "A kò tíì túnto fifi basemap QField pọ sí ìfìdíkalẹ̀ yìí. %(config)s ò sí."
 
 #: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:91
+#: app/htmx/setup_steps/setup_step_responses.py:90
 msgid "Project not found or access denied."
 msgstr "A kò rí iṣẹ́ náà tàbí a kọ ọ́ láàyè."
 
-#: app/htmx/basemap/basemap_fragments.py:112
+#: app/htmx/basemap/basemap_fragments.py:105
 msgid "Basemap attached to QField project successfully."
 msgstr "A so basemap pọ mọ iṣẹ QField ni aṣeyọri."
 
-#: app/htmx/basemap/basemap_fragments.py:122
+#: app/htmx/basemap/basemap_fragments.py:115
 msgid "Basemap attach has not started yet."
 msgstr "Fifi basemap pọ kò tíì bẹ̀rẹ̀."
 
-#: app/htmx/basemap/basemap_fragments.py:133
+#: app/htmx/basemap/basemap_fragments.py:126
 msgid "Failed to search imagery right now. Please try again shortly."
 msgstr "A kò lè wá àwọn àwòrán báyìí. Jọ̀wọ́ tún gbìyànjú láìpẹ́."
 
-#: app/htmx/basemap/basemap_fragments.py:146
+#: app/htmx/basemap/basemap_fragments.py:139
 msgid "Failed to start basemap generation right now. Please try again shortly."
 msgstr "A kò lè bẹ̀rẹ̀ ṣíṣe basemap báyìí. Jọ̀wọ́ tún gbìyànjú láìpẹ́."
 
-#: app/htmx/basemap/basemap_fragments.py:160
+#: app/htmx/basemap/basemap_fragments.py:153
 msgid "Failed to refresh basemap status right now. Please try again shortly."
 msgstr "A kò lè tún ipo basemap ṣe báyìí. Jọ̀wọ́ tún gbìyànjú láìpẹ́."
 
-#: app/htmx/basemap/basemap_routes.py:93
+#: app/htmx/basemap/basemap_routes.py:113
 msgid "Basemap tools are available after publication."
 msgstr "Àwọn irinṣẹ́ basemap wà lẹ́yìn ìtẹ̀jáde."
 
-#: app/htmx/basemap/basemap_routes.py:253
+#: app/htmx/basemap/basemap_routes.py:273
 msgid "No basemap generation in progress."
 msgstr "Iṣẹ́ maapu pápá ń lọ lọwọ"
 
@@ -333,7 +337,7 @@ msgstr ""
 "Agbegbe iṣẹ akanṣe gbọdọ jẹ JSON to wulo (GeoJSON Polygon, MultiPolygon, "
 "Feature, tabi FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:55
+#: app/htmx/project_create/project_create_simple_flow.py:60
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -341,12 +345,13 @@ msgstr ""
 "A ko ri awọn ile OSM ti o wa tẹlẹ ni agbegbe yii. Tẹsiwaju maapu lati "
 "ibẹrẹ."
 
-#: app/htmx/project_create/project_create_simple_flow.py:152
+#: app/htmx/project_create/project_create_simple_flow.py:157
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr "A ko le gbe fọọmu OSM Buildings aiyipada fun ṣiṣẹda iṣẹ akanṣe rọọrun."
 
-#: app/htmx/project_create/project_create_submit_routes.py:139
-#: app/htmx/project_create/project_create_submit_routes.py:200
+#: app/htmx/project_create/project_create_simple_flow.py:269
+#: app/htmx/project_create/project_create_submit_routes.py:140
+#: app/htmx/project_create/project_create_submit_routes.py:209
 msgid "An unexpected error occurred. Please try again."
 msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ. Jọwọ gbiyanju lẹẹkansi."
 
@@ -372,7 +377,7 @@ msgstr "Olumulo yìí kò sí. Jọwọ dá a sílẹ̀ kíákíá."
 msgid "This user is already a collaborator on this project."
 msgstr "Olumulo yìí ti jẹ́ alábàáṣiṣẹ́pọ̀ lórí iṣẹ́ yìí tẹ́lẹ̀."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1257
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1360
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "Fífikun alábàáṣiṣẹ́pọ̀ kuna: %(exc)s"
@@ -507,8 +512,8 @@ msgstr "kúrò nínú iṣẹ́ yìí?"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
 #: app/templates/new_project_custom.html:156
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:66
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:156
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:177
 msgid "Cancel"
 msgstr "Fagilé"
 
@@ -529,9 +534,9 @@ msgid "No collaborators yet."
 msgstr "Kò tíì sí alábàáṣiṣẹ́pọ̀ kankan."
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:218
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:90
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:96
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:129
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:91
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:97
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:140
 #: app/templates/qfc_admin.html:52
 msgid "Username"
 msgstr "Orúkọ olumulo"
@@ -723,11 +728,11 @@ msgstr ""
 "láti fipamọ́. Bí kò bá rí bẹ́ẹ̀, ṣàtúnṣe àwọn ìwọn tó wà lókè kí o sì tẹ "
 "\"Split Again\" láti tún ṣẹ̀dá a."
 
-#: app/htmx/setup_steps/setup_step_responses.py:86
+#: app/htmx/setup_steps/setup_step_responses.py:85
 msgid "An unexpected error occurred"
 msgstr "Aṣiṣe airotẹlẹ ṣẹlẹ"
 
-#: app/htmx/setup_steps/setup_step_responses.py:161
+#: app/htmx/setup_steps/setup_step_responses.py:160
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -737,7 +742,7 @@ msgstr ""
 " bá a lọ, fi àwọn àlàyé imọ̀ẹ̀rọ tó wà ní isalẹ ranṣẹ́ sí alabojuto "
 "àpẹẹrẹ rẹ tàbí ẹgbẹ́ atilẹyin."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:96
+#: app/htmx/setup_steps/setup_step_split_routes.py:99
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -745,7 +750,7 @@ msgstr ""
 "A kò rí ìyọkúrò data kankan. Jọwọ gba data OSM wọlé tàbí gbe fáìlì "
 "GeoJSON sókè kọ́kọ́."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:127
+#: app/htmx/setup_steps/setup_step_split_routes.py:130
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -754,7 +759,7 @@ msgstr ""
 "A ń fi gbogbo AOI hàn (láìpín) pẹ̀lú %(data_feature_count)s àwọn ẹ̀yà "
 "data. Gbogbo AOI náà ni a máa lò gẹ́gẹ́ bí iṣẹ́ kan ṣoṣo."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:134
+#: app/htmx/setup_steps/setup_step_split_routes.py:137
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -763,11 +768,11 @@ msgstr ""
 "A ń fi ààlà iṣẹ́ %(task_count)s àti %(data_feature_count)s àwọn ẹ̀yà data"
 " hàn pọ̀."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:187
+#: app/htmx/setup_steps/setup_step_split_routes.py:190
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "A kò rí àgbékalẹ̀ iṣẹ́ náà. Kò ṣee ṣe láti foju kọ́ pínpín iṣẹ́."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:209
+#: app/htmx/setup_steps/setup_step_split_routes.py:215
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
@@ -775,23 +780,23 @@ msgstr ""
 "✓ A foju kọ́ pínpín iṣẹ́. Gbogbo AOI ni a máa lò gẹ́gẹ́ bí iṣẹ́ kan ṣoṣo."
 " O lè lọ sí Ìgbésẹ̀ 5."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:263
+#: app/htmx/setup_steps/setup_step_split_routes.py:270
 msgid "Please select a splitting option."
 msgstr "Jọwọ yan ọ̀nà pínpín kan."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:284
+#: app/htmx/setup_steps/setup_step_split_routes.py:294
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ Kò sí dandan fún pínpín iṣẹ́ nínú ètò iṣẹ́ yìí."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:333
+#: app/htmx/setup_steps/setup_step_split_routes.py:344
 msgid "No task areas data provided."
 msgstr "A kò pèsè data agbègbè iṣẹ́ kankan."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:337
+#: app/htmx/setup_steps/setup_step_split_routes.py:348
 msgid "Invalid task areas data format."
 msgstr "Ọ̀nà ìṣètò data agbègbè iṣẹ́ kò tọ́."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:357
+#: app/htmx/setup_steps/setup_step_split_routes.py:371
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ A ti fipamọ́ àwọn iṣẹ́ tí a pín ní àṣeyọrí"
 
@@ -871,88 +876,97 @@ msgstr "Agbegbe {latitude:.4f}_{longitude:.4f}"
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:164
+#: app/qfield/qfield_crud.py:166
 msgid "Project outline is missing or has no geometry."
 msgstr "sonu tabi ko ni geometry."
 
-#: app/qfield/qfield_crud.py:170
+#: app/qfield/qfield_crud.py:172
 msgid "Project outline geometry has no coordinates."
 msgstr "ko ni awọn ipoidojuko."
 
-#: app/qfield/qfield_crud.py:479
+#: app/qfield/qfield_crud.py:476
 msgid "Project outline is required for QField project creation."
 msgstr "✓ Kò sí dandan fún pínpín iṣẹ́ nínú ètò iṣẹ́ yìí."
 
-#: app/qfield/qfield_crud.py:484
+#: app/qfield/qfield_crud.py:481
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm wa ni ti beere fun QField ise agbese ẹda."
 
-#: app/qfield/qfield_crud.py:501
+#: app/qfield/qfield_crud.py:498
 msgid "Failed to modify XLSForm for QField."
 msgstr "Kuna lati yipada XLSForm fun QField."
 
-#: app/qfield/qfield_crud.py:542
+#: app/qfield/qfield_crud.py:539
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS wrapper ti pari ṣugbọn ko kọ awọn faili ti o wu jade."
 
-#: app/qfield/qfield_crud.py:554
+#: app/qfield/qfield_crud.py:551
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS wrapper ti pari ṣugbọn ko si faili .qgz ninu iṣẹjade."
 
-#: app/qfield/qfield_crud.py:584
+#: app/qfield/qfield_crud.py:581
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField ID ise agbese sonu; ko le so basemap."
 
-#: app/qfield/qfield_crud.py:618
+#: app/qfield/qfield_crud.py:615
 msgid "Basemap attach completed but produced no project files."
 msgstr "A ti so basemapu mọ iṣẹ́ QField."
 
-#: app/qfield/qfield_crud.py:771 app/qfield/qfield_crud.py:785
+#: app/qfield/qfield_crud.py:801
+#, python-format
+msgid ""
+"QFieldCloud did not finish processing the project file after %(attempts)d"
+" attempts (last status: %(status)s)."
+msgstr ""
+"QFieldCloud kò parí sisẹ faili iṣẹ akanṣe lẹ́yìn ìgbìyànjú %(attempts)d "
+"(ipo ikẹhin: %(status)s)."
+
+#: app/qfield/qfield_crud.py:855 app/qfield/qfield_crud.py:869
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS iran ise agbese kuna: %(error)s"
 
-#: app/qfield/qfield_crud.py:778
+#: app/qfield/qfield_crud.py:862
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS pada JSON ti ko tọ."
 
-#: app/qfield/qfield_crud.py:802
+#: app/qfield/qfield_crud.py:886
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "Kuna lati ṣe igbasilẹ maapu ipilẹ MBTiles fun ikojọpọ (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:817
+#: app/qfield/qfield_crud.py:901
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "Ṣe igbasilẹ kóòdù QR"
 
-#: app/qfield/qfield_crud.py:932
+#: app/qfield/qfield_crud.py:1027
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "kuna lati gbe awọn faili sori QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1206
+#: app/qfield/qfield_crud.py:1309
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "A kò rí iṣẹ́ (%(project_id)s)."
 
-#: app/qfield/qfield_crud.py:1226
+#: app/qfield/qfield_crud.py:1329
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
 " to the organization: %(error)s"
 msgstr "jẹ ti agbari '%(owner)s'. Ko le fi '%(username)s' kun si ajo: %(error)s"
 
-#: app/qfield/qfield_crud.py:1244
+#: app/qfield/qfield_crud.py:1347
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "'%(username)s' ko si lori QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1251
+#: app/qfield/qfield_crud.py:1354
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "Olumulo '%(username)s' ti jẹ́ alábàáṣiṣẹ́pọ̀ lórí iṣẹ́ yìí tẹlẹ."
 
-#: app/qfield/qfield_crud.py:1292
+#: app/qfield/qfield_crud.py:1395
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Àwọn ìdánimọ̀ wulo!"
 
@@ -1013,7 +1027,7 @@ msgid "Search projects…"
 msgstr "Ṣàwárí iṣẹ́…"
 
 #: app/templates/home.html:68 app/templates/landing.html:503
-#: app/templates/layout.html:280 app/templates/new_project_chooser.html:1
+#: app/templates/layout.html:281 app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "Dá iṣẹ́ sílẹ̀"
@@ -1333,15 +1347,15 @@ msgstr "Ímẹ́lì:"
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Iṣẹ́ maapu pápá tó wà ní ìṣọ̀kan fún àwọn ìpolongo Open Mapping."
 
-#: app/templates/layout.html:195 app/templates/login.html:1
+#: app/templates/layout.html:196 app/templates/login.html:1
 msgid "Login"
 msgstr "Wọlé"
 
-#: app/templates/layout.html:273
+#: app/templates/layout.html:274
 msgid "Projects"
 msgstr "Àwọn iṣẹ́"
 
-#: app/templates/layout.html:287
+#: app/templates/layout.html:288
 msgid "QField Admin"
 msgstr "Alabojuto QField"
 
@@ -1575,8 +1589,8 @@ msgid "Description is required."
 msgstr "Àpèjúwe jẹ́ dandan."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup - OSM Buildings"
-msgstr "Ilé OSM"
+msgid "Quick Setup — OSM Buildings"
+msgstr "Eto Yara — Awọn ile OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""
@@ -1612,6 +1626,11 @@ msgstr "So mọ Iṣẹ Akanṣe QField"
 msgid "Creating project and preparing map..."
 msgstr "N ṣẹda iṣẹ akanṣe ati n mura maapu..."
 
+#: app/templates/new_project_simple_creating.html:2
+msgid "Creating Project"
+msgstr "N ṣẹda iṣẹ akanṣe"
+
+#: app/templates/partials/new_project/creating_fragment.html:11
 #: app/templates/project_details.html:6 app/templates/project_details.html:166
 #: app/templates/project_details.html:177
 msgid "Back to Projects"
@@ -1697,7 +1716,7 @@ msgstr ""
 msgid "Enter your QFieldCloud credentials to manage collaborators."
 msgstr "Tẹ àwọn ìdánimọ̀ QFieldCloud rẹ láti ṣakoso àwọn alábàáṣiṣẹ́pọ̀."
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:117
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:128
 #: app/templates/qfc_admin.html:36
 msgid "QField Cloud URL"
 msgstr "URL QField Cloud"
@@ -1710,9 +1729,9 @@ msgstr "URL ìpilẹ̀ àpẹẹrẹ QFieldCloud rẹ (láìsí /api/v1)."
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:102
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:108
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:141
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:103
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:109
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:152
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "Ọ̀rọ̀ aṣínà"
@@ -1744,6 +1763,32 @@ msgstr "Àwọn olumulo tí a forúkọsílẹ̀"
 #: app/templates/partials/metrics.html:33
 msgid "Supported Mapping Apps"
 msgstr "Àwọn ohun èlò maapu tí a ń ṣètìlẹ́yìn fún"
+
+#: app/templates/partials/new_project/creating_fragment.html:4
+msgid "Project creation failed."
+msgstr "Ṣiṣẹda iṣẹ akanṣe kuna."
+
+#: app/templates/partials/new_project/creating_fragment.html:6
+msgid "An unexpected error occurred."
+msgstr "Aṣiṣe airotẹlẹ kan ṣẹlẹ."
+
+#: app/templates/partials/new_project/creating_fragment.html:10
+msgid "Try Again"
+msgstr "Gbiyanju lẹẹkansi"
+
+#: app/templates/partials/new_project/creating_fragment.html:23
+msgid "Setting up your project..."
+msgstr "N ṣeto iṣẹ akanṣe rẹ..."
+
+#: app/templates/partials/new_project/creating_fragment.html:25
+msgid ""
+"Downloading map data, splitting tasks, and preparing the QField project.\n"
+"    This can take a minute or two - this page will redirect automatically"
+" when ready."
+msgstr ""
+"N gba data maapu silẹ, n pin awọn iṣẹ, ati n mura iṣẹ akanṣe QField.\n"
+"    Eyi le gba iṣẹju kan tabi meji - oju-iwe yii yoo darí ọ laifọwọyi "
+"nigbati o ba ti ṣetan."
 
 #: app/templates/partials/new_project/map_script.html:3
 msgid "Area"
@@ -1843,15 +1888,27 @@ msgstr ""
 "Wá àwọn àwòrán HOT OpenAerialMap fún AOI yìí, kí o sì dá basemap MBTiles "
 "ṣẹ̀dá."
 
-#: app/templates/partials/project_details/basemap_section.html:26
+#: app/templates/partials/project_details/basemap_section.html:32
+msgid ""
+"A basemap job is currently in progress. Wait for it to finish before "
+"starting a new search."
+msgstr ""
+"Iṣẹ basemap kan ń lọ lọwọlọwọ. Duro kí o pari kí o tó bẹ̀rẹ̀ ìwádìí "
+"tuntun."
+
+#: app/templates/partials/project_details/basemap_section.html:37
 msgid "Search OAM Imagery"
 msgstr "Wá àwòrán OAM"
 
-#: app/templates/partials/project_details/basemap_section.html:37
+#: app/templates/partials/project_details/basemap_section.html:41
+msgid "Search is disabled while a basemap job is running."
+msgstr "A ti pa ìwádìí nigba ti iṣẹ basemap ń ṣiṣẹ."
+
+#: app/templates/partials/project_details/basemap_section.html:56
 msgid "Basemap generation previously failed. Please search again and retry."
 msgstr "Ṣíṣe basemap ti kuna tẹ́lẹ̀. Jọ̀wọ́ tún wá a kí o sì tún gbìyànjú."
 
-#: app/templates/partials/project_details/basemap_section.html:41
+#: app/templates/partials/project_details/basemap_section.html:60
 msgid "No basemap selected yet."
 msgstr "Kò tíì sí basemap tí a yàn."
 
@@ -2108,7 +2165,7 @@ msgstr "Àwọn ìdánimọ̀ kò tọ́. Jọwọ ṣàyẹ̀wò kí o sì tún
 msgid "Error testing credentials: %(message)s"
 msgstr "Aṣiṣe nígbà tí a ń dán àwọn ìdánimọ̀ wò: %(message)s"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:159
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:180
 #: app/templates/partials/project_details/style_and_scripts.html:47
 msgid "Test Credentials"
 msgstr "Ṣàyẹ̀wò àwọn ìdánimọ̀"
@@ -2126,7 +2183,7 @@ msgstr "A ń dá iṣẹ́ sílẹ̀ nínú %(project_type)s... Èyí lè gba à
 msgid "Error:"
 msgstr "Aṣiṣe:"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:8
+#: app/templates/partials/project_details/fragments/basemap_progress.html:5
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
 "      use. Please retry attach."
@@ -2134,94 +2191,108 @@ msgstr ""
 "Fifi basemap mọ́ iṣẹ́ kuna fun báyìí. Iṣẹ́ akanṣe rẹ ti ṣetan fun lilo. "
 "Jọwọ tún gbiyanju lati fi i mọ́."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:23
+#: app/templates/partials/project_details/fragments/basemap_progress.html:20
 msgid "Retry Attach"
 msgstr "Tún fi pọ̀"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:29
+#: app/templates/partials/project_details/fragments/basemap_progress.html:26
 msgid ""
-"Basemap attach is in progress. Use the button below to check the latest "
-"status."
+"Basemap is attaching to the QField project. This can take a minute; click"
+" below to check\n"
+"      the latest status."
 msgstr ""
-"Fifi basemap pọ ń lọ lọwọ. Lo bọtìnì tó wà ní isalẹ láti ṣàyẹ̀wò ipo "
-"tuntun jù."
+"A ń so basemap mọ́ iṣẹ akanṣe QField. Eyi le gba iṣẹju kan; tẹ ni isalẹ "
+"lati ṣayẹwo ipo tuntun."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:43
-#: app/templates/partials/project_details/fragments/basemap_progress.html:48
-#: app/templates/partials/project_details/fragments/basemap_progress.html:111
-#: app/templates/partials/project_details/fragments/basemap_progress.html:116
+#: app/templates/partials/project_details/fragments/basemap_progress.html:41
+#: app/templates/partials/project_details/fragments/basemap_progress.html:104
 msgid "Checking..."
 msgstr "N ṣàyẹ̀wò..."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:44
-#: app/templates/partials/project_details/fragments/basemap_progress.html:48
-#: app/templates/partials/project_details/fragments/basemap_progress.html:112
-#: app/templates/partials/project_details/fragments/basemap_progress.html:116
+#: app/templates/partials/project_details/fragments/basemap_progress.html:42
+#: app/templates/partials/project_details/fragments/basemap_progress.html:45
+#: app/templates/partials/project_details/fragments/basemap_progress.html:105
+#: app/templates/partials/project_details/fragments/basemap_progress.html:108
 msgid "Check Status"
 msgstr "Ipò iṣẹ́"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:69
+#: app/templates/partials/project_details/fragments/basemap_progress.html:62
 msgid ""
-"Basemap generation is in progress. Use the button below to check the "
-"latest status."
+"Basemap generation is in progress on the imagery server. Click below to "
+"check whether\n"
+"      it's ready."
 msgstr ""
-"Ṣiṣẹda basemap n lọ lọwọ. Lo bọtini ti o wa ni isalẹ lati ṣayẹwo ipo "
-"tuntun julọ."
+"Ṣiṣẹda basemap ń lọ lori olupin aworan. Tẹ ni isalẹ lati ṣayẹwo boya o ti"
+" ṣetan."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:70
+#: app/templates/partials/project_details/fragments/basemap_progress.html:63
 msgid "STAC item"
 msgstr "Ohun STAC"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:71
+#: app/templates/partials/project_details/fragments/basemap_progress.html:64
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:15
 msgid "Zoom"
 msgstr "Sún"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:3
+#: app/templates/partials/project_details/fragments/basemap_ready.html:4
 msgid ""
 "Basemap attached to\n"
 "    QField project."
 msgstr "A ti fi basemap mọ́ iṣẹ́ akanṣe QField."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:4
+#: app/templates/partials/project_details/fragments/basemap_ready.html:5
 msgid ""
 "Basemap is\n"
 "    ready. Attaching to QField project in progress."
 msgstr "Basemap ti ṣetan. Ilana sisọ ọ mọ iṣẹ akanṣe QField n lọ lọwọ."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:5
+#: app/templates/partials/project_details/fragments/basemap_ready.html:7
 msgid ""
-"Basemap is ready. Not yet\n"
-"    attached to QField project."
-msgstr "Basemap ti ṣetan. Ṣugbọn a kò tíì so ọ mọ iṣẹ akanṣe QField."
+"Basemap is ready, but attach to the QField project failed.\n"
+"    Please retry attach."
+msgstr ""
+"Basemap ti ṣetan, ṣugbọn sisọ mọ́ iṣẹ akanṣe QField kuna.\n"
+"    Jọ̀wọ́ tún gbìyànjú sisọ mọ́."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:6
+#: app/templates/partials/project_details/fragments/basemap_ready.html:8
+msgid ""
+"Basemap is ready. Not yet attached to QField\n"
+"    project."
+msgstr ""
+"Basemap ti ṣetan. Ko tíì so mọ́ iṣẹ akanṣe\n"
+"    QField."
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:9
 msgid "Basemap is ready."
 msgstr "Basemap ti ṣetan."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:8
-msgid "Total size"
-msgstr "Iwọn lapapọ"
+#: app/templates/partials/project_details/fragments/basemap_ready.html:10
+msgid ""
+"Total\n"
+"    size"
+msgstr ""
+"Iwọn\n"
+"    lapapọ"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:9
+#: app/templates/partials/project_details/fragments/basemap_ready.html:12
 msgid "Available Zoom"
 msgstr "Sun-un to wa"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:21
+#: app/templates/partials/project_details/fragments/basemap_ready.html:24
 msgid "Download MBTiles"
 msgstr "Ṣe igbasilẹ MBTiles"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:30
+#: app/templates/partials/project_details/fragments/basemap_ready.html:33
 #: app/templates/partials/project_details/fragments/basemap_search_results.html:26
 msgid "View Metadata"
 msgstr "Wo metadata"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:43
-#: app/templates/partials/project_details/fragments/basemap_ready.html:54
+#: app/templates/partials/project_details/fragments/basemap_ready.html:46
+#: app/templates/partials/project_details/fragments/basemap_ready.html:57
 msgid "Attach to QField Project"
 msgstr "So mọ Iṣẹ Akanṣe QField"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:61
+#: app/templates/partials/project_details/fragments/basemap_ready.html:64
 msgid ""
 "Use the ODK offline maps documentation to configure this MBTiles file in "
 "Collect."
@@ -2633,43 +2704,63 @@ msgstr ""
 msgid "Use custom credentials"
 msgstr "Ìdánimọ̀ àdáni"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:59
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:60
 msgid "Confirm Project Finalisation"
 msgstr "Jẹ́rìí ìparí iṣẹ́"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:63
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:64
 msgid "Are you sure you want to finalise this project?"
 msgstr "Ṣé o dá ọ lójú pé o fẹ́ parí iṣẹ́ yìí?"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:68
 msgid "Confirm & Finalise"
 msgstr "Jẹ́rìí kí o sì parí"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:73
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:74
 msgid "Custom Credentials"
 msgstr "Ìdánimọ̀ àdáni"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:78
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:79
 msgid "ODK Central URL"
 msgstr "URL ODK Central"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:84
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:85
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:118
+msgid "Where should this project live?"
+msgstr "Nibo ni iṣẹ akanṣe yii yẹ kí o wa?"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:122
+msgid "Use my account on app.qfield.cloud"
+msgstr "Lo akanti mi lori app.qfield.cloud"
+
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:123
+msgid "Use a custom-hosted QFieldCloud instance"
+msgstr "Lo QFieldCloud ti a gbalejo funra rẹ"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:134
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:135
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:146
 msgid "qfield_username"
 msgstr "qfield_username"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:147
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:158
 msgid "qfield_password"
 msgstr "qfield_password"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:162
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:163
+msgid "Organisation name"
+msgstr "Orukọ agbari"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:168
+msgid "Optional - leave blank to create under your username"
+msgstr "Aṣayan - fi silẹ ni ofo lati ṣẹda labẹ orukọ olumulo rẹ"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "Fipamọ́ kí o sì tẹ̀síwájú"
 

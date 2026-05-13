@@ -1,0 +1,29 @@
+{% if project and project.creation_status == 'failed' %}
+<div id="creating-fragment" style="text-align: center">
+  <wa-callout variant="danger" style="text-align: left">
+    <strong>{{ _("Project creation failed.") }}</strong>
+    <div style="margin-top: 6px">
+      {{ project.creation_error or _("An unexpected error occurred.") }}
+    </div>
+  </wa-callout>
+  <div style="margin-top: 16px; display: flex; gap: 10px; justify-content: center">
+    <wa-button href="/new/simple" variant="brand">{{ _("Try Again") }}</wa-button>
+    <wa-button href="/projects" variant="default">{{ _("Back to Projects") }}</wa-button>
+  </div>
+</div>
+{% else %}
+<div
+  id="creating-fragment"
+  hx-get="/projects/{{ project.id }}/creation-status"
+  hx-trigger="every 10s"
+  hx-swap="outerHTML"
+  style="text-align: center"
+>
+  <wa-spinner style="font-size: 32px"></wa-spinner>
+  <h2 style="margin-top: 16px">{{ _("Setting up your project...") }}</h2>
+  <p style="margin-top: 6px; color: var(--wa-color-neutral-fill-loud)">
+    {{ _("Downloading map data, splitting tasks, and preparing the QField project. This can take a
+    minute or two - this page will redirect automatically when ready.") }}
+  </p>
+</div>
+{% endif %}

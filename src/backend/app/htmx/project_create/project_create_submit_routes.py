@@ -2,21 +2,25 @@
 
 # ruff: noqa: D103
 
+import asyncio
 import json
 import logging
+from datetime import datetime, timezone
 
-from litestar import post
+from litestar import get, post
 from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
 from litestar.params import Body
-from litestar.plugins.htmx import HTMXRequest
-from litestar.response import Response
+from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
+from litestar.response import Response, Template
 from psycopg import AsyncConnection
 
 from app.auth.auth_deps import get_user_sub, login_required
 from app.db.database import db_conn
+from app.db.models import DbProject
 from app.i18n import _
+from app.projects import project_schemas
 from app.projects.project_services import (
     ConflictError,
     ServiceError,
@@ -31,9 +35,6 @@ from ..setup_steps.setup_step_responses import (
 from ..setup_steps.setup_step_responses import (
     unexpected_error_response as _unexpected_error_response,
 )
-from .project_create_basemap_orchestration import (
-    autostart_basemap_for_simple_project as _autostart_basemap_for_simple_project,
-)
 from .project_create_parsing import outline_json_error as _outline_json_error
 from .project_create_parsing import parse_outline_payload as _parse_outline_payload
 from .project_create_parsing import (
@@ -44,7 +45,7 @@ from .project_create_simple_flow import (
     create_simple_project_stub as _create_simple_project_stub,
 )
 from .project_create_simple_flow import (
-    finalize_simple_project_creation as _finalize_simple_project_creation,
+    run_simple_project_creation_background as _run_simple_project_creation_background,
 )
 
 log = logging.getLogger(__name__)
@@ -177,14 +178,22 @@ async def create_simple_project_htmx(
             outline=outline,
             hashtags=hashtags,
         )
-        _, headers = await _finalize_simple_project_creation(
-            db=db,
-            project_id=project.id,
-            outline=outline,
-            autostart_callback=_autostart_basemap_for_simple_project,
+        await DbProject.update(
+            db,
+            project.id,
+            project_schemas.ProjectUpdate(
+                creation_status="in_progress",
+                creation_error=None,
+                creation_updated_at=datetime.now(timezone.utc),
+            ),
+        )
+        await db.commit()
+
+        asyncio.create_task(
+            _run_simple_project_creation_background(project.id, outline)
         )
 
-        return _hx_redirect_response(f"/projects/{project.id}", headers=headers)
+        return _hx_redirect_response(f"/projects/{project.id}/creating")
     except SvcValidationError as e:
         return _validation_error_response(e.message)
     except ConflictError as e:
@@ -201,7 +210,59 @@ async def create_simple_project_htmx(
         )
 
 
+@get(
+    path="/projects/{project_id:int}/creating",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+)
+async def project_creating_page(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    auth_user: object,
+    project_id: int,
+) -> Template | Response:
+    """Full-page placeholder while async creation finalizes in the background."""
+    project = await DbProject.one(db, project_id)
+    if project and project.creation_status == "ready":
+        return _hx_redirect_response(
+            f"/projects/{project_id}",
+            status_code=status.HTTP_303_SEE_OTHER,
+            header_name="Location",
+        )
+    return HTMXTemplate(
+        template_name="new_project_simple_creating.html",
+        context={"project": project},
+    )
+
+
+@get(
+    path="/projects/{project_id:int}/creation-status",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+)
+async def project_creation_status(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    auth_user: object,
+    project_id: int,
+) -> Template | Response:
+    """Polling fragment for /projects/{id}/creating; redirects when ready."""
+    project = await DbProject.one(db, project_id)
+    if project and project.creation_status == "ready":
+        return _hx_redirect_response(f"/projects/{project_id}")
+    return HTMXTemplate(
+        template_name="partials/new_project/creating_fragment.html",
+        context={"project": project},
+    )
+
+
 ROUTE_HANDLERS = [
     create_project_htmx,
     create_simple_project_htmx,
+    project_creating_page,
+    project_creation_status,
 ]

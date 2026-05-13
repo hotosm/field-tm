@@ -64,6 +64,9 @@ CREATE TABLE projects (
     basemap_attach_status character varying DEFAULT 'idle',
     basemap_attach_error text,
     basemap_attach_updated_at timestamp with time zone,
+    creation_status character varying DEFAULT 'ready',
+    creation_error text,
+    creation_updated_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );

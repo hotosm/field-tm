@@ -397,3 +397,8 @@ class ProjectUpdate(ProjectInBase, ODKCentral):
     basemap_attach_status: Optional[str] = None
     basemap_attach_error: Optional[str] = None
     basemap_attach_updated_at: Optional[AwareDatetime] = None
+
+    # Async creation workflow state
+    creation_status: Optional[str] = None
+    creation_error: Optional[str] = None
+    creation_updated_at: Optional[AwareDatetime] = None
