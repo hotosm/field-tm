@@ -1609,8 +1609,8 @@ msgid "Description is required."
 msgstr "Popis je povinný."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "Rychlé nastavení — Budovy OSM"
+msgid "Quick Setup - OSM Buildings"
+msgstr "Rychlé nastavení - Budovy OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""

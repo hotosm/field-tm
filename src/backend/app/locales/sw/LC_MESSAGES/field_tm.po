@@ -1626,8 +1626,8 @@ msgid "Description is required."
 msgstr "Maelezo yanahitajika."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "Usanidi wa Haraka — Majengo ya OSM"
+msgid "Quick Setup - OSM Buildings"
+msgstr "Usanidi wa Haraka - Majengo ya OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""

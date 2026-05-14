@@ -1658,8 +1658,8 @@ msgid "Description is required."
 msgstr "La description est requise."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "Configuration rapide — Bâtiments OSM"
+msgid "Quick Setup - OSM Buildings"
+msgstr "Configuration rapide - Bâtiments OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""

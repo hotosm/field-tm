@@ -1600,8 +1600,8 @@ msgid "Description is required."
 msgstr "विवरण आवश्यक छ।"
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "छिटो सेटअप — OSM भवनहरू"
+msgid "Quick Setup - OSM Buildings"
+msgstr "छिटो सेटअप - OSM भवनहरू"
 
 #: app/templates/new_project_simple.html:9
 msgid ""

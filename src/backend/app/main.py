@@ -232,6 +232,9 @@ def _get_logging_config() -> LoggingConfig:
             }
         },
         log_exceptions="always",
+        # Skip the noisy "Uncaught exception" traceback for 404s - the bulk
+        # of these are scanner probes (/RDWeb/Pages/, /.git, /wp-login.php).
+        disable_stack_trace={status.HTTP_404_NOT_FOUND},
     )
     return logging_config
 
@@ -266,6 +269,15 @@ def configure_root_router() -> Router:
         return None
 
     @get(
+        "/robots.txt",
+        status_code=status.HTTP_200_OK,
+        media_type="text/plain",
+        sync_to_thread=False,
+    )
+    def robots_txt() -> str:
+        return "User-agent: *\nDisallow: /\n"
+
+    @get(
         "/__heartbeat__",
         dependencies={
             "db": Provide(db_conn),
@@ -292,6 +304,7 @@ def configure_root_router() -> Router:
         route_handlers=[
             deployment_details,
             simple_heartbeat,
+            robots_txt,
             heartbeat_plus_db,
         ],
     )

@@ -1569,8 +1569,8 @@ msgid "Description is required."
 msgstr "ต้องระบุคำอธิบาย"
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "ตั้งค่าด่วน — อาคาร OSM"
+msgid "Quick Setup - OSM Buildings"
+msgstr "ตั้งค่าด่วน - อาคาร OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""

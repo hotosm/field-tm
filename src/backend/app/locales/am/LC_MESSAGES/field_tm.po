@@ -1534,8 +1534,8 @@ msgid "Description is required."
 msgstr "መግለጫ ያስፈልጋል።"
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "ፈጣን ማዋቀር — OSM ሕንፃዎች"
+msgid "Quick Setup - OSM Buildings"
+msgstr "ፈጣን ማዋቀር - OSM ሕንፃዎች"
 
 #: app/templates/new_project_simple.html:9
 msgid ""

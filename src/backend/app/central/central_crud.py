@@ -20,6 +20,7 @@
 import csv
 import json
 import logging
+import re
 import secrets
 import string
 from asyncio import gather
@@ -28,6 +29,7 @@ from io import BytesIO, StringIO
 from typing import Optional, Union
 from uuid import UUID, uuid4
 
+import pandas as pd
 from geojson_aoi import parse_aoi
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
@@ -281,6 +283,77 @@ async def get_form_list(db: AsyncConnection) -> list:
         ) from e
 
 
+# Lists Field-TM injects during the merge - users don't have to define
+# these themselves, so don't fail validation when the survey references them.
+_INJECTED_CHOICE_LISTS = frozenset({"yes_no", "mapping_mode", "digitisation_problem"})
+_SELECT_TYPE_RE = re.compile(r"^\s*(select_one|select_multiple)\s+(\S+)")
+
+
+def _validate_user_xlsform_choices(xlsform: BytesIO) -> None:
+    """Catch obvious select/choice mismatches in a user-uploaded XLSForm.
+
+    Raises HTTPException(422) listing each survey row whose
+    select_one/select_multiple references a list_name that is not present in
+    the choices sheet. select_one_from_file is skipped (the source is a CSV,
+    not a list).
+
+    Leaves ``xlsform`` seeked back to position 0 so the subsequent merge step
+    can read it again.
+    """
+    try:
+        xlsform.seek(0)
+        sheets = pd.read_excel(xlsform, sheet_name=None, engine="calamine")
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=_("Could not read XLSForm file: %(error)s") % {"error": exc},
+        ) from exc
+    finally:
+        xlsform.seek(0)
+
+    survey_df = sheets.get("survey")
+    if survey_df is None or "type" not in survey_df.columns:
+        return
+
+    choices_df = sheets.get("choices")
+    available_lists: set[str] = set(_INJECTED_CHOICE_LISTS)
+    if choices_df is not None and "list_name" in choices_df.columns:
+        available_lists.update(
+            str(value)
+            for value in choices_df["list_name"].dropna().tolist()
+            if str(value).strip()
+        )
+
+    invalid: list[tuple[int, str]] = []
+    for offset, type_value in enumerate(survey_df["type"].tolist()):
+        if pd.isna(type_value):
+            continue
+        match = _SELECT_TYPE_RE.match(str(type_value))
+        if not match:
+            continue
+        list_ref = match.group(2)
+        if "." in list_ref:
+            # select_one_from_file uses a CSV; not a choices list
+            continue
+        if list_ref not in available_lists:
+            # +2: header row is row 1, dataframe is 0-indexed
+            invalid.append((offset + 2, list_ref))
+
+    if not invalid:
+        return
+
+    parts = ", ".join(f"row {row} references list '{name}'" for row, name in invalid)
+    raise HTTPException(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        detail=_(
+            "XLSForm has select questions referencing lists that aren't "
+            "defined in the choices sheet: %(rows)s. Check your survey "
+            "and choices sheets."
+        )
+        % {"rows": parts},
+    )
+
+
 async def read_and_test_xform(input_data: BytesIO) -> None:
     """Read and validate an XForm.
 
@@ -341,6 +414,11 @@ async def validate_and_update_user_xlsform(
     use_odk_collect: bool = False,
 ) -> BytesIO:  # noqa: PLR0913
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
+    # Pre-validate: catch select/choice mismatches up-front so we can point at
+    # the user's row in their original file, rather than a row in the merged
+    # form which they can't see.
+    _validate_user_xlsform_choices(xlsform)
+
     xform_id, updated_file_bytes = await append_fields_to_user_xlsform(
         xlsform,
         form_name=form_name,
