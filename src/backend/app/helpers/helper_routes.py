@@ -47,6 +47,7 @@ from app.helpers.geometry_utils import (
     javarosa_to_geojson_geom,
     multigeom_to_singlegeom,
 )
+from app.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -74,7 +75,7 @@ async def download_template(
             },
             status_code=status.HTTP_200_OK,
         )
-    msg = "Failed to convert YAML form to XLSForm."
+    msg = _("Failed to convert YAML form to XLSForm.")
     raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail=msg,
@@ -97,7 +98,7 @@ async def convert_geojson_to_odk_csv_wrapper(
     if file_ext not in allowed_extensions:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Provide a valid .json or .geojson file",
+            detail=_("Provide a valid .json or .geojson file"),
         )
 
     contents = await geojson.read()
@@ -135,7 +136,7 @@ async def create_entities_from_csv(
     if file_ext != ".csv":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Provide a valid .csv",
+            detail=_("Provide a valid .csv"),
         )
 
     def parse_csv(csv_bytes: bytes):
@@ -189,7 +190,7 @@ async def convert_odk_submission_json_to_geojson_wrapper(
     if file_ext not in allowed_extensions:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Provide a valid .json file",
+            detail=_("Provide a valid .json file"),
         )
 
     contents = await json_file.read()
@@ -224,7 +225,7 @@ async def get_raw_data_api_osm_token(
     if not response.ok:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Could not login to raw-data-api",
+            detail=_("Could not login to raw-data-api"),
         )
 
     raw_api_login_url = response.json().get("login_url")
@@ -248,7 +249,7 @@ async def flatten_multipolygons_to_polygons(
     if not featcol:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="No geometries present",
+            detail=_("No geometries present"),
         )
     multi_to_single_polygons = multigeom_to_singlegeom(featcol)
 
@@ -265,7 +266,7 @@ async def flatten_multipolygons_to_polygons(
 
     raise HTTPException(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        detail="Your geojson file is invalid.",
+        detail=_("Your geojson file is invalid."),
     )
 
 

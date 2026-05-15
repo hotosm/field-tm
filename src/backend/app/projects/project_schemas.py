@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""DTOs and schemas for project endpoints."""
+"""DTOs and schemas for project workflows."""
 
 from typing import Annotated, Optional, Self, Union
 
@@ -29,7 +29,15 @@ from geojson_pydantic import (
 )
 from litestar.datastructures import UploadFile
 from litestar.dto import DataclassDTO, DTOConfig
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, ValidationInfo
+from pydantic import (
+    AliasChoices,
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    ValidationError,
+    ValidationInfo,
+)
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.central.central_schemas import ODKCentral
@@ -238,8 +246,6 @@ class StubProjectIn(BaseModel):
             geom_type = getattr(value, "type", None)
 
         if geom_type in ["Point", "MultiPoint", "LineString", "MultiLineString"]:
-            from pydantic import ValidationError
-
             # Raise ValidationError that will result in 422 status code
             raise ValidationError.from_exception_data(
                 "ValueError",
@@ -381,3 +387,18 @@ class ProjectUpdate(ProjectInBase, ODKCentral):
     data_extract_geojson: Optional[dict] = None
     # GeoJSON task areas/boundaries stored directly in database
     task_areas_geojson: Optional[dict] = None
+
+    # Offline basemap workflow state
+    basemap_stac_item_id: Optional[str] = None
+    basemap_url: Optional[str] = None
+    basemap_status: Optional[str] = None
+    basemap_minzoom: Optional[int] = None
+    basemap_maxzoom: Optional[int] = None
+    basemap_attach_status: Optional[str] = None
+    basemap_attach_error: Optional[str] = None
+    basemap_attach_updated_at: Optional[AwareDatetime] = None
+
+    # Async creation workflow state
+    creation_status: Optional[str] = None
+    creation_error: Optional[str] = None
+    creation_updated_at: Optional[AwareDatetime] = None

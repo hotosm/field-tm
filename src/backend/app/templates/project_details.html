@@ -3,7 +3,7 @@
 <div class="ftm-page ftm-page--wide">
   <div style="margin-bottom: 20px">
     <wa-button href="/projects" variant="default" style="margin-bottom: 20px">
-      {{ _("← Back to Projects") }}
+      ← {{ _("Back to Projects") }}
     </wa-button>
   </div>
 
@@ -147,7 +147,8 @@
         </p>
       </div>
       {% endif %} {% if status_value == 'PUBLISHED' %} {% include
-      "partials/project_details/manager_setup_summary.html" %} {% else %} {% include
+      "partials/project_details/manager_setup_summary.html" %} {% include
+      "partials/project_details/basemap_section.html" %} {% else %} {% include
       "partials/project_details/setup_steps.html" %} {% endif %}
     </div>
 
@@ -168,7 +169,7 @@
   {% else %}
   <wa-card>
     <div style="padding: 40px; text-align: center">
-      <h2 class="ftm-section-title">{{ _("Project Not Found") }}</h2>
+      <h2 class="ftm-section-title">{{ _("Project not found.") }}</h2>
       <p style="color: #666; margin: 20px 0">
         {{ _("The project you're looking for doesn't exist or you don't have permission to view
         it.") }}

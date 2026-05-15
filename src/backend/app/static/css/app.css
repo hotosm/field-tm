@@ -1199,3 +1199,458 @@ hot-header {
 .ftm-login-back:hover {
   text-decoration: underline;
 }
+
+/* --- Header language selector ----------------------------- */
+.ftm-header-lang-trigger::part(base) {
+  background: white;
+  border: 0;
+  color: var(--hot-color-neutral-900, #404248);
+  box-shadow: none;
+}
+
+.ftm-header-lang-trigger:hover::part(base),
+.ftm-header-lang-trigger:focus-visible::part(base) {
+  background: white;
+}
+
+.ftm-header-lang-trigger::part(label) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+}
+
+.ftm-header-lang-trigger__icon {
+  color: var(--hot-color-neutral-700, #62646a);
+  font-size: 0.7rem;
+}
+
+.ftm-header-lang-menu {
+  min-width: 12rem;
+  max-height: 70vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+}
+
+.ftm-header-lang-option {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--hot-color-neutral-900, #404248);
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: start;
+  cursor: pointer;
+}
+
+.ftm-header-lang-option:hover,
+.ftm-header-lang-option:focus-visible {
+  background: var(--hot-color-neutral-100, #e8e8e8);
+  outline: none;
+}
+
+.ftm-header-lang-option--active {
+  background: color-mix(in oklab, var(--wa-color-brand-fill-loud, #d43f3f) 12%, white);
+  font-weight: var(--hot-font-weight-semibold, 600);
+}
+
+/* ============================================================
+   Create-project chooser (/new)
+   ============================================================ */
+.ftm-chooser-intro {
+  margin: 0 0 28px;
+  color: var(--ftm-text-muted);
+  font-size: var(--hot-font-size-medium);
+  line-height: 1.55;
+}
+
+.ftm-chooser-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.ftm-chooser-card {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  background: white;
+  border: 2px solid var(--ftm-border);
+  border-radius: var(--ftm-radius);
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    transform 0.15s;
+}
+
+.ftm-chooser-card:hover,
+.ftm-chooser-card:focus-visible {
+  border-color: var(--ftm-brand);
+  box-shadow: 0 8px 24px color-mix(in oklab, var(--ftm-brand) 18%, transparent);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.ftm-chooser-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.ftm-chooser-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--ftm-brand) 14%, white);
+  color: var(--ftm-brand);
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.ftm-chooser-card__title {
+  margin: 0;
+  font-size: var(--hot-font-size-large);
+  font-family: var(--hot-font-sans-variant-condensed);
+  color: var(--ftm-text);
+  line-height: 1.2;
+}
+
+.ftm-chooser-card__tagline {
+  margin: 0 0 14px;
+  color: var(--ftm-text-muted);
+  font-size: var(--hot-font-size-small);
+  line-height: 1.5;
+}
+
+.ftm-chooser-card__list {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ftm-chooser-card__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: var(--hot-font-size-small);
+  color: var(--ftm-text);
+  line-height: 1.4;
+}
+
+.ftm-chooser-card__list li::before {
+  content: "✓";
+  color: var(--ftm-color-success);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ftm-chooser-card__list--limits li::before {
+  content: "✗";
+  color: var(--ftm-text-light);
+}
+
+.ftm-chooser-card__cta {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--ftm-radius-sm);
+  background: var(--ftm-brand);
+  color: white;
+  font-weight: var(--hot-font-weight-semibold);
+  font-size: var(--hot-font-size-medium);
+}
+
+.ftm-chooser-card--secondary .ftm-chooser-card__cta {
+  background: white;
+  color: var(--ftm-brand);
+  border: 1.5px solid var(--ftm-brand);
+}
+
+.ftm-chooser-card--secondary .ftm-chooser-card__icon {
+  background: var(--ftm-bg-muted);
+  color: var(--ftm-text);
+}
+
+/* Custom-project sections - give the long form clearer rhythm */
+.ftm-custom-section {
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--ftm-border);
+}
+
+.ftm-custom-section:last-of-type {
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+
+.ftm-custom-section__title {
+  margin: 0 0 4px;
+  font-size: var(--hot-font-size-medium);
+  font-family: var(--hot-font-sans-variant-condensed);
+  color: var(--ftm-text);
+}
+
+.ftm-custom-section__hint {
+  margin: 0 0 14px;
+  color: var(--ftm-text-muted);
+  font-size: var(--hot-font-size-small);
+  line-height: 1.5;
+}
+
+/* Stack icon + label + description in the field-app radio cards */
+.ftm-radio-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* ============================================================
+   Setup stepper (project_details)
+   ============================================================ */
+.ftm-stepper {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 0 0 28px;
+  padding: 16px 12px;
+  background: var(--ftm-bg-muted);
+  border-radius: var(--ftm-radius);
+  overflow-x: auto;
+}
+
+.ftm-stepper__node {
+  flex: 1 1 0;
+  min-width: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  padding: 0 8px;
+}
+
+.ftm-stepper__node:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  inset-inline-start: 50%;
+  width: 100%;
+  height: 2px;
+  background: var(--ftm-border);
+  z-index: 0;
+}
+
+.ftm-stepper__node--complete:not(:last-child)::after {
+  background: var(--ftm-color-success);
+}
+
+.ftm-stepper__bubble {
+  position: relative;
+  z-index: 1;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border: 2px solid var(--ftm-border);
+  color: var(--ftm-text-muted);
+  font-weight: var(--hot-font-weight-bold);
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.ftm-stepper__node--current .ftm-stepper__bubble {
+  background: var(--ftm-brand);
+  border-color: var(--ftm-brand);
+  color: white;
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ftm-brand) 18%, transparent);
+}
+
+.ftm-stepper__node--complete .ftm-stepper__bubble {
+  background: var(--ftm-color-success);
+  border-color: var(--ftm-color-success);
+  color: white;
+}
+
+.ftm-stepper__label {
+  font-size: var(--hot-font-size-x-small);
+  color: var(--ftm-text-muted);
+  font-weight: var(--hot-font-weight-semibold);
+  line-height: 1.25;
+  max-width: 110px;
+}
+
+.ftm-stepper__node--current .ftm-stepper__label {
+  color: var(--ftm-text);
+}
+
+.ftm-stepper__node--complete .ftm-stepper__label {
+  color: var(--ftm-color-success);
+}
+
+/* Setup-step layout helpers - keep partials free of inline styles */
+.ftm-step-intro {
+  margin: 0 0 18px;
+  color: var(--ftm-text);
+  line-height: 1.55;
+}
+
+.ftm-step-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.ftm-step-field__label {
+  font-weight: var(--hot-font-weight-semibold);
+  color: var(--ftm-text);
+}
+
+.ftm-step-field__hint {
+  margin: 0;
+  color: var(--ftm-text-muted);
+  font-size: var(--hot-font-size-x-small);
+}
+
+.ftm-step-secondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: var(--hot-font-size-small);
+  color: var(--ftm-text-muted);
+  margin: 0 0 16px;
+}
+
+.ftm-step-secondary__divider {
+  flex: 1;
+  height: 1px;
+  background: var(--ftm-border);
+}
+
+.ftm-soft-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--ftm-brand);
+  text-decoration: underline;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ftm-soft-link:hover {
+  text-decoration: none;
+}
+
+.ftm-soft-link[disabled] {
+  color: var(--ftm-text-light);
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+.ftm-step-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px 16px;
+  margin: 6px 0 0;
+}
+
+.ftm-step-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.ftm-step-option input[type="checkbox"] {
+  margin: 3px 0 0;
+  cursor: pointer;
+}
+
+.ftm-step-option__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.ftm-step-option__title {
+  font-weight: var(--hot-font-weight-semibold);
+  color: var(--ftm-text);
+  font-size: var(--hot-font-size-small);
+}
+
+.ftm-step-option__hint {
+  color: var(--ftm-text-muted);
+  font-size: var(--hot-font-size-x-small);
+  line-height: 1.4;
+}
+
+.ftm-step-option--child {
+  margin-inline-start: 24px;
+}
+
+/* Compact completed-step summary (replaces large card once done) */
+.ftm-step--complete-compact {
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid var(--ftm-color-success);
+  border-inline-start: 4px solid var(--ftm-color-success);
+  border-radius: var(--ftm-radius-sm);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ftm-step--complete-compact .ftm-step__check {
+  font-size: 1.05rem;
+  margin: 0;
+}
+
+.ftm-step--complete-compact-title {
+  margin: 0;
+  font-size: var(--hot-font-size-small);
+  font-weight: var(--hot-font-weight-semibold);
+  color: var(--ftm-text);
+}
+
+@media (max-width: 720px) {
+  .ftm-stepper {
+    padding: 12px 6px;
+  }
+
+  .ftm-stepper__node {
+    min-width: 78px;
+  }
+
+  .ftm-stepper__label {
+    font-size: 0.7rem;
+  }
+}

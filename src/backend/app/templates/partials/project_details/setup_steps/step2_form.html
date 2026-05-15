@@ -1,0 +1,155 @@
+{% if has_xlsform %}
+<div id="step-2-container" class="ftm-step--complete-compact">
+  <span class="ftm-step__check" aria-hidden="true">✓</span>
+  <p class="ftm-step--complete-compact-title">{{ _("Survey form ready") }}</p>
+</div>
+{% else %}
+<div id="step-2-container" class="ftm-step ftm-step--pending">
+  <div class="ftm-step__header">
+    <h3 class="ftm-step__title">{{ _("Choose Your Survey Form") }}</h3>
+  </div>
+  <p class="ftm-step-intro">
+    {{ _("Pick a ready-made survey that matches what you're mapping. You can upload your own survey
+    file if none of these fit.") }}
+  </p>
+
+  <form
+    id="upload-xlsform-form"
+    hx-post="/upload-xlsform-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+    hx-target="#xlsform-status"
+    hx-swap="innerHTML"
+    hx-encoding="multipart/form-data"
+  >
+    <div class="ftm-step-field">
+      <label for="xlsform-select" class="ftm-step-field__label">
+        {{ _("Survey form") }} <span class="ftm-form-required">*</span>
+      </label>
+      <select id="xlsform-select" class="ftm-split-select" disabled>
+        <option value="">{{ _("Loading survey types...") }}</option>
+      </select>
+    </div>
+
+    <p class="ftm-step-secondary">
+      <span class="ftm-step-secondary__divider" aria-hidden="true"></span>
+      <span>{{ _("or") }}</span>
+      <button type="button" id="upload-xlsform-btn" class="ftm-soft-link">
+        {{ _("upload your own survey file (.xls / .xlsx)") }}
+      </button>
+      <span class="ftm-step-secondary__divider" aria-hidden="true"></span>
+    </p>
+
+    <small id="selected-xlsform-name" class="ftm-form-help" style="margin-top: -8px"></small>
+
+    <div
+      id="custom-form-disclaimer"
+      class="ftm-config-note ftm-config-note--muted"
+      style="display: none; margin: 4px 0 12px"
+    >
+      <span>
+        {{ _("Heads up: Field-TM auto-adds fields for tasks and feature selection. Your form should
+        only contain the survey questions you want to ask.") }}
+      </span>
+    </div>
+
+    <input
+      type="hidden"
+      id="need-verification-fields-hidden"
+      name="need_verification_fields"
+      value="true"
+    />
+    <input
+      type="hidden"
+      id="default-language-explicit-hidden"
+      name="default_language_explicit"
+      value="false"
+    />
+    <input
+      type="hidden"
+      id="include-photo-upload-hidden"
+      name="include_photo_upload"
+      value="true"
+    />
+    {% if field_mapping_app_value %} {% set is_odk = field_mapping_app_upper == 'ODK' %}
+    <input type="hidden" name="use_odk_collect" value="{{ 'true' if is_odk else 'false' }}" />
+    {% else %}
+    <input type="hidden" name="use_odk_collect" value="false" />
+    {% endif %}
+
+    <div id="xlsform-status" class="ftm-step__status"></div>
+
+    <div class="ftm-step__actions" style="margin: 14px 0 8px">
+      <wa-button id="upload-xlsform-submit-btn" type="submit" variant="brand" disabled>
+        {{ _("Continue") }}
+      </wa-button>
+      <button
+        type="button"
+        id="form-advanced-config-toggle"
+        class="wa-button wa-button--default ftm-advanced-toggle"
+      >
+        {{ _("More options") }}
+      </button>
+    </div>
+
+    <div id="form-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
+      <div class="ftm-advanced-config__content">
+        <div class="ftm-step-field">
+          <label for="default-language-select" class="ftm-step-field__label">
+            {{ _("Form language") }}
+          </label>
+          <select id="default-language-select" name="default_language" class="ftm-split-select">
+            <option value="english">{{ _("English") }}</option>
+            <option value="spanish">{{ _("Spanish") }}</option>
+            <option value="french">{{ _("French") }}</option>
+            <option value="portuguese">{{ _("Portuguese") }}</option>
+            <option value="swahili">{{ _("Swahili") }}</option>
+            <option value="hindi">{{ _("Hindi") }}</option>
+          </select>
+        </div>
+
+        <div class="ftm-step-options" role="group" aria-label="{{ _('Form questions') }}">
+          <label class="ftm-step-option">
+            <input type="checkbox" id="include-photo-upload-checkbox" checked />
+            <span class="ftm-step-option__text">
+              <span class="ftm-step-option__title">{{ _("Ask for a photo") }}</span>
+              <span class="ftm-step-option__hint">
+                {{ _("Mappers will be asked to take a photo at the location.") }}
+              </span>
+            </span>
+          </label>
+
+          <label class="ftm-step-option ftm-step-option--child" id="mandatory-photo-label">
+            <input
+              type="checkbox"
+              name="mandatory_photo_upload"
+              id="mandatory-photo-checkbox"
+              value="true"
+            />
+            <span class="ftm-step-option__text">
+              <span class="ftm-step-option__title">{{ _("Make photo mandatory") }}</span>
+            </span>
+          </label>
+
+          <label class="ftm-step-option">
+            <input type="checkbox" id="verification-fields-checkbox" checked />
+            <span class="ftm-step-option__text">
+              <span class="ftm-step-option__title">{{ _("Ask to verify existing features") }}</span>
+              <span class="ftm-step-option__hint">
+                {{ _("Mappers confirm whether existing OSM features are correctly digitised.") }}
+              </span>
+            </span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <input
+      type="file"
+      name="xlsform"
+      id="xlsform-file-input"
+      accept=".xls,.xlsx"
+      style="display: none"
+    />
+    <input type="hidden" name="template_form_id" id="template-form-id" value="" />
+  </form>
+</div>
+{% endif %}

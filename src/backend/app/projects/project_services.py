@@ -17,13 +17,14 @@
 #
 """Shared service layer for project operations.
 
-These functions contain the core business logic used by both HTMX routes
-and REST API routes. They accept typed arguments and raise domain exceptions
-(not HTTP exceptions), returning plain data structures.
+These functions contain the core business logic used by HTMX flows and
+other backend workflows. They accept typed arguments and raise domain
+exceptions (not HTTP exceptions), returning plain data structures.
 """
 
 import json
 import logging
+from asyncio import TimeoutError as AsyncTimeoutError
 from asyncio import get_running_loop
 from dataclasses import dataclass
 from functools import partial
@@ -35,6 +36,8 @@ from anyio import to_thread
 from area_splitter import SplittingAlgorithm
 from area_splitter.splitter import split_by_sql, split_by_square
 from geojson_aoi import parse_aoi
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
 from osm_fieldwork.json_data_models import data_models_path
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
@@ -53,7 +56,9 @@ from app.helpers.geometry_utils import (
     geojson_area_km2,
     polygon_to_centroid,
 )
+from app.i18n import _
 from app.projects import project_crud, project_deps, project_schemas
+from app.qfield.qfield_crud import create_qfield_project
 from app.qfield.qfield_deps import qfield_client
 
 log = logging.getLogger(__name__)
@@ -61,6 +66,33 @@ log = logging.getLogger(__name__)
 HTTP_STATUS_OK_MIN = 200
 HTTP_STATUS_OK_MAX_EXCLUSIVE = 300
 HTTP_STATUS_NOT_FOUND = 404
+SIMPLE_PROJECT_TAGS = ["osm", "buildings", "simple"]
+
+
+def _simple_project_description() -> str:
+    """Return the translated description for simple workflow projects."""
+    return _(
+        "This project was created with a simplified workflow in FieldTM and is made "
+        "to collect building data to enhance OpenStreetMap."
+    )
+
+
+def _simple_project_fallback_city() -> str:
+    """Return the translated fallback location label for simple workflow projects."""
+    return _("Unnamed Area")
+
+
+def _format_simple_fallback_city(centroid) -> str:
+    """Build a deterministic fallback city-like label from centroid coordinates."""
+    if centroid is None:
+        return _simple_project_fallback_city()
+
+    lon = getattr(centroid, "x", None)
+    lat = getattr(centroid, "y", None)
+    if lon is None or lat is None:
+        return _simple_project_fallback_city()
+
+    return _("Area {latitude:.4f}_{longitude:.4f}").format(latitude=lat, longitude=lon)
 
 
 # ============================================================================
@@ -361,6 +393,83 @@ def _format_location_str(location) -> str | None:
     return None
 
 
+def _normalize_city_name(city_name: str | None) -> str | None:
+    """Normalize nearest-city text before using it in generated names."""
+    if not city_name:
+        return None
+    normalized = " ".join(str(city_name).split())
+    return normalized or None
+
+
+def _derive_simple_project_name(location, centroid=None) -> str:
+    """Build the simplified project title from nearest city with fallback."""
+    city_name = _normalize_city_name(getattr(location, "city", None))
+    fallback_city = _format_simple_fallback_city(centroid)
+    return _("{location} OSM Buildings").format(location=city_name or fallback_city)
+
+
+def _derive_simple_project_metadata(
+    location, centroid=None
+) -> tuple[str, str, list[str]]:
+    """Build name/description/tags for the simplified AOI-only workflow."""
+    return (
+        _derive_simple_project_name(location, centroid=centroid),
+        _simple_project_description(),
+        SIMPLE_PROJECT_TAGS.copy(),
+    )
+
+
+def _build_simple_outline_payload(outline: dict) -> dict:
+    """Normalize simplified-flow outlines to GeoJSON geometry for storage."""
+    featcol = parse_aoi(settings.FTM_DB_URL, outline, merge=True)
+    features = featcol.get("features", [])
+    if not features:
+        raise ValidationError(
+            "You must draw or upload an Area of Interest (AOI) on the map."
+        )
+    geometry = features[0].get("geometry")
+    if not geometry:
+        raise ValidationError(
+            "You must draw or upload an Area of Interest (AOI) on the map."
+        )
+    return geometry
+
+
+async def derive_simple_project_metadata(
+    db: AsyncConnection,
+    outline: dict,
+) -> tuple[str, str, list[str], str | None]:
+    """Derive simplified-flow project metadata from AOI centroid lookup."""
+    if not outline:
+        raise ValidationError(
+            "You must draw or upload an Area of Interest (AOI) on the map."
+        )
+
+    normalized_outline = _build_simple_outline_payload(outline)
+    centroid = await polygon_to_centroid(normalized_outline)
+
+    try:
+        async with AsyncNearestCity(db) as geocoder:
+            location = await geocoder.query(centroid.x, centroid.y)
+    except Exception as e:
+        log.warning(
+            "Nearest-city lookup failed for simple workflow at lat=%s lon=%s; "
+            "falling back to default naming. Error: %s",
+            centroid.y,
+            centroid.x,
+            e,
+            exc_info=True,
+        )
+        location = None
+
+    project_name, description, hashtags = _derive_simple_project_metadata(
+        location,
+        centroid=centroid,
+    )
+    location_str = _format_location_str(location)
+    return project_name, description, hashtags, location_str
+
+
 async def _populate_project_location(
     db: AsyncConnection,
     project_name: str,
@@ -371,7 +480,7 @@ async def _populate_project_location(
         outline_dict = project_data.outline.model_dump()
         async with AsyncNearestCity(db) as geocoder:
             centroid = await polygon_to_centroid(outline_dict)
-            location = await geocoder.query(centroid.y, centroid.x)
+            location = await geocoder.query(centroid.x, centroid.y)
             project_data.location_str = _format_location_str(location)
     except Exception as e:
         log.error(
@@ -443,7 +552,7 @@ async def process_xlsform(
     include_photo_upload: bool = True,
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
-    default_language: str = "english",
+    default_language: str | None = None,
 ) -> None:  # noqa: PLR0913
     """Validate, process, and store an XLSForm for a project.
 
@@ -561,9 +670,8 @@ def _validate_downloaded_geojson(geojson_data: dict) -> dict:
         raise ServiceError("Downloaded GeoJSON has invalid feature structure.")
     if len(features) == 0:
         raise ValidationError(
-            "No matching OSM features were found for this area and selection. "
-            "Try different extract options, upload custom GeoJSON, "
-            "or choose Collect New Data Only."
+            "No data found in OSM. Please continue with the Collect New "
+            "Data Only option."
         )
     return geojson_data
 
@@ -612,14 +720,31 @@ async def download_osm_data(
     )
 
     # Generate data extract
-    result = await project_crud.generate_data_extract(
-        project.id,
-        aoi_featcol,
-        geom_type_lower,
-        config_data,
-        centroid,
-        True,
-    )
+    try:
+        result = await project_crud.generate_data_extract(
+            project.id,
+            aoi_featcol,
+            geom_type_lower,
+            config_data,
+            centroid,
+            True,
+        )
+    except HTTPException as exc:
+        if (
+            exc.status_code == status.HTTP_400_BAD_REQUEST
+            and "Failed to generate data extract from the raw data API."
+            in str(exc.detail)
+        ):
+            raise ServiceError(
+                "OSM data extraction timed out or failed upstream. "
+                "Please reduce the AOI size or choose Collect New Data Only."
+            ) from exc
+        raise
+    except AsyncTimeoutError as exc:
+        raise ServiceError(
+            "OSM data extraction timed out. "
+            "Please reduce the AOI size or choose Collect New Data Only."
+        ) from exc
 
     # Download GeoJSON from URL
     download_url = result.data.get("download_url")
@@ -630,7 +755,20 @@ async def download_osm_data(
     geojson_data = _validate_downloaded_geojson(geojson_data)
 
     # Validate and clean GeoJSON
-    featcol = parse_aoi(settings.FTM_DB_URL, geojson_data)
+    try:
+        featcol = parse_aoi(settings.FTM_DB_URL, geojson_data)
+    except TypeError as exc:
+        raise ValidationError(
+            "No valid geometries found in OSM for the selected extract settings. "
+            "Please continue with the Collect New Data Only option."
+        ) from exc
+
+    if not featcol or not isinstance(featcol, dict) or not featcol.get("features"):
+        raise ValidationError(
+            "No valid geometries found in OSM for the selected extract settings. "
+            "Please continue with the Collect New Data Only option."
+        )
+
     featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
 
     if not featcol_single_geom_type:
@@ -1265,6 +1403,7 @@ async def finalize_qfield_project(
     db: AsyncConnection,
     project_id: int,
     custom_qfield_creds=None,
+    default_language: str | None = None,
 ) -> QFieldFinalizeResult:
     """Create project in QField with all data.
 
@@ -1272,6 +1411,7 @@ async def finalize_qfield_project(
         db: Database connection.
         project_id: The project ID.
         custom_qfield_creds: Optional custom QField credentials.
+        default_language: Optional form language override for project generation.
 
     Returns:
         QFieldFinalizeResult with URL and manager credentials.
@@ -1280,8 +1420,6 @@ async def finalize_qfield_project(
         ValidationError: If prerequisites are missing.
         ServiceError: If QField project creation fails.
     """
-    from app.qfield.qfield_crud import create_qfield_project
-
     project = await DbProject.one(db, project_id)
 
     if not project.xlsform_content:
@@ -1293,7 +1431,12 @@ async def finalize_qfield_project(
         )
 
     log.info(f"Creating QField project for Field-TM project {project_id}")
-    result = await create_qfield_project(db, project, custom_qfield_creds)
+    result = await create_qfield_project(
+        db,
+        project,
+        custom_qfield_creds,
+        default_language=default_language,
+    )
 
     # Update project status to PUBLISHED
     await DbProject.update(

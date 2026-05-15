@@ -17,12 +17,15 @@
 #
 """Logic for interaction with QFieldCloud & data."""
 
+import asyncio
 import base64
 import json
 import logging
+import os
 import re
 import shutil
 import tempfile
+import zipfile
 from asyncio import get_running_loop
 from copy import deepcopy
 from dataclasses import dataclass
@@ -32,7 +35,6 @@ from pathlib import Path
 from random import getrandbits
 from secrets import token_urlsafe
 from typing import Optional
-from urllib.parse import urlsplit
 from uuid import uuid4
 
 from aiohttp import ClientSession, ClientTimeout
@@ -44,21 +46,76 @@ from psycopg import AsyncConnection
 from qfieldcloud_sdk.interfaces import QfcRequestException
 from qfieldcloud_sdk.sdk import (
     FileTransferType,
+    JobTypes,
     OrganizationMemberRole,
     ProjectCollaboratorRole,
 )
 
-from app.config import encrypt_value, settings
+from app.config import decrypt_value, encrypt_value, settings
 from app.db.models import DbProject
+from app.i18n import _
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_deps import qfield_client
 from app.qfield.qfield_schemas import QFieldCloud
+from app.qfield.qfield_utils import resolve_backend_qfc_url
 
 log = logging.getLogger(__name__)
 
 # Timeout for QGIS wrapper HTTP calls (project generation can be slow)
 QGIS_REQUEST_TIMEOUT = ClientTimeout(total=300)  # 5 minutes
 QFC_NAME_SANITIZE_PATTERN = re.compile(r"[^A-Za-z0-9_.-]+")
+
+# Field-TM QField plugin: bundled and sent to the QGIS wrapper on every
+# field-project generation.  The wrapper unpacks ``main.qml`` as the
+# project plugin and applies any ``styles/{layer_name}.qml`` to matching
+# layers.  Path is overridable via env for tests / non-standard layouts.
+QFIELD_PLUGIN_DIR = os.environ.get("QFIELD_PLUGIN_DIR", "/opt/qfield-plugin")
+_qfield_plugin_zip_b64: Optional[str] = None
+
+
+def _build_qfield_plugin_zip_b64() -> Optional[str]:
+    """Build (once) a base64-encoded zip of the bundled QField plugin dir."""
+    global _qfield_plugin_zip_b64
+    if _qfield_plugin_zip_b64 is not None:
+        return _qfield_plugin_zip_b64 or None
+
+    plugin_dir = Path(QFIELD_PLUGIN_DIR)
+    if not plugin_dir.is_dir():
+        log.warning(
+            "QFIELD_PLUGIN_DIR %s not found; sending no plugin to wrapper", plugin_dir
+        )
+        _qfield_plugin_zip_b64 = ""
+        return None
+
+    buf = BytesIO()
+    files_added = 0
+    with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
+        for path in sorted(plugin_dir.rglob("*")):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(plugin_dir)
+            arcname = str(rel)
+            # The plugin .qml at the root is renamed to ``main.qml`` so the
+            # wrapper can rebrand it to ``{title}.qml`` per QField convention.
+            if rel.parent == Path(".") and rel.suffix == ".qml":
+                arcname = "main.qml"
+            zf.write(path, arcname)
+            files_added += 1
+
+    if files_added == 0:
+        log.warning(
+            "QFIELD_PLUGIN_DIR %s is empty; sending no plugin to wrapper", plugin_dir
+        )
+        _qfield_plugin_zip_b64 = ""
+        return None
+
+    _qfield_plugin_zip_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+    log.info(
+        "Built QField plugin zip (%d files, %d bytes b64)",
+        files_added,
+        len(_qfield_plugin_zip_b64),
+    )
+    return _qfield_plugin_zip_b64
 
 
 @dataclass(slots=True)
@@ -70,27 +127,6 @@ class QFieldProjectResult:
     manager_password: Optional[str]
     mapper_username: Optional[str]
     mapper_password: Optional[str]
-
-
-def strip_qfc_api_suffix(url: str) -> str:
-    """Return the canonical QFieldCloud origin without API path segments."""
-    value = (url or "").strip()
-    if not value:
-        return ""
-
-    parsed = urlsplit(value)
-    if parsed.scheme and parsed.netloc:
-        return f"{parsed.scheme}://{parsed.netloc}".rstrip("/")
-
-    return value.split("/api/v1")[0].rstrip("/")
-
-
-def normalise_qfc_url(url: str) -> str:
-    """Return the canonical QFieldCloud API root with trailing slash."""
-    base = strip_qfc_api_suffix(url)
-    if not base:
-        return ""
-    return f"{base}/api/v1/"
 
 
 # ---------------------------------------------------------------------------
@@ -127,13 +163,13 @@ def _outline_to_bbox_str(outline: dict) -> str:
     if not geometry:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Project outline is missing or has no geometry.",
+            detail=_("Project outline is missing or has no geometry."),
         )
     coords = _flatten_geom_coords(geometry)
     if not coords:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Project outline geometry has no coordinates.",
+            detail=_("Project outline geometry has no coordinates."),
         )
     lons = [c[0] for c in coords]
     lats = [c[1] for c in coords]
@@ -198,12 +234,7 @@ def _build_qfc_service_account_email(username: str) -> str:
     if not local_part:
         local_part = "ftm-qfield-user"
 
-    domain = (settings.FTM_DOMAIN or "field.localhost").strip().lower()
-    domain = re.sub(r"[^a-z0-9.-]+", "-", domain).strip(".-")
-    if not domain or "." not in domain:
-        domain = "noreply.local"
-
-    return f"{local_part}@{domain}"
+    return f"{local_part}@fieldtm.org"
 
 
 # ---------------------------------------------------------------------------
@@ -344,6 +375,75 @@ def _should_open_in_edit_mode(data_extract: Optional[dict]) -> bool:
     return not isinstance(features, list) or len(features) == 0
 
 
+def _resolve_backend_qfc_url(url: str) -> str:
+    """Prefer the internal QFieldCloud URL for local public hostnames.
+
+    In local Docker-based development, backend services cannot resolve browser-facing
+    `*.localhost` hostnames routed via the dev proxy. When that happens, we keep the
+    public URL for user-facing links but route backend API calls through the internal
+    QFieldCloud URL configured in `QFIELDCLOUD_URL`.
+    """
+    return resolve_backend_qfc_url(url)
+
+
+def _resolve_project_qfield_credentials(project: DbProject) -> QFieldCloud | None:
+    """Resolve per-project QField credentials for follow-up operations.
+
+    Uses stored project credentials when all required fields are present.
+    Returns ``None`` when project-level credentials are unavailable so callers
+    can fall back to deployment defaults.
+    """
+    if not all(
+        [
+            project.external_project_instance_url,
+            project.external_project_username,
+            project.external_project_password_encrypted,
+        ]
+    ):
+        return None
+
+    try:
+        password = decrypt_value(project.external_project_password_encrypted)
+    except Exception as exc:
+        log.warning(
+            "Failed to decrypt stored QField credentials for project %s: %s",
+            project.id,
+            exc,
+        )
+        return None
+
+    backend_url = _resolve_backend_qfc_url(project.external_project_instance_url)
+
+    return QFieldCloud(
+        qfield_cloud_url=backend_url,
+        qfield_cloud_user=project.external_project_username,
+        qfield_cloud_password=password,
+    )
+
+
+def get_missing_basemap_attach_config(project: DbProject | None = None) -> list[str]:
+    """Return required config keys missing for basemap attach workflow."""
+    missing: list[str] = []
+    if not (settings.QFIELDCLOUD_QGIS_URL or "").strip():
+        missing.append("QFIELDCLOUD_QGIS_URL")
+
+    custom_creds = _resolve_project_qfield_credentials(project) if project else None
+    if custom_creds:
+        return missing
+
+    if not (settings.QFIELDCLOUD_URL or "").strip():
+        missing.append("QFIELDCLOUD_URL")
+    if not (settings.QFIELDCLOUD_USER or "").strip():
+        missing.append("QFIELDCLOUD_USER")
+    if not (
+        settings.QFIELDCLOUD_PASSWORD
+        and settings.QFIELDCLOUD_PASSWORD.get_secret_value().strip()
+    ):
+        missing.append("QFIELDCLOUD_PASSWORD")
+
+    return missing
+
+
 # ---------------------------------------------------------------------------
 # Core: create QField project
 # ---------------------------------------------------------------------------
@@ -353,6 +453,7 @@ async def create_qfield_project(
     db: AsyncConnection,
     project: DbProject,
     custom_qfield_creds: QFieldCloud | None = None,
+    default_language: str | None = None,
 ) -> QFieldProjectResult:
     """Create QField project in QFieldCloud via the QGIS wrapper service.
 
@@ -372,12 +473,12 @@ async def create_qfield_project(
     if not project.outline:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Project outline is required for QField project creation.",
+            detail=_("Project outline is required for QField project creation."),
         )
     if not project.xlsform_content:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="XLSForm is required for QField project creation.",
+            detail=_("XLSForm is required for QField project creation."),
         )
 
     # ── Compute derived values ──────────────────────────────────────────
@@ -388,12 +489,13 @@ async def create_qfield_project(
     form_language, final_form = await modify_form_for_qfield(
         BytesIO(project.xlsform_content),
         geom_layer_type=geom_type,
+        default_language=default_language,
     )
     xlsform_bytes = final_form.getvalue()
     if not xlsform_bytes:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail="Failed to modify XLSForm for QField.",
+            detail=_("Failed to modify XLSForm for QField."),
         )
 
     # ── Prepare local data ──────────────────────────────────────────────
@@ -431,10 +533,11 @@ async def create_qfield_project(
 
         # ── Step 2: Read outputs from DB, upload to QFieldCloud ──────
         output_files = await _read_qgis_job_outputs(db, job_id)
+        await db.commit()
         if not output_files:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="QGIS wrapper completed but wrote no output files.",
+                detail=_("QGIS wrapper completed but wrote no output files."),
             )
 
         tmp_dir = tempfile.mkdtemp(prefix="qfield_upload_")
@@ -446,7 +549,7 @@ async def create_qfield_project(
             if not qgz_files:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="QGIS wrapper completed but no .qgz file in output.",
+                    detail=_("QGIS wrapper completed but no .qgz file in output."),
                 )
             log.info("QGIS project generated: %s", qgz_files[0].name)
 
@@ -467,25 +570,125 @@ async def create_qfield_project(
         await db.commit()
 
 
+async def attach_basemap_to_qfield_project(
+    db: AsyncConnection,
+    project: DbProject,
+    basemap_url: str,
+) -> None:
+    """Attach an MBTiles basemap to an existing QField project via QGIS wrapper."""
+    if not project.external_project_id:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=_("QField project ID is missing; cannot attach basemap."),
+        )
+
+    custom_qfield_creds = _resolve_project_qfield_credentials(project)
+
+    job_id = uuid4()
+
+    try:
+        await _insert_qgis_job(
+            db,
+            job_id,
+            b"",
+            {},
+            {},
+            operation="basemap",
+            project_id=str(project.external_project_id),
+            basemap_url=basemap_url,
+        )
+        await db.commit()
+
+        await _call_qgis_wrapper(
+            job_id=str(job_id),
+            title=project.project_name or f"project-{project.id}",
+            language="",
+            extent="0,0,0,0",
+            open_in_edit_mode=False,
+            endpoint="/basemap",
+            qfield_cloud=custom_qfield_creds,
+        )
+
+        output_files = await _read_qgis_job_outputs(db, job_id)
+        await db.commit()
+        if not output_files:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=_("Basemap attach completed but produced no project files."),
+            )
+
+        upload_dir = tempfile.mkdtemp(prefix="qfield_basemap_upload_")
+        try:
+            for filename, b64_content in output_files.items():
+                (Path(upload_dir) / filename).write_bytes(base64.b64decode(b64_content))
+
+            await _download_file_for_qfield_upload(
+                basemap_url,
+                Path(upload_dir) / "basemap.mbtiles",
+            )
+
+            loop = get_running_loop()
+            async with qfield_client(custom_qfield_creds) as client:
+                await loop.run_in_executor(
+                    None,
+                    partial(
+                        client.upload_files,
+                        project_id=project.external_project_id,
+                        upload_type=FileTransferType.PROJECT,
+                        project_path=upload_dir,
+                        filter_glob="*",
+                        throw_on_error=True,
+                        force=True,
+                    ),
+                )
+        finally:
+            shutil.rmtree(upload_dir, ignore_errors=True)
+    finally:
+        await _delete_qgis_job(db, job_id)
+        await db.commit()
+
+
 async def _insert_qgis_job(
     db: AsyncConnection,
     job_id,
     xlsform: bytes,
     features: dict,
     tasks: dict,
+    operation: str = "field",
+    project_id: Optional[str] = None,
+    basemap_url: Optional[str] = None,
 ) -> None:
     """Insert a new QGIS job with input files into the database."""
     async with db.cursor() as cur:
         await cur.execute(
             """
-            INSERT INTO qgis_jobs (job_id, xlsform, features, tasks)
-            VALUES (%(job_id)s, %(xlsform)s, %(features)s, %(tasks)s)
+            INSERT INTO qgis_jobs (
+                job_id,
+                xlsform,
+                features,
+                tasks,
+                operation,
+                project_id,
+                basemap_url
+            )
+            VALUES (
+                %(job_id)s,
+                %(xlsform)s,
+                %(features)s,
+                %(tasks)s,
+                %(operation)s,
+                %(project_id)s,
+                %(basemap_url)s
+            )
             """,
             {
                 "job_id": job_id,
                 "xlsform": xlsform,
                 "features": json.dumps(features),
                 "tasks": json.dumps(tasks),
+                "operation": operation,
+                "project_id": project_id,
+                "basemap_url": basemap_url,
             },
         )
     log.debug("Inserted QGIS job %s", job_id)
@@ -517,6 +720,93 @@ async def _delete_qgis_job(db: AsyncConnection, job_id) -> None:
     log.debug("Deleted QGIS job %s", job_id)
 
 
+async def _wait_for_projectfile_processing(
+    *,
+    loop,
+    client,
+    api_project_id: str,
+    attempts: int = 3,
+    poll_interval: float = 2.0,
+    poll_timeout: float = 180.0,
+) -> None:
+    """Trigger process_projectfile, poll until it finishes, retry on failure.
+
+    QFieldCloud auto-enqueues a process_projectfile job when the .qgz is
+    uploaded, but the qfield-app gunicorn worker can drop in-flight requests
+    when it rotates on max-requests. That leaves the job seeing an incomplete
+    project (e.g. missing .qgz) and silently no-oping. We explicitly trigger
+    with force=True and poll, retrying if the job ends in ``failed``.
+    """
+    last_status: Optional[str] = None
+    for attempt in range(1, attempts + 1):
+        job = await loop.run_in_executor(
+            None,
+            partial(
+                client.job_trigger,
+                api_project_id,
+                JobTypes.PROCESS_PROJECTFILE,
+                force=True,
+            ),
+        )
+        job_id = job.get("id")
+        if not job_id:
+            log.warning(
+                "QFC job_trigger returned no id on attempt %d for project %s",
+                attempt,
+                api_project_id,
+            )
+            continue
+
+        elapsed = 0.0
+        while elapsed < poll_timeout:
+            await asyncio.sleep(poll_interval)
+            elapsed += poll_interval
+            try:
+                status_resp = await loop.run_in_executor(
+                    None, partial(client.job_status, job_id)
+                )
+            except Exception as exc:
+                log.warning(
+                    "QFC job_status failed on attempt %d for job %s: %s",
+                    attempt,
+                    job_id,
+                    exc,
+                )
+                continue
+            last_status = status_resp.get("status")
+            if last_status == "finished":
+                log.info(
+                    "QFC process_projectfile finished on attempt %d for project %s",
+                    attempt,
+                    api_project_id,
+                )
+                return
+            if last_status == "failed":
+                log.warning(
+                    "QFC process_projectfile failed on attempt %d for project %s",
+                    attempt,
+                    api_project_id,
+                )
+                break
+        else:
+            log.warning(
+                "QFC process_projectfile timed out on attempt %d for project %s "
+                "(last status: %s)",
+                attempt,
+                api_project_id,
+                last_status,
+            )
+
+    raise HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail=_(
+            "QFieldCloud did not finish processing the project file after "
+            "%(attempts)d attempts (last status: %(status)s)."
+        )
+        % {"attempts": attempts, "status": last_status or "unknown"},
+    )
+
+
 async def _call_qgis_wrapper(
     *,
     job_id: str,
@@ -524,6 +814,8 @@ async def _call_qgis_wrapper(
     language: str,
     extent: str,
     open_in_edit_mode: bool,
+    endpoint: str = "/",
+    qfield_cloud: QFieldCloud | None = None,
 ) -> None:
     """POST to the QGIS wrapper to trigger project generation.
 
@@ -539,35 +831,77 @@ async def _call_qgis_wrapper(
         "extent": extent,
         "open_in_edit_mode": open_in_edit_mode,
     }
+    if endpoint in ("/", "/field"):
+        plugin_zip_b64 = _build_qfield_plugin_zip_b64()
+        if plugin_zip_b64:
+            payload["plugin_zip"] = plugin_zip_b64
+    if qfield_cloud:
+        if qfield_cloud.qfield_cloud_url:
+            payload["qfield_cloud_url"] = qfield_cloud.qfield_cloud_url
+        if qfield_cloud.qfield_cloud_user:
+            payload["qfield_cloud_user"] = qfield_cloud.qfield_cloud_user
+        if qfield_cloud.qfield_cloud_password:
+            payload["qfield_cloud_password"] = qfield_cloud.qfield_cloud_password
+
     log.info("Calling QGIS wrapper at %s for project '%s'", qgis_url, title)
 
     async with (
         ClientSession(timeout=QGIS_REQUEST_TIMEOUT) as session,
-        session.post(f"{qgis_url}/", json=payload) as response,
+        session.post(f"{qgis_url}{endpoint}", json=payload) as response,
     ):
         body = await response.text()
         if response.status != status.HTTP_200_OK:
             log.error("QGIS wrapper returned %s: %s", response.status, body)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"QGIS project generation failed: {body}",
+                detail=_("QGIS project generation failed: %(error)s") % {"error": body},
             )
         try:
             result = json.loads(body)
         except json.JSONDecodeError as exc:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="QGIS wrapper returned invalid JSON.",
+                detail=_("QGIS wrapper returned invalid JSON."),
             ) from exc
         if result.get("status") != "success":
             msg = result.get("message", "Unknown error")
             log.error("QGIS wrapper reported failure: %s", msg)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=f"QGIS project generation failed: {msg}",
+                detail=_("QGIS project generation failed: %(error)s") % {"error": msg},
             )
 
     log.debug("QGIS wrapper call succeeded for job %s", job_id)
+
+
+async def _download_file_for_qfield_upload(url: str, destination: Path) -> None:
+    """Download a remote file directly to disk for QFieldCloud upload."""
+    async with (
+        ClientSession(timeout=ClientTimeout(total=600)) as session,
+        session.get(url) as response,
+    ):
+        if response.status != status.HTTP_200_OK:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=(
+                    _(
+                        "Failed to download basemap MBTiles for upload "
+                        "(HTTP %(status)s)."
+                    )
+                    % {"status": response.status}
+                ),
+            )
+
+        with destination.open("wb") as output:
+            async for chunk in response.content.iter_chunked(1024 * 1024):
+                if chunk:
+                    output.write(chunk)
+
+    if not destination.exists() or destination.stat().st_size == 0:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_("Downloaded basemap MBTiles is empty."),
+        )
 
 
 async def _create_qfc_user(username: str, password: str, client) -> bool:
@@ -667,6 +1001,17 @@ async def _upload_to_qfieldcloud(
                 ),
             )
             log.debug("Upload complete: %s", upload_info)
+
+            # The qfield-app's gunicorn worker can rotate on max-requests
+            # mid-upload, dropping the in-flight .qgz upload or the
+            # auto-enqueued process_projectfile job. Re-trigger explicitly
+            # and poll, retrying on failure, so we don't end up with a
+            # half-processed project the user cannot open in QField.
+            await _wait_for_projectfile_processing(
+                loop=loop,
+                client=client,
+                api_project_id=api_project_id,
+            )
         except Exception as e:
             # Rollback: delete the QFieldCloud project on upload failure
             log.warning(
@@ -681,7 +1026,8 @@ async def _upload_to_qfieldcloud(
                 log.warning("Failed to clean up QFieldCloud project %s", api_project_id)
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=f"Failed to upload files to QFieldCloud: {e}",
+                detail=_("Failed to upload files to QFieldCloud: %(error)s")
+                % {"error": e},
             ) from e
 
         # Provision per-project service accounts via the QFC admin API.
@@ -867,20 +1213,28 @@ async def _project_has_collaborator(
 def _resolve_qfc_owner(client, custom_creds: QFieldCloud | None) -> str:
     """Resolve the QFieldCloud project owner.
 
-    Prefers the explicit QFIELDCLOUD_PROJECT_OWNER setting (which may be an
-    organisation name rather than the authenticated user).  Falls back to the
-    authenticated username, then the configured login user.
+    With custom creds (user-supplied account on the official or a self-hosted
+    instance) we IGNORE the deployment's QFIELDCLOUD_PROJECT_OWNER setting,
+    since it points at our own org (e.g. "hotosm"). Prefer the org name the
+    user provided, otherwise fall back to their authenticated username.
+
+    Without custom creds (the default deployment flow), keep the existing
+    behaviour: prefer QFIELDCLOUD_PROJECT_OWNER, then the authenticated user.
     """
-    # Explicit owner override takes highest priority (e.g. an org like "hotosm")
-    if settings.QFIELDCLOUD_PROJECT_OWNER:
-        return settings.QFIELDCLOUD_PROJECT_OWNER
-    # The SDK client stores the logged-in username after authentication
-    username = getattr(client, "username", None)
-    if username:
-        return username
-    # Fallback to configured login username
-    if custom_creds and custom_creds.qfield_cloud_user:
-        return custom_creds.qfield_cloud_user
+    client_username = getattr(client, "username", None)
+
+    if custom_creds:
+        candidates = [
+            custom_creds.qfield_cloud_org,
+            client_username,
+            custom_creds.qfield_cloud_user,
+        ]
+    else:
+        candidates = [settings.QFIELDCLOUD_PROJECT_OWNER, client_username]
+
+    for candidate in candidates:
+        if candidate:
+            return candidate
     return settings.QFIELDCLOUD_USER or "admin"
 
 
@@ -954,7 +1308,8 @@ async def add_qfc_project_collaborator(
     except Exception as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"QFieldCloud project '{qfc_project_id}' not found.",
+            detail=_("QFieldCloud project '%(project_id)s' not found.")
+            % {"project_id": qfc_project_id},
         ) from exc
 
     owner = project.get("owner", "")
@@ -972,8 +1327,12 @@ async def add_qfc_project_collaborator(
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail=(
-                    f"Project belongs to organization '{owner}'. "
-                    f"Could not add '{username}' to the organization: {exc}"
+                    _(
+                        "Project belongs to organization '%(owner)s'. "
+                        "Could not add '%(username)s' to the organization: "
+                        "%(error)s"
+                    )
+                    % {"owner": owner, "username": username, "error": exc}
                 ),
             ) from exc
 
@@ -987,16 +1346,20 @@ async def add_qfc_project_collaborator(
         if status_code == status.HTTP_404_NOT_FOUND:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"User '{username}' does not exist on QFieldCloud.",
+                detail=_("User '%(username)s' does not exist on QFieldCloud.")
+                % {"username": username},
             ) from exc
         if status_code == status.HTTP_409_CONFLICT:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
-                detail=f"User '{username}' is already a collaborator on this project.",
+                detail=_(
+                    "User '%(username)s' is already a collaborator on this project."
+                )
+                % {"username": username},
             ) from exc
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Failed to add collaborator: {exc}",
+            detail=_("Failed to add collaborator: %(exc)s") % {"exc": exc},
         ) from exc
 
     log.info(
@@ -1031,7 +1394,7 @@ async def qfc_credentials_test(qfc_creds: QFieldCloud):
         log.debug(msg)
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="QFieldCloud credentials are invalid.",
+            detail=_("QFieldCloud credentials are invalid."),
         ) from e
 
 

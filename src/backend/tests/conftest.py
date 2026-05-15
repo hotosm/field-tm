@@ -211,14 +211,6 @@ async def odk_project(odk_creds):
 
 
 @pytest_asyncio.fixture(scope="function")
-async def api_key(client):
-    """A real API key for use in external API endpoint tests."""
-    resp = await client.post("/api/v1/auth/api-keys", json={"name": "test-api-key"})
-    assert resp.status_code == 201, resp.text
-    yield resp.json()["api_key"]
-
-
-@pytest_asyncio.fixture(scope="function")
 async def project_with_xlsform(db, admin_user):
     """A project pre-loaded with a real XLSForm but no data extract.
 

@@ -1,5 +1,61 @@
 # Changelog
 
+## 2026.3.2 (2026-05-13)
+
+### Fix
+
+- **backend**: small fixes to the db + bg task usage, avoid db locking
+
+## 2026.3.1 (2026-05-13)
+
+### Fix
+
+- implement background task creation for /simple-project with poll
+
+## 2026.3.0 (2026-05-12)
+
+### Feat
+
+- hook up bundling of field-tm plugin + styles for qfield project creation
+- add qfield plugin code based on work from @nirvn at opengisch
+
+### Fix
+
+- **frontend**: correct wa imports for qfield custom creds modal + translations
+- **osm-fieldwork**: add missed 'offset' option for digitisation correct question
+- **backend**: logic to check is basemap generation is complete
+- **qfield**: allow specify custom instance, users username on official instance, or hot instance
+- **backend**: improve qfield client login/logout functionality
+- **qfield**: layer config using old qgis api + survey layer style name
+- **deps**: update dependency cryptography to v46.0.7 (#3070)
+
+### Refactor
+
+- big update to project creation experience to make more user friendly
+- **frontend**: move the language selector into the hot-header lang slot
+- large refactor to improve code modularity, simplicity, maintainability
+
+## 2026.2.0 (2026-04-24)
+
+### Feat
+
+- add simplified project creation workflow - streamlined, fix #3067
+- **monitoring**: filter robots.txt noise from sentry traces and events (#3046)
+- update qgis packager wrapper for generic usage field-tm / drone-tm
+
+### Fix
+
+- **osm-fieldwork**: ensure selected language is passed to xlsform, fix qfield project setup
+- **qgis**: ensure dem layer is not visible in drone-tm qfield projects
+- **deps**: update dependency litestar to v2.21.1 (#3051)
+- **deps**: update dependency cryptography to v46.0.6 (#3050)
+
+### Refactor
+
+- add option to bundle OAM imagery, update translations, fix issues
+- **translations**: osm_fieldwork is monolingual PO, update UI string for all langs
+- **auth**: remove API-key auth lifecycle and align profile auth route behavior
+
 ## 2026.1.3 (2026-03-23)
 
 ### Feat

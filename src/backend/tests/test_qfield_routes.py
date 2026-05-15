@@ -17,61 +17,28 @@
 #
 """Tests for qfield routes."""
 
-from uuid import uuid4
+import base64
+from contextlib import asynccontextmanager
+from io import BytesIO
+from types import SimpleNamespace
 
 import pytest
 
-from app.auth.api_key import hash_api_key
-from app.db.models import DbApiKey
+from app.qfield import qfield_crud
 from app.qfield.qfield_crud import (
     _build_qfc_service_account_email,
     _create_qfc_user,
     _is_org_owned_project,
+    _resolve_backend_qfc_url,
     _resolve_qfield_project_url,
     _sanitize_qfc_project_name,
     _should_open_in_edit_mode,
     _strip_feature_properties_for_qfield,
     clean_tags_for_qgis,
-    normalise_qfc_url,
 )
+from app.qfield.qfield_routes import qfield_router
 from app.qfield.qfield_schemas import QFieldCloud
-
-
-@pytest.fixture()
-async def ensure_api_keys_table(db):
-    """Ensure the api_keys table exists for API-key-protected route tests."""
-    async with db.cursor() as cur:
-        await cur.execute(
-            """
-            CREATE TABLE IF NOT EXISTS public.api_keys (
-                id SERIAL PRIMARY KEY,
-                user_sub character varying NOT NULL
-                    REFERENCES public.users(sub) ON DELETE CASCADE,
-                key_hash character varying NOT NULL UNIQUE,
-                name character varying,
-                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                last_used_at TIMESTAMPTZ,
-                is_active BOOLEAN NOT NULL DEFAULT TRUE
-            );
-            """
-        )
-    await db.commit()
-
-
-@pytest.fixture()
-async def admin_api_key(db, admin_user, ensure_api_keys_table):
-    """Create a real API key row for integration route calls."""
-    raw_key = f"ftm_qfield_{uuid4().hex}"
-    await DbApiKey.create(
-        db,
-        DbApiKey(
-            user_sub=admin_user.sub,
-            key_hash=hash_api_key(raw_key),
-            name="qfield route integration key",
-        ),
-    )
-    await db.commit()
-    return raw_key
+from app.qfield.qfield_utils import normalise_qfc_url
 
 
 async def test_qfield_creds_test_invalid_credentials_returns_400(client):
@@ -88,40 +55,14 @@ async def test_qfield_creds_test_invalid_credentials_returns_400(client):
     assert response.status_code == 400
 
 
-async def test_qfield_add_collaborator_requires_api_key(client):
-    """Collaborator route should reject requests without an API key."""
-    response = await client.post(
-        "/api/v1/qfield/projects/nonexistent/collaborators",
-        json={"username": "new-user", "role": "editor"},
+def test_legacy_qfield_add_collaborator_api_is_removed():
+    """Collaborator management belongs to the token-based QFC admin HTMX flow."""
+    route_paths = [route.path for route in qfield_router.routes]
+
+    assert "/api/v1/qfield/test-credentials" in route_paths
+    assert (
+        "/api/v1/qfield/projects/{qfc_project_id:str}/collaborators" not in route_paths
     )
-
-    assert response.status_code == 401
-
-
-async def test_qfield_add_collaborator_with_real_api_key_hits_qfield_flow(
-    client, admin_api_key
-):
-    """Route should authenticate via DB API key and execute collaborator flow."""
-    response = await client.post(
-        "/api/v1/qfield/projects/nonexistent/collaborators",
-        headers={"x-api-key": admin_api_key},
-        json={"username": "new-user", "role": "editor"},
-    )
-
-    # We only assert the auth boundary here; downstream QFieldCloud may return
-    # project-not-found (404) or service/login failures (500) depending stack state.
-    assert response.status_code != 401
-
-
-async def test_qfield_add_collaborator_payload_defaults_role(client, admin_api_key):
-    """Role should default when omitted, still exercising the real route path."""
-    response = await client.post(
-        "/api/v1/qfield/projects/nonexistent/collaborators",
-        headers={"x-api-key": admin_api_key},
-        json={"username": "new-user"},
-    )
-
-    assert response.status_code != 401
 
 
 def test_clean_tags_for_qgis_stringifies_nested_properties():
@@ -180,6 +121,44 @@ def test_resolve_qfield_project_url_falls_back_to_instance_root():
     assert url == "http://qfield.field.localhost:7050"
 
 
+def test_resolve_backend_qfc_url_prefers_internal_url_for_local_public_hostname(
+    monkeypatch,
+):
+    """Backend QField clients should use the internal URL for local proxy hosts."""
+    monkeypatch.setattr(
+        "app.qfield.qfield_crud.settings.QFIELDCLOUD_URL",
+        "http://qfield-app:8000",
+    )
+
+    resolved = _resolve_backend_qfc_url("http://qfield.field.localhost:7050")
+
+    assert resolved == "http://qfield-app:8000/api/v1/"
+
+
+def test_resolve_backend_qfc_url_prefers_internal_for_dev_test_hostname(monkeypatch):
+    """Backend QField clients should rewrite local test domains to internal host."""
+    monkeypatch.setattr(
+        "app.qfield.qfield_crud.settings.QFIELDCLOUD_URL",
+        "http://qfield-app:8000/api/v1/",
+    )
+
+    resolved = _resolve_backend_qfc_url("https://qfield.field-tm.dev.test")
+
+    assert resolved == "http://qfield-app:8000/api/v1/"
+
+
+def test_resolve_backend_qfc_url_keeps_remote_custom_url(monkeypatch):
+    """A real remote custom QField URL should remain unchanged."""
+    monkeypatch.setattr(
+        "app.qfield.qfield_crud.settings.QFIELDCLOUD_URL",
+        "http://qfield-app:8000/api/v1/",
+    )
+
+    resolved = _resolve_backend_qfc_url("https://app.qfield.cloud")
+
+    assert resolved == "https://app.qfield.cloud/api/v1/"
+
+
 def test_normalise_qfc_url_strips_project_path_segments():
     """QFieldCloud URLs should be reduced to the instance origin before API path."""
     assert (
@@ -233,20 +212,18 @@ def test_sanitize_qfc_project_name_handles_unicode_and_symbols():
     assert sanitized == "FieldTM-Kathmandu-1"
 
 
-def test_build_qfc_service_account_email_uses_configured_domain():
+def test_build_qfc_service_account_email_uses_fieldtm_domain():
     """Provisioned QField users should always get a non-empty email."""
     email = _build_qfc_service_account_email("ftm_manager_14")
 
-    assert email == "ftm_manager_14@field.localhost"
+    assert email == "ftm_manager_14@fieldtm.org"
 
 
-def test_build_qfc_service_account_email_falls_back_for_invalid_domain(monkeypatch):
-    """Fallback to a safe local domain when FTM_DOMAIN is not email-safe."""
-    monkeypatch.setattr("app.qfield.qfield_crud.settings.FTM_DOMAIN", "localhost")
-
+def test_build_qfc_service_account_email_sanitizes_local_part():
+    """Usernames should be normalized into valid email local parts."""
     email = _build_qfc_service_account_email("ftm mapper 14")
 
-    assert email == "ftm-mapper-14@noreply.local"
+    assert email == "ftm-mapper-14@fieldtm.org"
 
 
 @pytest.mark.asyncio
@@ -277,7 +254,7 @@ async def test_create_qfc_user_passes_generated_email_to_sdk():
         {
             "username": "ftm_mapper_14",
             "password": "secret",
-            "email": "ftm_mapper_14@field.localhost",
+            "email": "ftm_mapper_14@fieldtm.org",
             "exist_ok": True,
         }
     ]
@@ -311,6 +288,184 @@ def test_org_owned_project_detection_only_triggers_for_different_owner():
     """Only org-owned projects need organization membership before sharing."""
     assert _is_org_owned_project("HOTOSM", "svcftm") is True
     assert _is_org_owned_project("svcftm", "svcftm") is False
+
+
+@pytest.mark.asyncio
+async def test_attach_basemap_to_qfield_project_inserts_job_with_basemap_url(
+    monkeypatch,
+):
+    """Basemap attach should enqueue qgis job using basemap_url transport."""
+
+    class DummyDb:
+        async def commit(self):
+            return None
+
+    inserted_calls = []
+    deleted_calls = []
+
+    async def fake_insert_qgis_job(
+        db,
+        job_id,
+        xlsform,
+        features,
+        tasks,
+        operation="field",
+        project_id=None,
+        basemap_url=None,
+    ):
+        inserted_calls.append(
+            {
+                "db": db,
+                "job_id": job_id,
+                "xlsform": xlsform,
+                "features": features,
+                "tasks": tasks,
+                "operation": operation,
+                "project_id": project_id,
+                "basemap_url": basemap_url,
+            }
+        )
+
+    async def fake_call_qgis_wrapper(**kwargs):
+        assert kwargs["endpoint"] == "/basemap"
+
+    async def fake_read_qgis_job_outputs(db, job_id):
+        return {
+            "project.qgz": base64.b64encode(b"qgz-bytes").decode("ascii"),
+        }
+
+    async def fake_delete_qgis_job(db, job_id):
+        deleted_calls.append(job_id)
+
+    downloaded_basemaps = []
+
+    async def fake_download_file_for_qfield_upload(url, destination):
+        downloaded_basemaps.append((url, destination.name))
+        destination.write_bytes(b"mbtiles-bytes")
+
+    @asynccontextmanager
+    async def fake_qfield_client(_creds=None):
+        class FakeClient:
+            def upload_files(self, **kwargs):
+                return None
+
+        yield FakeClient()
+
+    monkeypatch.setattr(qfield_crud, "_insert_qgis_job", fake_insert_qgis_job)
+    monkeypatch.setattr(qfield_crud, "_call_qgis_wrapper", fake_call_qgis_wrapper)
+    monkeypatch.setattr(
+        qfield_crud, "_read_qgis_job_outputs", fake_read_qgis_job_outputs
+    )
+    monkeypatch.setattr(
+        qfield_crud,
+        "_download_file_for_qfield_upload",
+        fake_download_file_for_qfield_upload,
+    )
+    monkeypatch.setattr(qfield_crud, "_delete_qgis_job", fake_delete_qgis_job)
+    monkeypatch.setattr(qfield_crud, "qfield_client", fake_qfield_client)
+
+    project = SimpleNamespace(
+        id=7,
+        external_project_id="qfc-123",
+        project_name="demo",
+        external_project_instance_url=None,
+        external_project_username=None,
+        external_project_password_encrypted=None,
+    )
+
+    await qfield_crud.attach_basemap_to_qfield_project(
+        DummyDb(),
+        project,
+        "https://tiles.example.com/basemap.mbtiles",
+    )
+
+    assert len(inserted_calls) == 1
+    inserted = inserted_calls[0]
+    assert inserted["operation"] == "basemap"
+    assert inserted["project_id"] == "qfc-123"
+    assert inserted["basemap_url"] == "https://tiles.example.com/basemap.mbtiles"
+    assert deleted_calls
+    assert downloaded_basemaps == [
+        ("https://tiles.example.com/basemap.mbtiles", "basemap.mbtiles")
+    ]
+
+
+@pytest.mark.asyncio
+async def test_create_qfield_project_passes_resolved_language_to_qgis_wrapper(
+    monkeypatch,
+):
+    """create_qfield_project should pass resolved form language to QGIS wrapper."""
+
+    class DummyDb:
+        async def commit(self):
+            return None
+
+    captured: dict = {}
+
+    async def fake_modify_form_for_qfield(*args, **kwargs):
+        return "french(fr)", BytesIO(b"updated-xlsform")
+
+    async def fake_db_update(*args, **kwargs):
+        return None
+
+    async def fake_insert_qgis_job(*args, **kwargs):
+        return None
+
+    async def fake_call_qgis_wrapper(**kwargs):
+        captured["language"] = kwargs["language"]
+
+    async def fake_read_qgis_job_outputs(*args, **kwargs):
+        return {
+            "project.qgz": base64.b64encode(b"qgz-bytes").decode("ascii"),
+        }
+
+    async def fake_delete_qgis_job(*args, **kwargs):
+        return None
+
+    async def fake_upload_to_qfieldcloud(**kwargs):
+        return qfield_crud.QFieldProjectResult(
+            qfield_url="https://app.qfield.cloud/project/demo",
+            manager_username=None,
+            manager_password=None,
+            mapper_username=None,
+            mapper_password=None,
+        )
+
+    monkeypatch.setattr(
+        qfield_crud, "modify_form_for_qfield", fake_modify_form_for_qfield
+    )
+    monkeypatch.setattr(qfield_crud.DbProject, "update", fake_db_update)
+    monkeypatch.setattr(qfield_crud, "_insert_qgis_job", fake_insert_qgis_job)
+    monkeypatch.setattr(qfield_crud, "_call_qgis_wrapper", fake_call_qgis_wrapper)
+    monkeypatch.setattr(
+        qfield_crud, "_read_qgis_job_outputs", fake_read_qgis_job_outputs
+    )
+    monkeypatch.setattr(qfield_crud, "_delete_qgis_job", fake_delete_qgis_job)
+    monkeypatch.setattr(
+        qfield_crud, "_upload_to_qfieldcloud", fake_upload_to_qfieldcloud
+    )
+
+    project = SimpleNamespace(
+        id=11,
+        project_name="demo",
+        outline={
+            "type": "Feature",
+            "geometry": {"type": "Point", "coordinates": [85.3, 27.7]},
+            "properties": {},
+        },
+        xlsform_content=b"original-xlsform",
+        data_extract_geojson={"type": "FeatureCollection", "features": []},
+        task_areas_geojson={},
+        external_project_id=None,
+    )
+
+    await qfield_crud.create_qfield_project(
+        DummyDb(),
+        project,
+        default_language="english",
+    )
+
+    assert captured["language"] == "french(fr)"
 
 
 if __name__ == "__main__":

@@ -14,7 +14,7 @@ work. Mappers use ODK Collect or QField on mobile; managers create and monitor
 projects via a web UI. The backend handles task splitting, ODK/QFieldCloud
 integration, data conflation, and submission tracking.
 
-**Stack:** Python 3.12 / LiteStar / HTMX / PostgreSQL 18 + PostGIS 3.6 /
+**Stack:** Python 3.13 / LiteStar / HTMX / PostgreSQL 18 + PostGIS 3.6 /
 Docker Compose (dev + prod) / Helm (k8s) / uv / Ruff / pre-commit
 
 ---
@@ -120,6 +120,19 @@ These are non-negotiable regardless of task scope.
 - Comments only where intent is non-obvious.
 - HTMX: server owns state, use partial responses, no client-side state
   duplication, no JS where HTMX suffices.
+
+### HTMX Patterns
+
+- Route handlers should stay thin: parse request, call service/helpers,
+  return page or fragment.
+- Durable business logic belongs in
+  `app.projects.project_services` (or equivalent service modules), not
+  template/route glue.
+- Prefer `project-setup:*` event names for setup flow HTMX triggers.
+- Keep server-rendered state authoritative; use client-side storage only for
+  UI convenience.
+- For `/api/v1/*` routes, keep the auth posture explicit in code and tests
+  (including intentional no-auth endpoints).
 
 ---
 

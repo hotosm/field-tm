@@ -26,7 +26,7 @@ import logging
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import date
 from re import sub
-from typing import TYPE_CHECKING, Any, Mapping, Optional, Self
+from typing import Any, Mapping, Optional, Self
 
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
@@ -34,6 +34,7 @@ from psycopg import AsyncConnection, sql
 from psycopg.rows import class_row
 from pydantic import AwareDatetime, BaseModel
 
+from app.central.central_schemas import ODKCentral
 from app.config import settings
 from app.db.enums import (
     FieldMappingApp,
@@ -42,9 +43,7 @@ from app.db.enums import (
     ProjectVisibility,
     XLSFormType,
 )
-
-if TYPE_CHECKING:
-    from app.central.central_schemas import ODKCentral
+from app.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -72,7 +71,8 @@ def dump_and_check_model(db_model: Any) -> dict:
     if not model_dump:
         log.error("Attempted create or update with no data.")
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="No data provided."
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=_("No data provided."),
         )
 
     return model_dump
@@ -88,8 +88,6 @@ def _add_encrypted_odk_credentials(
         and project_update.external_project_password
     ):
         return
-
-    from app.central.central_schemas import ODKCentral
 
     odk_creds = ODKCentral(
         external_project_instance_url=project_update.external_project_instance_url,
@@ -328,122 +326,6 @@ class DbUser:
 
 
 @dataclass(slots=True)
-class DbApiKey:
-    """Table api_keys."""
-
-    id: Optional[int] = None
-    user_sub: Optional[str] = None
-    key_hash: Optional[str] = None
-    name: Optional[str] = None
-    created_at: Optional[AwareDatetime] = None
-    last_used_at: Optional[AwareDatetime] = None
-    is_active: Optional[bool] = True
-
-    @classmethod
-    async def create(cls, db: AsyncConnection, api_key_in: Self) -> Self:
-        """Create a new API key record."""
-        model_dump = dump_and_check_model(api_key_in)
-        columns = sql.SQL(", ").join(sql.Identifier(key) for key in model_dump)
-        value_placeholders = sql.SQL(", ").join(
-            sql.Placeholder(key) for key in model_dump
-        )
-
-        query = sql.SQL(
-            """
-            INSERT INTO api_keys ({columns})
-            VALUES ({values})
-            ON CONFLICT (key_hash) DO UPDATE
-            SET
-                user_sub = EXCLUDED.user_sub,
-                name = EXCLUDED.name,
-                is_active = TRUE
-            RETURNING *;
-        """
-        ).format(columns=columns, values=value_placeholders)
-
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(query, model_dump)
-            new_api_key = await cur.fetchone()
-
-        if new_api_key is None:
-            msg = f"Unknown SQL error for data: {model_dump}"
-            log.error(f"API key creation failed: {msg}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=msg,
-            )
-
-        return new_api_key
-
-    @classmethod
-    async def get_by_hash(
-        cls, db: AsyncConnection, key_hash: str, active_only: bool = True
-    ) -> Optional[Self]:
-        """Get API key record by hash."""
-        sql = """
-            SELECT *
-            FROM api_keys
-            WHERE key_hash = %(key_hash)s
-        """
-        params: dict[str, Any] = {"key_hash": key_hash}
-        if active_only:
-            sql += " AND is_active = TRUE"
-        sql += ";"
-
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(sql, params)
-            return await cur.fetchone()
-
-    @classmethod
-    async def all_for_user(cls, db: AsyncConnection, user_sub: str) -> list[Self]:
-        """List all API keys for a user."""
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(
-                """
-                SELECT *
-                FROM api_keys
-                WHERE user_sub = %(user_sub)s
-                ORDER BY created_at DESC;
-            """,
-                {"user_sub": user_sub},
-            )
-            rows = await cur.fetchall()
-
-        return rows or []
-
-    @classmethod
-    async def deactivate(
-        cls, db: AsyncConnection, key_id: int, user_sub: str
-    ) -> Optional[Self]:
-        """Deactivate an API key owned by a given user."""
-        async with db.cursor(row_factory=class_row(cls)) as cur:
-            await cur.execute(
-                """
-                UPDATE api_keys
-                SET is_active = FALSE
-                WHERE id = %(key_id)s
-                  AND user_sub = %(user_sub)s
-                RETURNING *;
-            """,
-                {"key_id": key_id, "user_sub": user_sub},
-            )
-            return await cur.fetchone()
-
-    @classmethod
-    async def touch_last_used(cls, db: AsyncConnection, key_id: int) -> None:
-        """Update API key last used timestamp."""
-        async with db.cursor() as cur:
-            await cur.execute(
-                """
-                UPDATE api_keys
-                SET last_used_at = NOW()
-                WHERE id = %(key_id)s;
-            """,
-                {"key_id": key_id},
-            )
-
-
-@dataclass(slots=True)
 class DbTemplateXLSForm:
     """Table template_xlsforms.
 
@@ -519,6 +401,17 @@ class DbProject:
     xlsform_content: Optional[bytes] = None
     hashtags: Optional[list[str]] = None
     custom_tms_url: Optional[str] = None
+    basemap_stac_item_id: Optional[str] = None
+    basemap_url: Optional[str] = None
+    basemap_status: Optional[str] = None
+    basemap_minzoom: Optional[int] = None
+    basemap_maxzoom: Optional[int] = None
+    basemap_attach_status: Optional[str] = None
+    basemap_attach_error: Optional[str] = None
+    basemap_attach_updated_at: Optional[AwareDatetime] = None
+    creation_status: Optional[str] = None
+    creation_error: Optional[str] = None
+    creation_updated_at: Optional[AwareDatetime] = None
     created_at: Optional[AwareDatetime] = None
     updated_at: Optional[AwareDatetime] = None
     # Encrypted ODK appuser token (may be null until generated)
@@ -667,8 +560,6 @@ class DbProject:
             hasattr(project_in, "external_project_password")
             and project_in.external_project_password
         ):
-            from app.central.central_schemas import ODKCentral
-
             odk_creds = ODKCentral(
                 external_project_instance_url=project_in.external_project_instance_url,
                 external_project_username=project_in.external_project_username,
@@ -796,8 +687,6 @@ class DbProject:
 
         Returns None if no credentials are set.
         """
-        from app.central.central_schemas import ODKCentral
-
         has_complete_creds = all(
             [
                 self.external_project_instance_url,

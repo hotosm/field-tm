@@ -101,9 +101,13 @@
       import "@awesome.me/webawesome/dist/components/card/card.js";
       import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
       import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
+      import "@awesome.me/webawesome/dist/components/icon/icon.js";
       import "@awesome.me/webawesome/dist/components/input/input.js";
       import "@awesome.me/webawesome/dist/components/option/option.js";
+      import "@awesome.me/webawesome/dist/components/radio/radio.js";
+      import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
       import "@awesome.me/webawesome/dist/components/select/select.js";
+      import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
       import "@awesome.me/webawesome/dist/components/tag/tag.js";
       import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
     </script>
@@ -111,17 +115,17 @@
     <!-- HOT UI theme + components -->
     <link
       rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/style-core.css"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.1/dist/style-core.css"
     />
     <!-- modulepreload: browser fetches, parses, and compiles the module eagerly  -->
     <!-- so custom elements are defined as soon as possible after the page loads. -->
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/hotosm-ui.js"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.1/dist/hotosm-ui.js"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.9.0/dist/hotosm-ui.js"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.1/dist/hotosm-ui.js"
     ></script>
     {% if auth_enabled %}
     <link
@@ -164,7 +168,30 @@
   </head>
 
   <body>
+    <hot-announcement src="https://d33erh71igmru9.cloudfront.net/field-tm.json"></hot-announcement>
+
     <hot-header id="app-header" title="FieldTM" size="medium">
+      <wa-dropdown slot="lang">
+        <wa-button slot="trigger" variant="text" class="ftm-header-lang-trigger">
+          {{ locale_labels.get(current_locale(), current_locale().upper()) }}
+          <wa-icon
+            name="chevron-down"
+            class="ftm-header-lang-trigger__icon"
+            aria-hidden="true"
+          ></wa-icon>
+        </wa-button>
+        <div class="ftm-header-lang-menu">
+          {% for locale_code in supported_locales %}
+          <button
+            type="button"
+            class="ftm-header-lang-option{% if current_locale() == locale_code %} ftm-header-lang-option--active{% endif %}"
+            data-locale-switch="{{ locale_code }}"
+          >
+            {{ locale_labels.get(locale_code, locale_code.upper()) }}
+          </button>
+          {% endfor %}
+        </div>
+      </wa-dropdown>
       {% if auth_enabled %}
       <hotosm-auth
         slot="auth"
@@ -182,6 +209,24 @@
     {% block content %}{% endblock %}
 
     <script>
+      // Strip ?lang= from the URL after the locale cookie middleware has set
+      // ftm_locale, so refreshes and shared links don't keep overriding the
+      // user's stored preference.
+      if (new URLSearchParams(window.location.search).has("lang")) {
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete("lang");
+        window.history.replaceState({}, "", cleanUrl.toString());
+      }
+
+      document.querySelectorAll("[data-locale-switch]").forEach((item) => {
+        item.addEventListener("click", () => {
+          const nextLocale = item.dataset.localeSwitch;
+          const nextUrl = new URL(window.location.href);
+          nextUrl.searchParams.set("lang", nextLocale);
+          window.location.assign(nextUrl.toString());
+        });
+      });
+
       {% if auth_enabled %}
       // hotosm-auth emits 'hanko-login' on every page load when a session exists.
       // We call /profile/me once per session: it syncs the user into the FTM

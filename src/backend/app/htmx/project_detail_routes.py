@@ -19,7 +19,6 @@
 """Project detail and QR code HTMX routes."""
 
 import json
-import logging
 from contextlib import suppress
 
 from litestar import delete, get
@@ -28,7 +27,7 @@ from litestar.di import Provide
 from litestar.exceptions import HTTPException
 from litestar.params import Parameter
 from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
-from litestar.response import Response, Template
+from litestar.response import Response
 from psycopg import AsyncConnection
 
 from app.auth.auth_deps import (
@@ -50,8 +49,9 @@ from app.projects.project_services import (
 )
 
 from .htmx_helpers import callout as _callout
-
-log = logging.getLogger(__name__)
+from .setup_steps.setup_step_responses import (
+    hx_redirect_response as _hx_redirect_response,
+)
 
 
 def _app_name(project: DbProject) -> str:
@@ -197,7 +197,7 @@ async def project_details(
     db: AsyncConnection,
     project_id: int,
     auth_user: object | None = None,
-) -> Template:
+) -> HTMXTemplate:
     """Render project details page."""
     try:
         project = await DbProject.one(db, project_id)
@@ -269,12 +269,7 @@ async def delete_project_htmx(
         )
 
     await db.commit()
-    return Response(
-        content="",
-        media_type="text/html",
-        status_code=status.HTTP_200_OK,
-        headers={"HX-Redirect": "/projects"},
-    )
+    return _hx_redirect_response("/projects")
 
 
 @get(
@@ -327,11 +322,4 @@ async def project_qrcode_htmx(
             ),
             media_type="text/html",
             status_code=e.status_code,
-        )
-    except Exception as e:
-        log.error(f"Error generating QR code via HTMX: {e}", exc_info=True)
-        return Response(
-            content=_callout("warning", _friendly_qr_error(e)),
-            media_type="text/html",
-            status_code=status.HTTP_200_OK,
         )

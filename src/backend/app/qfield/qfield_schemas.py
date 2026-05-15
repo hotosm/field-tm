@@ -24,6 +24,7 @@ from pydantic import BaseModel
 from pydantic.functional_validators import field_validator, model_validator
 
 from app.config import HttpUrlStr
+from app.qfield.qfield_utils import normalise_qfc_url
 
 log = logging.getLogger(__name__)
 
@@ -34,19 +35,15 @@ log = logging.getLogger(__name__)
 # 3. Is used directly as a route parameter (Litestar handles Pydantic models natively)
 
 
-class AddQFCCollaboratorRequest(BaseModel):
-    """Request body to add a collaborator to a QFieldCloud project."""
-
-    username: str
-    role: str = "editor"
-
-
 class QFieldCloud(BaseModel):
     """QField Cloud credentials for API input validation."""
 
     qfield_cloud_url: Optional[HttpUrlStr] = None
     qfield_cloud_user: Optional[str] = None
     qfield_cloud_password: Optional[str] = None
+    # Optional org name. When set, the project is created under this org;
+    # when unset, the project is created under qfield_cloud_user.
+    qfield_cloud_org: Optional[str] = None
 
     @field_validator("qfield_cloud_url", mode="after")
     @classmethod
@@ -57,7 +54,6 @@ class QFieldCloud(BaseModel):
         """
         if not value:
             return None
-        from app.qfield.qfield_crud import normalise_qfc_url
 
         return normalise_qfc_url(value)
 

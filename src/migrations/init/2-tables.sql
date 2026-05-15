@@ -56,6 +56,17 @@ CREATE TABLE projects (
     task_areas_geojson JSONB,
     hashtags character varying [],
     custom_tms_url character varying,
+    basemap_stac_item_id character varying,
+    basemap_url character varying,
+    basemap_status character varying,
+    basemap_minzoom integer,
+    basemap_maxzoom integer,
+    basemap_attach_status character varying DEFAULT 'idle',
+    basemap_attach_error text,
+    basemap_attach_updated_at timestamp with time zone,
+    creation_status character varying DEFAULT 'ready',
+    creation_error text,
+    creation_updated_at timestamp with time zone,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );
@@ -90,31 +101,9 @@ CREATE TABLE qgis_jobs (
     xlsform BYTEA,
     features JSONB,
     tasks JSONB,
-    output_files JSONB
+    output_files JSONB,
+    operation character varying NOT NULL DEFAULT 'field',
+    project_id character varying,
+    basemap_url character varying
 );
 ALTER TABLE qgis_jobs OWNER TO current_user;
-
-
-CREATE TABLE api_keys (
-    id integer NOT NULL,
-    user_sub character varying NOT NULL,
-    key_hash character varying NOT NULL,
-    name character varying,
-    created_at timestamp with time zone NOT NULL DEFAULT now(),
-    last_used_at timestamp with time zone,
-    is_active boolean NOT NULL DEFAULT TRUE
-);
-ALTER TABLE api_keys OWNER TO current_user;
-CREATE SEQUENCE api_keys_id_seq
-AS integer
-START WITH 1
-INCREMENT BY 1
-NO MINVALUE
-NO MAXVALUE
-CACHE 1;
-ALTER TABLE api_keys_id_seq OWNER TO current_user;
-ALTER SEQUENCE api_keys_id_seq OWNED BY api_keys.id;
--- Autoincrement PK
-ALTER TABLE ONLY api_keys ALTER COLUMN id SET DEFAULT nextval(
-    'api_keys_id_seq'::regclass
-);

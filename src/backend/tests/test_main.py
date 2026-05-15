@@ -1,13 +1,17 @@
 """Tests for app bootstrap helpers."""
 
 import os
+from types import SimpleNamespace
 
+from litestar import status_codes as status
+from litestar.exceptions import HTTPException
+
+from app import main
 from app.auth.auth_routes import auth_router
 from app.central.central_routes import central_router
 from app.config import AuthProvider, OtelSettings, Settings
 from app.helpers.helper_routes import helper_router
 from app.main import _configure_template_engine, build_login_app_url, create_app
-from app.projects.project_routes import api_router
 from app.projects.project_schemas import StubProjectIn
 from app.qfield.qfield_routes import qfield_router
 
@@ -84,8 +88,6 @@ def test_otel_settings_exclude_static_urls(monkeypatch):
 
 def test_create_app_skips_auth_setup_when_provider_disabled(monkeypatch):
     """Disabled auth mode must not call setup_auth()."""
-    from app import main
-
     monkeypatch.setattr(main.settings, "AUTH_PROVIDER", AuthProvider.DISABLED)
 
     def _raise_if_called():
@@ -97,11 +99,38 @@ def test_create_app_skips_auth_setup_when_provider_disabled(monkeypatch):
     assert app is not None
 
 
+def test_htmx_exception_handler_preserves_http_status():
+    """HTMX error fragments should not mask the real HTTP status."""
+    request = SimpleNamespace(headers={"HX-Request": "true"})
+    exc = HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Missing <project>",
+    )
+
+    response = main._htmx_exception_handler(request, exc)
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.media_type == "text/html"
+    assert "Missing &lt;project&gt;" in response.content
+
+
+def test_htmx_exception_handler_preserves_server_error_status():
+    """HTMX server errors should remain visible to clients and monitoring."""
+    request = SimpleNamespace(headers={"HX-Request": "true"})
+    exc = HTTPException(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        detail="Internal detail",
+    )
+
+    response = main._htmx_exception_handler(request, exc)
+
+    assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+    assert "An unexpected error occurred" in response.content
+    assert "Internal detail" not in response.content
+
+
 def test_api_routers_share_versioned_prefix_and_tag():
     """JSON API routers should live under /api/v1 and share one schema tag."""
-    assert api_router.path == "/api/v1"
-    assert api_router.tags == ["api"]
-
     assert auth_router.path == "/api/v1/auth"
     assert auth_router.tags == ["api"]
 
@@ -124,7 +153,6 @@ def test_stub_project_internal_fields_are_persistable():
 
 def test_template_engine_config_handles_disabled_auth_without_hanko_urls(monkeypatch):
     """Disabled auth must not attempt to derive login URL from missing Hanko URL."""
-    from app import main
 
     class _FakeInnerEngine:
         def __init__(self):

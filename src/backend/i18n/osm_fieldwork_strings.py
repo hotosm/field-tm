@@ -19,6 +19,7 @@ def get_osm_fieldwork_msgids() -> tuple[str, ...]:
         pgettext("xlsform_label", "new"),
         pgettext("xlsform_label", "new_feature"),
         pgettext("xlsform_label", "no"),
+        pgettext("xlsform_label", "offset"),
         pgettext("xlsform_label", "osm_username"),
         pgettext("xlsform_label", "other"),
         pgettext("xlsform_label", "split"),

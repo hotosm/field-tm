@@ -11,6 +11,7 @@ from app.auth.auth_schemas import AuthUser
 from app.db.models import (
     DbUser,
 )
+from app.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +87,8 @@ async def get_or_create_user(
         if not db_user_details:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"User ({user_data.sub}) could not be inserted in db",
+                detail=_("User (%(user_sub)s) could not be inserted in db")
+                % {"user_sub": user_data.sub},
             )
 
         return db_user_details

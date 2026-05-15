@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-23 23:31+0000\n"
+"POT-Creation-Date: 2026-05-13 04:50+0100\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: tr\n"
@@ -18,41 +18,160 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:163
+#: app/main.py:144
+msgid "Validation failed"
+msgstr "Doğrulaması başarısız oldu"
+
+#: app/main.py:168
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "Beklenmeyen bir hata oluştu. Lütfen bir yöneticiyle iletişime geçin."
 
-#: app/htmx/project_create_routes.py:205
+#: app/main.py:286
+msgid "Could not connect to database"
+msgstr "Veritabanına bağlanılamadı"
+
+#: app/auth/auth_deps.py:73
+msgid "Authenticated user is missing a valid identifier."
+msgstr "Kimliği doğrulanmış kullanıcının geçerli bir tanımlayıcısı eksik."
+
+#: app/auth/roles.py:142
+msgid "User must be an administrator"
+msgstr "Kullanıcısı yönetici olmalıdır"
+
+#: app/auth/roles.py:163
+msgid "User does not have permission to access the project."
+msgstr "Kullanıcısının projeye erişim izni yok."
+
+#: app/auth/roles.py:234
+#, python-format
+msgid "Project is locked since it is in %(state)s state."
+msgstr "Projesi %(state)s durumunda olduğundan kilitlidir."
+
+#: app/auth/user_crud.py:88
+#, python-format
+msgid "User (%(user_sub)s) could not be inserted in db"
+msgstr "Kullanıcısı (%(user_sub)s) db'ye eklenemedi"
+
+#: app/central/central_crud.py:151
+#, python-format
+msgid "Error listing projects on ODK Central: %(error)s"
+msgstr "ODK Central'da projeler listelenirken hata oluştu: %(error)s"
+
+#: app/central/central_crud.py:182
+#, python-format
+msgid "Error creating project on ODK Central: %(error)s"
+msgstr "ODK Central'da proje oluşturulurken hata oluştu: %(error)s"
+
+#: app/central/central_crud.py:244
+#, python-format
+msgid "Failed to upload form to ODK Central: %(error)s"
+msgstr "Form ODK Central'a yüklenemedi: %(error)s"
+
+#: app/central/central_crud.py:259
+msgid "form_id is required to list submissions with pyodk."
+msgstr "form_id gereklidir."
+
+#: app/central/central_crud.py:302
+#, python-format
+msgid "XLSForm is invalid: %(error)s"
+msgstr "XLSForm geçersiz: %(error)s"
+
+#: app/central/central_crud.py:429
+msgid "Conversion GeoJSON --> CSV failed"
+msgstr "Dönüşümü GeoJSON --> CSV başarısız oldu"
+
+#: app/central/central_crud.py:500
+msgid "Project contains no submissions yet"
+msgstr "Projesi henüz başvuru içermiyor"
+
+#: app/central/central_crud.py:562
+msgid "'geometry' data field is mandatory"
+msgstr "'geometri' veri alanı zorunludur"
+
+#: app/central/central_crud.py:830
+msgid "ODK project_id is missing; cannot create/merge entity lists."
+msgstr "ODK project_id eksik; varlık listeleri oluşturulamıyor/birleştirilemiyor."
+
+#: app/central/central_crud.py:963
+msgid "Could not generate token for app user."
+msgstr "Uygulama kullanıcısı için belirteç oluşturulamadı."
+
+#: app/central/central_crud.py:995 app/central/central_crud.py:1001
+msgid "An error occurred while creating the app user token."
+msgstr "QR kodu oluşturulurken beklenmeyen bir hata oluştu."
+
+#: app/central/central_crud.py:1015
+#, python-format
+msgid "Could not assign %(scope)s role to app user."
+msgstr "%(scope)s rolü uygulama kullanıcısına atanamadı."
+
+#: app/central/central_crud.py:1054
+msgid "Could not find 'Project Manager' role in ODK Central."
+msgstr "Projeyi ODK Central'da aç"
+
+#: app/central/central_crud.py:1079
+msgid "ODK Central returned no user ID after creation."
+msgstr "ODK Central, oluşturulduktan sonra kullanıcı kimliği döndürmedi."
+
+#: app/central/central_crud.py:1212
+msgid "Failed to create ODK Central manager user."
+msgstr "ODK Merkezi yönetici kullanıcısı oluşturulamadı."
+
+#: app/central/central_crud.py:1232
+msgid "Unexpected error while testing ODK Central credentials."
+msgstr "QR kodu oluşturulurken beklenmeyen bir hata oluştu."
+
+#: app/central/central_deps.py:199
+#: app/htmx/project_create/project_create_templates.py:104
 msgid "Provide a valid .xls or .xlsx file"
 msgstr "Geçerli bir .xls veya .xlsx dosyası sağlayın"
 
-#: app/htmx/project_create_routes.py:223
-msgid "Failed to load template form."
-msgstr "Şablon form yüklenemedi."
+#: app/db/models.py:75
+msgid "No data provided."
+msgstr "Veri çıkarımı sağlanmadı."
 
-#: app/htmx/project_create_routes.py:231
-msgid "Please select a form or upload a file."
-msgstr "Lütfen bir form seçin veya bir dosya yükleyin."
+#: app/helpers/basemap_services.py:26
+#, python-format
+msgid "%(action)s failed with HTTP %(status_code)s."
+msgstr "%(action)s, HTTP %(status_code)s ile başarısız oldu."
 
-#: app/htmx/project_create_routes.py:456 app/htmx/project_detail_routes.py:297
-msgid "Project not found."
-msgstr "Proje bulunamadı."
+#: app/helpers/basemap_services.py:40
+#, python-format
+msgid "%(action)s failed due to upstream connection error."
+msgstr "%(action)s, yukarı akış bağlantı hatası nedeniyle başarısız oldu."
 
-#: app/htmx/project_create_routes.py:466
-msgid "Project ID mismatch. You do not have access to this project."
-msgstr "Proje kimliği eşleşmiyor. Bu projeye erişim izniniz yok."
+#: app/helpers/basemap_services.py:181
+#, python-format
+msgid "Tilepack API returned HTTP %(status_code)s."
+msgstr "Tilepack API, HTTP %(status_code)s'i döndürdü."
 
-#: app/htmx/project_create_routes.py:508
-msgid "Form validated and uploaded successfully! Reloading page..."
-msgstr "Form başarıyla doğrulandı ve yüklendi! Sayfa yeniden yükleniyor..."
+#: app/helpers/helper_routes.py:78
+msgid "Failed to convert YAML form to XLSForm."
+msgstr "YAML formu XLSForm'a dönüştürülemedi."
 
-#: app/htmx/project_create_routes.py:532 app/htmx/setup_step_routes.py:77
-msgid "An unexpected error occurred"
-msgstr "Beklenmeyen bir hata oluştu"
+#: app/helpers/helper_routes.py:101
+msgid "Provide a valid .json or .geojson file"
+msgstr "Geçerli bir .xls veya .xlsx dosyası sağlayın"
 
-#: app/htmx/project_create_routes.py:536
-msgid "Error"
-msgstr "Hata"
+#: app/helpers/helper_routes.py:139
+msgid "Provide a valid .csv"
+msgstr "Geçerli bir .xls veya .xlsx dosyası sağlayın"
+
+#: app/helpers/helper_routes.py:193
+msgid "Provide a valid .json file"
+msgstr "Geçerli bir .xls veya .xlsx dosyası sağlayın"
+
+#: app/helpers/helper_routes.py:228
+msgid "Could not login to raw-data-api"
+msgstr "Ham veri API'sine giriş yapılamadı"
+
+#: app/helpers/helper_routes.py:252
+msgid "No geometries present"
+msgstr "Geometri yok"
+
+#: app/helpers/helper_routes.py:269
+msgid "Your geojson file is invalid."
+msgstr "Geojson dosyanız geçersiz."
 
 #: app/htmx/project_detail_routes.py:97
 msgid "Mapper Login (QFieldCloud)"
@@ -126,272 +245,466 @@ msgstr "Proje (%(project_id)s) bulunamadı."
 msgid "Only the project manager can delete this project."
 msgstr "Bu projeyi yalnızca proje yöneticisi silebilir."
 
-#: app/htmx/project_detail_routes.py:326 app/htmx/setup_step_routes.py:598
-#: app/htmx/setup_step_routes.py:718 app/htmx/setup_step_routes.py:829
-#: app/htmx/setup_step_routes.py:883 app/htmx/setup_step_routes.py:982
-#: app/htmx/setup_step_routes.py:1080 app/htmx/setup_step_routes.py:1156
-#: app/htmx/setup_step_routes.py:1249 app/htmx/setup_step_routes.py:1320
-#: app/htmx/setup_step_routes.py:1390
+#: app/htmx/project_detail_routes.py:292 app/templates/project_details.html:172
+msgid "Project not found."
+msgstr "Proje bulunamadı."
+
+#: app/htmx/project_detail_routes.py:321
+#: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Hata: %(error_msg)s"
 
-#: app/htmx/qfc_admin_routes.py:55
-msgid "Admin"
-msgstr "Yönetici"
+#: app/htmx/basemap/basemap_attach_flow.py:68
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
+msgstr ""
+"Altlık harita ekleme şimdilik başarısız oldu. Projeniz kullanıma hazır. "
+"Lütfen eklemeyi tekrar deneyin."
 
-#: app/htmx/qfc_admin_routes.py:56 app/templates/project_details.html:72
-msgid "Manager"
-msgstr "Yönetici"
+#: app/htmx/basemap/basemap_attach_flow.py:73
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+"Geçici bir ağ sorunu nedeniyle altlık harita ekleme tamamlanamadı. "
+"Projeniz kullanıma hazır. Lütfen eklemeyi tekrar deneyin."
 
-#: app/htmx/qfc_admin_routes.py:57
-msgid "Editor"
-msgstr "Düzenleyici"
+#: app/htmx/basemap/basemap_attach_flow.py:122
+msgid "Basemap attach is available after publication."
+msgstr "Altlık harita ekleme yayınlamadan sonra kullanılabilir."
 
-#: app/htmx/qfc_admin_routes.py:58
-msgid "Reporter"
-msgstr "Raporlayan"
+#: app/htmx/basemap/basemap_attach_flow.py:131
+msgid "Basemap attach is only available for QField projects."
+msgstr "Altlık harita ekleme yalnızca QField projeleri için kullanılabilir."
 
-#: app/htmx/qfc_admin_routes.py:59
-msgid "Reader"
-msgstr "Okuyucu"
+#: app/htmx/basemap/basemap_attach_flow.py:141
+msgid "Basemap is not ready yet. Please wait for generation to complete."
+msgstr "Altlık harita henüz hazır değil. Lütfen üretim tamamlanana kadar bekleyin."
 
-#: app/htmx/qfc_admin_routes.py:106
+#: app/htmx/basemap/basemap_attach_flow.py:156
+msgid ""
+"Basemap download URL is not available yet. Please refresh status and try "
+"again shortly."
+msgstr ""
+"Altlık harita indirme URL’si henüz kullanılamıyor. Lütfen durumu "
+"yenileyin ve kısa süre sonra tekrar deneyin."
+
+#: app/htmx/basemap/basemap_attach_flow.py:172
+#, python-format
+msgid ""
+"QField basemap attach is not configured on this deployment. Missing "
+"%(config)s."
+msgstr ""
+"Bu dağıtımda QField altlık harita ekleme yapılandırılmamış. %(config)s "
+"eksik."
+
+#: app/htmx/basemap/basemap_fragments.py:17
+#: app/htmx/setup_steps/setup_step_responses.py:90
+msgid "Project not found or access denied."
+msgstr "Proje bulunamadı veya erişim reddedildi."
+
+#: app/htmx/basemap/basemap_fragments.py:105
+msgid "Basemap attached to QField project successfully."
+msgstr "Altlık harita QField projesine başarıyla eklendi."
+
+#: app/htmx/basemap/basemap_fragments.py:115
+msgid "Basemap attach has not started yet."
+msgstr "Altlık harita ekleme işlemi henüz başlamadı."
+
+#: app/htmx/basemap/basemap_fragments.py:126
+msgid "Failed to search imagery right now. Please try again shortly."
+msgstr "Şu anda görüntü aranamadı. Lütfen kısa süre sonra tekrar deneyin."
+
+#: app/htmx/basemap/basemap_fragments.py:139
+msgid "Failed to start basemap generation right now. Please try again shortly."
+msgstr ""
+"Şu anda altlık harita üretimi başlatılamadı. Lütfen kısa süre sonra "
+"tekrar deneyin."
+
+#: app/htmx/basemap/basemap_fragments.py:153
+msgid "Failed to refresh basemap status right now. Please try again shortly."
+msgstr ""
+"Şu anda altlık harita durumu yenilenemedi. Lütfen kısa süre sonra tekrar "
+"deneyin."
+
+#: app/htmx/basemap/basemap_routes.py:113
+msgid "Basemap tools are available after publication."
+msgstr "Altlık harita araçları yayınlamadan sonra kullanılabilir."
+
+#: app/htmx/basemap/basemap_routes.py:273
+msgid "No basemap generation in progress."
+msgstr "Saha haritalama sürüyor"
+
+#: app/htmx/project_create/project_create_parsing.py:15
+msgid ""
+"Project area must be valid JSON (GeoJSON Polygon, MultiPolygon, Feature, "
+"or FeatureCollection)."
+msgstr ""
+"Proje alanı geçerli JSON olmalıdır (GeoJSON Polygon, MultiPolygon, "
+"Feature veya FeatureCollection)."
+
+#: app/htmx/project_create/project_create_simple_flow.py:60
+msgid ""
+"No existing OSM buildings were found in this area. Continue mapping from "
+"scratch."
+msgstr ""
+"Bu alanda mevcut OSM binaları bulunamadı. Sıfırdan haritalamaya devam "
+"edin."
+
+#: app/htmx/project_create/project_create_simple_flow.py:157
+msgid "Could not load default OSM Buildings form for simple project creation."
+msgstr "Basit proje oluşturma için varsayılan OSM Buildings formu yüklenemedi."
+
+#: app/htmx/project_create/project_create_simple_flow.py:269
+#: app/htmx/project_create/project_create_submit_routes.py:140
+#: app/htmx/project_create/project_create_submit_routes.py:209
+msgid "An unexpected error occurred. Please try again."
+msgstr "Beklenmeyen bir hata oluştu. Lütfen tekrar deneyin."
+
+#: app/htmx/project_create/project_create_templates.py:119
+msgid "Failed to load template form."
+msgstr "Şablon form yüklenemedi."
+
+#: app/htmx/project_create/project_create_templates.py:127
+msgid "Please select a form or upload a file."
+msgstr "Lütfen bir form seçin veya bir dosya yükleyin."
+
+#: app/htmx/project_create/project_create_xlsform_routes.py:132
+msgid "Form validated and uploaded successfully! Reloading page..."
+msgstr "Form başarıyla doğrulandı ve yüklendi! Sayfa yeniden yükleniyor..."
+
+#: app/htmx/qfc_admin/qfc_admin_routes.py:73
 msgid "This user does not exist. Please create it first."
 msgstr "Bu kullanıcı mevcut değil. Lütfen önce oluşturun."
 
-#: app/htmx/qfc_admin_routes.py:108
+#: app/htmx/qfc_admin/qfc_admin_routes.py:75
 msgid "This user is already a collaborator on this project."
 msgstr "Bu kullanıcı zaten bu projede işbirlikçi."
 
-#: app/htmx/qfc_admin_routes.py:109
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1360
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "İşbirlikçi eklenemedi: %(exc)s"
 
-#: app/htmx/qfc_admin_routes.py:115
-#, python-format
-msgid ""
-"This project belongs to the %(organization)s organization. The user must "
-"be added to that organization before they can be added as a collaborator."
-" Your QFieldCloud account does not have permission to manage organization"
-" members."
-msgstr ""
-"Bu proje %(organization)s kuruluşuna aittir. Kullanıcının işbirlikçi "
-"olarak eklenmeden önce bu kuruluşa eklenmesi gerekir. QFieldCloud "
-"hesabınızın kuruluş üyelerini yönetme izni yok."
-
-#: app/htmx/qfc_admin_routes.py:163
+#: app/htmx/qfc_admin/qfc_admin_routes.py:106
 msgid "All fields are required."
 msgstr "Tüm alanlar zorunludur."
 
-#: app/htmx/qfc_admin_routes.py:178
+#: app/htmx/qfc_admin/qfc_admin_routes.py:121
 msgid "Login succeeded but no token received."
 msgstr "Giriş başarılı oldu ancak belirteç alınmadı."
 
-#: app/htmx/qfc_admin_routes.py:186
+#: app/htmx/qfc_admin/qfc_admin_routes.py:129
 msgid "Login failed. Check your URL and credentials."
 msgstr "Giriş başarısız oldu. URL'nizi ve bilgilerinizi kontrol edin."
 
-#: app/htmx/qfc_admin_routes.py:217
-msgid "QFieldCloud Projects"
-msgstr "QFieldCloud Projeleri"
-
-#: app/htmx/qfc_admin_routes.py:222
-msgid "Connected as"
-msgstr "Bağlı kullanıcı"
-
-#: app/htmx/qfc_admin_routes.py:223
-msgid "to"
-msgstr "ile"
-
-#: app/htmx/qfc_admin_routes.py:229
-msgid "Log Out"
-msgstr "Çıkış Yap"
-
-#: app/htmx/qfc_admin_routes.py:234
-msgid "No projects found."
-msgstr "Proje bulunamadı."
-
-#: app/htmx/qfc_admin_routes.py:243
-msgid "Public"
-msgstr "Herkese açık"
-
-#: app/htmx/qfc_admin_routes.py:245
-msgid "Private"
-msgstr "Özel"
-
-#: app/htmx/qfc_admin_routes.py:259
-msgid "Manage"
-msgstr "Yönet"
-
-#: app/htmx/qfc_admin_routes.py:269
-msgid "Project"
-msgstr "Proje"
-
-#: app/htmx/qfc_admin_routes.py:269
-msgid "Owner"
-msgstr "Sahip"
-
-#: app/htmx/qfc_admin_routes.py:269
-msgid "Visibility"
-msgstr "Görünürlük"
-
-#: app/htmx/qfc_admin_routes.py:269 app/templates/new_project.html:38
-#: app/templates/project_details.html:58
-msgid "Description"
-msgstr "Açıklama"
-
-#: app/htmx/qfc_admin_routes.py:298
+#: app/htmx/qfc_admin/qfc_admin_routes.py:168
 msgid "Session expired. Please log in again."
 msgstr "Oturum süresi doldu. Lütfen tekrar giriş yapın."
 
-#: app/htmx/qfc_admin_routes.py:317
+#: app/htmx/qfc_admin/qfc_admin_routes.py:183
 #, python-format
 msgid "Could not load collaborators: %(exc)s"
 msgstr "İşbirlikçiler yüklenemedi: %(exc)s"
 
-#: app/htmx/qfc_admin_routes.py:387
-msgid "Update"
-msgstr "Güncelle"
-
-#: app/htmx/qfc_admin_routes.py:390 app/htmx/qfc_admin_routes.py:397
-#: app/htmx/qfc_admin_routes.py:405
-msgid "Remove"
-msgstr "Kaldır"
-
-#: app/htmx/qfc_admin_routes.py:395
-msgid "Remove Collaborator"
-msgstr "İşbirlikçiyi Kaldır"
-
-#: app/htmx/qfc_admin_routes.py:397
-msgid "from this project?"
-msgstr "bu projeden?"
-
-#: app/htmx/qfc_admin_routes.py:401 app/templates/new_project.html:169
-#: app/templates/partials/project_details/setup_steps.html:694
-#: app/templates/partials/project_details/setup_steps.html:789
-msgid "Cancel"
-msgstr "İptal"
-
-#: app/htmx/qfc_admin_routes.py:411
-msgid "User"
-msgstr "Kullanıcı"
-
-#: app/htmx/qfc_admin_routes.py:411
-msgid "Role"
-msgstr "Rol"
-
-#: app/htmx/qfc_admin_routes.py:411
-msgid "Actions"
-msgstr "İşlemler"
-
-#: app/htmx/qfc_admin_routes.py:417
-msgid "No collaborators yet."
-msgstr "Henüz işbirlikçi yok."
-
-#: app/htmx/qfc_admin_routes.py:431
-#: app/templates/partials/project_details/setup_steps.html:722
-#: app/templates/partials/project_details/setup_steps.html:728
-#: app/templates/partials/project_details/setup_steps.html:762
-#: app/templates/qfc_admin.html:52
-msgid "Username"
-msgstr "Kullanıcı adı"
-
-#: app/htmx/qfc_admin_routes.py:441
-msgid "Add Collaborator"
-msgstr "İşbirlikçi Ekle"
-
-#: app/htmx/qfc_admin_routes.py:449
-msgid "Close"
-msgstr "Kapat"
-
-#: app/htmx/qfc_admin_routes.py:456
-msgid "Collaborators"
-msgstr "İşbirlikçiler"
-
-#: app/htmx/qfc_admin_routes.py:480
+#: app/htmx/qfc_admin/qfc_admin_routes.py:214
 msgid "Username is required."
 msgstr "Kullanıcı adı gereklidir."
 
-#: app/htmx/qfc_admin_routes.py:530
+#: app/htmx/qfc_admin/qfc_admin_routes.py:268
 #, python-format
 msgid "Failed to remove collaborator: %(exc)s"
 msgstr "İşbirlikçi kaldırılamadı: %(exc)s"
 
-#: app/htmx/qfc_admin_routes.py:569
+#: app/htmx/qfc_admin/qfc_admin_routes.py:311
 #, python-format
 msgid "Failed to update collaborator: %(exc)s"
 msgstr "İşbirlikçi güncellenemedi: %(exc)s"
 
-#: app/htmx/qfc_admin_routes.py:593
+#: app/htmx/qfc_admin/qfc_admin_routes.py:338
 #, python-format
 msgid "Collaborator refresh failed: %(exc)s"
 msgstr "İşbirlikçi yenileme başarısız oldu: %(exc)s"
 
-#: app/htmx/setup_step_routes.py:83
-msgid "Project not found or access denied."
-msgstr "Proje bulunamadı veya erişim reddedildi."
+#: app/htmx/qfc_admin/qfc_admin_templates.py:9
+msgid "Admin"
+msgstr "Yönetici"
 
-#: app/htmx/setup_step_routes.py:156
-msgid ""
-"Project finalisation failed. Please check your settings and try again. If"
-" it continues, send the technical details below to your instance "
-"administrator or support team."
-msgstr ""
-"Proje sonlandırılamadı. Lütfen ayarlarınızı kontrol edip tekrar deneyin. "
-"Sorun devam ederse aşağıdaki teknik ayrıntıları örnek yöneticinize veya "
-"destek ekibinize gönderin."
+#: app/htmx/qfc_admin/qfc_admin_templates.py:10
+#: app/templates/project_details.html:72
+msgid "Manager"
+msgstr "Yönetici"
 
-#: app/htmx/setup_step_routes.py:225
-msgid "Invalid GeoJSON data in request. Please try uploading again."
-msgstr "İstekteki GeoJSON verisi geçersiz. Lütfen tekrar yüklemeyi deneyin."
+#: app/htmx/qfc_admin/qfc_admin_templates.py:11
+msgid "Editor"
+msgstr "Düzenleyici"
 
-#: app/htmx/setup_step_routes.py:231
-msgid "Error reading GeoJSON data from request."
-msgstr "İstekten GeoJSON verisi okunurken hata oluştu."
+#: app/htmx/qfc_admin/qfc_admin_templates.py:12
+msgid "Reporter"
+msgstr "Raporlayan"
 
-#: app/htmx/setup_step_routes.py:252
+#: app/htmx/qfc_admin/qfc_admin_templates.py:13
+msgid "Reader"
+msgstr "Okuyucu"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:51
+msgid "QFieldCloud Projects"
+msgstr "QFieldCloud Projeleri"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:56
+msgid "Connected as"
+msgstr "Bağlı kullanıcı"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:57
+msgid "to"
+msgstr "ile"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:63
+msgid "Log Out"
+msgstr "Çıkış Yap"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:68
+msgid "No projects found."
+msgstr "Proje bulunamadı."
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:77
+msgid "Public"
+msgstr "Herkese açık"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:79
+msgid "Private"
+msgstr "Özel"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:93
+msgid "Manage"
+msgstr "Yönet"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:103
+msgid "Project"
+msgstr "Proje"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:103
+msgid "Owner"
+msgstr "Sahip"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:103
+msgid "Visibility"
+msgstr "Görünürlük"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:103
+#: app/templates/project_details.html:58
+msgid "Description"
+msgstr "Açıklama"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:175
+msgid "Update"
+msgstr "Güncelle"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:178
+#: app/htmx/qfc_admin/qfc_admin_templates.py:185
+#: app/htmx/qfc_admin/qfc_admin_templates.py:193
+msgid "Remove"
+msgstr "Kaldır"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:183
+msgid "Remove Collaborator"
+msgstr "İşbirlikçiyi Kaldır"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:185
+msgid "from this project?"
+msgstr "bu projeden?"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:189
+#: app/templates/new_project_custom.html:156
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:177
+msgid "Cancel"
+msgstr "İptal"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:199
+msgid "User"
+msgstr "Kullanıcı"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:199
+msgid "Role"
+msgstr "Rol"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:199
+msgid "Actions"
+msgstr "İşlemler"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:205
+msgid "No collaborators yet."
+msgstr "Henüz işbirlikçi yok."
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:218
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:91
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:97
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:140
+#: app/templates/qfc_admin.html:52
+msgid "Username"
+msgstr "Kullanıcı adı"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:228
+msgid "Add Collaborator"
+msgstr "İşbirlikçi Ekle"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:236
+msgid "Close"
+msgstr "Kapat"
+
+#: app/htmx/qfc_admin/qfc_admin_templates.py:243
+msgid "Collaborators"
+msgstr "İşbirlikçiler"
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:66
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:150
+msgid "Data Extract"
+msgstr "Veri Çıkarımı"
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:78
+#, python-format
+msgid "OSM data downloaded successfully! Found %(feature_count)s features."
+msgstr "OSM verisi başarıyla indirildi! %(feature_count)s özellik bulundu."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:81
 #, python-format
 msgid ""
-"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
-"Please select a smaller area."
+"Previewing %(feature_count)s features on map. Review the data below. If "
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"downloading again with different parameters."
 msgstr ""
-"Alan %(area_km2)s km² ve %(area_limit)s km² sınırını aşıyor. Lütfen daha "
-"küçük bir alan seçin."
+"Haritada %(feature_count)s özellik önizleniyor. Aşağıdaki veriyi "
+"inceleyin. Memnunsanız kaydetmek için \"Accept Data Extract\" düğmesine "
+"tıklayın. Aksi halde farklı parametrelerle tekrar indirmeyi deneyin."
 
-#: app/htmx/setup_step_routes.py:260
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:111
+#: app/templates/partials/project_details/style_and_scripts.html:26
+msgid "Invalid file type. Please upload a .geojson or .json file."
+msgstr "Geçersiz dosya türü. Lütfen bir .geojson veya .json dosyası yükleyin."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:134
+msgid "No valid geometries found in GeoJSON."
+msgstr "GeoJSON içinde geçerli geometri bulunamadı."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:162
+#, python-format
+msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
+msgstr "✓ GeoJSON başarıyla yüklendi! %(feature_count)s özellik bulundu."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:165
 #, python-format
 msgid ""
-"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
-"longer to process. The data extract API is limited to 200 km²."
+"Previewing %(feature_count)s features on map. Review the data below. If "
+"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
+"uploading a different file."
 msgstr ""
-"Alan %(area_km2)s km². Büyük alanların (>% (area_warn)s km²) işlenmesi "
-"daha uzun sürebilir. Veri çıkarma API'si 200 km² ile sınırlıdır."
+"Haritada %(feature_count)s özellik önizleniyor. Aşağıdaki veriyi "
+"inceleyin. Memnunsanız kaydetmek için \"Accept Data Extract\" düğmesine "
+"tıklayın. Aksi halde farklı bir dosya yüklemeyi deneyin."
 
-#: app/htmx/setup_step_routes.py:326 app/htmx/setup_step_routes.py:779
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:195
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:317
+msgid ""
+"No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
+"first."
+msgstr ""
+"GeoJSON verisi bulunamadı. Lütfen önce OSM verisini indirin veya bir "
+"GeoJSON dosyası yükleyin."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:216
+#: app/htmx/setup_steps/setup_step_map_layers.py:27
 msgid "Project AOI"
 msgstr "Proje AOI"
 
-#: app/htmx/setup_step_routes.py:339
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:227
+#, python-format
+msgid "Data Extract (%(feature_count)s features)"
+msgstr "Veri Çıkarımı (%(feature_count)s özellik)"
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:244
+#, python-format
+msgid ""
+"Previewing %(feature_count)s data features on map. Review the data, then "
+"continue to the next step."
+msgstr ""
+"Haritada %(feature_count)s veri özelliği önizleniyor. Veriyi inceleyin, "
+"ardından sonraki adıma geçin."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
+msgid ""
+"✓ Collect-new-data mode selected. Task splitting is skipped and you can "
+"continue."
+msgstr ""
+"✓ Yalnızca yeni veri toplama modu seçildi. Görev bölme atlandı ve devam "
+"edebilirsiniz."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
+msgid ""
+"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
+"tasks)."
+msgstr ""
+"✓ Veri çıktısı başarıyla kaydedildi! Artık Adım 4’e (görevleri böl) "
+"geçebilirsiniz."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:374
+msgid "No data extract provided."
+msgstr "Veri çıkarımı sağlanmadı."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:381
+msgid "Invalid data extract format."
+msgstr "Geçersiz veri çıkarımı biçimi."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:398
+#, python-format
+msgid ""
+"✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
+"complete."
+msgstr ""
+"✓ Veri çıkarımı kabul edildi! %(feature_count)s özellik kaydedildi. 3. "
+"adım artık tamamlandı."
+
+#: app/htmx/setup_steps/setup_step_extract_helpers.py:42
+msgid "Invalid GeoJSON data in request. Please try uploading again."
+msgstr "İstekteki GeoJSON verisi geçersiz. Lütfen tekrar yüklemeyi deneyin."
+
+#: app/htmx/setup_steps/setup_step_extract_helpers.py:50
+msgid "Error reading GeoJSON data from request."
+msgstr "İstekten GeoJSON verisi okunurken hata oluştu."
+
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:95
+msgid "Project mapping app is not configured for finalisation."
+msgstr "Proje haritalama uygulaması sonlandırma için yapılandırılmamış."
+
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:133
+msgid ""
+"Provide ODK URL, username, and password (all 3), or leave them all blank "
+"to use server defaults."
+msgstr ""
+"ODK URL, kullanıcı adı ve şifreyi (üçünü birden) sağlayın ya da sunucu "
+"varsayılanlarını kullanmak için hepsini boş bırakın."
+
+#: app/htmx/setup_steps/setup_step_map_layers.py:39
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "Veri Çıkarımı (%(data_feature_count)s özellik)"
 
-#: app/htmx/setup_step_routes.py:353
+#: app/htmx/setup_steps/setup_step_map_layers.py:52
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "Görev Sınırları (%(task_count)s görev)"
 
-#: app/htmx/setup_step_routes.py:362
+#: app/htmx/setup_steps/setup_step_map_layers.py:61
 msgid "Task ID"
 msgstr "Görev Kimliği"
 
-#: app/htmx/setup_step_routes.py:363
+#: app/htmx/setup_steps/setup_step_map_layers.py:62
 msgid "Building Count"
 msgstr "Bina Sayısı"
 
-#: app/htmx/setup_step_routes.py:397
+#: app/htmx/setup_steps/setup_step_map_layers.py:81
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
@@ -399,7 +712,7 @@ msgstr ""
 "Görev sınırı bulunamadı. Lütfen önce yukarıdaki \"Split AOI\" düğmesini "
 "kullanarak projeyi görevlere ayırın."
 
-#: app/htmx/setup_step_routes.py:453
+#: app/htmx/setup_steps/setup_step_map_layers.py:132
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
@@ -408,7 +721,7 @@ msgstr ""
 "✓ AOI başarıyla bölündü! %(algorithm)s kullanılarak %(task_count)s görev "
 "alanı oluşturuldu."
 
-#: app/htmx/setup_step_routes.py:460
+#: app/htmx/setup_steps/setup_step_map_layers.py:139
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -421,88 +734,21 @@ msgstr ""
 "düğmesine tıklayın. Aksi halde yukarıdaki parametreleri ayarlayıp yeniden"
 " oluşturmak için \"Split Again\" düğmesine tıklayın."
 
-#: app/htmx/setup_step_routes.py:547 app/htmx/setup_step_routes.py:680
-msgid "Data Extract"
-msgstr "Veri Çıkarımı"
+#: app/htmx/setup_steps/setup_step_responses.py:85
+msgid "An unexpected error occurred"
+msgstr "Beklenmeyen bir hata oluştu"
 
-#: app/htmx/setup_step_routes.py:560
-#, python-format
-msgid "OSM data downloaded successfully! Found %(feature_count)s features."
-msgstr "OSM verisi başarıyla indirildi! %(feature_count)s özellik bulundu."
-
-#: app/htmx/setup_step_routes.py:563
-#, python-format
+#: app/htmx/setup_steps/setup_step_responses.py:160
 msgid ""
-"Previewing %(feature_count)s features on map. Review the data below. If "
-"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
-"downloading again with different parameters."
+"Project finalisation failed. Please check your settings and try again. If"
+" it continues, send the technical details below to your instance "
+"administrator or support team."
 msgstr ""
-"Haritada %(feature_count)s özellik önizleniyor. Aşağıdaki veriyi "
-"inceleyin. Memnunsanız kaydetmek için \"Accept Data Extract\" düğmesine "
-"tıklayın. Aksi halde farklı parametrelerle tekrar indirmeyi deneyin."
+"Proje sonlandırılamadı. Lütfen ayarlarınızı kontrol edip tekrar deneyin. "
+"Sorun devam ederse aşağıdaki teknik ayrıntıları örnek yöneticinize veya "
+"destek ekibinize gönderin."
 
-#: app/htmx/setup_step_routes.py:635
-#: app/templates/partials/project_details/style_and_scripts.html:28
-msgid "Invalid file type. Please upload a .geojson or .json file."
-msgstr "Geçersiz dosya türü. Lütfen bir .geojson veya .json dosyası yükleyin."
-
-#: app/htmx/setup_step_routes.py:660
-msgid "No valid geometries found in GeoJSON."
-msgstr "GeoJSON içinde geçerli geometri bulunamadı."
-
-#: app/htmx/setup_step_routes.py:692
-#, python-format
-msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
-msgstr "✓ GeoJSON başarıyla yüklendi! %(feature_count)s özellik bulundu."
-
-#: app/htmx/setup_step_routes.py:695
-#, python-format
-msgid ""
-"Previewing %(feature_count)s features on map. Review the data below. If "
-"satisfied, click \"Accept Data Extract\" to save. Otherwise, try "
-"uploading a different file."
-msgstr ""
-"Haritada %(feature_count)s özellik önizleniyor. Aşağıdaki veriyi "
-"inceleyin. Memnunsanız kaydetmek için \"Accept Data Extract\" düğmesine "
-"tıklayın. Aksi halde farklı bir dosya yüklemeyi deneyin."
-
-#: app/htmx/setup_step_routes.py:755 app/htmx/setup_step_routes.py:928
-msgid ""
-"No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
-"first."
-msgstr ""
-"GeoJSON verisi bulunamadı. Lütfen önce OSM verisini indirin veya bir "
-"GeoJSON dosyası yükleyin."
-
-#: app/htmx/setup_step_routes.py:791
-#, python-format
-msgid "Data Extract (%(feature_count)s features)"
-msgstr "Veri Çıkarımı (%(feature_count)s özellik)"
-
-#: app/htmx/setup_step_routes.py:810
-#, python-format
-msgid ""
-"Previewing %(feature_count)s data features on map. Review the data, then "
-"continue to the next step."
-msgstr ""
-"Haritada %(feature_count)s veri özelliği önizleniyor. Veriyi inceleyin, "
-"ardından sonraki adıma geçin."
-
-#: app/htmx/setup_step_routes.py:870
-msgid ""
-"✓ Collect-new-data mode selected. Task splitting is skipped and you can "
-"continue."
-msgstr ""
-"✓ Yalnızca yeni veri toplama modu seçildi. Görev bölme atlandı ve devam "
-"edebilirsiniz."
-
-#: app/htmx/setup_step_routes.py:948
-msgid ""
-"✓ Data extract successfully saved! You can now proceed to Step 4 (split "
-"tasks)."
-msgstr ""
-
-#: app/htmx/setup_step_routes.py:1018
+#: app/htmx/setup_steps/setup_step_split_routes.py:99
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -510,7 +756,7 @@ msgstr ""
 "Veri çıkarımı bulunamadı. Lütfen önce OSM verisini indirin veya bir "
 "GeoJSON dosyası yükleyin."
 
-#: app/htmx/setup_step_routes.py:1049
+#: app/htmx/setup_steps/setup_step_split_routes.py:130
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -519,7 +765,7 @@ msgstr ""
 "%(data_feature_count)s veri özelliğiyle birlikte tüm AOI (bölünmeden) "
 "önizleniyor. AOI'nin tamamı tek bir görev olarak kullanılacaktır."
 
-#: app/htmx/setup_step_routes.py:1056
+#: app/htmx/setup_steps/setup_step_split_routes.py:137
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -528,11 +774,11 @@ msgstr ""
 "%(task_count)s görev sınırı ve %(data_feature_count)s veri özelliği "
 "birlikte önizleniyor."
 
-#: app/htmx/setup_step_routes.py:1115
+#: app/htmx/setup_steps/setup_step_split_routes.py:190
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "Proje sınırı bulunamadı. Görev bölme atlanamaz."
 
-#: app/htmx/setup_step_routes.py:1142
+#: app/htmx/setup_steps/setup_step_split_routes.py:215
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
@@ -540,172 +786,312 @@ msgstr ""
 "✓ Görev bölme atlandı. AOI'nin tamamı tek bir görev olarak "
 "kullanılacaktır. Adım 5'e geçebilirsiniz."
 
-#: app/htmx/setup_step_routes.py:1204
+#: app/htmx/setup_steps/setup_step_split_routes.py:270
 msgid "Please select a splitting option."
 msgstr "Lütfen bir bölme seçeneği seçin."
 
-#: app/htmx/setup_step_routes.py:1225
+#: app/htmx/setup_steps/setup_step_split_routes.py:294
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ Bu proje kurulumu için görev bölme gerekli değildir."
 
-#: app/htmx/setup_step_routes.py:1282
-msgid "No data extract provided."
-msgstr "Veri çıkarımı sağlanmadı."
-
-#: app/htmx/setup_step_routes.py:1286
-msgid "Invalid data extract format."
-msgstr "Geçersiz veri çıkarımı biçimi."
-
-#: app/htmx/setup_step_routes.py:1303
-#, python-format
-msgid ""
-"✓ Data extract accepted! Saved %(feature_count)s features. Step 2 is now "
-"complete."
-msgstr ""
-"✓ Veri çıkarımı kabul edildi! %(feature_count)s özellik kaydedildi. Adım "
-"2 artık tamamlandı."
-
-#: app/htmx/setup_step_routes.py:1353
+#: app/htmx/setup_steps/setup_step_split_routes.py:344
 msgid "No task areas data provided."
 msgstr "Görev alanı verisi sağlanmadı."
 
-#: app/htmx/setup_step_routes.py:1357
+#: app/htmx/setup_steps/setup_step_split_routes.py:348
 msgid "Invalid task areas data format."
 msgstr "Geçersiz görev alanı veri biçimi."
 
-#: app/htmx/setup_step_routes.py:1374
-#: app/templates/partials/project_details/setup_steps.html:455
+#: app/htmx/setup_steps/setup_step_split_routes.py:371
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ Bölünmüş görevler başarıyla kaydedildi"
 
-#: app/htmx/setup_step_routes.py:1429
+#: app/htmx/setup_steps/setup_step_validate_routes.py:47
+#, python-format
 msgid ""
-"Provide ODK URL, username, and password (all 3), or leave them all blank "
-"to use server defaults."
+"Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
+"Please reduce your project area."
 msgstr ""
-"ODK URL, kullanıcı adı ve şifreyi (üçünü birden) sağlayın ya da sunucu "
-"varsayılanlarını kullanmak için hepsini boş bırakın."
+"Alan %(area_km2)s km², bu da %(area_limit)s km² sınırını aşıyor. Lütfen "
+"proje alanınızı küçültün."
 
-#: app/htmx/setup_step_routes.py:1551
+#: app/htmx/setup_steps/setup_step_validate_routes.py:52
+#, python-format
+msgid ""
+"Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
+"longer to process."
+msgstr ""
+"Alan %(area_km2)s km². Büyük alanların (>%(area_warn)s km²) işlenmesi "
+"daha uzun sürebilir."
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:77
 msgid "GeoJSON is required"
 msgstr "GeoJSON gereklidir"
 
-#: app/htmx/setup_step_routes.py:1562
+#: app/htmx/setup_steps/setup_step_validate_routes.py:87
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "Poligon geometrisi bulunamadı. Proje alanı bir poligon olmalıdır."
+
+#: app/projects/project_crud.py:136
+msgid "Selected area is too large. Please select an area smaller than 200 km²."
+msgstr "Seçilen alan çok büyük. Lütfen 200 km²'den küçük bir alan seçin."
+
+#: app/projects/project_crud.py:147
+msgid "Failed to generate data extract from the raw data API."
+msgstr "Ham veri API'sinden veri özütü oluşturulamadı."
+
+#: app/projects/project_crud.py:901
+msgid "QField project ID not found."
+msgstr "Proje bulunamadı."
+
+#: app/projects/project_crud.py:934
+msgid "Project name not found."
+msgstr "Proje bulunamadı."
+
+#: app/projects/project_crud.py:941
+msgid "ODK project ID not found."
+msgstr "Proje bulunamadı."
+
+#: app/projects/project_crud.py:950
+msgid "Appuser token not found."
+msgstr "Proje bulunamadı."
+
+#: app/projects/project_crud.py:967
+msgid "Failed to generate QR code."
+msgstr "Şablon form yüklenemedi."
+
+#: app/projects/project_services.py:75
+msgid ""
+"This project was created with a simplified workflow in FieldTM and is "
+"made to collect building data to enhance OpenStreetMap."
+msgstr ""
+"Bu proje FieldTM içinde basitleştirilmiş bir iş akışıyla oluşturuldu ve "
+"OpenStreetMap’i geliştirmek için bina verisi toplamak üzere tasarlandı."
+
+#: app/projects/project_services.py:82
+msgid "Unnamed Area"
+msgstr "Adsız Alan"
+
+#: app/projects/project_services.py:95
+#, python-brace-format
+msgid "Area {latitude:.4f}_{longitude:.4f}"
+msgstr "Alan {latitude:.4f}_{longitude:.4f}"
+
+#: app/projects/project_services.py:408
+#, python-brace-format
+msgid "{location} OSM Buildings"
+msgstr "{location} OSM Buildings"
+
+#: app/qfield/qfield_crud.py:166
+msgid "Project outline is missing or has no geometry."
+msgstr "Proje taslağı eksik veya geometrisi yok."
+
+#: app/qfield/qfield_crud.py:172
+msgid "Project outline geometry has no coordinates."
+msgstr "Proje anahat geometrisinin koordinatları yoktur."
+
+#: app/qfield/qfield_crud.py:476
+msgid "Project outline is required for QField project creation."
+msgstr "✓ Bu proje kurulumu için görev bölme gerekli değildir."
+
+#: app/qfield/qfield_crud.py:481
+msgid "XLSForm is required for QField project creation."
+msgstr "XLSForm gereklidir."
+
+#: app/qfield/qfield_crud.py:498
+msgid "Failed to modify XLSForm for QField."
+msgstr "QField için XLSForm değiştirilemedi."
+
+#: app/qfield/qfield_crud.py:539
+msgid "QGIS wrapper completed but wrote no output files."
+msgstr "QGIS sarmalayıcısı tamamlandı ancak çıktı dosyası yazmadı."
+
+#: app/qfield/qfield_crud.py:551
+msgid "QGIS wrapper completed but no .qgz file in output."
+msgstr "QGIS sarmalayıcısı tamamlandı ancak çıktıda .qgz dosyası yok."
+
+#: app/qfield/qfield_crud.py:581
+msgid "QField project ID is missing; cannot attach basemap."
+msgstr "QField proje kimliği eksik; temel harita eklenemiyor."
+
+#: app/qfield/qfield_crud.py:615
+msgid "Basemap attach completed but produced no project files."
+msgstr "Altlık harita QField projesine eklendi."
+
+#: app/qfield/qfield_crud.py:801
+#, python-format
+msgid ""
+"QFieldCloud did not finish processing the project file after %(attempts)d"
+" attempts (last status: %(status)s)."
+msgstr ""
+"QFieldCloud, %(attempts)d denemeden sonra proje dosyasını işlemeyi "
+"bitirmedi (son durum: %(status)s)."
+
+#: app/qfield/qfield_crud.py:855 app/qfield/qfield_crud.py:869
+#, python-format
+msgid "QGIS project generation failed: %(error)s"
+msgstr "QGIS proje oluşturma işlemi başarısız oldu: %(error)s"
+
+#: app/qfield/qfield_crud.py:862
+msgid "QGIS wrapper returned invalid JSON."
+msgstr "QGIS sarmalayıcısı geçersiz JSON döndürdü."
+
+#: app/qfield/qfield_crud.py:886
+#, python-format
+msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
+msgstr "Yükleme için MBTiles temel haritası indirilemedi (HTTP %(status)s)."
+
+#: app/qfield/qfield_crud.py:901
+msgid "Downloaded basemap MBTiles is empty."
+msgstr "QR Kodunu İndir"
+
+#: app/qfield/qfield_crud.py:1027
+#, python-format
+msgid "Failed to upload files to QFieldCloud: %(error)s"
+msgstr "Dosyalar QFieldCloud'a yüklenemedi: %(error)s"
+
+#: app/qfield/qfield_crud.py:1309
+#, python-format
+msgid "QFieldCloud project '%(project_id)s' not found."
+msgstr "Proje (%(project_id)s) bulunamadı."
+
+#: app/qfield/qfield_crud.py:1329
+#, python-format
+msgid ""
+"Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
+" to the organization: %(error)s"
+msgstr ""
+"Projesi '%(owner)s' kuruluşuna aittir. '%(username)s' kuruluşa "
+"eklenemedi: %(error)s"
+
+#: app/qfield/qfield_crud.py:1347
+#, python-format
+msgid "User '%(username)s' does not exist on QFieldCloud."
+msgstr "Kullanıcısı '%(username)s' QFieldCloud'da mevcut değil."
+
+#: app/qfield/qfield_crud.py:1354
+#, python-format
+msgid "User '%(username)s' is already a collaborator on this project."
+msgstr "'%(username)s' kullanıcısı zaten bu projede işbirlikçi."
+
+#: app/qfield/qfield_crud.py:1395
+msgid "QFieldCloud credentials are invalid."
+msgstr "✓ Kimlik bilgileri geçerli!"
 
 #: app/templates/home.html:13
 msgid "Filters"
 msgstr "Filtreler"
 
-#: app/templates/home.html:18
+#: app/templates/home.html:17
 msgid "All projects"
 msgstr "Tüm projeler"
 
-#: app/templates/home.html:19
+#: app/templates/home.html:17
 msgid "Draft"
 msgstr "Taslak"
 
-#: app/templates/home.html:20
+#: app/templates/home.html:18
 msgid "Published"
 msgstr "Yayınlandı"
 
-#: app/templates/home.html:21
+#: app/templates/home.html:18
 msgid "Completed"
 msgstr "Tamamlandı"
 
-#: app/templates/home.html:22
+#: app/templates/home.html:18
 msgid "Archived"
 msgstr "Arşivlendi"
 
-#: app/templates/home.html:26
+#: app/templates/home.html:21
 msgid "Project Status"
 msgstr "Proje Durumu"
 
-#: app/templates/home.html:41
+#: app/templates/home.html:35
 msgid "Newest first"
 msgstr "Önce en yeni"
 
-#: app/templates/home.html:42
+#: app/templates/home.html:35
 msgid "Oldest first"
 msgstr "Önce en eski"
 
-#: app/templates/home.html:43
+#: app/templates/home.html:36
 msgid "Name (A-Z)"
 msgstr "Ad (A-Z)"
 
-#: app/templates/home.html:44
+#: app/templates/home.html:36
 msgid "Name (Z-A)"
 msgstr "Ad (Z-A)"
 
-#: app/templates/home.html:47
+#: app/templates/home.html:38
 msgid "Sort By"
 msgstr "Sıralama"
 
-#: app/templates/home.html:61
+#: app/templates/home.html:52
 msgid "Search"
 msgstr "Ara"
 
-#: app/templates/home.html:67
+#: app/templates/home.html:58
 msgid "Search projects…"
 msgstr "Projeleri ara…"
 
-#: app/templates/home.html:77 app/templates/landing.html:566
-#: app/templates/layout.html:222 app/templates/new_project.html:1
-#: app/templates/new_project.html:167
+#: app/templates/home.html:68 app/templates/landing.html:503
+#: app/templates/layout.html:281 app/templates/new_project_chooser.html:1
+#: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "Proje Oluştur"
 
-#: app/templates/home.html:78
+#: app/templates/home.html:69
 msgid "+ New"
 msgstr "+ Yeni"
 
-#: app/templates/home.html:84
+#: app/templates/home.html:74
 #, python-format
 msgid "Showing %(count)s project"
 msgid_plural "Showing %(count)s projects"
 msgstr[0] "%(count)s proje gösteriliyor"
 msgstr[1] "%(count)s proje gösteriliyor"
 
-#: app/templates/home.html:85
+#: app/templates/home.html:75
 #, python-format
 msgid "in %(status)s"
 msgstr "%(status)s içinde"
 
-#: app/templates/home.html:86
+#: app/templates/home.html:76
 #, python-format
-msgid "matching \"%(query)s\""
+msgid ""
+"matching\n"
+"      \"%(query)s\""
 msgstr "\"%(query)s\" ile eşleşen"
 
-#: app/templates/home.html:102
+#: app/templates/home.html:93
 msgid "Private Project"
 msgstr "Özel Proje"
 
-#: app/templates/home.html:125 app/templates/project_details.html:33
+#: app/templates/home.html:117 app/templates/project_details.html:33
 msgid "Unnamed Project"
 msgstr "Adsız Proje"
 
-#: app/templates/home.html:133
+#: app/templates/home.html:126
 msgid "Location:"
 msgstr "Konum:"
 
-#: app/templates/home.html:154
+#: app/templates/home.html:145
 msgid "Created:"
 msgstr "Oluşturulma:"
 
-#: app/templates/home.html:154
+#: app/templates/home.html:146
 msgid "N/A"
 msgstr "Yok"
 
-#: app/templates/home.html:163
+#: app/templates/home.html:156
 msgid "No projects found. Create your first project to get started!"
 msgstr "Proje bulunamadı. Başlamak için ilk projenizi oluşturun!"
 
-#: app/templates/landing.html:558
+#: app/templates/landing.html:493
 msgid "Coordinate field campaigns"
 msgstr "Saha kampanyalarını koordine edin"
 
-#: app/templates/landing.html:561
+#: app/templates/landing.html:496
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
@@ -713,265 +1099,272 @@ msgstr ""
 "Kesintisiz koordinasyonla saha haritalama verimliliğini ve doğruluğunu "
 "artırma."
 
-#: app/templates/landing.html:564
+#: app/templates/landing.html:500
 msgid "Explore Projects"
 msgstr "Projeleri Keşfet"
 
-#: app/templates/landing.html:576
+#: app/templates/landing.html:513
 msgid "Loading metrics..."
 msgstr "Metrikler yükleniyor..."
 
-#: app/templates/landing.html:584
+#: app/templates/landing.html:521
 msgid "What is it?"
 msgstr "Bu nedir?"
 
-#: app/templates/landing.html:586
+#: app/templates/landing.html:523
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
-"map features by coordinating mapping in the field."
+"map features\n"
+"        by coordinating mapping in the field."
 msgstr ""
 "Field Tasking Manager (Field-TM), sahadaki haritalamayı koordine ederek "
 "ekiplerin harita özelliklerine yerel bilgi eklemesine yardımcı olur."
 
-#: app/templates/landing.html:589
+#: app/templates/landing.html:527
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
-"mature tools like ODK and QField. It is a standalone mobile and web "
-"workflow that helps teams collect geospatial data efficiently with "
-"commonly available Android devices."
+"mature tools\n"
+"        like ODK and QField. It is a standalone mobile and web workflow "
+"that helps teams collect\n"
+"        geospatial data efficiently with commonly available Android "
+"devices."
 msgstr ""
 "Field-TM, ODK ve QField gibi olgun araçları destekleyip genişleterek "
 "işbirlikçi haritalamayı kolaylaştırır. Ekiplerin yaygın Android "
 "cihazlarla coğrafi veriyi verimli biçimde toplamasına yardımcı olan "
 "bağımsız bir mobil ve web iş akışıdır."
 
-#: app/templates/landing.html:594
+#: app/templates/landing.html:534
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr ""
 "Bir proje yöneticisi dizüstü bilgisayarda FieldTM haritalama iş akışını "
 "gösteriyor"
 
-#: app/templates/landing.html:600
+#: app/templates/landing.html:540
 msgid "Main Features"
 msgstr "Ana Özellikler"
 
-#: app/templates/landing.html:603
+#: app/templates/landing.html:543
 msgid "Flexible Data Collection"
 msgstr "Esnek Veri Toplama"
 
-#: app/templates/landing.html:605
+#: app/templates/landing.html:545
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
-"workflows that fit different operational needs."
+"workflows that\n"
+"          fit different operational needs."
 msgstr ""
 "Farklı anket formlarını, birden çok veri biçimini ve farklı operasyonel "
 "ihtiyaçlara uyan uyarlanabilir iş akışlarını destekler."
 
-#: app/templates/landing.html:609
+#: app/templates/landing.html:550
 msgid "Open Source and Customizable"
 msgstr "Açık Kaynaklı ve Özelleştirilebilir"
 
-#: app/templates/landing.html:611
+#: app/templates/landing.html:552
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
-" requirements."
+"\n"
+"          requirements."
 msgstr ""
 "Field-TM'yi kendi anket mantığınıza, veri yapılarınıza ve entegrasyon "
 "gereksinimlerinize uyarlayın."
 
-#: app/templates/landing.html:615
+#: app/templates/landing.html:557
 msgid "Entity-Level Tracking"
 msgstr "Varlık Düzeyinde Takip"
 
-#: app/templates/landing.html:617
+#: app/templates/landing.html:559
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
-"informed decisions quickly."
+"informed\n"
+"          decisions quickly."
 msgstr ""
 "Yöneticilerin hızlı ve bilinçli kararlar verebilmesi için anket "
 "ilerlemesini görev ve özellik düzeyinde izleyin."
 
-#: app/templates/landing.html:624
+#: app/templates/landing.html:567
 msgid "Who is it for?"
 msgstr "Kimler için?"
 
-#: app/templates/landing.html:627
+#: app/templates/landing.html:570
 msgid "Project Manager"
 msgstr "Proje Yöneticisi"
 
-#: app/templates/landing.html:628
+#: app/templates/landing.html:571
 msgid "Create and coordinate field campaigns"
 msgstr "Saha kampanyaları oluşturun ve koordine edin"
 
-#: app/templates/landing.html:630
+#: app/templates/landing.html:573
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
-" interest, design survey forms, and split work into manageable tasks."
+" interest,\n"
+"          design survey forms, and split work into manageable tasks."
 msgstr ""
 "Proje yöneticileri, haritalama projeleri kurmak, ilgi alanlarını "
 "tanımlamak, anket formları tasarlamak ve işi yönetilebilir görevlere "
 "bölmek için Field-TM kullanır."
 
-#: app/templates/landing.html:633
+#: app/templates/landing.html:577
 msgid "Define a project area and upload or choose a survey form"
 msgstr "Bir proje alanı tanımlayın ve bir anket formu yükleyin veya seçin"
 
-#: app/templates/landing.html:634
+#: app/templates/landing.html:578
 msgid "Split the area into tasks and generate a data extract"
 msgstr "Alanı görevlere bölün ve bir veri çıkarımı oluşturun"
 
-#: app/templates/landing.html:635
+#: app/templates/landing.html:579
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "Projeyi ODK Central veya QFieldCloud'a yayınlayın"
 
-#: app/templates/landing.html:636
+#: app/templates/landing.html:580
 msgid "Share a QR code so mappers can start collecting data"
 msgstr "Haritalayıcıların veri toplamaya başlayabilmesi için bir QR kodu paylaşın"
 
-#: app/templates/landing.html:640
+#: app/templates/landing.html:584
 msgid "Field Mapper"
 msgstr "Saha Haritalayıcısı"
 
-#: app/templates/landing.html:641
+#: app/templates/landing.html:585
 msgid "Collect data in the field with your phone"
 msgstr "Telefonunuzla sahada veri toplayın"
 
-#: app/templates/landing.html:643
+#: app/templates/landing.html:587
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
-"publishes a project, mappers access it directly in their mobile app of "
+"publishes a\n"
+"          project, mappers access it directly in their mobile app of "
 "choice."
 msgstr ""
 "Haritalayıcıların Field-TM'ye giriş yapmasına gerek yoktur. Bir proje "
 "yöneticisi projeyi yayınladığında haritalayıcılar bunu doğrudan "
 "seçtikleri mobil uygulamada açar."
 
-#: app/templates/landing.html:646
+#: app/templates/landing.html:591
 msgid "Scan the QR code shared by your project manager"
 msgstr "Proje yöneticinizin paylaştığı QR kodunu tarayın"
 
-#: app/templates/landing.html:647
+#: app/templates/landing.html:592
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "Proje ODK Collect veya QField içinde otomatik olarak yüklenir"
 
-#: app/templates/landing.html:648
+#: app/templates/landing.html:593
 msgid "Navigate to your assigned task area and collect data"
 msgstr "Size atanan görev alanına gidin ve veri toplayın"
 
-#: app/templates/landing.html:649
+#: app/templates/landing.html:594
 msgid "Submit your survey, which goes straight to the server"
 msgstr "Anketinizi gönderin; doğrudan sunucuya gider"
 
-#: app/templates/landing.html:656
+#: app/templates/landing.html:601
 msgid "Field-TM Use Cases"
 msgstr "Field-TM Kullanım Durumları"
 
-#: app/templates/landing.html:661
+#: app/templates/landing.html:606
 msgid "Field mapping in progress"
 msgstr "Saha haritalama sürüyor"
 
-#: app/templates/landing.html:666
+#: app/templates/landing.html:611
 msgid "1. Community Mapping"
 msgstr "1. Topluluk Haritalama"
 
-#: app/templates/landing.html:668
+#: app/templates/landing.html:613
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
-"public facilities, and local services for inclusive planning."
+"public\n"
+"            facilities, and local services for inclusive planning."
 msgstr ""
 "Field Tasking Manager, kapsayıcı planlama için toplulukların gayriresmî "
 "yerleşimleri, kamu tesislerini ve yerel hizmetleri haritalamasını "
 "güçlendirir."
 
-#: app/templates/landing.html:672
+#: app/templates/landing.html:618
 msgid "2. Urban Planning and Management"
 msgstr "2. Kentsel Planlama ve Yönetim"
 
-#: app/templates/landing.html:674
+#: app/templates/landing.html:620
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
-"utilities through clear, manageable mapping tasks."
+"utilities\n"
+"            through clear, manageable mapping tasks."
 msgstr ""
 "Evlerin, yolların ve altyapıların koordineli anketlerini açık ve "
 "yönetilebilir haritalama görevleriyle yaparak daha akıllı şehirler kurun."
 
-#: app/templates/landing.html:678
+#: app/templates/landing.html:625
 msgid "3. Disaster Response and Recovery"
 msgstr "3. Afet Müdahalesi ve İyileştirme"
 
-#: app/templates/landing.html:680
+#: app/templates/landing.html:627
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
-"volunteers, and deliver reliable data for relief operations."
+"volunteers, and\n"
+"            deliver reliable data for relief operations."
 msgstr ""
 "Afetlerden sonra hasarlı altyapıyı hızla haritalayın, gönüllüleri "
 "koordine edin ve yardım operasyonları için güvenilir veri sağlayın."
 
-#: app/templates/landing.html:688
+#: app/templates/landing.html:636
 msgid "Resources"
 msgstr "Kaynaklar"
 
-#: app/templates/landing.html:696
+#: app/templates/landing.html:644
 msgid "Data Prep"
 msgstr "Veri Hazırlığı"
 
-#: app/templates/landing.html:697
+#: app/templates/landing.html:645
 msgid "HOT Export Tool"
 msgstr "HOT Dışa Aktarma Aracı"
 
-#: app/templates/landing.html:699
+#: app/templates/landing.html:647
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr "Proje alanınız için görev hazır coğrafi veri çıkarımlarını indirin."
 
-#: app/templates/landing.html:708 app/templates/landing.html:720
+#: app/templates/landing.html:656 app/templates/landing.html:668
 msgid "Documentation"
 msgstr "Dokümantasyon"
 
-#: app/templates/landing.html:709
+#: app/templates/landing.html:657
 msgid "ODK Central Guide"
 msgstr "ODK Central Rehberi"
 
-#: app/templates/landing.html:711
+#: app/templates/landing.html:659
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr ""
 "ODK içinde formları, uygulama kullanıcılarını ve saha gönderimlerini "
 "nasıl yöneteceğinizi öğrenin."
 
-#: app/templates/landing.html:721
+#: app/templates/landing.html:669
 msgid "QField Guide"
 msgstr "QField Rehberi"
 
-#: app/templates/landing.html:723
+#: app/templates/landing.html:671
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "Çevrimdışı haritalama için QFieldCloud projelerini ve mobil iş akışlarını"
 " kurun."
 
-#: app/templates/landing.html:733
+#: app/templates/landing.html:681
 msgid "Need assistance?"
 msgstr "Yardıma mı ihtiyacınız var?"
 
-#: app/templates/landing.html:734
+#: app/templates/landing.html:682
 msgid "Email:"
 msgstr "E-posta:"
 
-#: app/templates/landing.html:750
-msgid "Language"
-msgstr "Dil"
-
-#: app/templates/layout.html:7
+#: app/templates/layout.html:13
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Open Mapping kampanyaları için koordineli saha haritalama."
 
-#: app/templates/layout.html:161 app/templates/login.html:1
+#: app/templates/layout.html:196 app/templates/login.html:1
 msgid "Login"
 msgstr "Giriş"
 
-#: app/templates/layout.html:215
+#: app/templates/layout.html:274
 msgid "Projects"
 msgstr "Projeler"
 
-#: app/templates/layout.html:229
+#: app/templates/layout.html:288
 msgid "QField Admin"
 msgstr "QField Yöneticisi"
 
@@ -995,116 +1388,268 @@ msgstr "Bu dağıtımda kimlik doğrulama devre dışı."
 msgid "Back to home"
 msgstr "Ana sayfaya dön"
 
-#: app/templates/new_project.html:4
-msgid "Create New Project"
-msgstr "Yeni Proje Oluştur"
+#: app/templates/new_project_chooser.html:4
+msgid "What do you want to map?"
+msgstr "Neyi haritalamak istiyorsunuz?"
 
-#: app/templates/new_project.html:25
-msgid "Project Name"
+#: app/templates/new_project_chooser.html:6
+msgid ""
+"Pick the option that fits your project. You can change your mind later by"
+" starting over."
+msgstr ""
+"Projenize uyan seçeneği seçin. Daha sonra baştan başlayarak fikrinizi "
+"değiştirebilirsiniz."
+
+#: app/templates/new_project_chooser.html:14
+#: app/templates/new_project_chooser.html:26
+#: app/templates/new_project_simple.html:7
+msgid "Map buildings"
+msgstr "OSM Binaları"
+
+#: app/templates/new_project_chooser.html:17
+msgid "Quickest way to start. Just draw your area on the map and you're done."
+msgstr "Başlamanın en hızlı yolu. Haritada alanınızı çizmeniz yeterli."
+
+#: app/templates/new_project_chooser.html:21
+msgid "We'll pre-fill the project for you"
+msgstr "Projeyi sizin için önceden dolduracağız"
+
+#: app/templates/new_project_chooser.html:22
+msgid "Uses building outlines already in OpenStreetMap"
+msgstr "OpenStreetMap'te zaten bulunan bina sınırlarını kullanır"
+
+#: app/templates/new_project_chooser.html:23
+msgid "Comes with a ready-made survey for buildings"
+msgstr "Binalar için hazır bir anketle gelir"
+
+#: app/templates/new_project_chooser.html:32
+msgid "Something else"
+msgstr "Başka bir şey"
+
+#: app/templates/new_project_chooser.html:35
+msgid ""
+"Use this for anything that isn't buildings. You'll get more options to "
+"set things up\n"
+"        the way you want."
+msgstr ""
+"Bina olmayan her şey için bunu kullanın. İstediğiniz şekilde ayarlamak "
+"için daha fazla seçeneğiniz olur."
+
+#: app/templates/new_project_chooser.html:41
+msgid ""
+"Map roads, healthcare, water points, toilets, schools, and many other "
+"things"
+msgstr ""
+"Yolları, sağlık hizmetlerini, su noktalarını, tuvaletleri, okulları ve "
+"birçok başka şeyi haritalayın"
+
+#: app/templates/new_project_chooser.html:43
+msgid "Bring your own survey questions"
+msgstr "Kendi anket sorularınızı getirin"
+
+#: app/templates/new_project_chooser.html:44
+msgid "Bring your own map data, or start with an empty map"
+msgstr "Kendi harita verilerinizi getirin veya boş bir haritayla başlayın"
+
+#: app/templates/new_project_chooser.html:45
+msgid "Control how the area is divided up for mappers"
+msgstr "Alanının haritacılar için nasıl bölüneceğini kontrol edin"
+
+#: app/templates/new_project_chooser.html:48
+msgid "Set up a custom project"
+msgstr "Projeleri ara…"
+
+#: app/templates/new_project_custom.html:1
+msgid "Create Custom Project"
+msgstr "Proje Oluştur"
+
+#: app/templates/new_project_custom.html:5
+#: app/templates/new_project_simple.html:5
+msgid "Back"
+msgstr "Geri"
+
+#: app/templates/new_project_custom.html:7
+msgid "Set up your project"
+msgstr "Projeleri Keşfet"
+
+#: app/templates/new_project_custom.html:9
+msgid ""
+"Just the basics on this page: what you're mapping, where, and which app "
+"mappers will use.\n"
+"    You'll pick your survey questions and map data on the next page."
+msgstr ""
+"Bu sayfada yalnızca temel bilgiler var: neyi, nerede haritaladığınız ve "
+"haritacıların hangi uygulamayı kullanacağı. Anket sorularınızı ve harita "
+"verilerinizi sonraki sayfada seçeceksiniz."
+
+#: app/templates/new_project_custom.html:32
+msgid "About your project"
+msgstr "Projelere Geri Dön"
+
+#: app/templates/new_project_custom.html:34
+msgid ""
+"Give your project a clear name and a short summary so mappers know what "
+"it's\n"
+"          about."
+msgstr ""
+"Projenize açık bir ad ve kısa bir özet verin, böylece haritacılar ne "
+"hakkında olduğunu bilir."
+
+#: app/templates/new_project_custom.html:40
+msgid "Project name"
 msgstr "Proje Adı"
 
-#: app/templates/new_project.html:30
-msgid "Enter project name"
-msgstr "Proje adını girin"
+#: app/templates/new_project_custom.html:45
+msgid "e.g. Buildings in West Nairobi"
+msgstr "örn. Batı Nairobi'deki Binalar"
 
-#: app/templates/new_project.html:43
-msgid "Enter project description"
-msgstr "Proje açıklamasını girin"
+#: app/templates/new_project_custom.html:53
+msgid "What are you mapping?"
+msgstr "Haritalama İçin Hazır"
 
-#: app/templates/new_project.html:52
-msgid "Field Mapping App"
-msgstr "Saha Haritalama Uygulaması"
-
-#: app/templates/new_project.html:92
-msgid "Project Area"
-msgstr "Proje Alanı"
-
-#: app/templates/new_project.html:101
-msgid "Draw Area"
-msgstr "Alan Çiz"
-
-#: app/templates/new_project.html:109
-msgid "Upload GeoJSON"
-msgstr "GeoJSON Yükle"
-
-#: app/templates/new_project.html:117
-msgid "Clear"
-msgstr "Temizle"
-
-#: app/templates/new_project.html:125
+#: app/templates/new_project_custom.html:58
 msgid ""
-"Draw a polygon on the map or upload a GeoJSON file to define your project"
-" area. Maximum project size is 1,000 km². Areas over 100 km² will show a "
-"warning. The OSM data extract API is limited to 200 km²."
+"A short description. e.g. Mapping water points and toilets in informal "
+"settlements."
 msgstr ""
-"Proje alanınızı tanımlamak için harita üzerine bir poligon çizin veya bir"
-" GeoJSON dosyası yükleyin. Maksimum proje boyutu 1.000 km²'dir. 100 km² "
-"üzerindeki alanlar uyarı gösterir. OSM veri çıkarma API'si 200 km² ile "
-"sınırlıdır."
+"Kısa bir açıklama. örn. Gayriresmî yerleşimlerde su noktaları ve "
+"tuvaletlerin haritalanması."
 
-#: app/templates/new_project.html:133
-#: app/templates/partials/project_details/setup_steps.html:153
-#: app/templates/partials/project_details/setup_steps.html:329
-#: app/templates/partials/project_details/setup_steps.html:470
-#: app/templates/partials/project_details/setup_steps.html:678
-msgid "Advanced Config"
-msgstr "Gelişmiş Yapılandırma"
+#: app/templates/new_project_custom.html:67
+msgid "Which app will mappers use?"
+msgstr "Haritacılar hangi uygulamayı kullanacak?"
 
-#: app/templates/new_project.html:145
-msgid "Merge geometries (use convex hull for multipolygons)"
-msgstr "Geometrileri birleştir (çoklu poligonlar için convex hull kullan)"
+#: app/templates/new_project_custom.html:69
+msgid "Pick the app you want mappers to install on their phone to do the survey."
+msgstr ""
+"Haritacıların anketi yapmak için telefonlarına yüklemesini istediğiniz "
+"uygulamayı seçin."
 
-#: app/templates/new_project.html:154 app/templates/project_details.html:95
-msgid "Hashtags"
+#: app/templates/new_project_custom.html:89
+msgid ""
+"Powerful GIS-style mapping app, including geometry editing, but with a "
+"simple\n"
+"                mapping pathway enabled via our HOT plugin."
+msgstr ""
+"Geometri düzenleme dahil güçlü GIS tarzı haritalama uygulaması; HOT "
+"eklentimizle basit bir haritalama yolu etkinleştirilmiştir."
+
+#: app/templates/new_project_custom.html:111
+msgid ""
+"Simple form-based survey app. Best for straightforward question-and-"
+"answer\n"
+"                surveys."
+msgstr ""
+"Basit form tabanlı anket uygulaması. Doğrudan soru-cevap anketleri için "
+"en iyisidir."
+
+#: app/templates/new_project_custom.html:120
+msgid "Where are you mapping?"
+msgstr "Haritalama İçin Hazır"
+
+#: app/templates/new_project_custom.html:122
+msgid "Draw the area mappers will cover. Smaller areas are easier to coordinate."
+msgstr ""
+"Haritacıların kapsayacağı alanı çizin. Daha küçük alanları koordine etmek"
+" daha kolaydır."
+
+#: app/templates/new_project_custom.html:129
+msgid "Tags"
 msgstr "Etiketler"
 
-#: app/templates/new_project.html:157
-msgid "Type hashtags and press Enter or comma"
+#: app/templates/new_project_custom.html:131
+msgid "optional"
+msgstr "isteğe bağlı"
+
+#: app/templates/new_project_custom.html:135
+msgid ""
+"Add tags so other people can find your project. Tags are like #buildings "
+"or\n"
+"          #campaign-2026."
+msgstr ""
+"Başkalarının projenizi bulabilmesi için etiket ekleyin. Etiketler "
+"#buildings veya #campaign-2026 gibidir."
+
+#: app/templates/new_project_custom.html:141
+msgid "Type a tag and press Enter"
 msgstr "Etiketleri yazın ve Enter veya virgül tuşuna basın"
 
-#: app/templates/new_project.html:162
-msgid ""
-"Type hashtags and press Enter or comma to add them. Click the × on a tag "
-"to remove it."
+#: app/templates/new_project_custom.html:146
+msgid "Press Enter or comma after each tag. Click × on a tag to remove it."
 msgstr ""
 "Eklemek için etiketleri yazın ve Enter veya virgül tuşuna basın. "
 "Kaldırmak için etiket üzerindeki × işaretine tıklayın."
 
-#: app/templates/new_project.html:168
+#: app/templates/new_project_custom.html:152
+#: app/templates/partials/project_details/setup_steps/step2_form.html:82
+msgid "Continue"
+msgstr "Devam Et"
+
+#: app/templates/new_project_custom.html:154
 msgid "Creating..."
 msgstr "Oluşturuluyor..."
 
-#: app/templates/new_project.html:177
+#: app/templates/new_project_custom.html:164
 msgid "Something went wrong. Please try again."
 msgstr "Bir şeyler ters gitti. Lütfen tekrar deneyin."
 
-#: app/templates/new_project.html:178
-msgid "Invalid GeoJSON format. Please check your file."
-msgstr "Geçersiz GeoJSON biçimi. Lütfen dosyanızı kontrol edin."
-
-#: app/templates/new_project.html:179
-msgid "Invalid GeoJSON file. Please check the file format."
-msgstr "Geçersiz GeoJSON dosyası. Lütfen dosya biçimini kontrol edin."
-
-#: app/templates/new_project.html:180 app/templates/new_project.html:736
-msgid ""
-"You must draw or upload an Area of Interest (AOI) on the map before "
-"submitting."
-msgstr ""
-"Göndermeden önce harita üzerinde bir İlgi Alanı (AOI) çizmeniz veya "
-"yüklemeniz gerekir."
-
-#: app/templates/new_project.html:701
+#: app/templates/new_project_custom.html:295
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Bu adda bir proje zaten mevcut. Lütfen farklı bir ad seçin."
 
-#: app/templates/new_project.html:861
+#: app/templates/new_project_custom.html:379
 msgid "Description is required."
 msgstr "Açıklama gereklidir."
 
-#: app/templates/project_details.html:6
-msgid "← Back to Projects"
-msgstr "← Projelere Geri Dön"
+#: app/templates/new_project_simple.html:1
+msgid "Quick Setup — OSM Buildings"
+msgstr "Hızlı Kurulum — OSM Binaları"
+
+#: app/templates/new_project_simple.html:9
+msgid ""
+"Just draw the area you want to map. We'll set everything up for you using"
+" building\n"
+"    outlines from OpenStreetMap and a ready-made survey for buildings."
+msgstr ""
+"Haritalamak istediğiniz alanı çizmeniz yeterli. OpenStreetMap'teki bina "
+"sınırlarını ve binalar için hazır anketi kullanarak her şeyi "
+"ayarlayacağız."
+
+#: app/templates/new_project_simple.html:14
+msgid "This is only for mapping buildings."
+msgstr "Bu yalnızca binaları haritalamak içindir."
+
+#: app/templates/new_project_simple.html:15
+msgid ""
+"If you want to map something else (like roads or water points), use your "
+"own survey\n"
+"    questions, or bring your own map data,"
+msgstr ""
+"Başka bir şey haritalamak istiyorsanız (yollar veya su noktaları gibi), "
+"kendi anket sorularınızı kullanmak ya da kendi harita verilerinizi "
+"getirmek istiyorsanız,"
+
+#: app/templates/new_project_simple.html:17
+msgid "set up a custom project instead"
+msgstr "bunun yerine özel bir proje ayarlayın"
+
+#: app/templates/new_project_simple.html:46
+msgid "Switch to Custom Project"
+msgstr "QField Projesine Ekle"
+
+#: app/templates/new_project_simple.html:55
+msgid "Creating project and preparing map..."
+msgstr "Proje oluşturuluyor ve harita hazırlanıyor..."
+
+#: app/templates/new_project_simple_creating.html:2
+msgid "Creating Project"
+msgstr "Proje oluşturuluyor"
+
+#: app/templates/partials/new_project/creating_fragment.html:11
+#: app/templates/project_details.html:6 app/templates/project_details.html:166
+#: app/templates/project_details.html:177
+msgid "Back to Projects"
+msgstr "Projelere Geri Dön"
 
 #: app/templates/project_details.html:46
 msgid "Project Metadata"
@@ -1125,6 +1670,10 @@ msgstr "Oluşturuldu"
 #: app/templates/project_details.html:84
 msgid "Last Updated"
 msgstr "Son Güncelleme"
+
+#: app/templates/project_details.html:95
+msgid "Hashtags"
+msgstr "Etiketler"
 
 #: app/templates/project_details.html:107
 msgid "External Project"
@@ -1151,24 +1700,15 @@ msgstr "QFieldCloud Projesini Yönet →"
 msgid "View Project Externally →"
 msgstr "Projeyi Harici Olarak Görüntüle →"
 
-#: app/templates/project_details.html:159
+#: app/templates/project_details.html:160
 msgid "Delete this project in downstream and Field-TM? This cannot be undone."
 msgstr "Bu proje downstream ve Field-TM'de silinsin mi? Bu işlem geri alınamaz."
 
-#: app/templates/project_details.html:162
+#: app/templates/project_details.html:163
 msgid "Delete Project"
 msgstr "Projeyi Sil"
 
-#: app/templates/project_details.html:165
-#: app/templates/project_details.html:176
-msgid "Back to Projects"
-msgstr "Projelere Geri Dön"
-
-#: app/templates/project_details.html:171
-msgid "Project Not Found"
-msgstr "Proje Bulunamadı"
-
-#: app/templates/project_details.html:173
+#: app/templates/project_details.html:174
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view\n"
@@ -1191,9 +1731,10 @@ msgstr ""
 msgid "Enter your QFieldCloud credentials to manage collaborators."
 msgstr "İşbirlikçileri yönetmek için QFieldCloud bilgilerinizi girin."
 
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:128
 #: app/templates/qfc_admin.html:36
-msgid "QFieldCloud URL"
-msgstr "QFieldCloud URL'si"
+msgid "QField Cloud URL"
+msgstr "QField Cloud URL'si"
 
 #: app/templates/qfc_admin.html:46
 msgid "The base URL of your QFieldCloud instance (without /api/v1)."
@@ -1203,9 +1744,9 @@ msgstr "QFieldCloud örneğinizin temel URL'si (/api/v1 olmadan)."
 msgid "admin"
 msgstr "admin"
 
-#: app/templates/partials/project_details/setup_steps.html:734
-#: app/templates/partials/project_details/setup_steps.html:740
-#: app/templates/partials/project_details/setup_steps.html:774
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:103
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:109
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:152
 #: app/templates/qfc_admin.html:59
 msgid "Password"
 msgstr "Şifre"
@@ -1238,6 +1779,158 @@ msgstr "Kayıtlı Kullanıcılar"
 msgid "Supported Mapping Apps"
 msgstr "Desteklenen Haritalama Uygulamaları"
 
+#: app/templates/partials/new_project/creating_fragment.html:4
+msgid "Project creation failed."
+msgstr "Proje oluşturma başarısız oldu."
+
+#: app/templates/partials/new_project/creating_fragment.html:6
+msgid "An unexpected error occurred."
+msgstr "Beklenmeyen bir hata oluştu."
+
+#: app/templates/partials/new_project/creating_fragment.html:10
+msgid "Try Again"
+msgstr "Tekrar dene"
+
+#: app/templates/partials/new_project/creating_fragment.html:23
+msgid "Setting up your project..."
+msgstr "Projeniz hazırlanıyor..."
+
+#: app/templates/partials/new_project/creating_fragment.html:25
+msgid ""
+"Downloading map data, splitting tasks, and preparing the QField project.\n"
+"    This can take a minute or two - this page will redirect automatically"
+" when ready."
+msgstr ""
+"Harita verileri indiriliyor, görevler bölünüyor ve QField projesi "
+"hazırlanıyor.\n"
+"    Bu bir veya iki dakika sürebilir - hazır olduğunda bu sayfa otomatik "
+"olarak yönlendirilecektir."
+
+#: app/templates/partials/new_project/map_script.html:3
+msgid "Area"
+msgstr "Alan"
+
+#: app/templates/partials/new_project/map_script.html:4
+msgid "Invalid GeoJSON format. Please check your file."
+msgstr "Geçersiz GeoJSON biçimi. Lütfen dosyanızı kontrol edin."
+
+#: app/templates/partials/new_project/map_script.html:5
+msgid "Invalid GeoJSON file. Please check the file format."
+msgstr "Geçersiz GeoJSON dosyası. Lütfen dosya biçimini kontrol edin."
+
+#: app/templates/partials/new_project/map_script.html:6
+msgid "Invalid geometry"
+msgstr "Geçersiz geometri"
+
+#: app/templates/partials/new_project/map_script.html:7
+msgid "Undo last vertex"
+msgstr "Son köşeyi geri al"
+
+#: app/templates/partials/new_project/map_script.html:8
+msgid "My location"
+msgstr "Konumum"
+
+#: app/templates/partials/new_project/map_script.html:9
+msgid "Failed to validate GeoJSON"
+msgstr "GeoJSON doğrulanamadı"
+
+#: app/templates/partials/new_project/map_script.html:10
+msgid "No GeoJSON returned from validation"
+msgstr "Doğrulamadan GeoJSON dönmedi"
+
+#: app/templates/partials/new_project/map_script.html:11
+msgid "You must draw or upload a project area on the map before submitting."
+msgstr ""
+"Göndermeden önce harita üzerinde bir İlgi Alanı (AOI) çizmeniz veya "
+"yüklemeniz gerekir."
+
+#: app/templates/partials/new_project/map_section.html:3
+msgid "Project Area"
+msgstr "Proje Alanı"
+
+#: app/templates/partials/new_project/map_section.html:6
+msgid "Draw the area you want to map on the map below."
+msgstr "Aşağıdaki haritada haritalamak istediğiniz alanı çizin."
+
+#: app/templates/partials/new_project/map_section.html:15
+msgid "Draw Area"
+msgstr "Alan Çiz"
+
+#: app/templates/partials/new_project/map_section.html:18
+msgid "Clear"
+msgstr "Temizle"
+
+#: app/templates/partials/new_project/map_section.html:32
+#: app/templates/partials/project_details/setup_steps/step2_form.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:72
+#: app/templates/partials/project_details/setup_steps/step4_split.html:36
+msgid "More options"
+msgstr "Form Seçenekleri:"
+
+#: app/templates/partials/new_project/map_section.html:39
+msgid "Upload your own map file (GeoJSON)"
+msgstr "Özel GeoJSON Yükle"
+
+#: app/templates/partials/new_project/map_section.html:43
+msgid ""
+"If you already have a map file with your area boundary, upload it here "
+"instead of\n"
+"        drawing."
+msgstr ""
+"Alan sınırınızı içeren bir harita dosyanız zaten varsa, çizmek yerine "
+"burada yükleyin."
+
+#: app/templates/partials/new_project/map_section.html:50
+msgid "Combine multiple shapes into one"
+msgstr "Birden çok şekli tek bir şekle birleştir"
+
+#: app/templates/partials/new_project/map_section.html:55
+msgid ""
+"Keep areas under 100 km² for best results. Very large areas (over 200 "
+"km²) may not\n"
+"        download all map data automatically."
+msgstr ""
+"En iyi sonuçlar için alanları 100 km² altında tutun. Çok büyük alanlar "
+"(200 km² üzeri) tüm harita verilerini otomatik olarak indirmeyebilir."
+
+#: app/templates/partials/project_details/basemap_section.html:2
+msgid "Offline Basemap"
+msgstr "Çevrimdışı altlık harita"
+
+#: app/templates/partials/project_details/basemap_section.html:4
+msgid ""
+"Search HOT OpenAerialMap imagery for this AOI and generate an MBTiles "
+"basemap."
+msgstr ""
+"Bu AOI için HOT OpenAerialMap görüntülerini arayın ve bir MBTiles altlık "
+"harita oluşturun."
+
+#: app/templates/partials/project_details/basemap_section.html:32
+msgid ""
+"A basemap job is currently in progress. Wait for it to finish before "
+"starting a new search."
+msgstr ""
+"Şu anda bir altlık harita işi devam ediyor. Yeni bir arama başlatmadan "
+"önce bitmesini bekleyin."
+
+#: app/templates/partials/project_details/basemap_section.html:37
+msgid "Search OAM Imagery"
+msgstr "OAM Görüntülerini Ara"
+
+#: app/templates/partials/project_details/basemap_section.html:41
+msgid "Search is disabled while a basemap job is running."
+msgstr "Altlık harita işi çalışırken arama devre dışıdır."
+
+#: app/templates/partials/project_details/basemap_section.html:56
+msgid "Basemap generation previously failed. Please search again and retry."
+msgstr ""
+"Altlık harita üretimi daha önce başarısız oldu. Lütfen tekrar arayın ve "
+"yeniden deneyin."
+
+#: app/templates/partials/project_details/basemap_section.html:60
+msgid "No basemap selected yet."
+msgstr "Henüz bir altlık harita seçilmedi."
+
 #: app/templates/partials/project_details/manager_setup_summary.html:3
 msgid "Manager Setup Summary"
 msgstr "Yönetici Kurulum Özeti"
@@ -1251,32 +1944,28 @@ msgid "Project Location"
 msgstr "Proje Konumu"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-msgid "Step 2: Upload XLSForm"
-msgstr "Adım 2: XLSForm Yükle"
+#: app/templates/partials/project_details/setup_steps.html:53
+msgid "Survey Form"
+msgstr "Anket Formu"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:28
 #: app/templates/partials/project_details/manager_setup_summary.html:39
 #: app/templates/partials/project_details/manager_setup_summary.html:50
 #: app/templates/partials/project_details/manager_setup_summary.html:61
-#: app/templates/partials/project_details/setup_steps.html:46
-#: app/templates/partials/project_details/setup_steps.html:273
-#: app/templates/partials/project_details/setup_steps.html:447
 msgid "Complete"
 msgstr "Tamamlandı"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:36
-#: app/templates/partials/project_details/setup_steps.html:268
-msgid "Step 3: Get Data"
-msgstr "Adım 3: Veri Al"
+msgid "Map Data"
+msgstr "Harita Verileri"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:47
-msgid "Step 4: Split into Tasks"
-msgstr "Adım 4: Görevlere Böl"
+msgid "Tasks"
+msgstr "Görev Kimliği"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:58
-#: app/templates/partials/project_details/setup_steps.html:661
-msgid "Step 5: Finalise Project"
-msgstr "Adım 5: Projeyi Sonlandır"
+msgid "Project Created"
+msgstr "Oluşturulan Projeler"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:69
 msgid ""
@@ -1300,518 +1989,164 @@ msgstr "QR kodu yükleniyor..."
 msgid "Project Setup"
 msgstr "Proje Kurulumu"
 
-#: app/templates/partials/project_details/setup_steps.html:41
-msgid "Step 2: Select Survey Form"
-msgstr "Adım 2: Anket Formunu Seç"
-
-#: app/templates/partials/project_details/setup_steps.html:51
-msgid "Choose a preset survey type, or upload your own custom XLSForm."
-msgstr "Bir anket türü seçin ve önerilen varsayılanlarla devam edin."
-
-#: app/templates/partials/project_details/setup_steps.html:62
-msgid "Choose Survey Type:"
-msgstr "Anket Türünü Seçin:"
-
-#: app/templates/partials/project_details/setup_steps.html:64
-msgid "Loading survey types..."
-msgstr "Anket türleri yükleniyor..."
-
-#: app/templates/partials/project_details/setup_steps.html:81
-msgid "Or use your own form instead:"
-msgstr "Ya da bunun yerine kendi formunuzu kullanın:"
-
-#: app/templates/partials/project_details/setup_steps.html:89
-msgid "Upload Custom XLSForm"
-msgstr "Özel Form Yükle"
-
-#: app/templates/partials/project_details/setup_steps.html:103
-msgid ""
-"Note: Field-TM will automatically inject additional fields into your form"
-" for task\n"
-"          division and feature selection. Your form should only contain "
-"the survey questions you\n"
-"          want to ask (do not include select_one_from_file fields for "
-"tasks/features)."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:127
-msgid ""
-"Recommended defaults are active for ODK projects, including ODK Collect\n"
-"          compatibility."
-msgstr ""
-"ODK Collect uyumluluğu dahil olmak üzere ODK projeleri için önerilen "
-"varsayılanlar aktiftir."
-
-#: app/templates/partials/project_details/setup_steps.html:134
-#, python-format
-msgid "Recommended defaults are active for %(app_name)s projects."
-msgstr "%(app_name)s projeleri için önerilen varsayılanlar aktiftir."
-
-#: app/templates/partials/project_details/setup_steps.html:141
-msgid "Recommended defaults are active for this project."
-msgstr "Bu proje için önerilen varsayılanlar aktiftir."
-
-#: app/templates/partials/project_details/setup_steps.html:160
-msgid "Default Language:"
-msgstr "Varsayılan Dil:"
-
-#: app/templates/partials/project_details/setup_steps.html:162
-msgid "English"
-msgstr "İngilizce"
-
-#: app/templates/partials/project_details/setup_steps.html:163
-msgid "Spanish"
-msgstr "İspanyolca"
-
-#: app/templates/partials/project_details/setup_steps.html:164
-msgid "French"
-msgstr "Fransızca"
-
-#: app/templates/partials/project_details/setup_steps.html:165
-msgid "Portuguese"
-msgstr "Portekizce"
-
-#: app/templates/partials/project_details/setup_steps.html:166
-msgid "Swahili"
-msgstr "Svahili"
-
-#: app/templates/partials/project_details/setup_steps.html:167
-msgid "Hindi"
-msgstr "Hintçe"
-
-#: app/templates/partials/project_details/setup_steps.html:182
-msgid "Form Options:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:195
-msgid "Include photo upload question"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:209
-msgid "Make photo mandatory"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:214
-msgid "Asks the user to take a photo at their location."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:225
-msgid "Include digitisation verification question"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:229
-msgid "Asks the mapper to verify if existing features are correctly digitised."
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:252
-msgid "Continue"
-msgstr "Devam Et"
-
-#: app/templates/partials/project_details/setup_steps.html:256
-msgid "✓ Survey form uploaded successfully"
-msgstr "✓ Anket formu başarıyla yüklendi"
-
-#: app/templates/partials/project_details/setup_steps.html:278
-msgid "Download the recommended OSM data for your survey form."
-msgstr "Anket formunuz için önerilen OSM verilerini indirin."
-
-#: app/templates/partials/project_details/setup_steps.html:280
-msgid "Review the data on the map, then continue."
-msgstr "Haritadaki veriyi inceleyin, ardından devam edin."
-
-#: app/templates/partials/project_details/setup_steps.html:293
-#: app/templates/partials/project_details/style_and_scripts.html:27
-msgid "Download OSM Data"
-msgstr "OSM Verisini İndir"
-
-#: app/templates/partials/project_details/setup_steps.html:319
-msgid "Collect New Data Only"
-msgstr "Yalnızca Yeni Veri Topla"
-
-#: app/templates/partials/project_details/setup_steps.html:336
-msgid "Use custom data inputs or override the default OSM download options."
-msgstr ""
-"Özel veri girdileri kullanın veya varsayılan OSM indirme seçeneklerini "
-"geçersiz kılın."
-
-#: app/templates/partials/project_details/setup_steps.html:342
-msgid "OSM Category:"
-msgstr "OSM Kategorisi:"
-
-#: app/templates/partials/project_details/setup_steps.html:345
-msgid "OSM Buildings"
-msgstr "OSM Binaları"
-
-#: app/templates/partials/project_details/setup_steps.html:346
-msgid "OSM Highways"
-msgstr "OSM Yolları"
-
-#: app/templates/partials/project_details/setup_steps.html:347
-msgid "OSM Healthcare"
-msgstr "OSM Sağlık"
-
-#: app/templates/partials/project_details/setup_steps.html:348
-msgid "OSM Toilets"
-msgstr "OSM Tuvaletler"
-
-#: app/templates/partials/project_details/setup_steps.html:349
-msgid "OSM Religious"
-msgstr "OSM Dini Yerler"
-
-#: app/templates/partials/project_details/setup_steps.html:350
-msgid "OSM Landuse"
-msgstr "OSM Arazi Kullanımı"
-
-#: app/templates/partials/project_details/setup_steps.html:351
-msgid "OSM Waterways"
-msgstr "OSM Su Yolları"
-
-#: app/templates/partials/project_details/setup_steps.html:352
-msgid "OSM Water Points"
-msgstr "OSM Su Noktaları"
-
-#: app/templates/partials/project_details/setup_steps.html:353
-msgid "OSM Waste Disposal"
-msgstr "OSM Atık Bertarafı"
-
-#: app/templates/partials/project_details/setup_steps.html:354
-msgid "OSM Education"
-msgstr "OSM Eğitim"
-
-#: app/templates/partials/project_details/setup_steps.html:355
-msgid "OSM Cemeteries"
-msgstr "OSM Mezarlıklar"
-
-#: app/templates/partials/project_details/setup_steps.html:356
-msgid "OSM Amenities"
-msgstr "OSM Donatıları"
-
-#: app/templates/partials/project_details/setup_steps.html:361
-msgid "Geometry Type:"
-msgstr "Geometri Türü:"
-
-#: app/templates/partials/project_details/setup_steps.html:364
-msgid "Polygon"
-msgstr "Poligon"
-
-#: app/templates/partials/project_details/setup_steps.html:365
-msgid "Polyline"
-msgstr "Çoklu çizgi"
-
-#: app/templates/partials/project_details/setup_steps.html:366
-msgid "Point"
-msgstr "Nokta"
-
-#: app/templates/partials/project_details/setup_steps.html:379
-msgid "Use centroids"
-msgstr "Merkez noktaları kullan"
-
-#: app/templates/partials/project_details/setup_steps.html:391
-msgid "Upload Custom GeoJSON"
-msgstr "Özel GeoJSON Yükle"
-
-#: app/templates/partials/project_details/setup_steps.html:410
-msgid "Generating OSM data extract... This may take a moment."
-msgstr "OSM veri çıkarımı oluşturuluyor... Bu biraz zaman alabilir."
-
-#: app/templates/partials/project_details/setup_steps.html:429
-msgid "OSM data extract ready"
-msgstr "OSM veri çıkarımı hazır"
-
-#: app/templates/partials/project_details/setup_steps.html:442
-#, fuzzy
-msgid "Step 4: Split into Tasks (Optional)"
-msgstr "Adım 3: Görevlere Böl (İsteğe Bağlı)"
-
-#: app/templates/partials/project_details/setup_steps.html:452
-msgid "✓ Task splitting is not relevant without existing data"
-msgstr "✓ Mevcut veri olmadan görev bölme ilgili değildir"
-
-#: app/templates/partials/project_details/setup_steps.html:458
-msgid ""
-"Generate task areas by splitting the Area of Interest (AOI). Choose an "
-"algorithm and\n"
-"      parameters, then split. Review the preview, and click \"Accept Task"
-" Areas\" to save. Or\n"
-"      click"
-msgstr ""
-"İlgi Alanını (AOI) bölerek görev alanları oluşturun. Bir algoritma ve "
-"parametre seçin, ardından bölün. Önizlemeyi inceleyin ve kaydetmek için "
-"\"Accept Task Areas\" seçeneğine tıklayın. Veya tıklayın"
-
-#: app/templates/partials/project_details/setup_steps.html:461
-#: app/templates/partials/project_details/setup_steps.html:480
-msgid "Skip"
-msgstr "Atla"
-
-#: app/templates/partials/project_details/setup_steps.html:462
-msgid "to use the whole AOI as a single task."
-msgstr "tüm AOI'yi tek bir görev olarak kullanmak için."
-
-#: app/templates/partials/project_details/setup_steps.html:494
-msgid "Choose which linear features influence building-based task splitting."
-msgstr "Bina tabanlı görev bölmeyi hangi doğrusal özelliklerin etkilediğini seçin."
-
-#: app/templates/partials/project_details/setup_steps.html:518
-msgid "Include roads"
-msgstr "Yolları dahil et"
-
-#: app/templates/partials/project_details/setup_steps.html:527
-msgid "Include rivers"
-msgstr "Nehirleri dahil et"
-
-#: app/templates/partials/project_details/setup_steps.html:536
-msgid "Include railways"
-msgstr "Demiryollarını dahil et"
-
-#: app/templates/partials/project_details/setup_steps.html:545
-msgid "Include aeroways"
-msgstr "Hava yollarını dahil et"
-
-#: app/templates/partials/project_details/setup_steps.html:552
-msgid "Algorithm:"
-msgstr "Algoritma:"
-
-#: app/templates/partials/project_details/setup_steps.html:554
-msgid "Select splitting option..."
-msgstr "Bölme seçeneğini seçin..."
-
-#: app/templates/partials/project_details/setup_steps.html:555
-#: app/templates/partials/project_details/style_and_scripts.html:30
-msgid "Split by Square"
-msgstr "Karelere Böl"
-
-#: app/templates/partials/project_details/setup_steps.html:556
-msgid "Average Buildings v1 (Voronoi)"
-msgstr "Ortalama Binalar v1 (Voronoi)"
-
-#: app/templates/partials/project_details/setup_steps.html:558
-msgid "Average Buildings v2 (Straight Skeleton)"
-msgstr "Ortalama Binalar v2 (Straight Skeleton)"
-
-#: app/templates/partials/project_details/setup_steps.html:560
-#, fuzzy
-msgid "Split by Specific Number of Tasks"
-msgstr "Belirli Sayıda Göreve Böl (Yakında)"
-
-#: app/templates/partials/project_details/setup_steps.html:567
-msgid "Avg. Buildings per Task:"
-msgstr "Görev Başına Ortalama Bina:"
-
-#: app/templates/partials/project_details/setup_steps.html:579
-msgid "Number of Tasks:"
-msgstr ""
-
-#: app/templates/partials/project_details/setup_steps.html:591
-msgid "Dimension (meters):"
-msgstr "Boyut (metre):"
-
-#: app/templates/partials/project_details/setup_steps.html:610
-msgid "Split Again"
-msgstr "Tekrar Böl"
-
-#: app/templates/partials/project_details/setup_steps.html:610
-#: app/templates/partials/project_details/style_and_scripts.html:32
-msgid "Split AOI"
+#: app/templates/partials/project_details/setup_steps.html:44
+msgid "Project setup progress"
+msgstr "Proje Kurulumu"
+
+#: app/templates/partials/project_details/setup_steps.html:47
+msgid "Project Details"
+msgstr "Proje AOI"
+
+#: app/templates/partials/project_details/setup_steps.html:59
+msgid "Get Data"
+msgstr "Adım 3: Veri Al"
+
+#: app/templates/partials/project_details/setup_steps.html:65
+msgid "Split Tasks"
 msgstr "AOI'yi Böl"
 
-#: app/templates/partials/project_details/setup_steps.html:646
-msgid "Splitting AOI into tasks... This may take a moment."
-msgstr "AOI görevlere bölünüyor... Bu biraz zaman alabilir."
-
-#: app/templates/partials/project_details/setup_steps.html:662
-msgid "Ready"
-msgstr "Hazır"
-
-#: app/templates/partials/project_details/setup_steps.html:665
-msgid ""
-"All prerequisites are complete! Create the project in your chosen mapping"
-" tool."
-msgstr ""
-"Tüm ön koşullar tamamlandı! Projeyi seçtiğiniz haritalama aracında "
-"oluşturun."
-
-#: app/templates/partials/project_details/setup_steps.html:670
-msgid "Finalise Project"
+#: app/templates/partials/project_details/setup_steps.html:69
+msgid "Finalise"
 msgstr "Projeyi Sonlandır"
 
-#: app/templates/partials/project_details/setup_steps.html:687
-msgid "Confirm Project Finalisation"
-msgstr "Proje Sonlandırmasını Onayla"
-
-#: app/templates/partials/project_details/setup_steps.html:691
-msgid "Are you sure you want to finalise this project?"
-msgstr "Bu projeyi sonlandırmak istediğinizden emin misiniz?"
-
-#: app/templates/partials/project_details/setup_steps.html:696
-msgid "Confirm & Finalise"
-msgstr "Onayla ve Sonlandır"
-
-#: app/templates/partials/project_details/setup_steps.html:704
-msgid "Custom Credentials"
-msgstr "Özel Kimlik Bilgileri"
-
-#: app/templates/partials/project_details/setup_steps.html:710
-msgid "ODK Central URL"
-msgstr "ODK Central URL'si"
-
-#: app/templates/partials/project_details/setup_steps.html:716
-msgid "https://your-odk-central.com"
-msgstr "https://your-odk-central.com"
-
-#: app/templates/partials/project_details/setup_steps.html:750
-msgid "QField Cloud URL"
-msgstr "QField Cloud URL'si"
-
-#: app/templates/partials/project_details/setup_steps.html:756
-msgid "https://qfield.cloud"
-msgstr "https://qfield.cloud"
-
-#: app/templates/partials/project_details/setup_steps.html:768
-msgid "qfield_username"
-msgstr "qfield_username"
-
-#: app/templates/partials/project_details/setup_steps.html:780
-msgid "qfield_password"
-msgstr "qfield_password"
-
-#: app/templates/partials/project_details/setup_steps.html:792
-#: app/templates/partials/project_details/style_and_scripts.html:49
-msgid "Test Credentials"
-msgstr "Kimlik Bilgilerini Test Et"
-
-#: app/templates/partials/project_details/setup_steps.html:795
-msgid "Save & Continue"
-msgstr "Kaydet ve Devam Et"
-
-#: app/templates/partials/project_details/style_and_scripts.html:10
+#: app/templates/partials/project_details/style_and_scripts.html:8
 msgid "Select a survey type..."
 msgstr "Bir anket türü seçin..."
 
-#: app/templates/partials/project_details/style_and_scripts.html:11
+#: app/templates/partials/project_details/style_and_scripts.html:9
 msgid "No survey types available"
 msgstr "Kullanılabilir anket türü yok"
 
-#: app/templates/partials/project_details/style_and_scripts.html:12
-msgid "No survey forms are available. Upload a custom form in Advanced Config."
+#: app/templates/partials/project_details/style_and_scripts.html:10
+msgid "No survey forms are available. Upload your own survey file above."
 msgstr ""
 "Kullanılabilir anket formu yok. Gelişmiş Yapılandırma bölümünde özel bir "
 "form yükleyin."
 
-#: app/templates/partials/project_details/style_and_scripts.html:13
-msgid "Select a survey type, or upload a custom form in Advanced Config."
-msgstr ""
-"Bir anket türü seçin veya Gelişmiş Yapılandırma bölümünde özel bir form "
-"yükleyin."
+#: app/templates/partials/project_details/style_and_scripts.html:11
+msgid "Pick a survey form, or upload your own."
+msgstr "Bir anket türü seçin ve önerilen varsayılanlarla devam edin."
 
-#: app/templates/partials/project_details/style_and_scripts.html:14
+#: app/templates/partials/project_details/style_and_scripts.html:12
 msgid "Survey type selected."
 msgstr "Anket türü seçildi."
 
-#: app/templates/partials/project_details/style_and_scripts.html:15
+#: app/templates/partials/project_details/style_and_scripts.html:13
 msgid "Invalid file type. Please upload a .xls or .xlsx file."
 msgstr "Geçersiz dosya türü. Lütfen .xls veya .xlsx dosyası yükleyin."
 
-#: app/templates/partials/project_details/style_and_scripts.html:16
+#: app/templates/partials/project_details/style_and_scripts.html:14
 msgid "Selected file:"
 msgstr "Seçilen dosya:"
 
-#: app/templates/partials/project_details/style_and_scripts.html:17
+#: app/templates/partials/project_details/style_and_scripts.html:15
 msgid "Custom form selected."
 msgstr "Özel form seçildi."
 
-#: app/templates/partials/project_details/style_and_scripts.html:18
-msgid "Choose a survey type first, or upload a custom form in Advanced Config."
-msgstr ""
-"Önce bir anket türü seçin veya Gelişmiş Yapılandırma bölümünde özel bir "
-"form yükleyin."
+#: app/templates/partials/project_details/style_and_scripts.html:16
+msgid "Pick a survey form, or upload your own first."
+msgstr "Bir anket türü seçin ve önerilen varsayılanlarla devam edin."
 
-#: app/templates/partials/project_details/style_and_scripts.html:19
+#: app/templates/partials/project_details/style_and_scripts.html:17
 msgid "polygons"
 msgstr "poligonlar"
 
-#: app/templates/partials/project_details/style_and_scripts.html:20
+#: app/templates/partials/project_details/style_and_scripts.html:18
 msgid "polylines"
 msgstr "çoklu çizgiler"
 
-#: app/templates/partials/project_details/style_and_scripts.html:21
+#: app/templates/partials/project_details/style_and_scripts.html:19
 msgid "points"
 msgstr "noktalar"
 
-#: app/templates/partials/project_details/style_and_scripts.html:22
+#: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
 msgstr "özellikler"
 
-#: app/templates/partials/project_details/style_and_scripts.html:23
+#: app/templates/partials/project_details/style_and_scripts.html:21
 msgid ""
-"You uploaded a custom form, so this OSM download is optional. Use "
-"Advanced Config to upload your own GeoJSON or adjust download settings."
+"You uploaded a custom form, so this OSM download is optional. Upload your"
+" own map file below or open More options to adjust the source."
 msgstr ""
 "Özel bir form yüklediniz, bu nedenle bu OSM indirmesi isteğe bağlıdır. "
 "Kendi GeoJSON dosyanızı yüklemek veya indirme ayarlarını düzenlemek için "
 "Gelişmiş Yapılandırma'yı kullanın."
 
-#: app/templates/partials/project_details/style_and_scripts.html:24
+#: app/templates/partials/project_details/style_and_scripts.html:22
 #, python-format
 msgid ""
-"Recommended source: %(title)s (%(geom_label)s). Review the data on the "
-"map, then continue."
+"Recommended for your form: %(title)s (%(geom_label)s). Review the data on"
+" the map, then continue."
 msgstr ""
 "Önerilen kaynak: %(title)s (%(geom_label)s). Haritadaki veriyi inceleyin,"
 " ardından devam edin."
 
-#: app/templates/partials/project_details/style_and_scripts.html:25
+#: app/templates/partials/project_details/style_and_scripts.html:23
 #, python-format
 msgid ""
-"Recommended source updated (%(geom_label)s). Review the data on the map, "
-"then continue."
+"Source updated (%(geom_label)s). Review the data on the map, then "
+"continue."
 msgstr ""
 "Önerilen kaynak güncellendi (%(geom_label)s). Haritadaki veriyi "
 "inceleyin, ardından devam edin."
 
-#: app/templates/partials/project_details/style_and_scripts.html:26
+#: app/templates/partials/project_details/style_and_scripts.html:24
 msgid "Downloading..."
 msgstr "İndiriliyor..."
 
-#: app/templates/partials/project_details/style_and_scripts.html:29
+#: app/templates/partials/project_details/setup_steps/step3_data.html:27
+#: app/templates/partials/project_details/style_and_scripts.html:25
+msgid "Use OSM data"
+msgstr "OSM Verisini İndir"
+
+#: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "Confirm No Splitting"
 msgstr "Bölmeme İşlemini Onayla"
 
-#: app/templates/partials/project_details/style_and_scripts.html:31
-msgid "Split by Buildings"
+#: app/templates/partials/project_details/style_and_scripts.html:28
+msgid "Split by grid"
+msgstr "Karelere Böl"
+
+#: app/templates/partials/project_details/style_and_scripts.html:29
+msgid "Split by buildings"
 msgstr "Binalara Göre Böl"
 
-#: app/templates/partials/project_details/style_and_scripts.html:33
+#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/style_and_scripts.html:30
+msgid "Split area"
+msgstr "Tekrar Böl"
+
+#: app/templates/partials/project_details/style_and_scripts.html:31
 msgid "Select Option"
 msgstr "Seçenek Seç"
 
-#: app/templates/partials/project_details/style_and_scripts.html:34
+#: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Confirming..."
 msgstr "Onaylanıyor..."
 
-#: app/templates/partials/project_details/style_and_scripts.html:35
+#: app/templates/partials/project_details/style_and_scripts.html:33
 msgid "Splitting..."
 msgstr "Bölünüyor..."
 
-#: app/templates/partials/project_details/style_and_scripts.html:36
+#: app/templates/partials/project_details/style_and_scripts.html:34
 msgid "ODK Central"
 msgstr "ODK Central"
 
-#: app/templates/partials/project_details/style_and_scripts.html:37
+#: app/templates/partials/project_details/style_and_scripts.html:35
 msgid "QField"
 msgstr "QField"
 
-#: app/templates/partials/project_details/style_and_scripts.html:38
+#: app/templates/partials/project_details/style_and_scripts.html:36
 msgid "the mapping tool"
 msgstr "haritalama aracı"
 
-#: app/templates/partials/project_details/style_and_scripts.html:39
+#: app/templates/partials/project_details/style_and_scripts.html:37
 msgid "Project type not set. Please set the field mapping app first."
 msgstr ""
 "Proje türü ayarlanmadı. Lütfen önce saha haritalama uygulamasını "
 "ayarlayın."
 
-#: app/templates/partials/project_details/style_and_scripts.html:40
+#: app/templates/partials/project_details/style_and_scripts.html:38
 #, python-format
 msgid ""
 "Are you sure you want to finalise this project in %(project_type)s? This "
@@ -1821,51 +2156,189 @@ msgstr ""
 "misiniz? Bu işlem projeyi oluşturacak, formları yükleyecek ve gerekli tüm"
 " dosyaları üretecektir."
 
-#: app/templates/partials/project_details/style_and_scripts.html:41
+#: app/templates/partials/project_details/style_and_scripts.html:39
 msgid "Custom ODK Credentials"
 msgstr "Özel ODK Kimlik Bilgileri"
 
-#: app/templates/partials/project_details/style_and_scripts.html:42
+#: app/templates/partials/project_details/style_and_scripts.html:40
 msgid "Custom QField Credentials"
 msgstr "Özel QField Kimlik Bilgileri"
 
-#: app/templates/partials/project_details/style_and_scripts.html:43
+#: app/templates/partials/project_details/style_and_scripts.html:41
 msgid "Please fill in all fields."
 msgstr "Lütfen tüm alanları doldurun."
 
-#: app/templates/partials/project_details/style_and_scripts.html:44
+#: app/templates/partials/project_details/style_and_scripts.html:42
 msgid "Testing..."
 msgstr "Test ediliyor..."
 
-#: app/templates/partials/project_details/style_and_scripts.html:45
+#: app/templates/partials/project_details/style_and_scripts.html:43
 msgid "Testing credentials..."
 msgstr "Kimlik bilgileri test ediliyor..."
 
-#: app/templates/partials/project_details/style_and_scripts.html:46
+#: app/templates/partials/project_details/style_and_scripts.html:44
 msgid "✓ Credentials are valid!"
 msgstr "✓ Kimlik bilgileri geçerli!"
 
-#: app/templates/partials/project_details/style_and_scripts.html:47
+#: app/templates/partials/project_details/style_and_scripts.html:45
 msgid "Invalid credentials. Please check and try again."
 msgstr "Geçersiz kimlik bilgileri. Lütfen kontrol edip tekrar deneyin."
 
-#: app/templates/partials/project_details/style_and_scripts.html:48
+#: app/templates/partials/project_details/style_and_scripts.html:46
 #, python-format
 msgid "Error testing credentials: %(message)s"
 msgstr "Kimlik bilgileri test edilirken hata oluştu: %(message)s"
 
-#: app/templates/partials/project_details/style_and_scripts.html:50
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:180
+#: app/templates/partials/project_details/style_and_scripts.html:47
+msgid "Test Credentials"
+msgstr "Kimlik Bilgilerini Test Et"
+
+#: app/templates/partials/project_details/style_and_scripts.html:48
 msgid "Please test credentials first before continuing."
 msgstr "Devam etmeden önce lütfen kimlik bilgilerini test edin."
 
-#: app/templates/partials/project_details/style_and_scripts.html:51
+#: app/templates/partials/project_details/style_and_scripts.html:49
 #, python-format
 msgid "Creating project in %(project_type)s... This may take a moment."
 msgstr "%(project_type)s içinde proje oluşturuluyor... Bu biraz zaman alabilir."
 
-#: app/templates/partials/project_details/style_and_scripts.html:52
+#: app/templates/partials/project_details/style_and_scripts.html:50
 msgid "Error:"
 msgstr "Hata:"
+
+#: app/templates/partials/project_details/fragments/basemap_progress.html:5
+msgid ""
+"Basemap attach failed for now. Your project is ready to\n"
+"      use. Please retry attach."
+msgstr ""
+"Altlık harita ekleme şimdilik başarısız oldu. Projeniz kullanıma hazır. "
+"Lütfen eklemeyi tekrar deneyin."
+
+#: app/templates/partials/project_details/fragments/basemap_progress.html:20
+msgid "Retry Attach"
+msgstr "Yeniden Ekle"
+
+#: app/templates/partials/project_details/fragments/basemap_progress.html:26
+msgid ""
+"Basemap is attaching to the QField project. This can take a minute; click"
+" below to check\n"
+"      the latest status."
+msgstr ""
+"Altlık harita QField projesine ekleniyor. Bu bir dakika sürebilir; en son"
+" durumu kontrol etmek için aşağıya tıklayın."
+
+#: app/templates/partials/project_details/fragments/basemap_progress.html:41
+#: app/templates/partials/project_details/fragments/basemap_progress.html:104
+msgid "Checking..."
+msgstr "Kontrol ediliyor..."
+
+#: app/templates/partials/project_details/fragments/basemap_progress.html:42
+#: app/templates/partials/project_details/fragments/basemap_progress.html:45
+#: app/templates/partials/project_details/fragments/basemap_progress.html:105
+#: app/templates/partials/project_details/fragments/basemap_progress.html:108
+msgid "Check Status"
+msgstr "Proje Durumu"
+
+#: app/templates/partials/project_details/fragments/basemap_progress.html:62
+msgid ""
+"Basemap generation is in progress on the imagery server. Click below to "
+"check whether\n"
+"      it's ready."
+msgstr ""
+"Görüntü sunucusunda altlık harita oluşturuluyor. Hazır olup olmadığını "
+"kontrol etmek için aşağıya tıklayın."
+
+#: app/templates/partials/project_details/fragments/basemap_progress.html:63
+msgid "STAC item"
+msgstr "STAC öğesi"
+
+#: app/templates/partials/project_details/fragments/basemap_progress.html:64
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:15
+msgid "Zoom"
+msgstr "Yakınlaştırma"
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:4
+msgid ""
+"Basemap attached to\n"
+"    QField project."
+msgstr "Altlık harita QField projesine eklendi."
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:5
+msgid ""
+"Basemap is\n"
+"    ready. Attaching to QField project in progress."
+msgstr "Altlık harita hazır. QField projesine ekleme işlemi sürüyor."
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:7
+msgid ""
+"Basemap is ready, but attach to the QField project failed.\n"
+"    Please retry attach."
+msgstr ""
+"Altlık harita hazır, ancak QField projesine ekleme başarısız oldu.\n"
+"    Lütfen eklemeyi tekrar deneyin."
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:8
+msgid ""
+"Basemap is ready. Not yet attached to QField\n"
+"    project."
+msgstr ""
+"Altlık harita hazır. Henüz QField\n"
+"    projesine eklenmedi."
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:9
+msgid "Basemap is ready."
+msgstr "Altlık harita hazır."
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:10
+msgid ""
+"Total\n"
+"    size"
+msgstr ""
+"Toplam\n"
+"    boyut"
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:12
+msgid "Available Zoom"
+msgstr "Kullanılabilir Yakınlaştırma"
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:24
+msgid "Download MBTiles"
+msgstr "MBTiles İndir"
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:33
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:26
+msgid "View Metadata"
+msgstr "Meta veriyi görüntüle"
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:46
+#: app/templates/partials/project_details/fragments/basemap_ready.html:57
+msgid "Attach to QField Project"
+msgstr "QField Projesine Ekle"
+
+#: app/templates/partials/project_details/fragments/basemap_ready.html:64
+msgid ""
+"Use the ODK offline maps documentation to configure this MBTiles file in "
+"Collect."
+msgstr ""
+"Bu MBTiles dosyasını Collect içinde yapılandırmak için ODK çevrimdışı "
+"harita belgelerini kullanın."
+
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:3
+msgid "Select one imagery item to start MBTiles generation."
+msgstr "MBTiles üretimini başlatmak için bir görüntü öğesi seçin."
+
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:13
+msgid "Cloud"
+msgstr "Kapat"
+
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:49
+msgid "Use this image"
+msgstr "Bu görüntüyü kullan"
+
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:59
+msgid "No imagery items were found for this AOI."
+msgstr "Bu AOI için hiç görüntü öğesi bulunamadı."
 
 #: app/templates/partials/project_details/fragments/data_extract_preview.html:24
 msgid "Accept Data Extract"
@@ -1922,65 +2395,397 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "Görev Seçimlerini Kabul Et"
 
-#~ msgid ""
-#~ "Manager account could not be created "
-#~ "automatically. Log in to QFieldCloud as"
-#~ " admin to manage the project."
-#~ msgstr ""
+#: app/templates/partials/project_details/setup_steps/step2_form.html:4
+msgid "Survey form ready"
+msgstr "Anket formu hazır"
 
-#~ msgid ""
-#~ "✓ Data extract successfully saved! You"
-#~ " can now proceed to Step 3 "
-#~ "(upload XLSForm) and then Step 4 "
-#~ "(split tasks)."
-#~ msgstr ""
-#~ "✓ Veri çıkarımı başarıyla kaydedildi! "
-#~ "Artık Adım 3'e (XLSForm yükleme) ve "
-#~ "ardından Adım 4'e (görevleri bölme) "
-#~ "geçebilirsiniz."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:9
+msgid "Choose Your Survey Form"
+msgstr "Anket Türünü Seçin:"
 
-#~ msgid ""
-#~ "✓ Task splitting skipped. The whole "
-#~ "AOI will be used as a single "
-#~ "task. You can proceed to Step 4."
-#~ msgstr ""
-#~ "✓ Görev bölme atlandı. AOI'nin tamamı"
-#~ " tek bir görev olarak kullanılacaktır. "
-#~ "Adım 4'e geçebilirsiniz."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:12
+msgid ""
+"Pick a ready-made survey that matches what you're mapping. You can upload"
+" your own survey\n"
+"    file if none of these fit."
+msgstr ""
+"Haritaladığınız şeyle eşleşen hazır bir anket seçin. Bunlardan hiçbiri "
+"uygun değilse kendi anket dosyanızı yükleyebilirsiniz."
 
-#~ msgid "Step 1: Upload XLSForm"
-#~ msgstr "Adım 1: XLSForm Yükle"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:25
+msgid "Survey form"
+msgstr "Anket formu"
 
-#~ msgid "Step 2: Get Data"
-#~ msgstr "Adım 2: Veri Al"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:28
+msgid "Loading survey types..."
+msgstr "Anket türleri yükleniyor..."
 
-#~ msgid "Step 3: Split into Tasks"
-#~ msgstr "Adım 3: Görevlere Böl"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+msgid "or"
+msgstr "veya"
 
-#~ msgid "Step 4: Finalise Project"
-#~ msgstr "Adım 4: Projeyi Sonlandır"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:36
+msgid "upload your own survey file (.xls / .xlsx)"
+msgstr "kendi anket dosyanızı yükleyin (.xls / .xlsx)"
 
-#~ msgid "Step 1: Select Survey Form"
-#~ msgstr "Adım 1: Anket Formunu Seç"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:49
+msgid ""
+"Heads up: Field-TM auto-adds fields for tasks and feature selection. Your"
+" form should\n"
+"        only contain the survey questions you want to ask."
+msgstr ""
+"Not: Field-TM, görev bölümü ve özellik seçimi için formunuza otomatik "
+"olarak ek alanlar ekleyecektir. Formunuz yalnızca sormak istediğiniz "
+"anket sorularını içermelidir (görevler/özellikler için "
+"select_one_from_file alanları eklemeyin)."
 
-#~ msgid "Choose a survey type and continue with recommended defaults."
-#~ msgstr "Bir anket türü seçin ve önerilen varsayılanlarla devam edin."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Form language"
+msgstr "Dil"
 
-#~ msgid "Upload a custom XLSForm or adjust form-processing options."
-#~ msgstr "Özel bir XLSForm yükleyin veya form işleme seçeneklerini ayarlayın."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:100
+msgid "English"
+msgstr "İngilizce"
 
-#~ msgid "Upload Custom Form"
-#~ msgstr "Özel Form Yükle"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:101
+msgid "Spanish"
+msgstr "İspanyolca"
 
-#~ msgid "Make photo upload mandatory"
-#~ msgstr "Fotoğraf yüklemeyi zorunlu yap"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:102
+msgid "French"
+msgstr "Fransızca"
 
-#~ msgid ""
-#~ "Note: Field-TM will automatically inject"
-#~ " additional fields into your form for"
-#~ " task division and feature selection. "
-#~ "Your form should only contain the "
-#~ "survey questions you want to ask "
-#~ "(do not include select_one_from_file fields"
-#~ " for tasks/features)."
-#~ msgstr ""
+#: app/templates/partials/project_details/setup_steps/step2_form.html:103
+msgid "Portuguese"
+msgstr "Portekizce"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:104
+msgid "Swahili"
+msgstr "Svahili"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:105
+msgid "Hindi"
+msgstr "Hintçe"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:109
+msgid "Form questions"
+msgstr "Form Seçenekleri:"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:113
+msgid "Ask for a photo"
+msgstr "Fotoğraf iste"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:115
+msgid "Mappers will be asked to take a photo at the location."
+msgstr "Kullanıcıdan bulunduğu yerde bir fotoğraf çekmesini ister."
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:128
+msgid "Make photo mandatory"
+msgstr "Fotoğrafı zorunlu yap"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:135
+msgid "Ask to verify existing features"
+msgstr ""
+"Haritacının mevcut özniteliklerin doğru sayısallaştırılıp "
+"sayısallaştırılmadığını doğrulamasını ister."
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:137
+msgid "Mappers confirm whether existing OSM features are correctly digitised."
+msgstr ""
+"Haritacının mevcut özniteliklerin doğru sayısallaştırılıp "
+"sayısallaştırılmadığını doğrulamasını ister."
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:4
+msgid "Data extract ready"
+msgstr "OSM veri çıkarımı hazır"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:9
+msgid "Add Your Data"
+msgstr "OSM Verisini İndir"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:12
+msgid ""
+"Pull existing features from OpenStreetMap for your project area, or start"
+" with an empty\n"
+"    map so mappers can collect everything from scratch."
+msgstr ""
+"Proje alanınız için OpenStreetMap'ten mevcut ögeleri alın veya "
+"haritacıların her şeyi sıfırdan toplaması için boş bir haritayla "
+"başlayın."
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:53
+msgid "Start with empty map"
+msgstr "Boş haritayla başla"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:61
+msgid "upload your own map file (GeoJSON)"
+msgstr "Özel GeoJSON Yükle"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:79
+msgid "Override the default OSM source for this project."
+msgstr "Bu proje için önerilen varsayılanlar aktiftir."
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+msgid "What to download"
+msgstr "Ne indirilecek"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:88
+msgid "OSM Buildings"
+msgstr "OSM Binaları"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:89
+msgid "OSM Highways"
+msgstr "OSM Yolları"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:90
+msgid "OSM Healthcare"
+msgstr "OSM Sağlık"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:91
+msgid "OSM Toilets"
+msgstr "OSM Tuvaletler"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:92
+msgid "OSM Religious"
+msgstr "OSM Dini Yerler"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:93
+msgid "OSM Landuse"
+msgstr "OSM Arazi Kullanımı"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:94
+msgid "OSM Waterways"
+msgstr "OSM Su Yolları"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:95
+msgid "OSM Water Points"
+msgstr "OSM Su Noktaları"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:96
+msgid "OSM Waste Disposal"
+msgstr "OSM Atık Bertarafı"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:97
+msgid "OSM Education"
+msgstr "OSM Eğitim"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:98
+msgid "OSM Cemeteries"
+msgstr "OSM Mezarlıklar"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:99
+msgid "OSM Amenities"
+msgstr "OSM Donatıları"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+msgid "Feature shape"
+msgstr "özellikler"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:107
+msgid "Polygon (area)"
+msgstr "Poligon"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:108
+msgid "Line"
+msgstr "Çoklu çizgi"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:109
+msgid "Point"
+msgstr "Nokta"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:116
+msgid "Use centroids"
+msgstr "Merkez noktaları kullan"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+msgid "Convert polygons to single points."
+msgstr "Çokgenleri tek noktalara dönüştür."
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:140
+msgid "Generating OSM data extract... This may take a moment."
+msgstr "OSM veri çıkarımı oluşturuluyor... Bu biraz zaman alabilir."
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:6
+msgid ""
+"Task splitting skipped (no existing\n"
+"    data)"
+msgstr "✓ Mevcut veri olmadan görev bölme ilgili değildir"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:7
+msgid "Task areas ready"
+msgstr "Altlık harita hazır."
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:13
+msgid "Split into Tasks"
+msgstr "Adım 4: Görevlere Böl"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:14
+msgid "Optional"
+msgstr "İsteğe bağlı"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:17
+msgid ""
+"Divide your area into smaller tasks so multiple mappers can work in "
+"parallel. Pick how to\n"
+"    split below, preview the result, then accept it. Or skip to use the "
+"whole area as one task."
+msgstr ""
+"Birden çok haritacının paralel çalışabilmesi için alanınızı daha küçük "
+"görevlere bölün. Aşağıda nasıl bölüneceğini seçin, sonucu önizleyin ve "
+"kabul edin. Ya da tüm alanı tek görev olarak kullanmak için atlayın."
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:29
+msgid "Skip splitting"
+msgstr "Bölünüyor..."
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:50
+msgid ""
+"When splitting by building count, these linear features are used as "
+"natural task\n"
+"          boundaries."
+msgstr ""
+"Bina sayısına göre bölerken, bu çizgisel ögeler doğal görev sınırları "
+"olarak kullanılır."
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:75
+msgid "Include roads"
+msgstr "Yolları dahil et"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:84
+msgid "Include rivers"
+msgstr "Nehirleri dahil et"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:93
+msgid "Include railways"
+msgstr "Demiryollarını dahil et"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:102
+msgid "Include aeroways"
+msgstr "Hava yollarını dahil et"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:109
+msgid "How to split"
+msgstr "Nasıl bölünsün"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+msgid "Choose a method..."
+msgstr "Bir yöntem seçin..."
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:112
+msgid "By number of buildings (faster)"
+msgstr "Bina sayısına göre (daha hızlı)"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:114
+msgid "By number of buildings (cleaner shapes)"
+msgstr "Bina sayısına göre (daha temiz şekiller)"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:116
+msgid "By a regular grid"
+msgstr "Düzenli ızgaraya göre"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+msgid "Into a fixed number of tasks"
+msgstr "Belirli Sayıda Göreve Böl (Yakında)"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:122
+msgid "Buildings per task"
+msgstr "Görev Başına Ortalama Bina:"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:133
+msgid "Number of tasks"
+msgstr "Görev Sayısı:"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:145
+msgid "Grid square size (metres)"
+msgstr "Izgara karesi boyutu (metre)"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+msgid "Split Again"
+msgstr "Tekrar Böl"
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:199
+msgid "Splitting area into tasks... This may take a moment."
+msgstr "AOI görevlere bölünüyor... Bu biraz zaman alabilir."
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:4
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:19
+msgid "Finalise Project"
+msgstr "Projeyi Sonlandır"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:5
+msgid "Ready"
+msgstr "Hazır"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:8
+msgid ""
+"Everything's ready. Click below to create the project in your chosen "
+"mapping tool."
+msgstr ""
+"Tüm ön koşullar tamamlandı! Projeyi seçtiğiniz haritalama aracında "
+"oluşturun."
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:27
+msgid "Use custom credentials"
+msgstr "Özel Kimlik Bilgileri"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:60
+msgid "Confirm Project Finalisation"
+msgstr "Proje Sonlandırmasını Onayla"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:64
+msgid "Are you sure you want to finalise this project?"
+msgstr "Bu projeyi sonlandırmak istediğinizden emin misiniz?"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:68
+msgid "Confirm & Finalise"
+msgstr "Onayla ve Sonlandır"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:74
+msgid "Custom Credentials"
+msgstr "Özel Kimlik Bilgileri"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:79
+msgid "ODK Central URL"
+msgstr "ODK Central URL'si"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:85
+msgid "https://your-odk-central.com"
+msgstr "https://your-odk-central.com"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:118
+msgid "Where should this project live?"
+msgstr "Bu proje nerede bulunmalı?"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:122
+msgid "Use my account on app.qfield.cloud"
+msgstr "app.qfield.cloud üzerindeki hesabımı kullan"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:123
+msgid "Use a custom-hosted QFieldCloud instance"
+msgstr "Özel barındırılan bir QFieldCloud örneği kullan"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:134
+msgid "https://qfield.cloud"
+msgstr "https://qfield.cloud"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:146
+msgid "qfield_username"
+msgstr "qfield_username"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:158
+msgid "qfield_password"
+msgstr "qfield_password"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:163
+msgid "Organisation name"
+msgstr "Kuruluş adı"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:168
+msgid "Optional - leave blank to create under your username"
+msgstr "İsteğe bağlı - kullanıcı adınız altında oluşturmak için boş bırakın"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
+msgid "Save & Continue"
+msgstr "Kaydet ve Devam Et"
+

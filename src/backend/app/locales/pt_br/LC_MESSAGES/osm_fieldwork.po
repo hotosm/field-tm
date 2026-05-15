@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-03-23 23:31+0000\n"
+"POT-Creation-Date: 2026-05-13 04:50+0100\n"
 "PO-Revision-Date: 2026-03-18 17:42+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: pt_br\n"
@@ -85,36 +85,40 @@ msgstr "Não"
 
 #: i18n/osm_fieldwork_strings.py:22
 msgctxt "xlsform_label"
+msgid "offset"
+msgstr "Deslocamento"
+
+#: i18n/osm_fieldwork_strings.py:23
+msgctxt "xlsform_label"
 msgid "osm_username"
 msgstr "Nome de usuário OSM"
 
-#: i18n/osm_fieldwork_strings.py:23
+#: i18n/osm_fieldwork_strings.py:24
 msgctxt "xlsform_label"
 msgid "other"
 msgstr "Outro"
 
-#: i18n/osm_fieldwork_strings.py:24
+#: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
 msgid "split"
 msgstr "Dividir"
 
-#: i18n/osm_fieldwork_strings.py:25
+#: i18n/osm_fieldwork_strings.py:26
 msgctxt "xlsform_label"
 msgid "survey_questions"
 msgstr "Perguntas da pesquisa"
 
-#: i18n/osm_fieldwork_strings.py:26
+#: i18n/osm_fieldwork_strings.py:27
 msgctxt "xlsform_label"
 msgid "task"
 msgstr "Tarefa"
 
-#: i18n/osm_fieldwork_strings.py:27
+#: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
 msgid "verification"
 msgstr "Verificação"
 
-#: i18n/osm_fieldwork_strings.py:28
+#: i18n/osm_fieldwork_strings.py:29
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "Sim"
-

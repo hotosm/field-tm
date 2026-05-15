@@ -11,6 +11,7 @@ RUN apt-get update --quiet \
 RUN pip install --no-warn-script-location --break-system-packages \
       --no-cache-dir \
       git+https://github.com/opengisch/xlsform2qgis.git \
+      git+https://github.com/opengisch/libqfieldsync.git \
       psycopg[c]
 
 

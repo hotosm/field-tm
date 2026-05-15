@@ -1,7 +1,22 @@
-"""Layer styling (symbols, labels, rules)."""
+"""Layer styling.
 
+Two distinct styling paths live in this module:
+
+- ``configure_drone_task_layer_style`` (drone-tm): programmatic styling
+  applied to ``dtm-tasks``.  Kept here verbatim because the drone wrapper
+  does not yet ship QML style files. Will be removed / made generic in future!
+
+- ``apply_named_style`` / ``apply_styles_from_dir`` / ``unpack_plugin_zip``
+  (field-tm): generic QML-based styling fed by ``plugin_zip`` from the
+  caller.  Layer styling is driven by ``styles/{layer_name}.qml`` files
+  inside the supplied zip.
+"""
+
+import io
 import logging
-from typing import Any
+import zipfile
+from pathlib import Path
+from typing import Any, Optional
 
 
 def _resolve_over_point_label_placement() -> Any:
@@ -27,12 +42,56 @@ def _resolve_over_point_label_placement() -> Any:
     return 1
 
 
-def configure_task_layer_style(
+def _resolve_identifiable_map_layer_flag() -> Any:
+    """Return the map-layer identifiable flag enum value when available.
+
+    QGIS 3.30+ exposes ``Qgis.MapLayerFlag``; QGIS 3.44 / current ships
+    ``QgsMapLayer.LayerFlag``.  Try both so the resolver works across
+    versions.
+    """
+    from qgis.core import Qgis, QgsMapLayer
+
+    enum_holders = (
+        getattr(Qgis, "MapLayerFlag", None),
+        getattr(QgsMapLayer, "LayerFlag", None),
+    )
+    for holder in enum_holders:
+        if holder is None:
+            continue
+        for attr_name in ("Identifiable", "IdentifiableLayer"):
+            flag_value = getattr(holder, attr_name, None)
+            if flag_value is not None:
+                return flag_value
+
+    return None
+
+
+def set_layer_not_identifiable(layer, log: logging.Logger) -> None:
+    """Disable identify interaction for the given layer when supported."""
+    if hasattr(layer, "flags") and hasattr(layer, "setFlags"):
+        identifiable_flag = _resolve_identifiable_map_layer_flag()
+        if identifiable_flag is not None:
+            layer.setFlags(layer.flags() & ~identifiable_flag)
+            return
+        log.debug("Identifiable flag enum unresolved; falling back to setIdentifiable")
+
+    if hasattr(layer, "setIdentifiable"):
+        layer.setIdentifiable(False)
+        return
+
+    log.warning("Layer does not expose an identifiable toggle API")
+
+
+def configure_drone_task_layer_style(
     task_layer,
     log: logging.Logger,
     label_field: str = 'coalesce("task_id", $id)',
 ) -> None:
-    """Configure the tasks layer in QGIS."""
+    """Configure the drone-tm tasks layer (programmatic styling).
+
+    Drone-tm does not yet ship QML style files; this remains the
+    programmatic path until that refactor lands.
+    """
     from qgis.core import (
         QgsPalLayerSettings,
         QgsTextBufferSettings,
@@ -46,11 +105,11 @@ def configure_task_layer_style(
         log.warning("No task layer available for styling")
         return
 
-    log.info("Styling tasks layer")
+    log.info("Styling drone tasks layer")
     symbol = _build_layer_symbol(
         layer,
         fill_rgba=(0, 0, 0, 0),
-        stroke_rgba=(130, 128, 133, 255),  # --hot-color-neutral-500 (#828085)
+        stroke_rgba=(66, 133, 244, 255),
         stroke_width=1.2,
     )
     layer.renderer().setSymbol(symbol)
@@ -79,52 +138,125 @@ def configure_task_layer_style(
 
     layer.setLabeling(QgsVectorLayerSimpleLabeling(label_settings))
     layer.setLabelsEnabled(True)
+    set_layer_not_identifiable(layer, log)
     layer.triggerRepaint()
 
 
-def configure_survey_layer_style(survey_layer, log: logging.Logger) -> None:
-    """Configure the survey layer in QGIS."""
-    from qgis.core import QgsRuleBasedRenderer
+def apply_named_style(layer, qml_path: Path, log: logging.Logger) -> bool:
+    """Apply a QML style file to a layer (Labeling + Symbology only).
 
-    layer = _resolve_vector_layer(survey_layer)
-    if not layer:
-        log.warning("No survey layer available for styling")
-        return
+    The category mask is intentionally narrow: form/field config from a
+    style file can clobber the xlsform-derived attribute editor setup.
+    """
+    from qgis.core import QgsMapLayer
 
-    log.info("Styling survey/features layer")
-
-    root_rule = QgsRuleBasedRenderer.Rule(None)
-    root_rule.appendChild(
-        _build_status_rule(
-            layer,
-            label="Mapped",
-            expression='"status" = \'mapped\'',
-            fill_rgba=(80, 193, 203, 120),
-            stroke_rgba=(80, 193, 203, 255),
-        )
+    categories = (
+        QgsMapLayer.StyleCategory.Labeling | QgsMapLayer.StyleCategory.Symbology
     )
-    root_rule.appendChild(
-        _build_status_rule(
-            layer,
-            label="Invalid",
-            expression='"status" = \'invalid\'',
-            fill_rgba=(215, 63, 63, 110),
-            stroke_rgba=(215, 63, 63, 255),
-        )
-    )
-
-    default_rule = _build_status_rule(
-        layer,
-        label="Default",
-        expression="",
-        fill_rgba=(130, 128, 133, 90),
-        stroke_rgba=(64, 66, 72, 220),
-    )
-    default_rule.setIsElse(True)
-    root_rule.appendChild(default_rule)
-
-    layer.setRenderer(QgsRuleBasedRenderer(root_rule))
+    message, ok = layer.loadNamedStyle(str(qml_path), False, categories)
+    if not ok:
+        log.warning("Failed to load style %s onto layer %s: %s", qml_path, layer.name(), message)
+        return False
     layer.triggerRepaint()
+    log.info("Applied style %s to layer %s", qml_path.name, layer.name())
+    return True
+
+
+def apply_styles_from_dir(project, styles_dir: Path, log: logging.Logger) -> set[str]:
+    """Apply each ``{layer_name}.qml`` in ``styles_dir`` to its matching layer.
+
+    Returns the set of layer names that were successfully styled.
+    """
+    styled: set[str] = set()
+    if not styles_dir.is_dir():
+        return styled
+
+    for qml_path in sorted(styles_dir.glob("*.qml")):
+        layer_name = qml_path.stem
+        layers = project.mapLayersByName(layer_name)
+        if not layers:
+            log.debug("No layer named %s in project, skipping style %s", layer_name, qml_path.name)
+            continue
+        if apply_named_style(layers[0], qml_path, log):
+            styled.add(layer_name)
+    return styled
+
+
+def unpack_plugin_zip(
+    plugin_zip_bytes: bytes,
+    dest_dir: Path,
+    project_basename: str,
+    log: logging.Logger,
+) -> Optional[Path]:
+    """Unpack a plugin zip into ``dest_dir``.
+
+    ``main.qml`` is renamed to ``{project_basename}.qml`` so QField
+    auto-discovers it as the project plugin.  All other entries keep
+    their relative paths.
+
+    Returns the path to the unpacked ``styles/`` directory if present,
+    otherwise ``None``.
+    """
+    try:
+        with zipfile.ZipFile(io.BytesIO(plugin_zip_bytes), "r") as pz:
+            _extract_plugin_entries(pz, dest_dir, project_basename, log)
+    except zipfile.BadZipFile:
+        log.error("plugin_zip is not a valid zip file; skipping plugin unpack")
+        return None
+
+    styles_dir = dest_dir / "styles"
+    return styles_dir if styles_dir.is_dir() else None
+
+
+def _extract_plugin_entries(
+    pz: zipfile.ZipFile,
+    dest_dir: Path,
+    project_basename: str,
+    log: logging.Logger,
+) -> None:
+    """Write each non-dir entry from the plugin zip into ``dest_dir``."""
+    namelist = pz.namelist()
+    common_prefix = _common_zip_prefix(namelist)
+    for info in pz.infolist():
+        if info.is_dir():
+            continue
+        rel_name = _resolve_plugin_entry_name(
+            info.filename, common_prefix, project_basename
+        )
+        if not rel_name:
+            continue
+        target = dest_dir / rel_name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(pz.read(info.filename))
+    log.info("Unpacked %d plugin entries into %s", len(namelist), dest_dir)
+
+
+def _resolve_plugin_entry_name(
+    raw_name: str, common_prefix: str, project_basename: str
+) -> str:
+    """Strip the common wrapping dir and rename ``main.qml`` to the basename."""
+    rel_name = raw_name
+    if common_prefix and rel_name.startswith(common_prefix):
+        rel_name = rel_name[len(common_prefix):]
+    if rel_name == "main.qml":
+        return f"{project_basename}.qml"
+    return rel_name
+
+
+def _common_zip_prefix(namelist: list[str]) -> str:
+    """Return a single common top-level directory prefix if every entry shares one.
+
+    Handles both flat zips (files at root) and wrapped zips (everything
+    under a single directory like ``qfield-plugin/``).
+    """
+    files = [n for n in namelist if not n.endswith("/")]
+    if not files:
+        return ""
+    first_dirs = {p.split("/", 1)[0] for p in files if "/" in p}
+    roots_without_dir = {p for p in files if "/" not in p}
+    if len(first_dirs) == 1 and not roots_without_dir:
+        return first_dirs.pop() + "/"
+    return ""
 
 
 def _resolve_vector_layer(layer_or_layers):
@@ -183,31 +315,6 @@ def _build_layer_symbol(
             "name": "circle",
         }
     )
-
-
-def _build_status_rule(
-    layer,
-    *,
-    label: str,
-    expression: str,
-    fill_rgba: tuple[int, int, int, int],
-    stroke_rgba: tuple[int, int, int, int],
-):
-    """Build a rule for survey-layer status styling."""
-    from qgis.core import QgsRuleBasedRenderer
-
-    rule = QgsRuleBasedRenderer.Rule(
-        _build_layer_symbol(
-            layer,
-            fill_rgba=fill_rgba,
-            stroke_rgba=stroke_rgba,
-            stroke_width=0.9,
-        )
-    )
-    rule.setLabel(label)
-    if expression:
-        rule.setFilterExpression(expression)
-    return rule
 
 
 def _rgba_string(rgba: tuple[int, int, int, int]) -> str:

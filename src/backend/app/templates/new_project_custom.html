@@ -1,0 +1,405 @@
+{% extends "layout.html" %} {% block title %}{{ _("Create Custom Project") }} — Field Tasking
+Manager{% endblock %} {% block content %}
+<div class="ftm-page ftm-page--narrow">
+  <div style="margin-bottom: 16px">
+    <wa-button href="/new" variant="default" size="small">← {{ _("Back") }}</wa-button>
+  </div>
+  <h1 style="margin-bottom: 8px">{{ _("Set up your project") }}</h1>
+  <p class="ftm-chooser-intro" style="margin-bottom: 24px">
+    {{ _("Just the basics on this page: what you're mapping, where, and which app mappers will use.
+    You'll pick your survey questions and map data on the next page.") }}
+  </p>
+
+  <wa-card>
+    <form
+      id="create-project-form"
+      style="padding: 20px"
+      hx-post="/projects/create"
+      hx-target="#form-error-container"
+      hx-swap="innerHTML"
+      hx-indicator="#submit-indicator"
+      data-require-outline="true"
+    >
+      <div id="form-error-container">
+        <div id="form-error" style="margin-bottom: 16px; display: none">
+          <wa-callout variant="danger">
+            <span id="form-error-message"></span>
+          </wa-callout>
+        </div>
+      </div>
+
+      <section class="ftm-custom-section">
+        <h2 class="ftm-custom-section__title">{{ _("About your project") }}</h2>
+        <p class="ftm-custom-section__hint">
+          {{ _("Give your project a clear name and a short summary so mappers know what it's
+          about.") }}
+        </p>
+
+        <div class="ftm-form-group">
+          <label for="project_name_input" class="ftm-form-label">
+            {{ _("Project name") }} <span class="ftm-form-required">*</span>
+          </label>
+          <wa-input
+            name="project_name"
+            id="project_name_input"
+            placeholder="{{ _('e.g. Buildings in West Nairobi') }}"
+            style="width: 100%"
+          ></wa-input>
+          <div id="project-name-error" style="margin-top: 8px"></div>
+        </div>
+
+        <div class="ftm-form-group">
+          <label for="description_input" class="ftm-form-label">
+            {{ _("What are you mapping?") }} <span class="ftm-form-required">*</span>
+          </label>
+          <wa-textarea
+            name="description"
+            id="description_input"
+            placeholder="{{ _('A short description. e.g. Mapping water points and toilets in informal settlements.') }}"
+            rows="4"
+            style="width: 100%"
+          ></wa-textarea>
+          <div id="description-error" style="margin-top: 8px"></div>
+        </div>
+      </section>
+
+      <section class="ftm-custom-section">
+        <h2 class="ftm-custom-section__title">{{ _("Which app will mappers use?") }}</h2>
+        <p class="ftm-custom-section__hint">
+          {{ _("Pick the app you want mappers to install on their phone to do the survey.") }}
+        </p>
+        <div id="field-mapping-app-container" class="ftm-radio-group">
+          <label class="app-radio-label ftm-radio-card">
+            <input
+              type="radio"
+              name="field_mapping_app"
+              value="QField"
+              required
+              style="margin: 0; cursor: pointer"
+            />
+            <img
+              src="/static/images/qfield-logo.svg"
+              alt="QField"
+              class="ftm-app-logo"
+              onerror="this.style.display = 'none'"
+            />
+            <span class="ftm-radio-card__text">
+              <span style="font-weight: 600">QField</span>
+              <small class="ftm-form-help" style="margin: 0">
+                {{ _("Powerful GIS-style mapping app, including geometry editing, but with a simple
+                mapping pathway enabled via our HOT plugin.") }}
+              </small>
+            </span>
+          </label>
+          <label class="app-radio-label ftm-radio-card">
+            <input
+              type="radio"
+              name="field_mapping_app"
+              value="ODK"
+              required
+              style="margin: 0; cursor: pointer"
+            />
+            <img
+              src="/static/images/odk-logo.svg"
+              alt="ODK"
+              class="ftm-app-logo"
+              onerror="this.style.display = 'none'"
+            />
+            <span class="ftm-radio-card__text">
+              <span style="font-weight: 600">ODK Collect</span>
+              <small class="ftm-form-help" style="margin: 0">
+                {{ _("Simple form-based survey app. Best for straightforward question-and-answer
+                surveys.") }}
+              </small>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <section class="ftm-custom-section">
+        <h2 class="ftm-custom-section__title">{{ _("Where are you mapping?") }}</h2>
+        <p class="ftm-custom-section__hint">
+          {{ _("Draw the area mappers will cover. Smaller areas are easier to coordinate.") }}
+        </p>
+        {% include "partials/new_project/map_section.html" %}
+      </section>
+
+      <section class="ftm-custom-section">
+        <h2 class="ftm-custom-section__title">
+          {{ _("Tags") }}
+          <span style="font-weight: 400; color: var(--ftm-text-muted); font-size: 0.85em"
+            >({{ _("optional") }})</span
+          >
+        </h2>
+        <p class="ftm-custom-section__hint">
+          {{ _("Add tags so other people can find your project. Tags are like #buildings or
+          #campaign-2026.") }}
+        </p>
+        <div class="ftm-form-group" style="margin-bottom: 0">
+          <wa-input
+            id="hashtag-input"
+            placeholder='{{ _("Type a tag and press Enter") }}'
+            style="width: 100%"
+          ></wa-input>
+          <div id="hashtags-container" class="ftm-hashtags-container"></div>
+          <small class="ftm-form-help">
+            {{ _("Press Enter or comma after each tag. Click × on a tag to remove it.") }}
+          </small>
+        </div>
+      </section>
+
+      <div class="ftm-form-actions">
+        <wa-button type="submit" variant="brand" id="submit-btn">{{ _("Continue") }}</wa-button>
+        <span id="submit-indicator" style="display: none; margin-inline-start: 10px"
+          >{{ _("Creating...") }}</span
+        >
+        <wa-button href="/projects" variant="default">{{ _("Cancel") }}</wa-button>
+      </div>
+    </form>
+  </wa-card>
+</div>
+
+<script type="module">
+  const I18N = {
+    somethingWentWrong: {{ _("Something went wrong. Please try again.")|tojson }},
+  };
+
+  const form = document.getElementById("create-project-form");
+  const errorContainer = document.getElementById("form-error");
+  const errorMessageEl = document.getElementById("form-error-message");
+  const hashtagInput = document.getElementById("hashtag-input");
+  const hashtagsContainer = document.getElementById("hashtags-container");
+  const hashtags = new Set();
+
+  function renderCallout(container, variant, message) {
+    if (!container) return;
+    container.textContent = "";
+    if (!message) return;
+    const callout = document.createElement("wa-callout");
+    callout.setAttribute("variant", variant);
+    const span = document.createElement("span");
+    span.textContent = message;
+    callout.appendChild(span);
+    container.appendChild(callout);
+  }
+  function showError(message) {
+    if (!errorContainer || !errorMessageEl) return;
+    errorMessageEl.textContent = message || I18N.somethingWentWrong;
+    errorContainer.style.display = "block";
+  }
+
+  function clearError() {
+    if (!errorContainer || !errorMessageEl) return;
+    errorMessageEl.textContent = "";
+    errorContainer.style.display = "none";
+  }
+
+  function addHashtag(tag) {
+    tag = tag.trim().replace(/^#+/, "");
+    if (!tag) return;
+
+    const hashtag = tag.startsWith("#") ? tag : `#${tag}`;
+    if (hashtags.has(hashtag)) return;
+
+    hashtags.add(hashtag);
+    renderHashtags();
+  }
+
+  function removeHashtag(tag) {
+    hashtags.delete(tag);
+    renderHashtags();
+  }
+
+  function renderHashtags() {
+    hashtagsContainer.innerHTML = "";
+    hashtags.forEach((tag) => {
+      const tagEl = document.createElement("wa-tag");
+      tagEl.setAttribute("with-remove", "");
+      tagEl.textContent = tag;
+      tagEl.dataset.tag = tag;
+      hashtagsContainer.appendChild(tagEl);
+    });
+  }
+
+  if (hashtagsContainer) {
+    hashtagsContainer.addEventListener("click", (e) => {
+      const tagEl = e.target.closest("wa-tag");
+      if (tagEl && tagEl.dataset.tag) {
+        const path = e.composedPath ? e.composedPath() : [e.target];
+        const clickedElement = path[0];
+
+        const isRemoveButton =
+          clickedElement.tagName === "BUTTON" ||
+          clickedElement.tagName === "svg" ||
+          clickedElement.tagName === "path" ||
+          clickedElement.getAttribute("part") === "remove" ||
+          clickedElement.classList.contains("remove") ||
+          clickedElement.closest("button") ||
+          clickedElement.closest('[part="remove"]');
+
+        if (isRemoveButton) {
+          e.preventDefault();
+          e.stopPropagation();
+          removeHashtag(tagEl.dataset.tag);
+          return;
+        }
+      }
+    });
+
+    ["remove", "wa-remove", "tag-remove"].forEach((eventName) => {
+      hashtagsContainer.addEventListener(eventName, (e) => {
+        const tagEl = e.target;
+        if (tagEl && tagEl.dataset.tag) {
+          e.preventDefault();
+          e.stopPropagation();
+          removeHashtag(tagEl.dataset.tag);
+        }
+      });
+    });
+  }
+
+  if (hashtagInput) {
+    hashtagInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === ",") {
+        e.preventDefault();
+        const value = hashtagInput.value ? hashtagInput.value.trim() : "";
+        if (value) {
+          value.split(",").forEach((tag) => addHashtag(tag));
+          hashtagInput.value = "";
+        }
+      }
+    });
+
+    hashtagInput.addEventListener("blur", () => {
+      const value = hashtagInput.value ? hashtagInput.value.trim() : "";
+      if (value) {
+        value.split(",").forEach((tag) => addHashtag(tag));
+        hashtagInput.value = "";
+      }
+    });
+  }
+
+  document.body.addEventListener("duplicateProjectName", function (event) {
+    let errorMsg = "";
+    if (event.detail && typeof event.detail === "object") {
+      errorMsg = event.detail.duplicateProjectName || "";
+    } else if (typeof event.detail === "string") {
+      errorMsg = event.detail;
+    }
+
+    const projectNameError = document.getElementById("project-name-error");
+    const projectNameInput = document.getElementById("project_name_input");
+
+    if (projectNameError) {
+      const fallbackDuplicateMessage =
+        {{ _("A project with this name already exists. Please choose a different name.")|tojson }};
+      renderCallout(projectNameError, "danger", errorMsg || fallbackDuplicateMessage);
+    }
+
+    if (projectNameInput) {
+      setTimeout(() => {
+        projectNameInput.focus();
+        projectNameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  });
+
+  document.body.addEventListener("htmx:afterSwap", function (event) {
+    const xhr = event.detail.xhr;
+    if (xhr.status !== 409) {
+      return;
+    }
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(xhr.responseText, "text/html");
+    const errorMessage = doc.querySelector("#form-error-message")?.textContent;
+
+    if (!errorMessage) {
+      return;
+    }
+
+    const projectNameError = document.getElementById("project-name-error");
+    if (projectNameError) {
+      renderCallout(projectNameError, "danger", errorMessage);
+    }
+
+    const projectNameInput = document.getElementById("project_name_input");
+    if (projectNameInput) {
+      setTimeout(() => {
+        projectNameInput.focus();
+        projectNameInput.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  });
+
+  const projectNameInput = document.getElementById("project_name_input");
+  if (projectNameInput) {
+    projectNameInput.addEventListener("input", function () {
+      const projectNameError = document.getElementById("project-name-error");
+      if (projectNameError) {
+        projectNameError.textContent = "";
+      }
+    });
+  }
+
+  const descriptionInput = document.getElementById("description_input");
+  if (descriptionInput) {
+    descriptionInput.addEventListener("input", function () {
+      const descriptionError = document.getElementById("description-error");
+      if (descriptionError) {
+        descriptionError.textContent = "";
+      }
+    });
+  }
+
+  const appRadioLabels = document.querySelectorAll(".app-radio-label");
+  appRadioLabels.forEach((label) => {
+    const radio = label.querySelector('input[type="radio"]');
+    radio.addEventListener("change", function () {
+      appRadioLabels.forEach((l) => l.classList.remove("ftm-radio-card--selected"));
+      if (this.checked) {
+        label.classList.add("ftm-radio-card--selected");
+      }
+    });
+  });
+
+  if (form) {
+    form.addEventListener("submit", function (e) {
+      clearError();
+
+      const projectNameError = document.getElementById("project-name-error");
+      if (projectNameError) projectNameError.textContent = "";
+      const descriptionError = document.getElementById("description-error");
+      if (descriptionError) descriptionError.textContent = "";
+
+      if (!descriptionInput || !(descriptionInput.value ?? "").trim()) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (descriptionError) {
+          renderCallout(descriptionError, "danger", {{ _("Description is required.")|tojson }});
+        }
+        if (descriptionInput) {
+          setTimeout(() => {
+            descriptionInput.focus();
+            descriptionInput.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 100);
+        }
+        return false;
+      }
+
+      const hashtagsArray = Array.from(hashtags);
+      let hashtagsInput = document.getElementById("hashtags-hidden");
+      if (!hashtagsInput) {
+        hashtagsInput = document.createElement("input");
+        hashtagsInput.type = "hidden";
+        hashtagsInput.name = "hashtags";
+        hashtagsInput.id = "hashtags-hidden";
+        form.appendChild(hashtagsInput);
+      }
+      hashtagsInput.value = hashtagsArray.join(", ");
+
+      return true;
+    });
+  }
+</script>
+{% include "partials/new_project/map_script.html" %} {% endblock %}

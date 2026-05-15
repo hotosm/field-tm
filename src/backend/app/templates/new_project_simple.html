@@ -1,0 +1,121 @@
+{% extends "layout.html" %} {% block title %}{{ _("Quick Setup — OSM Buildings") }} — Field Tasking
+Manager{% endblock %} {% block content %}
+<div class="ftm-page ftm-page--narrow">
+  <div style="margin-bottom: 16px">
+    <wa-button href="/new" variant="default" size="small">← {{ _("Back") }}</wa-button>
+  </div>
+  <h1 style="margin-bottom: 8px"><span aria-hidden="true">🏠</span> {{ _("Map buildings") }}</h1>
+  <p class="ftm-chooser-intro" style="margin-bottom: 18px">
+    {{ _("Just draw the area you want to map. We'll set everything up for you using building
+    outlines from OpenStreetMap and a ready-made survey for buildings.") }}
+  </p>
+
+  <wa-callout variant="warning" style="margin-bottom: 20px">
+    <strong>{{ _("This is only for mapping buildings.") }}</strong>
+    {{ _("If you want to map something else (like roads or water points), use your own survey
+    questions, or bring your own map data,") }}
+    <a href="/new/custom" class="ftm-link--brand">{{ _("set up a custom project instead") }} →</a>
+  </wa-callout>
+
+  <wa-card>
+    <form
+      id="create-simple-project-form"
+      style="padding: 20px"
+      hx-post="/projects/create-simple"
+      hx-target="#form-error-container"
+      hx-swap="innerHTML"
+      hx-indicator="#submit-indicator"
+      data-require-outline="true"
+    >
+      <div id="form-error-container">
+        <div id="form-error" style="margin-bottom: 16px; display: none">
+          <wa-callout variant="danger">
+            <span id="form-error-message"></span>
+          </wa-callout>
+        </div>
+      </div>
+
+      {% with hide_advanced_config=true %} {% include "partials/new_project/map_section.html" %} {%
+      endwith %}
+
+      <div class="ftm-form-actions">
+        <wa-button type="submit" variant="brand" id="submit-btn">
+          <span id="submit-btn-label">{{ _("Create Project") }}</span>
+        </wa-button>
+        <wa-button href="/new/custom" variant="default"
+          >{{ _("Switch to Custom Project") }}</wa-button
+        >
+      </div>
+      <div
+        id="submit-indicator"
+        style="display: none; margin-top: 10px; align-items: center; gap: 8px"
+        aria-live="polite"
+      >
+        <wa-spinner style="font-size: 16px"></wa-spinner>
+        <span>{{ _("Creating project and preparing map...") }}</span>
+      </div>
+    </form>
+  </wa-card>
+</div>
+
+{% include "partials/new_project/map_script.html" %}
+<script type="module">
+  const form = document.getElementById("create-simple-project-form");
+  const submitBtn = document.getElementById("submit-btn");
+  const submitIndicator = document.getElementById("submit-indicator");
+  const formErrorContainer = document.getElementById("form-error-container");
+
+  function renderWarningCallout(container, message) {
+    if (!container || !message) return;
+    container.textContent = "";
+    const wrapper = document.createElement("div");
+    wrapper.id = "form-error";
+    wrapper.style.marginBottom = "16px";
+    wrapper.style.display = "block";
+
+    const callout = document.createElement("wa-callout");
+    callout.setAttribute("variant", "warning");
+    const span = document.createElement("span");
+    span.id = "form-error-message";
+    span.textContent = message;
+    callout.appendChild(span);
+    wrapper.appendChild(callout);
+    container.appendChild(wrapper);
+  }
+
+  document.body.addEventListener("simpleCollectNewDataNotice", function (event) {
+    let noticeMsg = "";
+    if (event.detail && typeof event.detail === "object") {
+      noticeMsg = event.detail.simpleCollectNewDataNotice || "";
+    } else if (typeof event.detail === "string") {
+      noticeMsg = event.detail;
+    }
+
+    if (!noticeMsg || !formErrorContainer) return;
+
+    renderWarningCallout(formErrorContainer, noticeMsg);
+  });
+
+  if (form && submitBtn) {
+    form.addEventListener("htmx:beforeRequest", () => {
+      submitBtn.setAttribute("disabled", "");
+      submitBtn.setAttribute("aria-busy", "true");
+      if (submitIndicator) {
+        submitIndicator.style.display = "inline-flex";
+      }
+    });
+
+    const restoreSubmitState = () => {
+      submitBtn.removeAttribute("disabled");
+      submitBtn.removeAttribute("aria-busy");
+      if (submitIndicator) {
+        submitIndicator.style.display = "none";
+      }
+    };
+
+    form.addEventListener("htmx:afterRequest", restoreSubmitState);
+    form.addEventListener("htmx:responseError", restoreSubmitState);
+    form.addEventListener("htmx:sendError", restoreSubmitState);
+  }
+</script>
+{% endblock %}

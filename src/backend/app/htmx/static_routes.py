@@ -53,6 +53,33 @@ async def serve_static_css(filename: str) -> Response:
     )
 
 
+@get("/static/js/{filename:str}")
+async def serve_static_js(filename: str) -> Response:
+    """Serve static JavaScript files."""
+    static_dir = Path(__file__).parent.parent / "static" / "js"
+    file_path = static_dir / filename
+
+    if (
+        not filename.endswith(".js")
+        or ".." in filename
+        or "/" in filename
+        or "\\" in filename
+    ):
+        return Response(content="Forbidden", status_code=status.HTTP_403_FORBIDDEN)
+
+    if not file_path.exists():
+        return Response(content="Not Found", status_code=status.HTTP_404_NOT_FOUND)
+
+    with open(file_path, "rb") as f:
+        content = f.read()
+
+    return Response(
+        content=content,
+        media_type="application/javascript",
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
+
+
 @get("/static/images/{filename:str}")
 async def serve_static_image(filename: str) -> Response:
     """Serve static image files."""
@@ -120,6 +147,16 @@ async def serve_favicon_png() -> Response:
 async def serve_favicon_svg() -> Response:
     """Serve favicon.svg."""
     return await _serve_icon_file("favicon.svg", "image/svg+xml")
+
+
+@get("/favicon.ico", include_in_schema=False)
+async def serve_favicon_ico() -> Response:
+    """Redirect favicon.ico requests to favicon.svg."""
+    return Response(
+        content=b"",
+        status_code=status.HTTP_307_TEMPORARY_REDIRECT,
+        headers={"Location": "/favicon.svg"},
+    )
 
 
 @get("/apple-touch-icon-180x180.png", include_in_schema=False)

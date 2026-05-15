@@ -126,12 +126,19 @@ check_if_missing_migrations() {
 execute_migrations() {
     mapfile -t ordered_scripts < <(for script in "${scripts_to_execute[@]}"; do echo "$script"; done | sort)
 
+    # Fail fast if a DDL statement can't acquire its lock within 10s, instead
+    # of letting the init container hang indefinitely behind a stuck backend.
+    # statement_timeout caps the migration body itself; raise per-migration via
+    # `SET LOCAL statement_timeout = '...';` inside the SQL if a step legitimately
+    # needs longer (e.g. a large backfill).
+    local pgopts="-c lock_timeout=10s -c statement_timeout=300s"
+
     for script_name in "${ordered_scripts[@]}"; do
         script_file="/opt/migrations/$script_name"
         pretty_echo "Executing migration: $script_name"
         # Apply migration with env vars substituted & if succeeds,
         # add an entry in the migrations table to indicate completion
-        envsubst < "$script_file" | psql "$db_url" \
+        envsubst < "$script_file" | PGOPTIONS="$pgopts" psql "$db_url" \
             --set ON_ERROR_STOP=1 --echo-all \
         && psql "$db_url" --set ON_ERROR_STOP=1 <<SQL
     INSERT INTO "_migrations" (date_executed, script_name)

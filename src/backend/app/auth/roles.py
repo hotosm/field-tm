@@ -39,6 +39,7 @@ from app.db.enums import (
     ProjectVisibility,
 )
 from app.db.models import DbProject, DbUser
+from app.i18n import _
 
 log = logging.getLogger(__name__)
 
@@ -138,7 +139,7 @@ async def super_admin(
     log.error("User %s requested an admin endpoint, but is not admin", username)
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
-        detail="User must be an administrator",
+        detail=_("User must be an administrator"),
     )
 
 
@@ -159,7 +160,7 @@ async def wrap_check_access(
     )
 
     if not db_user:
-        msg = "User does not have permission to access the project."
+        msg = _("User does not have permission to access the project.")
         # NOTE workaround to allow a mix of svcftm access on mapper frontend
         # for public projects, but also blocking access for svcftm on
         # mapper frontend if the project is private. We must send 401 and
@@ -230,7 +231,8 @@ async def mapper(
     ]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=f"Project is locked since it is in {project.status.value} state.",
+            detail=_("Project is locked since it is in %(state)s state.")
+            % {"state": project.status.value},
         )
 
     # If project is public, skip permission check

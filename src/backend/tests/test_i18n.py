@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from app.i18n import (
     DEFAULT_LOCALE,
     RTL_LOCALES,
+    SUPPORTED_LOCALES,
     _current_locale,
     get_current_dir,
     get_preferred_locale,
@@ -83,8 +84,6 @@ def test_get_current_dir_returns_ltr_for_english():
 
 def test_rtl_locales_are_subset_of_supported():
     """All RTL locales must be in the supported locales list."""
-    from app.i18n import SUPPORTED_LOCALES
-
     for locale in RTL_LOCALES:
         assert locale in SUPPORTED_LOCALES, (
             f"{locale} is RTL but not in SUPPORTED_LOCALES"

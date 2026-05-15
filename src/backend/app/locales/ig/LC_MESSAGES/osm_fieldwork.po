@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM OSM Fieldwork VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-03-23 23:31+0000\n"
+"POT-Creation-Date: 2026-05-13 04:50+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ig\n"
@@ -86,36 +86,40 @@ msgstr "Mba"
 
 #: i18n/osm_fieldwork_strings.py:22
 msgctxt "xlsform_label"
+msgid "offset"
+msgstr "Mbugharị ọnọdụ"
+
+#: i18n/osm_fieldwork_strings.py:23
+msgctxt "xlsform_label"
 msgid "osm_username"
 msgstr "Aha njirimara OSM"
 
-#: i18n/osm_fieldwork_strings.py:23
+#: i18n/osm_fieldwork_strings.py:24
 msgctxt "xlsform_label"
 msgid "other"
 msgstr "Nke ọzọ"
 
-#: i18n/osm_fieldwork_strings.py:24
+#: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
 msgid "split"
 msgstr "Kewaa"
 
-#: i18n/osm_fieldwork_strings.py:25
+#: i18n/osm_fieldwork_strings.py:26
 msgctxt "xlsform_label"
 msgid "survey_questions"
 msgstr "Ajụjụ nnyocha"
 
-#: i18n/osm_fieldwork_strings.py:26
+#: i18n/osm_fieldwork_strings.py:27
 msgctxt "xlsform_label"
 msgid "task"
 msgstr "Ọrụ"
 
-#: i18n/osm_fieldwork_strings.py:27
+#: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
 msgid "verification"
 msgstr "Nyocha"
 
-#: i18n/osm_fieldwork_strings.py:28
+#: i18n/osm_fieldwork_strings.py:29
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "Ee"
-

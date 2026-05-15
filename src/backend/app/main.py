@@ -28,9 +28,13 @@ from psycopg import AsyncConnection
 from psycopg.rows import tuple_row
 
 from app.__version__ import __version__
+from app.auth.auth_routes import auth_router
+from app.central.central_routes import central_router
 from app.config import AuthProvider, MonitoringTypes, settings
 from app.db.database import close_db_connection_pool, db_conn, get_db_connection_pool
 from app.db.models import DbUser
+from app.helpers.helper_routes import helper_router
+from app.htmx.htmx_routes import htmx_router
 from app.i18n import (
     LOCALE_LABELS,
     SUPPORTED_LOCALES,
@@ -50,6 +54,7 @@ from app.monitoring import (
     set_sentry_otel_tracer,
 )
 from app.projects.project_crud import read_and_insert_xlsforms
+from app.qfield.qfield_routes import qfield_router
 
 log = logging.getLogger(__name__)
 
@@ -136,7 +141,7 @@ def _custom_validation_exception_handler(
             {
                 "type": "validation_error",
                 "loc": ["body"],
-                "msg": str(exc.detail) if exc.detail else "Validation failed",
+                "msg": str(exc.detail) if exc.detail else _("Validation failed"),
                 "input": None,
                 "ctx": {},
             }
@@ -151,10 +156,10 @@ def _custom_validation_exception_handler(
 
 
 def _htmx_exception_handler(request: Request, exc: Exception) -> Response:
-    """Handle exceptions for HTMX requests to prevent proxy interception.
+    """Handle exceptions for HTMX requests with a swappable error fragment.
 
-    Returns a 200 OK response with an error component that HTMX can swap in.
-    This prevents bunkerweb from intercepting 500 errors and showing its own error page.
+    HTMX is configured in layout.html to swap 4xx/5xx responses, so keep the
+    true status code for clients, tests, and monitoring.
     """
     # Check if this is an HTMX request
     is_htmx = request.headers.get("HX-Request") == "true"
@@ -173,8 +178,7 @@ def _htmx_exception_handler(request: Request, exc: Exception) -> Response:
     if status_code >= HTTP_500_INTERNAL_SERVER_ERROR:
         log.exception(f"Server error intercepted: {str(exc)}")
 
-    # For HTMX requests, return 200 OK with error component
-    # to prevent bunkerweb interception of error pages
+    # For HTMX requests, return the error component with the real status code.
     if is_htmx:
         # Use wa-callout component to match the pattern used in HTMX routes
         # Escape the message for HTML safety
@@ -186,9 +190,9 @@ def _htmx_exception_handler(request: Request, exc: Exception) -> Response:
         return Response(
             content=error_html,
             media_type="text/html",
-            status_code=status.HTTP_200_OK,
+            status_code=status_code,
+            headers={"Vary": "HX-Request"},
             # HTMX will swap this into the target element specified in the request
-            # This prevents bunkerweb from intercepting 500 errors
         )
 
     # For non-HTMX requests, return standard error response
@@ -200,6 +204,7 @@ def _htmx_exception_handler(request: Request, exc: Exception) -> Response:
         },
         status_code=status_code,
         media_type="application/json",
+        headers={"Vary": "HX-Request"},
     )
 
 
@@ -278,7 +283,7 @@ def configure_root_router() -> Router:
             log.warning("Server failed __heartbeat__ database connection check")
             return HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Could not connect to database",
+                detail=_("Could not connect to database"),
             )
 
     return Router(
@@ -340,13 +345,6 @@ def create_app() -> Litestar:
             dependencies=deps,
         )
     root_router = configure_root_router()
-    # Import routers after logger / settings to avoid circular imports
-    from app.auth.auth_routes import auth_router
-    from app.central.central_routes import central_router
-    from app.helpers.helper_routes import helper_router
-    from app.htmx.htmx_routes import htmx_router
-    from app.projects.project_routes import api_router
-    from app.qfield.qfield_routes import qfield_router
 
     plugins = [PydanticPlugin(), HTMXPlugin()]
 
@@ -360,7 +358,6 @@ def create_app() -> Litestar:
 
     route_handlers = [
         root_router,
-        api_router,
         auth_router,
         qfield_router,
         helper_router,
@@ -373,7 +370,11 @@ def create_app() -> Litestar:
     app = Litestar(
         route_handlers=route_handlers,
         plugins=plugins,
-        on_startup=[get_db_connection_pool, server_init, create_local_admin_user],
+        on_startup=[
+            get_db_connection_pool,
+            server_init,
+            create_local_admin_user,
+        ],
         on_shutdown=[close_db_connection_pool],
         cors_config=_build_cors_config(),
         openapi_config=OpenAPIConfig(title="Field-TM", version=__version__),

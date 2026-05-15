@@ -1,19 +1,25 @@
 """/field endpoint: xlsform + DB I/O (existing flow)."""
 
+import base64
 import json
 import logging
-import base64
+import os
 import shutil
 import tempfile
 import traceback
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Optional, Dict, Any
 
 import psycopg
+import requests
 
 from geometry import validate_geometry_file, analyse_and_fix_geometries
-from styling import configure_task_layer_style, configure_survey_layer_style
-from sanitize import sanitize_generated_qgz_metadata
+from styling import (
+    apply_styles_from_dir,
+    set_layer_not_identifiable,
+    unpack_plugin_zip,
+)
+from sanitize import sanitize_generated_qgis_metadata
 from utils import parse_and_validate_extent, set_project_file_permissions
 
 
@@ -158,7 +164,11 @@ def _prepare_tasks_layer(
     final_output_dir: Path,
     log: logging.Logger,
 ) -> Optional[str]:
-    """Convert task GeoJSON to a packaged GeoPackage when available."""
+    """Convert task GeoJSON to a packaged GeoPackage when available.
+
+    Adds ``status`` and ``assigned_to`` string columns to the tasks layer
+    so the field-tm QField plugin can drive task assignment state.
+    """
     log.info("Processing task geometries")
     set_project_file_permissions(project_path)
     tasks_geojson_path = project_path / "tasks.geojson"
@@ -171,7 +181,40 @@ def _prepare_tasks_layer(
     log.debug("Moving %s --> %s", tasks_gpkg_path_input, tasks_gpkg_path_final)
     shutil.move(tasks_gpkg_path_input, tasks_gpkg_path_final)
     set_project_file_permissions(project_path)
+
+    _add_plugin_task_fields(str(tasks_gpkg_path_final), log)
     return str(tasks_gpkg_path_final)
+
+
+def _add_plugin_task_fields(tasks_gpkg_path: str, log: logging.Logger) -> None:
+    """Add ``status`` and ``assigned_to`` string columns to the tasks layer."""
+    from qgis.core import QgsField, QgsVectorLayer
+    from qgis.PyQt.QtCore import QMetaType
+
+    layer = QgsVectorLayer(tasks_gpkg_path, "tasks", "ogr")
+    if not layer.isValid():
+        log.warning("Could not open tasks GPKG to add plugin fields: %s", tasks_gpkg_path)
+        return
+
+    status_field = QgsField("status", QMetaType.Type.QString)
+    assigned_to_field = QgsField("assigned_to", QMetaType.Type.QString)
+
+    if not layer.startEditing():
+        log.warning("Could not start editing tasks layer to add plugin fields")
+        return
+    layer.addAttribute(status_field)
+    layer.addAttribute(assigned_to_field)
+
+    status_idx = layer.fields().indexOf("status")
+    assigned_idx = layer.fields().indexOf("assigned_to")
+    for feature in layer.getFeatures():
+        layer.changeAttributeValue(feature.id(), status_idx, "available")
+        layer.changeAttributeValue(feature.id(), assigned_idx, "")
+
+    if not layer.commitChanges():
+        log.warning("Failed to commit plugin fields to tasks layer")
+        return
+    log.info("Added status/assigned_to fields to tasks layer")
 
 
 def _load_generated_project(project_file: str):
@@ -215,47 +258,127 @@ def _add_task_layer_to_project(
     log.info("Tasks layer added to project")
 
 
-def _ensure_survey_layer_on_top(project) -> None:
-    """Move the survey layer to the top of the layer tree when present."""
-    survey_layers = project.mapLayersByName("survey")
-    if not survey_layers:
+def _add_project_area_layer(
+    project,
+    tasks_gpkg_path: str,
+    final_output_dir: Path,
+    log: logging.Logger,
+) -> None:
+    """Add a dissolved tasks layer as ``project-area`` (non-identifiable)."""
+    from qgis import processing
+    from qgis.core import QgsVectorLayer
+
+    project_area_gpkg = final_output_dir / "project-area.gpkg"
+    try:
+        processing.run(
+            "native:dissolve",
+            {
+                "INPUT": tasks_gpkg_path,
+                "FIELD": [],
+                "OUTPUT": str(project_area_gpkg),
+            },
+        )
+    except Exception as exc:
+        log.warning("Failed to dissolve tasks into project-area: %s", exc)
         return
 
-    survey_layer = survey_layers[0]
-    layer_root = project.layerTreeRoot()
-    survey_node = layer_root.findLayer(survey_layer.id())
-    if not survey_node:
+    layer = QgsVectorLayer(str(project_area_gpkg), "project-area", "ogr")
+    if not layer.isValid():
+        log.warning("Generated project-area GPKG is not a valid QGIS layer")
         return
 
-    parent = survey_node.parent()
-    current_index = parent.children().index(survey_node)
-    if current_index != 0:
-        parent.insertLayer(0, survey_layer)
-        parent.removeChildNode(survey_node)
+    registered = project.addMapLayer(layer, addToLegend=False)
+    if not registered:
+        log.warning("Failed to register project-area layer in project")
+        return
+
+    project.layerTreeRoot().insertLayer(2, layer)
+    set_layer_not_identifiable(layer, log)
+    log.info("Project-area layer added to project")
 
 
-def configure_project_settings(qgis_project, log: logging.Logger) -> None:
-    """Configure the QField project for field mapping."""
-    log.info("Configuring QField project settings for field mapping")
+def _layer_order_priority(layer) -> int:
+    """Return canonical ordering priority for known layer names."""
+    layer_name = (layer.name() or "").strip().lower()
+    if layer_name == "survey":
+        return 0
+    if layer_name in {"tasks", "dtm-tasks"}:
+        return 1
+    if layer_name == "project-area":
+        return 50
+    if layer_name == "basemap":
+        return 90
+    if layer_name == "openstreetmap":
+        return 100
+    return 10
 
-    # Configure tasks layer
-    task_layers = qgis_project.mapLayersByName("tasks")
-    if task_layers:
-        configure_task_layer_style(task_layers, log)
-        log.info("Tasks layer styled successfully")
-    else:
-        log.warning("Tasks layer not found in project")
 
-    # Configure features layer (survey layer with purple fill, no stroke)
-    survey_layers = qgis_project.mapLayersByName("survey")
-    if survey_layers:
-        configure_survey_layer_style(survey_layers, log)
-        log.info("Survey/features layer styled successfully")
-    else:
-        log.warning("Survey layer not found in project")
+def _normalize_root_layer_order(project, log: logging.Logger) -> None:
+    """Normalize known layer positions in the root layer tree."""
+    root = project.layerTreeRoot()
 
-    # Save project changes
-    qgis_project.write()
+    ordered_layers = []
+    for index, node in enumerate(root.children()):
+        layer = getattr(node, "layer", lambda: None)()
+        if layer is None:
+            continue
+        ordered_layers.append((index, layer))
+
+    if not ordered_layers:
+        return
+
+    desired_layers = [
+        layer
+        for _, layer in sorted(
+            ordered_layers,
+            key=lambda item: (_layer_order_priority(item[1]), item[0]),
+        )
+    ]
+
+    changed = False
+    for target_index, layer in enumerate(desired_layers):
+        node = root.findLayer(layer.id())
+        if node is None:
+            continue
+        current_children = list(root.children())
+        if node not in current_children:
+            continue
+        current_index = current_children.index(node)
+        if current_index == target_index:
+            continue
+        root.insertLayer(target_index, layer)
+        root.removeChildNode(node)
+        changed = True
+
+    if changed:
+        log.info("Normalized field project layer order in root tree")
+
+
+def _apply_plugin_and_styles(
+    project,
+    plugin_zip: Optional[bytes],
+    final_output_dir: Path,
+    project_file: str,
+    log: logging.Logger,
+) -> None:
+    """Unpack the caller-supplied plugin zip and apply bundled QML styles.
+
+    The plugin's ``main.qml`` lands next to the ``.qgz`` with the same
+    basename so QField auto-discovers it, and any
+    ``styles/{layer_name}.qml`` is applied to the matching project layer
+    via ``loadNamedStyle``.
+    """
+    if not plugin_zip:
+        log.info("No plugin_zip supplied; skipping plugin/style application")
+        return
+
+    project_basename = Path(project_file).stem
+    styles_dir = unpack_plugin_zip(plugin_zip, final_output_dir, project_basename, log)
+    if styles_dir is None:
+        log.info("Plugin zip has no styles/ directory; nothing to apply")
+        return
+
+    apply_styles_from_dir(project, styles_dir, log)
 
 
 def _read_job_inputs(db_url: str, job_id: str, project_path: Path, log: logging.Logger) -> None:
@@ -278,15 +401,56 @@ def _read_job_inputs(db_url: str, job_id: str, project_path: Path, log: logging.
     log.debug("Read job inputs from DB and wrote to %s", project_path)
 
 
-def _write_job_outputs(db_url: str, job_id: str, final_dir: Path, log: logging.Logger) -> int:
+def _read_basemap_job_inputs(db_url: str, job_id: str) -> tuple[str, str]:
+    """Read basemap attach metadata from qgis_jobs."""
+    with psycopg.connect(db_url) as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT project_id, basemap_url FROM qgis_jobs WHERE job_id = %s",
+            (job_id,),
+        )
+        row = cur.fetchone()
+
+    if not row:
+        raise RuntimeError(f"Job {job_id} not found in database")
+
+    project_id, basemap_url = row
+    if not project_id:
+        raise RuntimeError("Missing project_id for basemap attach job")
+    if not basemap_url or not str(basemap_url).strip():
+        raise RuntimeError("Missing basemap_url for basemap attach job")
+
+    return str(project_id), str(basemap_url).strip()
+
+
+def _write_job_outputs(
+    db_url: str,
+    job_id: str,
+    final_dir: Path,
+    log: logging.Logger,
+    excluded_suffixes: tuple[str, ...] = (),
+) -> int:
     """Read output files from final/ dir and write as base64 dict to DB."""
+    excluded = {suffix.lower() for suffix in excluded_suffixes}
     output_files = {}
     for file_path in final_dir.iterdir():
-        if file_path.is_file():
-            output_files[file_path.name] = base64.b64encode(
-                file_path.read_bytes()
-            ).decode("ascii")
-            log.debug("Collected output file: %s (%d bytes)", file_path.name, file_path.stat().st_size)
+        if not file_path.is_file():
+            continue
+
+        if file_path.suffix.lower() in excluded:
+            log.info(
+                "Skipping output file %s from DB transport (suffix excluded)",
+                file_path.name,
+            )
+            continue
+
+        output_files[file_path.name] = base64.b64encode(
+            file_path.read_bytes()
+        ).decode("ascii")
+        log.debug(
+            "Collected output file: %s (%d bytes)",
+            file_path.name,
+            file_path.stat().st_size,
+        )
 
     with psycopg.connect(db_url) as conn, conn.cursor() as cur:
         cur.execute(
@@ -299,6 +463,7 @@ def _write_job_outputs(db_url: str, job_id: str, final_dir: Path, log: logging.L
     return len(output_files)
 
 
+
 def generate_qgis_project(
     db_url: str,
     job_id: str,
@@ -307,6 +472,7 @@ def generate_qgis_project(
     extent: str,
     open_in_edit_mode: bool,
     log: logging.Logger,
+    plugin_zip: Optional[bytes] = None,
 ) -> Dict[str, Any]:
     """Generate QGIS project using input files from the database.
 
@@ -341,13 +507,15 @@ def generate_qgis_project(
         log.info("Opening generated QGIS project to add task layer")
         project = _load_generated_project(project_file)
         _add_task_layer_to_project(project, tasks_gpkg_path_final, log)
-        _ensure_survey_layer_on_top(project)
+        if tasks_gpkg_path_final:
+            _add_project_area_layer(project, tasks_gpkg_path_final, final_output_dir, log)
+        _normalize_root_layer_order(project, log)
+
+        _apply_plugin_and_styles(project, plugin_zip, final_output_dir, project_file, log)
 
         # Finalise the project
         project.write()
-
-        configure_project_settings(project, log)
-        sanitize_generated_qgz_metadata(project_file, log, extent_bbox=extent_bbox)
+        sanitize_generated_qgis_metadata(project_file, log, extent_bbox=extent_bbox)
 
         num_files = _write_job_outputs(db_url, job_id, final_output_dir, log)
         log.info("Project generation complete, wrote %d output files to DB", num_files)
@@ -361,6 +529,232 @@ def generate_qgis_project(
         return {
             "status": "error",
             "message": str(e),
+            "traceback": traceback.format_exc(),
+        }
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+def _qfc_api_root(qfield_cloud_url: Optional[str] = None) -> str:
+    """Resolve QFieldCloud API URL from payload or environment."""
+    base = (qfield_cloud_url or os.environ.get("QFIELDCLOUD_URL") or "").strip().rstrip("/")
+    if not base:
+        raise RuntimeError("QFIELDCLOUD_URL is required for basemap attachment")
+    if base.endswith("/api/v1"):
+        return base
+    return f"{base}/api/v1"
+
+
+def _qfc_token(
+    qfield_cloud_url: Optional[str] = None,
+    qfield_cloud_user: Optional[str] = None,
+    qfield_cloud_password: Optional[str] = None,
+) -> str:
+    """Authenticate against QFieldCloud and return API token."""
+    user = (qfield_cloud_user or os.environ.get("QFIELDCLOUD_USER") or "").strip()
+    password = (
+        qfield_cloud_password or os.environ.get("QFIELDCLOUD_PASSWORD") or ""
+    ).strip()
+    if not user or not password:
+        raise RuntimeError(
+            "QFIELDCLOUD_USER and QFIELDCLOUD_PASSWORD are required for basemap attachment"
+        )
+
+    api_root = _qfc_api_root(qfield_cloud_url)
+    response = requests.post(
+        f"{api_root}/auth/login/",
+        data={"username": user, "password": password},
+        timeout=30,
+    )
+    response.raise_for_status()
+    payload = response.json()
+    token = payload.get("token")
+    if not token:
+        raise RuntimeError("QFieldCloud login returned no token")
+    return str(token)
+
+
+def _safe_remote_project_path(remote_name: str) -> Path:
+    """Validate and normalize remote QFieldCloud file paths for local write."""
+    normalized = str(PurePosixPath(remote_name or ""))
+    if not normalized or normalized in {".", "/"}:
+        raise RuntimeError("Remote project file has an empty path")
+    if normalized.startswith("/"):
+        raise RuntimeError(f"Remote project file path must be relative: {remote_name}")
+
+    parts = PurePosixPath(normalized).parts
+    if any(part in {"..", ""} for part in parts):
+        raise RuntimeError(f"Unsafe remote project file path: {remote_name}")
+
+    return Path(*parts)
+
+
+def _download_qfc_project_files(
+    project_id: str,
+    destination: Path,
+    log: logging.Logger,
+    qfield_cloud_url: Optional[str] = None,
+    qfield_cloud_user: Optional[str] = None,
+    qfield_cloud_password: Optional[str] = None,
+) -> None:
+    """Download all project files from QFieldCloud into destination directory."""
+    api_root = _qfc_api_root(qfield_cloud_url)
+    token = _qfc_token(
+        qfield_cloud_url=qfield_cloud_url,
+        qfield_cloud_user=qfield_cloud_user,
+        qfield_cloud_password=qfield_cloud_password,
+    )
+    headers = {"Authorization": f"token {token}"}
+
+    files_response = requests.get(
+        f"{api_root}/files/{project_id}",
+        params={"skip_metadata": "1"},
+        headers=headers,
+        timeout=30,
+    )
+    files_response.raise_for_status()
+    files = files_response.json() or []
+
+    for remote in files:
+        remote_name = remote.get("name")
+        if not remote_name:
+            continue
+
+        safe_relative_path = _safe_remote_project_path(str(remote_name))
+        local_path = destination / safe_relative_path
+        local_path.parent.mkdir(parents=True, exist_ok=True)
+        file_response = requests.get(
+            f"{api_root}/files/{project_id}/{remote_name}",
+            headers=headers,
+            timeout=120,
+        )
+        file_response.raise_for_status()
+        local_path.write_bytes(file_response.content)
+        log.debug("Downloaded remote file %s", remote_name)
+
+
+def _download_mbtiles_file(
+    basemap_url: str,
+    destination: Path,
+    log: logging.Logger,
+) -> None:
+    """Download MBTiles to destination with non-empty validation."""
+    total = 0
+    with requests.get(basemap_url, stream=True, timeout=300) as response:
+        response.raise_for_status()
+        with destination.open("wb") as output:
+            for chunk in response.iter_content(chunk_size=1024 * 1024):
+                if not chunk:
+                    continue
+                total += len(chunk)
+                output.write(chunk)
+
+    if total == 0 or not destination.exists() or destination.stat().st_size == 0:
+        raise RuntimeError("Downloaded basemap MBTiles is empty")
+
+    log.info("Downloaded basemap MBTiles (%d bytes)", total)
+
+
+def _attach_mbtiles_layer_to_project(
+    project_file: Path,
+    mbtiles_path: Path,
+    log: logging.Logger,
+) -> None:
+    """Attach MBTiles raster layer and normalize project layer ordering."""
+    from qgis.core import QgsProject, QgsRasterLayer
+
+    project = QgsProject.instance()
+    project.clear()
+    if not project.read(str(project_file)):
+        raise RuntimeError(f"Failed to open QGIS project: {project_file}")
+
+    existing = project.mapLayersByName("basemap")
+    for layer in existing:
+        project.removeMapLayer(layer.id())
+
+    basemap_layer = QgsRasterLayer(str(mbtiles_path), "basemap", "gdal")
+    if not basemap_layer.isValid():
+        raise RuntimeError("Generated MBTiles is not a valid QGIS raster layer")
+
+    project.addMapLayer(basemap_layer, addToLegend=False)
+    root = project.layerTreeRoot()
+    root.addLayer(basemap_layer)
+    _normalize_root_layer_order(project, log)
+
+    if not project.write(str(project_file)):
+        raise RuntimeError("Failed to save QGIS project after basemap attach")
+
+
+def attach_basemap_to_qgis_project(
+    db_url: str,
+    job_id: str,
+    log: logging.Logger,
+    qfield_cloud_url: Optional[str] = None,
+    qfield_cloud_user: Optional[str] = None,
+    qfield_cloud_password: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Attach MBTiles basemap to an existing QField project and write outputs."""
+    tmp_dir = tempfile.mkdtemp(prefix="qgis_basemap_job_")
+    working_dir = Path(tmp_dir) / "project"
+    final_dir = Path(tmp_dir) / "final"
+    working_dir.mkdir(parents=True, exist_ok=True)
+    final_dir.mkdir(parents=True, exist_ok=True)
+
+    try:
+        project_id, basemap_url = _read_basemap_job_inputs(db_url, job_id)
+        _download_qfc_project_files(
+            project_id,
+            working_dir,
+            log,
+            qfield_cloud_url=qfield_cloud_url,
+            qfield_cloud_user=qfield_cloud_user,
+            qfield_cloud_password=qfield_cloud_password,
+        )
+
+        qgz_files = sorted(working_dir.glob("**/*.qgz"))
+        if not qgz_files:
+            raise RuntimeError("No .qgz file found in downloaded QField project")
+        if len(qgz_files) > 1:
+            raise RuntimeError(
+                "Multiple .qgz files found in downloaded QField project; "
+                "cannot determine target project file deterministically"
+            )
+
+        qgz_file = qgz_files[0]
+        qgz_dir = qgz_file.parent
+        mbtiles_dest = qgz_dir / "basemap.mbtiles"
+        _download_mbtiles_file(basemap_url, mbtiles_dest, log)
+
+        _attach_mbtiles_layer_to_project(qgz_file, mbtiles_dest, log)
+        sanitize_generated_qgis_metadata(str(qgz_file), log)
+
+        for source in working_dir.rglob("*"):
+            if source.is_dir():
+                continue
+            relative_path = source.relative_to(working_dir)
+            target = final_dir / relative_path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
+
+        num_files = _write_job_outputs(
+            db_url,
+            job_id,
+            final_dir,
+            log,
+            excluded_suffixes=(".mbtiles",),
+        )
+        return {
+            "status": "success",
+            "message": (
+                "Basemap attached successfully "
+                f"({num_files} DB-transferred files; MBTiles kept for direct upload)."
+            ),
+        }
+    except Exception as exc:
+        log.error("Basemap attach failed: %s", exc)
+        return {
+            "status": "error",
+            "message": str(exc),
             "traceback": traceback.format_exc(),
         }
     finally:
