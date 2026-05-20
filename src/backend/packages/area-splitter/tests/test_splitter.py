@@ -19,8 +19,10 @@ from tempfile import NamedTemporaryFile
 from time import sleep
 
 import pytest
+from psycopg.types.json import Json
 
 from area_splitter import SplittingAlgorithm
+from area_splitter.db import configure_statement_timeout, insert_geoms_batch
 from area_splitter.splitter import (
     AreaSplitter,
     _is_linear_split_feature,
@@ -32,6 +34,127 @@ from area_splitter.splitter import (
 
 log = logging.getLogger(__name__)
 TESTDATA_DIR = str(Path(__file__).parent / "testdata")
+
+
+class _RecordingCursor:
+    """Minimal cursor double that records executemany calls."""
+
+    def __init__(self):
+        """Initialize the recorded call list."""
+        self.calls = []
+
+    def execute(self, query, params=None):
+        """Record an execute invocation."""
+        self.calls.append((query, params))
+
+    def executemany(self, query, params):
+        """Record an executemany invocation."""
+        self.calls.append((query, params))
+
+
+def test_configure_statement_timeout_sets_local_timeout():
+    """Statement timeout should be transaction-local and parameterized."""
+    cur = _RecordingCursor()
+
+    configure_statement_timeout(cur, 1234)
+
+    assert cur.calls == [
+        ("SELECT set_config('statement_timeout', %s, true)", ("1234",))
+    ]
+
+
+def test_configure_statement_timeout_allows_disable():
+    """A non-positive timeout should avoid issuing SET."""
+    cur = _RecordingCursor()
+
+    configure_statement_timeout(cur, 0)
+
+    assert cur.calls == []
+
+
+def test_insert_geoms_batch_uses_executemany_and_json_tags():
+    """Batch insert should use one executemany call with JSON-wrapped tags."""
+    cur = _RecordingCursor()
+
+    insert_geoms_batch(
+        cur,
+        "ways_poly",
+        [
+            {"osm_id": 1, "geom": '{"type":"Polygon"}', "tags": {"building": "yes"}},
+            {"osm_id": 2, "geom": '{"type":"Polygon"}', "tags": {"building": "hut"}},
+        ],
+    )
+
+    assert len(cur.calls) == 1
+    query, params = cur.calls[0]
+    assert "INSERT INTO ways_poly" in query
+    assert len(params) == 2
+    assert isinstance(params[0]["tags"], Json)
+    assert params[0]["osm_id"] == 1
+
+
+def test_insert_geoms_batch_noops_for_empty_rows():
+    """Empty buckets should not issue a database call."""
+    cur = _RecordingCursor()
+
+    insert_geoms_batch(cur, "ways_line", [])
+
+    assert cur.calls == []
+
+
+def test_insert_geoms_batch_rejects_unknown_table():
+    """The interpolated table name must stay allowlisted."""
+    with pytest.raises(ValueError, match="Unsupported table"):
+        insert_geoms_batch(
+            _RecordingCursor(),
+            "ways_poly; DROP TABLE ways_line",
+            [{"osm_id": 1, "geom": "{}", "tags": {}}],
+        )
+
+
+def test_insert_split_sql_extract_batches_polygons_and_lines(monkeypatch):
+    """The splitter should issue one batch insert per supported temp table."""
+    calls = []
+
+    def fake_insert_geoms_batch(_cur, table_name, rows):
+        """Record the table and rows passed to the batch insert helper."""
+        calls.append((table_name, rows))
+
+    monkeypatch.setattr(
+        "area_splitter.splitter.insert_geoms_batch",
+        fake_insert_geoms_batch,
+    )
+
+    AreaSplitter._insert_split_sql_extract(
+        object(),
+        object(),
+        {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Polygon", "coordinates": []},
+                    "properties": {"osm_id": 1, "tags": {"building": "yes"}},
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "LineString", "coordinates": []},
+                    "properties": {"osm_id": 2, "tags": {"highway": "primary"}},
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {"type": "Point", "coordinates": []},
+                    "properties": {"osm_id": 3, "tags": {"building": "yes"}},
+                },
+            ],
+        },
+    )
+
+    assert [table_name for table_name, _rows in calls] == ["ways_poly", "ways_line"]
+    assert len(calls[0][1]) == 1
+    assert calls[0][1][0]["osm_id"] == 1
+    assert len(calls[1][1]) == 1
+    assert calls[1][1][0]["osm_id"] == 2
 
 
 @pytest.mark.parametrize(

@@ -30,6 +30,13 @@ ingress:
   # automatically defaults to "localhost".
   host: field.localhost
   annotations: {}
+  # Recommended nginx annotations for production:
+  #   nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+  #   nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+  #   nginx.ingress.kubernetes.io/proxy-body-size: "30m"
+  # The proxy-*-timeout values must stay above the splitter
+  # DEFAULT_STATEMENT_TIMEOUT_MS (currently 270000) so PostgreSQL cancels
+  # long-running splits before the ingress times out.
   # TLS configuration. Set enabled: true for HTTPS.
   # secretName defaults to "<host>-tls" if left empty (useful with cert-manager).
   tls:

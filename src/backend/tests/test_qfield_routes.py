@@ -260,6 +260,55 @@ async def test_create_qfc_user_passes_generated_email_to_sdk():
     ]
 
 
+@pytest.mark.asyncio
+async def test_add_qfc_project_collaborator_user_not_found_in_org():
+    """404 from add_organization_member should surface as a clean user-not-found."""
+    from unittest.mock import MagicMock
+
+    from litestar.exceptions import HTTPException
+    from qfieldcloud_sdk.interfaces import QfcRequestException
+    from qfieldcloud_sdk.sdk import ProjectCollaboratorRole
+
+    from app.qfield.qfield_crud import add_qfc_project_collaborator
+
+    response = MagicMock()
+    response.status_code = 404
+    response.url = "http://qfield-app:8000/api/v1/members/HOTOSM/?limit=20&offset=0"
+    response.reason = "Not Found"
+    response.json.return_value = {
+        "code": "object_not_found",
+        "message": "Object not found",
+    }
+    response.content = b'{"detail": "User matching query does not exist."}'
+
+    class FakeClient:
+        username = "svcftm"
+
+        def get_project(self, _project_id):
+            return {"owner": "HOTOSM"}
+
+        def get_organization_members(self, _organization):
+            return []
+
+        def add_organization_member(self, *_args, **_kwargs):
+            raise QfcRequestException(response)
+
+    with pytest.raises(HTTPException) as excinfo:
+        await add_qfc_project_collaborator(
+            FakeClient(),
+            "qfc-project-7",
+            "spwoodcock",
+            ProjectCollaboratorRole.EDITOR,
+        )
+
+    assert excinfo.value.status_code == 404
+    assert "spwoodcock" in str(excinfo.value.detail)
+    assert "does not exist" in str(excinfo.value.detail)
+    # Make sure the noisy "Could not add ... to the organization: ..." wrapper
+    # did not get re-applied on top of the friendly message.
+    assert "Could not add" not in str(excinfo.value.detail)
+
+
 def test_strip_feature_properties_for_qfield_removes_seed_attributes():
     """Seed geometries should not leak raw source attributes into the QField layer."""
     stripped = _strip_feature_properties_for_qfield(

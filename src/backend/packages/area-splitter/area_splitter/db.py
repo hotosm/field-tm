@@ -21,6 +21,11 @@ from psycopg.types.json import Json
 
 log = logging.getLogger(__name__)
 
+# Kept ~30s below the production nginx ingress `proxy-read-timeout` (300s) so
+# Postgres cancels the splitter SQL before the reverse proxy gives up. Keep
+# this value strictly below the ingress timeout when retuning either side.
+DEFAULT_STATEMENT_TIMEOUT_MS = 270_000
+
 
 def create_connection(db: Union[str, psycopg.Connection]) -> psycopg.Connection:
     """Get db connection from existing psycopg connection, or URL string.
@@ -44,6 +49,21 @@ def create_connection(db: Union[str, psycopg.Connection]) -> psycopg.Connection:
         raise ValueError(msg)
 
     return conn
+
+
+def configure_statement_timeout(
+    cur: psycopg.Cursor,
+    timeout_ms: int = DEFAULT_STATEMENT_TIMEOUT_MS,
+) -> None:
+    """Apply a transaction-local PostgreSQL statement timeout.
+
+    This keeps long-running split SQL from exceeding Field-TM's production
+    reverse-proxy timeout and turning into an opaque 504 response.
+    """
+    if timeout_ms <= 0:
+        return
+
+    cur.execute("SELECT set_config('statement_timeout', %s, true)", (str(timeout_ms),))
 
 
 def close_connection(conn: psycopg.Connection):
@@ -149,23 +169,36 @@ def aoi_to_postgis(conn: psycopg.Connection, geom: dict) -> None:
         conn.rollback()  # Rollback in case of error
 
 
-def insert_geom(cur: psycopg.Cursor, table_name: str, **kwargs) -> None:
-    """Insert an OSM geometry into the database.
+_BATCH_INSERT_TABLES = frozenset({"ways_poly", "ways_line"})
 
-    Does not commit the values automatically.
+
+def insert_geoms_batch(
+    cur: psycopg.Cursor,
+    table_name: str,
+    rows: list[dict],
+) -> None:
+    """Batch-insert OSM geometries into one of the splitter temp tables.
+
+    Uses ``executemany`` (which psycopg3 pipelines when supported) so an
+    extract with thousands of features costs a single round-trip block
+    instead of one per feature.
 
     Args:
-        cur (psycopg.Cursor): The PostgreSQL cursor.
-        table_name (str): The name of the table to insert data into.
-        **kwargs: Keyword arguments representing the values to be inserted.
-
-    Returns:
-        None
+        cur: PostgreSQL cursor.
+        table_name: Target table, must be ``ways_poly`` or ``ways_line``.
+        rows: List of dicts with keys ``osm_id``, ``geom`` (GeoJSON str),
+            and ``tags`` (dict).
     """
+    if not rows:
+        return
+    if table_name not in _BATCH_INSERT_TABLES:
+        # Defense in depth: table name is interpolated into SQL, so guard
+        # against drift even though all callers pass a hardcoded value.
+        raise ValueError(f"Unsupported table for batch insert: {table_name}")
+
     query = (
         f"INSERT INTO {table_name} (geom, osm_id, tags) "
         "VALUES (ST_SetSRID(ST_GeomFromGeoJSON(%(geom)s), 4326), %(osm_id)s, %(tags)s)"
     )
-    if "tags" in kwargs:
-        kwargs["tags"] = Json(kwargs["tags"])
-    cur.execute(query, kwargs)
+    prepared = [{**row, "tags": Json(row.get("tags"))} for row in rows]
+    cur.executemany(query, prepared)

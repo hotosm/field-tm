@@ -1,9 +1,11 @@
 """Tests for HTMX routes."""
 
 import json
+from contextlib import asynccontextmanager
 from types import SimpleNamespace
 from unittest.mock import Mock
 
+from litestar import Router
 from litestar import status_codes as status
 
 from app.db.models import DbProject
@@ -16,7 +18,10 @@ from app.htmx.setup_steps.setup_step_extract_routes import (
     download_osm_data_htmx,
     upload_geojson_htmx,
 )
-from app.htmx.setup_steps.setup_step_finalize_routes import create_project_htmx
+from app.htmx.setup_steps.setup_step_finalize_routes import (
+    add_qfc_collaborator_htmx,
+    create_project_htmx,
+)
 from app.htmx.setup_steps.setup_step_map_layers import (
     build_split_preview_response,
     task_boundaries_layer,
@@ -40,6 +45,162 @@ from app.projects.project_services import ValidationError as SvcValidationError
 def test_step5_dispatch_route_is_registered():
     """The template-facing finalization endpoint must be exported to the router."""
     assert create_project_htmx in setup_step_finalize_routes.ROUTE_HANDLERS
+
+
+def test_step5_finalize_routes_register_with_litestar():
+    """Finalize route exports must be decorated route handlers."""
+    Router(path="/", route_handlers=setup_step_finalize_routes.ROUTE_HANDLERS)
+
+
+async def test_add_qfc_collaborator_escapes_success_message(monkeypatch):
+    """Collaborator success feedback must not render submitted HTML."""
+    project = SimpleNamespace(
+        id=42,
+        external_project_id="qfc-project-42",
+        external_project_instance_url="https://default-qfc.example.org/projects/42",
+    )
+    captured = {}
+
+    async def fake_project_one(_db, project_id):
+        assert project_id == project.id
+        return project
+
+    @asynccontextmanager
+    async def fake_qfield_client():
+        yield object()
+
+    async def fake_add_collaborator(_client, qfc_project_id, username, role):
+        captured["qfc_project_id"] = qfc_project_id
+        captured["username"] = username
+        captured["role"] = role.value
+
+    monkeypatch.setattr(
+        "app.qfield.qfield_utils.settings.QFIELDCLOUD_URL",
+        "https://default-qfc.example.org/api/v1/",
+    )
+    monkeypatch.setattr(setup_step_finalize_routes.DbProject, "one", fake_project_one)
+    monkeypatch.setattr(
+        setup_step_finalize_routes,
+        "qfield_client",
+        fake_qfield_client,
+    )
+    monkeypatch.setattr(
+        setup_step_finalize_routes,
+        "add_qfc_project_collaborator",
+        fake_add_collaborator,
+    )
+
+    response = await add_qfc_collaborator_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=project.id,
+        data={"qfc_username": "<img src=x onerror=alert(1)>"},
+    )
+
+    body = str(response.content)
+    assert response.status_code == status.HTTP_200_OK
+    assert "<img src=x onerror=alert(1)>" not in body
+    assert "&lt;img src=x onerror=alert(1)&gt;" in body
+    assert captured == {
+        "qfc_project_id": "qfc-project-42",
+        "username": "<img src=x onerror=alert(1)>",
+        "role": "editor",
+    }
+
+
+async def test_add_qfc_collaborator_escapes_httpexception_error(monkeypatch):
+    """Error-path messages from the QFC SDK must not render submitted HTML."""
+    from litestar.exceptions import HTTPException
+
+    project = SimpleNamespace(
+        id=44,
+        external_project_id="qfc-project-44",
+        external_project_instance_url="https://default-qfc.example.org/projects/44",
+    )
+
+    async def fake_project_one(_db, project_id):
+        assert project_id == project.id
+        return project
+
+    @asynccontextmanager
+    async def fake_qfield_client():
+        yield object()
+
+    async def fake_add_collaborator(_client, _qfc_project_id, _username, _role):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="QFC user '<script>alert(1)</script>' not found.",
+        )
+
+    monkeypatch.setattr(
+        "app.qfield.qfield_utils.settings.QFIELDCLOUD_URL",
+        "https://default-qfc.example.org/api/v1/",
+    )
+    monkeypatch.setattr(setup_step_finalize_routes.DbProject, "one", fake_project_one)
+    monkeypatch.setattr(
+        setup_step_finalize_routes,
+        "qfield_client",
+        fake_qfield_client,
+    )
+    monkeypatch.setattr(
+        setup_step_finalize_routes,
+        "add_qfc_project_collaborator",
+        fake_add_collaborator,
+    )
+
+    response = await add_qfc_collaborator_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=project.id,
+        data={"qfc_username": "alice"},
+    )
+
+    body = str(response.content)
+    assert response.status_code == status.HTTP_200_OK
+    assert "<script>alert(1)</script>" not in body
+    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in body
+
+
+async def test_add_qfc_collaborator_blocks_custom_qfc_instance(monkeypatch):
+    """Post-finalize collaborator add must not target the default QFC by mistake."""
+    project = SimpleNamespace(
+        id=43,
+        external_project_id="custom-project-43",
+        external_project_instance_url="https://custom-qfc.example.org/projects/43",
+    )
+    add_collaborator = Mock()
+
+    async def fake_project_one(_db, project_id):
+        assert project_id == project.id
+        return project
+
+    monkeypatch.setattr(
+        "app.qfield.qfield_utils.settings.QFIELDCLOUD_URL",
+        "https://default-qfc.example.org/api/v1/",
+    )
+    monkeypatch.setattr(setup_step_finalize_routes.DbProject, "one", fake_project_one)
+    monkeypatch.setattr(
+        setup_step_finalize_routes,
+        "add_qfc_project_collaborator",
+        add_collaborator,
+    )
+
+    response = await add_qfc_collaborator_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=project.id,
+        data={"qfc_username": "alice"},
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert "custom QFieldCloud instance" in str(response.content)
+    add_collaborator.assert_not_called()
 
 
 async def test_project_setup_shows_step1_advanced_config_toggle(client, stub_project):
@@ -359,6 +520,45 @@ def test_build_qfield_finalize_success_html_emits_finalize_event():
     assert trigger_payload is not None
     assert trigger_payload["provider"] == "QField"
     assert trigger_payload["projectId"] == 99
+
+
+def test_build_qfield_finalize_success_hides_custom_instance_collaborator_form(
+    monkeypatch,
+):
+    """Custom QFC projects must not show a form that posts to default creds."""
+    monkeypatch.setattr(
+        "app.qfield.qfield_utils.settings.QFIELDCLOUD_URL",
+        "https://default-qfc.example.org/api/v1/",
+    )
+    result = SimpleNamespace(
+        qfield_url="https://custom-qfc.example.org/projects/99",
+        manager_username="manager@fieldtm.org",
+        manager_password="Pass123!",
+    )
+
+    response_template = build_qfield_finalize_success_html(result, project_id=99)
+
+    assert response_template.context["show_collaborator_form"] is False
+
+
+def test_build_qfield_finalize_success_shows_default_instance_collaborator_form(
+    monkeypatch,
+):
+    """Default-instance QFC projects must surface the collaborator form."""
+    monkeypatch.setattr(
+        "app.qfield.qfield_utils.settings.QFIELDCLOUD_URL",
+        "https://default-qfc.example.org/api/v1/",
+    )
+    result = SimpleNamespace(
+        qfield_url="https://default-qfc.example.org/projects/100",
+        manager_username="manager@fieldtm.org",
+        manager_password="Pass123!",
+    )
+
+    response_template = build_qfield_finalize_success_html(result, project_id=100)
+
+    assert response_template.context["show_collaborator_form"] is True
+    assert response_template.context["project_id"] == 100
 
 
 def test_build_split_preview_response_emits_step4_preview_event(monkeypatch):

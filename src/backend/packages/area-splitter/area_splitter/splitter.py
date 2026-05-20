@@ -30,10 +30,11 @@ from area_splitter import SplittingAlgorithm, algorithms_path
 from area_splitter.db import (
     aoi_to_postgis,
     close_connection,
+    configure_statement_timeout,
     create_connection,
     create_tables,
     drop_tables,
-    insert_geom,
+    insert_geoms_batch,
 )
 
 log = logging.getLogger(__name__)
@@ -618,7 +619,16 @@ class AreaSplitter:
             raise ValueError(msg)
 
     def _insert_split_sql_extract(self, cur, osm_extract: dict) -> None:
-        """Insert the OSM extract into the temporary split tables."""
+        """Insert the OSM extract into the temporary split tables.
+
+        Buckets each feature into ways_poly (building polygons) or ways_line
+        (linear features) then issues a single batched insert per table.
+        Single-row inserts on a large extract dominated the split runtime -
+        executemany pipelines the round-trips so we go from O(N) request
+        latencies to roughly one.
+        """
+        polys: list[dict] = []
+        lines: list[dict] = []
         for feature in osm_extract["features"]:
             geometry = feature.get("geometry", {})
             geom_type = geometry.get("type", "")
@@ -632,12 +642,20 @@ class AreaSplitter:
             # Point buildings in ways_poly break voronoi's
             # ST_DUMPPOINTS/ST_VORONOIPOLYGONS pipeline
             if tags.get("building") and geom_type in ("Polygon", "MultiPolygon"):
-                insert_geom(cur, "ways_poly", **common_args)
+                polys.append(common_args)
             elif _is_linear_split_feature(tags) and geom_type in (
                 "LineString",
                 "MultiLineString",
             ):
-                insert_geom(cur, "ways_line", **common_args)
+                lines.append(common_args)
+
+        log.info(
+            "Inserting split extract: %d building polygons, %d linear features",
+            len(polys),
+            len(lines),
+        )
+        insert_geoms_batch(cur, "ways_poly", polys)
+        insert_geoms_batch(cur, "ways_line", lines)
 
     def _run_split_sql_files(
         self,
@@ -740,6 +758,9 @@ class AreaSplitter:
 
         # Get existing db engine, or create new one
         conn = create_connection(db)
+
+        with conn.cursor() as timeout_cur:
+            configure_statement_timeout(timeout_cur)
 
         # Generate db tables if not exist
         log.debug("Generating required temp tables")

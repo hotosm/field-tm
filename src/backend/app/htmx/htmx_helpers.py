@@ -18,6 +18,8 @@
 
 """Shared helper utilities for HTMX route handlers."""
 
+from html import escape
+
 
 def callout(variant: str, msg: str) -> str:
     """Build a wa-callout HTML snippet.
@@ -29,4 +31,6 @@ def callout(variant: str, msg: str) -> str:
     Returns:
         An HTML string containing a <wa-callout> element.
     """
-    return f'<wa-callout variant="{variant}"><span>{msg}</span></wa-callout>'
+    safe_variant = escape(str(variant), quote=True)
+    safe_msg = escape(str(msg), quote=True)
+    return f'<wa-callout variant="{safe_variant}"><span>{safe_msg}</span></wa-callout>'

@@ -1182,16 +1182,28 @@ async def _ensure_org_membership(
     if any(member.get("member") == username for member in members):
         return
 
-    await loop.run_in_executor(
-        None,
-        partial(
-            client.add_organization_member,
-            organization,
-            username,
-            OrganizationMemberRole.MEMBER,
-            False,
-        ),
-    )
+    try:
+        await loop.run_in_executor(
+            None,
+            partial(
+                client.add_organization_member,
+                organization,
+                username,
+                OrganizationMemberRole.MEMBER,
+                False,
+            ),
+        )
+    except QfcRequestException as exc:
+        # QFieldCloud returns 404 with "User matching query does not exist."
+        # when the username has no QFC account. Surface that to callers as a
+        # clean "user not found" so they can render a friendly message.
+        if exc.response.status_code == status.HTTP_404_NOT_FOUND:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=_("User '%(username)s' does not exist on QFieldCloud.")
+                % {"username": username},
+            ) from exc
+        raise
     log.info("Added QFC user '%s' to organization '%s'", username, organization)
 
 
@@ -1323,6 +1335,10 @@ async def add_qfc_project_collaborator(
                 organization=owner,
                 username=username,
             )
+        except HTTPException:
+            # _ensure_org_membership already raises a user-friendly HTTPException
+            # for the "user does not exist" case; preserve it verbatim.
+            raise
         except Exception as exc:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
