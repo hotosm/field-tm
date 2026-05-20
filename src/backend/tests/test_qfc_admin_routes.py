@@ -101,7 +101,7 @@ async def test_add_collaborator_invalid_session_returns_error(client):
     assert response.status_code == 200
     assert (
         "Failed to add collaborator" in response.text
-        or "project 'project-123' not found" in response.text
+        or "project &#x27;project-123&#x27; not found" in response.text
     )
 
 
