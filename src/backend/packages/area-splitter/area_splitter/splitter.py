@@ -28,8 +28,10 @@ from psycopg import Connection
 
 from area_splitter import SplittingAlgorithm, algorithms_path
 from area_splitter.db import (
+    acquire_splitter_serialization_lock,
     aoi_to_postgis,
     close_connection,
+    configure_lock_timeout,
     configure_statement_timeout,
     create_connection,
     create_tables,
@@ -759,8 +761,18 @@ class AreaSplitter:
         # Get existing db engine, or create new one
         conn = create_connection(db)
 
-        with conn.cursor() as timeout_cur:
-            configure_statement_timeout(timeout_cur)
+        # Order matters here:
+        #   1. statement_timeout caps total split duration (incl. queueing).
+        #   2. Advisory lock serializes concurrent splitter runs - acquired
+        #      BEFORE lock_timeout so a queued split can wait the full
+        #      statement_timeout, not just the short lock_timeout window.
+        #   3. lock_timeout then fail-fasts the actual DDL on any unexpected
+        #      catalog contention.
+        with conn.cursor() as setup_cur:
+            configure_statement_timeout(setup_cur)
+            log.debug("Acquiring splitter serialization lock")
+            acquire_splitter_serialization_lock(setup_cur)
+            configure_lock_timeout(setup_cur)
 
         # Generate db tables if not exist
         log.debug("Generating required temp tables")

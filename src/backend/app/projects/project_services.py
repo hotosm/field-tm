@@ -983,6 +983,15 @@ async def split_aoi(
     # Perform splitting based on algorithm
     log.info(f"Splitting AOI for project {project_id} using algorithm: {algorithm}")
 
+    # End the outer transaction before launching the split worker. The split
+    # runs in another thread against its own DB connection; if we leave a
+    # transaction open here, the outer connection sits idle holding a snapshot
+    # (and any catalog row locks acquired by earlier statements) for the
+    # duration of the split. In production that triggers Postgres'
+    # idle_in_transaction_session_timeout and can block the splitter on
+    # catalog locks long enough to hit the splitter's own statement_timeout.
+    await db.commit()
+
     if algorithm_enum in (
         SplittingAlgorithm.AVG_BUILDING_VORONOI,
         SplittingAlgorithm.AVG_BUILDING_SKELETON,

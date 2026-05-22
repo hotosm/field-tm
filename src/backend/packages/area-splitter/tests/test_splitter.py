@@ -22,7 +22,13 @@ import pytest
 from psycopg.types.json import Json
 
 from area_splitter import SplittingAlgorithm
-from area_splitter.db import configure_statement_timeout, insert_geoms_batch
+from area_splitter.db import (
+    SPLITTER_SERIALIZATION_LOCK_KEY,
+    acquire_splitter_serialization_lock,
+    configure_lock_timeout,
+    configure_statement_timeout,
+    insert_geoms_batch,
+)
 from area_splitter.splitter import (
     AreaSplitter,
     _is_linear_split_feature,
@@ -70,6 +76,35 @@ def test_configure_statement_timeout_allows_disable():
     configure_statement_timeout(cur, 0)
 
     assert cur.calls == []
+
+
+def test_configure_lock_timeout_sets_local_timeout():
+    """Lock timeout should be transaction-local and parameterized."""
+    cur = _RecordingCursor()
+
+    configure_lock_timeout(cur, 5678)
+
+    assert cur.calls == [("SELECT set_config('lock_timeout', %s, true)", ("5678",))]
+
+
+def test_configure_lock_timeout_allows_disable():
+    """A non-positive lock timeout should avoid issuing SET."""
+    cur = _RecordingCursor()
+
+    configure_lock_timeout(cur, 0)
+
+    assert cur.calls == []
+
+
+def test_acquire_splitter_serialization_lock_uses_xact_advisory_lock():
+    """Splitter serialization lock should call pg_advisory_xact_lock."""
+    cur = _RecordingCursor()
+
+    acquire_splitter_serialization_lock(cur)
+
+    assert cur.calls == [
+        ("SELECT pg_advisory_xact_lock(%s)", (SPLITTER_SERIALIZATION_LOCK_KEY,))
+    ]
 
 
 def test_insert_geoms_batch_uses_executemany_and_json_tags():

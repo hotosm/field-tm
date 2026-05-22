@@ -281,8 +281,15 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
         })
 
     def log_message(self, format, *args):
-        """Custom log message handler."""
-        self.log.info(f"{self.address_string()} - {format % args}")
+        """Custom log message handler.
+
+        Health-check probes from Kubernetes / load balancers fire every few
+        seconds and would otherwise drown out real request logs, so demote
+        them to DEBUG. Everything else stays at INFO.
+        """
+        message = format % args
+        level = logging.DEBUG if "/health" in message else logging.INFO
+        self.log.log(level, "%s - %s", self.address_string(), message)
 
 
 def create_handler_with_logger(logger):

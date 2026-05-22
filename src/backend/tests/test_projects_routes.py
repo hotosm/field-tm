@@ -551,7 +551,7 @@ async def test_split_aoi_building_algorithms_run_sync_without_kwargs(
     monkeypatch.setattr(project_services, "check_crs", fake_check_crs)
 
     result = await project_services.split_aoi(
-        db=Mock(),
+        db=Mock(commit=AsyncMock()),
         project_id=1,
         options=project_services.SplitAoiOptions(
             algorithm=algorithm,
@@ -635,7 +635,7 @@ async def test_split_aoi_total_tasks_passes_num_enumerators(monkeypatch):
     monkeypatch.setattr(project_services, "check_crs", fake_check_crs)
 
     result = await project_services.split_aoi(
-        db=Mock(),
+        db=Mock(commit=AsyncMock()),
         project_id=1,
         options=project_services.SplitAoiOptions(
             algorithm="TOTAL_TASKS",

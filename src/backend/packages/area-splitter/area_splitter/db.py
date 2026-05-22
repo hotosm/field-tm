@@ -26,6 +26,20 @@ log = logging.getLogger(__name__)
 # this value strictly below the ingress timeout when retuning either side.
 DEFAULT_STATEMENT_TIMEOUT_MS = 270_000
 
+# Surface lock contention quickly instead of waiting on the full statement
+# timeout: if the splitter cannot acquire a lock within 10s, fail with a
+# clear LockNotAvailable error rather than a generic statement-timeout
+# cancel mid-CREATE-TABLE (which is what concurrent splits looked like).
+DEFAULT_LOCK_TIMEOUT_MS = 10_000
+
+# Arbitrary stable 64-bit key for the splitter's serialization advisory
+# lock. The splitter writes to globally-named tables in ``public``
+# (``project_aoi``, ``ways_poly``, ``buildings``, ...) so concurrent runs
+# must not interleave. Acquired with ``pg_advisory_xact_lock``, which
+# auto-releases on transaction commit/rollback. Picked so it is unlikely
+# to collide with any other advisory lock in the database.
+SPLITTER_SERIALIZATION_LOCK_KEY = 7_341_109_241_762_310_001
+
 
 def create_connection(db: Union[str, psycopg.Connection]) -> psycopg.Connection:
     """Get db connection from existing psycopg connection, or URL string.
@@ -64,6 +78,41 @@ def configure_statement_timeout(
         return
 
     cur.execute("SELECT set_config('statement_timeout', %s, true)", (str(timeout_ms),))
+
+
+def configure_lock_timeout(
+    cur: psycopg.Cursor,
+    timeout_ms: int = DEFAULT_LOCK_TIMEOUT_MS,
+) -> None:
+    """Apply a transaction-local PostgreSQL lock timeout.
+
+    Without this, a blocked CREATE/DROP TABLE in the splitter will sit
+    waiting on a catalog lock for the full statement timeout (minutes)
+    before being cancelled, producing a confusing "statement timeout"
+    mid-DDL. With this set, blocked statements fail in seconds with an
+    explicit ``LockNotAvailable`` error, making concurrent-split issues
+    diagnosable.
+    """
+    if timeout_ms <= 0:
+        return
+
+    cur.execute("SELECT set_config('lock_timeout', %s, true)", (str(timeout_ms),))
+
+
+def acquire_splitter_serialization_lock(
+    cur: psycopg.Cursor,
+    key: int = SPLITTER_SERIALIZATION_LOCK_KEY,
+) -> None:
+    """Serialize concurrent splitter runs via a transaction-scoped advisory lock.
+
+    The splitter writes to globally-named tables in ``public``, so two
+    concurrent splits would otherwise clash on catalog locks. Holding an
+    ``xact`` advisory lock means a second concurrent splitter blocks here
+    until the first commits/rolls back; queued runs then proceed cleanly
+    rather than deadlocking on DDL. The lock is released automatically
+    with the transaction.
+    """
+    cur.execute("SELECT pg_advisory_xact_lock(%s)", (key,))
 
 
 def close_connection(conn: psycopg.Connection):
