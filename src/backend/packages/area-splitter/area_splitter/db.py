@@ -21,23 +21,16 @@ from psycopg.types.json import Json
 
 log = logging.getLogger(__name__)
 
-# Kept ~30s below the production nginx ingress `proxy-read-timeout` (300s) so
-# Postgres cancels the splitter SQL before the reverse proxy gives up. Keep
-# this value strictly below the ingress timeout when retuning either side.
+# Keep below the nginx ingress proxy-read-timeout (300s) so Postgres
+# cancels before the proxy gives up.
 DEFAULT_STATEMENT_TIMEOUT_MS = 270_000
 
-# Surface lock contention quickly instead of waiting on the full statement
-# timeout: if the splitter cannot acquire a lock within 10s, fail with a
-# clear LockNotAvailable error rather than a generic statement-timeout
-# cancel mid-CREATE-TABLE (which is what concurrent splits looked like).
+# Fail with LockNotAvailable in 10s instead of waiting the full statement
+# timeout - makes catalog-lock contention diagnosable.
 DEFAULT_LOCK_TIMEOUT_MS = 10_000
 
-# Arbitrary stable 64-bit key for the splitter's serialization advisory
-# lock. The splitter writes to globally-named tables in ``public``
-# (``project_aoi``, ``ways_poly``, ``buildings``, ...) so concurrent runs
-# must not interleave. Acquired with ``pg_advisory_xact_lock``, which
-# auto-releases on transaction commit/rollback. Picked so it is unlikely
-# to collide with any other advisory lock in the database.
+# Stable 64-bit key for the splitter's xact-scoped advisory lock; chosen
+# to not collide with other advisory locks.
 SPLITTER_SERIALIZATION_LOCK_KEY = 7_341_109_241_762_310_001
 
 
@@ -84,14 +77,12 @@ def configure_lock_timeout(
     cur: psycopg.Cursor,
     timeout_ms: int = DEFAULT_LOCK_TIMEOUT_MS,
 ) -> None:
-    """Apply a transaction-local PostgreSQL lock timeout.
+    """Apply a transaction-local Postgres lock_timeout.
 
-    Without this, a blocked CREATE/DROP TABLE in the splitter will sit
-    waiting on a catalog lock for the full statement timeout (minutes)
-    before being cancelled, producing a confusing "statement timeout"
-    mid-DDL. With this set, blocked statements fail in seconds with an
-    explicit ``LockNotAvailable`` error, making concurrent-split issues
-    diagnosable.
+    Without this, a blocked CREATE/DROP TABLE waits the full statement
+    timeout (minutes) before cancelling with a confusing "statement
+    timeout" mid-DDL; with it, blocked statements fail fast with a
+    clear LockNotAvailable.
     """
     if timeout_ms <= 0:
         return
@@ -103,14 +94,10 @@ def acquire_splitter_serialization_lock(
     cur: psycopg.Cursor,
     key: int = SPLITTER_SERIALIZATION_LOCK_KEY,
 ) -> None:
-    """Serialize concurrent splitter runs via a transaction-scoped advisory lock.
+    """Serialize concurrent splitter runs via an xact advisory lock.
 
-    The splitter writes to globally-named tables in ``public``, so two
-    concurrent splits would otherwise clash on catalog locks. Holding an
-    ``xact`` advisory lock means a second concurrent splitter blocks here
-    until the first commits/rolls back; queued runs then proceed cleanly
-    rather than deadlocking on DDL. The lock is released automatically
-    with the transaction.
+    Queued runs block here and proceed once the holder commits/rolls
+    back; the lock auto-releases with the transaction.
     """
     cur.execute("SELECT pg_advisory_xact_lock(%s)", (key,))
 
@@ -128,34 +115,35 @@ def close_connection(conn: psycopg.Connection):
 
 
 def create_tables(conn: psycopg.Connection):
-    """Create tables required for splitting.
+    """Create session-scoped temp tables required for splitting.
 
-    Uses a new cursor on existing connection, but not committed directly.
+    TEMP so each session lives in its own pg_temp_<N> namespace -
+    concurrent splits can't collide on (typname, public) in pg_type, and
+    orphans from a crashed run can't block future splits.
     """
     # First drop tables if they exist
     drop_tables(conn)
 
     create_cmd = """
-        CREATE TABLE project_aoi (
+        CREATE TEMP TABLE project_aoi (
             id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
             geom GEOMETRY(GEOMETRY, 4326)
         );
 
-        CREATE TABLE ways_poly (
+        CREATE TEMP TABLE ways_poly (
             id SERIAL PRIMARY KEY,
             osm_id VARCHAR NULL,
             geom GEOMETRY(GEOMETRY, 4326) NOT NULL,
             tags JSONB NULL
         );
 
-        CREATE TABLE ways_line (
+        CREATE TEMP TABLE ways_line (
             id SERIAL PRIMARY KEY,
             osm_id VARCHAR NULL,
             geom GEOMETRY(GEOMETRY, 4326) NOT NULL,
             tags JSONB NULL
         );
 
-        -- Create indexes for geospatial and query performance
         CREATE INDEX idx_project_aoi_geom ON project_aoi USING GIST(geom);
         CREATE INDEX idx_ways_poly_geom ON ways_poly USING GIST(geom);
         CREATE INDEX idx_ways_poly_tags ON ways_poly USING GIN(tags);

@@ -283,9 +283,7 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         """Custom log message handler.
 
-        Health-check probes from Kubernetes / load balancers fire every few
-        seconds and would otherwise drown out real request logs, so demote
-        them to DEBUG. Everything else stays at INFO.
+        Health probes fire every few seconds, so demote to DEBUG.
         """
         message = format % args
         level = logging.DEBUG if "/health" in message else logging.INFO

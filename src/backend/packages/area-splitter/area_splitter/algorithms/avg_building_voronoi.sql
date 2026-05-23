@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS dumpedpoints;
-CREATE TABLE dumpedpoints AS (
+CREATE TEMP TABLE dumpedpoints AS (
     SELECT
         cb.osm_id,
         cb.polyid,
@@ -18,7 +18,7 @@ USING gist (geom);
 -- VACUUM ANALYZE dumpedpoints;
 
 DROP TABLE IF EXISTS voronoids;
-CREATE TABLE voronoids AS (
+CREATE TEMP TABLE voronoids AS (
     SELECT
         ST_INTERSECTION((ST_DUMP(ST_VORONOIPOLYGONS(
             ST_COLLECT(points.geom)
@@ -35,7 +35,7 @@ USING gist (geom);
 -- VACUUM ANALYZE voronoids;
 
 DROP TABLE IF EXISTS voronois;
-CREATE TABLE voronois AS (
+CREATE TEMP TABLE voronois AS (
     SELECT
         p.clusteruid,
         v.geom
@@ -49,7 +49,7 @@ USING gist (geom);
 DROP TABLE voronoids;
 
 DROP TABLE IF EXISTS unsimplifiedtaskpolygons;
-CREATE TABLE unsimplifiedtaskpolygons AS (
+CREATE TEMP TABLE unsimplifiedtaskpolygons AS (
     SELECT
         clusteruid,
         ST_UNION(geom) AS geom
@@ -67,7 +67,7 @@ USING gist (geom);
 --*****************************Simplify*******************************
 -- Extract unique line segments
 DROP TABLE IF EXISTS taskpolygons;
-CREATE TABLE taskpolygons AS (
+CREATE TEMP TABLE taskpolygons AS (
     --Convert task polygon boundaries to linestrings
     WITH rawlines AS (
         SELECT

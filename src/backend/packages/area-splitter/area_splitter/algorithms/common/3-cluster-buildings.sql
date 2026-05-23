@@ -17,7 +17,7 @@ BEGIN
 
 -- Calculate a tentative number of tasks per partition.
     DROP TABLE IF EXISTS partition_tasks;
-    create table partition_tasks as
+    create TEMP table partition_tasks as
         select polyid, numfeatures,
         greatest(1,ceil(numfeatures/features_per_cluster))::int tasks
         from splitpolygons WHERE numfeatures > 0;
@@ -64,7 +64,7 @@ BEGIN
         END;
     END IF;
 
-CREATE TABLE clusteredbuildings AS (
+CREATE TEMP TABLE clusteredbuildings AS (
     WITH splitpolygonswithcontents AS (
         SELECT *
         FROM splitpolygons

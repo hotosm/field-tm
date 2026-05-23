@@ -222,10 +222,8 @@ def _build_cors_config() -> CORSConfig:
 
 def _get_logging_config() -> LoggingConfig:
     """Configure server logging config."""
-    # Sentry's HTTPS transport uses urllib3 under the hood and emits a
-    # DEBUG line per envelope POST (one every ~5s while traces are active),
-    # which drowns out real backend logs at LOG_LEVEL=DEBUG. Cap the noisy
-    # transport loggers at WARNING so genuine warnings still surface.
+    # Sentry's transport spams urllib3 DEBUG lines per envelope POST and
+    # drowns out real logs; cap at WARNING.
     quiet_loggers = ("urllib3", "urllib3.connectionpool", "sentry_sdk")
     logging_config = LoggingConfig(
         root={"level": settings.LOG_LEVEL, "handlers": ["queue_listener"]},

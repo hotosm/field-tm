@@ -26,7 +26,7 @@
  */
 
 DROP TABLE IF EXISTS taskpolygons;
-create table taskpolygons AS (
+create TEMP table taskpolygons AS (
   -- explain analyze
   WITH
   /* Generate convex hulls around each cluster. Also store a union of all the
@@ -179,5 +179,5 @@ create table taskpolygons AS (
 
 -- /* For testing:
  DROP TABLE IF EXISTS my_taskpolygons;
- create table my_taskpolygons AS select * from taskpolygons;
+ CREATE TEMP table my_taskpolygons AS select * from taskpolygons;
  -- */

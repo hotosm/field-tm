@@ -25,7 +25,7 @@ BEGIN
       IF merges_remaining < 0 THEN
         merges_remaining = 0; -- Skip merging
       END IF;
-      CREATE TABLE leastfeaturepolygons AS
+      CREATE TEMP TABLE leastfeaturepolygons AS
         SELECT taskid, geom,
         (SELECT COUNT(b.id) FROM buildings b
           WHERE ST_Intersects(taskpolygons.geom, b.geom)) numbuildings
@@ -42,7 +42,7 @@ BEGIN
       min_area := mean_area - stddev_area;
       min_buildings := num_buildings * 0.5;
 
-      CREATE TABLE leastfeaturepolygons AS
+      CREATE TEMP TABLE leastfeaturepolygons AS
       SELECT taskid, geom
       FROM taskpolygons
       WHERE ST_Area(geom) < min_area OR

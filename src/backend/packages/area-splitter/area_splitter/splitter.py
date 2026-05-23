@@ -761,13 +761,9 @@ class AreaSplitter:
         # Get existing db engine, or create new one
         conn = create_connection(db)
 
-        # Order matters here:
-        #   1. statement_timeout caps total split duration (incl. queueing).
-        #   2. Advisory lock serializes concurrent splitter runs - acquired
-        #      BEFORE lock_timeout so a queued split can wait the full
-        #      statement_timeout, not just the short lock_timeout window.
-        #   3. lock_timeout then fail-fasts the actual DDL on any unexpected
-        #      catalog contention.
+        # Advisory lock acquired BEFORE lock_timeout so queueing isn't
+        # capped by the short lock_timeout window; lock_timeout then
+        # applies to the subsequent DDL.
         with conn.cursor() as setup_cur:
             configure_statement_timeout(setup_cur)
             log.debug("Acquiring splitter serialization lock")
@@ -786,12 +782,12 @@ class AreaSplitter:
         cur = conn.cursor()
         self._insert_split_sql_extract(cur, osm_extract)
 
-        # Use raw sql for view generation & remainder of script
+        # TEMP view - a regular view on temp tables would error.
         log.debug("Creating db view with intersecting polylines")
         cur.execute("""
             DROP VIEW IF EXISTS lines_view;
 
-            CREATE VIEW lines_view AS
+            CREATE TEMP VIEW lines_view AS
             SELECT w.tags, w.geom
             FROM ways_line w
             CROSS JOIN (SELECT geom FROM project_aoi LIMIT 1) p
