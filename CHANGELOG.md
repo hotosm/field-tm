@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.3.5 (2026-05-23)
+
+### Fix
+
+- **area-splitter**: use temp tables for area splitter implementation
+
 ## 2026.3.4 (2026-05-23)
 
 ### Fix
