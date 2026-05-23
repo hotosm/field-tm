@@ -2,48 +2,106 @@
 
 <!-- markdownlint-disable -->
 
-## Organization Creation
+## Introduction
+
+Intro to FieldTM as a platform.
 
 <iframe
     width="720"
     height="500"
-    src="https://www.youtube.com/embed/ayF6byODcD4?si=CZWLStTiR2Iinr3J" title="2025 Org Creation"
+    src="https://drive.google.com/file/d/1a-0f4ng1vK_y0LyQs_8Vz4ha6O-83Iny/preview" title="2026 FieldTM Intro"
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
     referrerpolicy="strict-origin-when-cross-origin"
     allowfullscreen>
 </iframe>
 
-## Project Creation
+## Primary Workflows
+
+### Simplified Building Mapping Projects
+
+Collecting OpenStreetMap building field data.
 
 <iframe
     width="720"
     height="500"
-    src="https://www.youtube.com/embed/iLCuc2bXLcs?si=MD3q_O_LaBKtPqgv" title="2025 Project Creation"
+    src="https://drive.google.com/file/d/1wnwQTUxZ4W1-vHRaNQRRJjv9qFL2ZmNa/preview" title="2026 Building Mapping"
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
     referrerpolicy="strict-origin-when-cross-origin"
     allowfullscreen>
 </iframe>
 
-### Adding Custom Imagery
+### QField Project Management - Adding Mappers
+
+How to allow mappers to edit your project.
 
 <iframe
     width="720"
     height="500"
-    src="https://www.youtube.com/embed/XFU8btNf6n0?si=ZdAZwyo5pneMezGU" title="2025 Custom Imagery"
+    src="https://drive.google.com/file/d/1yiGRmESPUNy-lbzcpPmHv55-jSuHzDzh/preview" title="2026 QField Project Management"
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
     referrerpolicy="strict-origin-when-cross-origin"
     allowfullscreen>
 </iframe>
 
-## Mapping
+### Mapping In QField
+
+Mapping via the QField mobile app.
 
 <iframe
     width="720"
     height="500"
-    src="https://www.youtube.com/embed/fAVycJ5rowY?si=BeD0rGh2diP3_Erd" title="2025 Mapping"
+    src="https://drive.google.com/file/d/1VYTNMw0bVL-0fFayLwOThM0A0i6352s6/preview" title="2026 Mapping In QField"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen>
+</iframe>
+
+## Additional Info
+
+### Creating Surveys (XLSForms)
+
+Creating custom questionnaires to ask your users in the field.
+
+<iframe
+    width="720"
+    height="500"
+    src="https://drive.google.com/file/d/17tcD1GTPLBcogu4ANK_o5LQewtmSn9-I/preview" title="2026 Creating XLSForms"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen>
+</iframe>
+
+### Customized Projects
+
+All of the project creation options explained.
+
+<iframe
+    width="720"
+    height="500"
+    src="https://drive.google.com/file/d/12cadyO4soC7wLEFHrEuv082egenjm8oK/preview" title="2026 Customized Projects"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen>
+</iframe>
+
+### Adding Offline OpenAerialMap Imagery
+
+Coming soon!
+
+## May 2026 Quickstart
+
+How to get started quickly on a FieldTM project in QField.
+
+<iframe
+    width="720"
+    height="500"
+    src="https://drive.google.com/file/d/1ze2Fdfov2IUQr87hvxpZnLM5MQEXtxvd/preview" title="2026 Quickstart"
     frameborder="0"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
     referrerpolicy="strict-origin-when-cross-origin"
@@ -51,18 +109,3 @@
 </iframe>
 
 <!-- markdownlint-restore -->
-
-## Old Video Tutorials
-
-There is no guarantee these videos are up to date, but they may be
-useful for some!
-
-<https://github.com/user-attachments/assets/963e7b22-5752-4158-b12d-e67c643235b8>
-
-<https://github.com/user-attachments/assets/969e87e1-581c-4f76-93a7-0b4524b2db3a>
-
-<https://github.com/user-attachments/assets/82b200bc-620a-4712-8d2e-3dcc4c553230>
-
-<https://github.com/user-attachments/assets/03fe2d98-f441-4794-9a0d-5ae49722efed>
-
-<https://github.com/user-attachments/assets/a54ee33c-359c-46f9-b9a4-e58c909569c8>
