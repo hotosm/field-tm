@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026.3.4 (2026-05-23)
+
+### Fix
+
+- **backend**: supress non-helpful logging, fix up advisory locks for task-splitter
+
 ## 2026.3.3 (2026-05-20)
 
 ### Feat

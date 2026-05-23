@@ -2,8 +2,8 @@ apiVersion: v2
 type: application
 name: field-tm
 description: Field Tasking Manager - coordinated field mapping.
-version: "2026.3.3"
-appVersion: "2026.3.3"
+version: "2026.3.4"
+appVersion: "2026.3.4"
 maintainers:
 - email: sam.woodcock@hotosm.org
   name: Sam Woodcock
