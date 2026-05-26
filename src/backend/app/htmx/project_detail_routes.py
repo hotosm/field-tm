@@ -113,6 +113,7 @@ def _qrcode_panel_html(
     qr_download_name: str,
     app_name: str,
     mapper_creds_html: str,
+    open_app_url: str | None = None,
 ) -> str:
     """Build the QR code HTML payload."""
     scan_qr_code = _("Scan QR Code")
@@ -121,6 +122,23 @@ def _qrcode_panel_html(
     ) % {"app_name": app_name}
     project_qr_code = _("Project QR Code")
     download_qr_code = _("Download QR Code")
+    open_button_html = ""
+    if open_app_url:
+        open_in_app = _("Open in %(app_name)s") % {"app_name": app_name}
+        open_hint = _("If %(app_name)s is installed on this device.") % {
+            "app_name": app_name
+        }
+        open_button_html = f"""
+                <wa-button
+                    href="{open_app_url}"
+                    variant="brand"
+                >
+                    {open_in_app}
+                </wa-button>
+                <p style="margin: 6px 0 12px 0; font-size: 0.8em; color: #666;">
+                    {open_hint}
+                </p>
+        """
     return f"""
         <div class="ftm-qr-panel">
             <h3 class="ftm-qr-panel__title">{scan_qr_code}</h3>
@@ -135,6 +153,7 @@ def _qrcode_panel_html(
                 />
             </div>
             <div>
+                {open_button_html}
                 <wa-button
                     onclick="downloadQRCode('{qr_code_data_url}', '{qr_download_name}')"
                     variant="default"
@@ -301,11 +320,18 @@ async def project_qrcode_htmx(
         )
         app_name = _app_name(project)
         qr_download_name = f"{project.project_name}_{app_name}_{project_id}"
+        open_app_url = None
+        if (
+            project.field_mapping_app == FieldMappingApp.QFIELD
+            and project.external_project_id
+        ):
+            open_app_url = f"qfield://cloud?project={project.external_project_id}"
         html_content = _qrcode_panel_html(
             qr_code_data_url,
             qr_download_name,
             app_name,
             _mapper_credentials_html(project),
+            open_app_url=open_app_url,
         )
         return Response(
             content=html_content,
