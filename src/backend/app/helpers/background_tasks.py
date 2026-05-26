@@ -2,7 +2,7 @@
 
 The asyncio event loop only holds weak references to tasks created with
 ``asyncio.create_task``. If the caller does not retain the returned ``Task``,
-it can be garbage-collected mid-execution — interrupting cleanup paths such
+it can be garbage-collected mid-execution - interrupting cleanup paths such
 as ``async with`` for DB connections and leaking transactions / locks.
 
 This module keeps a module-level strong reference until the task completes.

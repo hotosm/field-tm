@@ -217,6 +217,41 @@ def _add_plugin_task_fields(tasks_gpkg_path: str, log: logging.Logger) -> None:
     log.info("Added status/assigned_to fields to tasks layer")
 
 
+def _add_plugin_survey_fields(project, log: logging.Logger) -> None:
+    """Add a ``status`` string column to the survey layer.
+
+    The bundled QField plugin styles survey features by this attribute
+    ('mapped', 'invalid', or empty/null for the default unmapped style)
+    and reads it to decide when a task is complete.
+    """
+    from qgis.core import QgsField
+    from qgis.PyQt.QtCore import QMetaType
+
+    layers = project.mapLayersByName("survey")
+    if not layers:
+        log.warning("Could not find survey layer to add plugin fields")
+        return
+    layer = layers[0]
+
+    if layer.fields().indexOf("status") >= 0:
+        log.debug("Survey layer already has 'status' field; skipping")
+        return
+
+    if not layer.startEditing():
+        log.warning("Could not start editing survey layer to add plugin fields")
+        return
+    layer.addAttribute(QgsField("status", QMetaType.Type.QString))
+
+    status_idx = layer.fields().indexOf("status")
+    for feature in layer.getFeatures():
+        layer.changeAttributeValue(feature.id(), status_idx, "")
+
+    if not layer.commitChanges():
+        log.warning("Failed to commit plugin fields to survey layer")
+        return
+    log.info("Added status field to survey layer")
+
+
 def _load_generated_project(project_file: str):
     """Load the generated QGIS project from disk."""
     from qgis.core import QgsProject
@@ -507,6 +542,7 @@ def generate_qgis_project(
         log.info("Opening generated QGIS project to add task layer")
         project = _load_generated_project(project_file)
         _add_task_layer_to_project(project, tasks_gpkg_path_final, log)
+        _add_plugin_survey_fields(project, log)
         if tasks_gpkg_path_final:
             _add_project_area_layer(project, tasks_gpkg_path_final, final_output_dir, log)
         _normalize_root_layer_order(project, log)

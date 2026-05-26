@@ -1618,8 +1618,8 @@ msgid "Description is required."
 msgstr "Ibsi barbaachisaa dha."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "Qindaa’ina Saffisaa — Gamoo OSM"
+msgid "Quick Setup - OSM Buildings"
+msgstr "Qindaa’ina Saffisaa - Gamoo OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""

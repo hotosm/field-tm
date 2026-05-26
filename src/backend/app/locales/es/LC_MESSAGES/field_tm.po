@@ -1643,8 +1643,8 @@ msgid "Description is required."
 msgstr "La descripción es obligatoria."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "Configuración rápida — Edificios OSM"
+msgid "Quick Setup - OSM Buildings"
+msgstr "Configuración rápida - Edificios OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""

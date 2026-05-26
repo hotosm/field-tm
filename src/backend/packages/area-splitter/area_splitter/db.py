@@ -21,6 +21,18 @@ from psycopg.types.json import Json
 
 log = logging.getLogger(__name__)
 
+# Keep below the nginx ingress proxy-read-timeout (300s) so Postgres
+# cancels before the proxy gives up.
+DEFAULT_STATEMENT_TIMEOUT_MS = 270_000
+
+# Fail with LockNotAvailable in 10s instead of waiting the full statement
+# timeout - makes catalog-lock contention diagnosable.
+DEFAULT_LOCK_TIMEOUT_MS = 10_000
+
+# Stable 64-bit key for the splitter's xact-scoped advisory lock; chosen
+# to not collide with other advisory locks.
+SPLITTER_SERIALIZATION_LOCK_KEY = 7_341_109_241_762_310_001
+
 
 def create_connection(db: Union[str, psycopg.Connection]) -> psycopg.Connection:
     """Get db connection from existing psycopg connection, or URL string.
@@ -46,6 +58,50 @@ def create_connection(db: Union[str, psycopg.Connection]) -> psycopg.Connection:
     return conn
 
 
+def configure_statement_timeout(
+    cur: psycopg.Cursor,
+    timeout_ms: int = DEFAULT_STATEMENT_TIMEOUT_MS,
+) -> None:
+    """Apply a transaction-local PostgreSQL statement timeout.
+
+    This keeps long-running split SQL from exceeding Field-TM's production
+    reverse-proxy timeout and turning into an opaque 504 response.
+    """
+    if timeout_ms <= 0:
+        return
+
+    cur.execute("SELECT set_config('statement_timeout', %s, true)", (str(timeout_ms),))
+
+
+def configure_lock_timeout(
+    cur: psycopg.Cursor,
+    timeout_ms: int = DEFAULT_LOCK_TIMEOUT_MS,
+) -> None:
+    """Apply a transaction-local Postgres lock_timeout.
+
+    Without this, a blocked CREATE/DROP TABLE waits the full statement
+    timeout (minutes) before cancelling with a confusing "statement
+    timeout" mid-DDL; with it, blocked statements fail fast with a
+    clear LockNotAvailable.
+    """
+    if timeout_ms <= 0:
+        return
+
+    cur.execute("SELECT set_config('lock_timeout', %s, true)", (str(timeout_ms),))
+
+
+def acquire_splitter_serialization_lock(
+    cur: psycopg.Cursor,
+    key: int = SPLITTER_SERIALIZATION_LOCK_KEY,
+) -> None:
+    """Serialize concurrent splitter runs via an xact advisory lock.
+
+    Queued runs block here and proceed once the holder commits/rolls
+    back; the lock auto-releases with the transaction.
+    """
+    cur.execute("SELECT pg_advisory_xact_lock(%s)", (key,))
+
+
 def close_connection(conn: psycopg.Connection):
     """Close the db connection."""
     # Execute all commands in a transaction before closing
@@ -59,34 +115,35 @@ def close_connection(conn: psycopg.Connection):
 
 
 def create_tables(conn: psycopg.Connection):
-    """Create tables required for splitting.
+    """Create session-scoped temp tables required for splitting.
 
-    Uses a new cursor on existing connection, but not committed directly.
+    TEMP so each session lives in its own pg_temp_<N> namespace -
+    concurrent splits can't collide on (typname, public) in pg_type, and
+    orphans from a crashed run can't block future splits.
     """
     # First drop tables if they exist
     drop_tables(conn)
 
     create_cmd = """
-        CREATE TABLE project_aoi (
+        CREATE TEMP TABLE project_aoi (
             id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
             geom GEOMETRY(GEOMETRY, 4326)
         );
 
-        CREATE TABLE ways_poly (
+        CREATE TEMP TABLE ways_poly (
             id SERIAL PRIMARY KEY,
             osm_id VARCHAR NULL,
             geom GEOMETRY(GEOMETRY, 4326) NOT NULL,
             tags JSONB NULL
         );
 
-        CREATE TABLE ways_line (
+        CREATE TEMP TABLE ways_line (
             id SERIAL PRIMARY KEY,
             osm_id VARCHAR NULL,
             geom GEOMETRY(GEOMETRY, 4326) NOT NULL,
             tags JSONB NULL
         );
 
-        -- Create indexes for geospatial and query performance
         CREATE INDEX idx_project_aoi_geom ON project_aoi USING GIST(geom);
         CREATE INDEX idx_ways_poly_geom ON ways_poly USING GIST(geom);
         CREATE INDEX idx_ways_poly_tags ON ways_poly USING GIN(tags);
@@ -149,23 +206,36 @@ def aoi_to_postgis(conn: psycopg.Connection, geom: dict) -> None:
         conn.rollback()  # Rollback in case of error
 
 
-def insert_geom(cur: psycopg.Cursor, table_name: str, **kwargs) -> None:
-    """Insert an OSM geometry into the database.
+_BATCH_INSERT_TABLES = frozenset({"ways_poly", "ways_line"})
 
-    Does not commit the values automatically.
+
+def insert_geoms_batch(
+    cur: psycopg.Cursor,
+    table_name: str,
+    rows: list[dict],
+) -> None:
+    """Batch-insert OSM geometries into one of the splitter temp tables.
+
+    Uses ``executemany`` (which psycopg3 pipelines when supported) so an
+    extract with thousands of features costs a single round-trip block
+    instead of one per feature.
 
     Args:
-        cur (psycopg.Cursor): The PostgreSQL cursor.
-        table_name (str): The name of the table to insert data into.
-        **kwargs: Keyword arguments representing the values to be inserted.
-
-    Returns:
-        None
+        cur: PostgreSQL cursor.
+        table_name: Target table, must be ``ways_poly`` or ``ways_line``.
+        rows: List of dicts with keys ``osm_id``, ``geom`` (GeoJSON str),
+            and ``tags`` (dict).
     """
+    if not rows:
+        return
+    if table_name not in _BATCH_INSERT_TABLES:
+        # Defense in depth: table name is interpolated into SQL, so guard
+        # against drift even though all callers pass a hardcoded value.
+        raise ValueError(f"Unsupported table for batch insert: {table_name}")
+
     query = (
         f"INSERT INTO {table_name} (geom, osm_id, tags) "
         "VALUES (ST_SetSRID(ST_GeomFromGeoJSON(%(geom)s), 4326), %(osm_id)s, %(tags)s)"
     )
-    if "tags" in kwargs:
-        kwargs["tags"] = Json(kwargs["tags"])
-    cur.execute(query, kwargs)
+    prepared = [{**row, "tags": Json(row.get("tags"))} for row in rows]
+    cur.executemany(query, prepared)

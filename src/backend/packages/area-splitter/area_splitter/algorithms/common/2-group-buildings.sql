@@ -1,5 +1,5 @@
 DROP TABLE IF EXISTS buildings;
-CREATE TABLE buildings AS (
+CREATE TEMP TABLE buildings AS (
     SELECT
         b.*,
         polys.polyid
@@ -23,7 +23,7 @@ USING gist (geom);
 -- VACUUM ANALYZE buildings;
 
 DROP TABLE IF EXISTS splitpolygons;
-CREATE TABLE splitpolygons AS (
+CREATE TEMP TABLE splitpolygons AS (
     WITH polygonsfeaturecount AS (
         SELECT
             sp.polyid,

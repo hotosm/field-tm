@@ -181,11 +181,11 @@ async def read_and_insert_xlsforms(db: AsyncConnection, directory: str) -> None:
 
             try:
                 data = convert_to_xlsform(str(file_path))
-
             except Exception:
                 log.exception(
                     f"Error occurred during in-memory conversion for {file_path}"
                 )
+                continue
 
             try:
                 insert_query = """

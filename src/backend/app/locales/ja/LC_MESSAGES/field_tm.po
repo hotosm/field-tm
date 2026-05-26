@@ -1496,8 +1496,8 @@ msgid "Description is required."
 msgstr "説明は必須です。"
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "クイック設定 — OSM 建物"
+msgid "Quick Setup - OSM Buildings"
+msgstr "クイック設定 - OSM 建物"
 
 #: app/templates/new_project_simple.html:9
 msgid ""

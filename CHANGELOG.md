@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026.3.5 (2026-05-23)
+
+### Fix
+
+- **area-splitter**: use temp tables for area splitter implementation
+
+## 2026.3.4 (2026-05-23)
+
+### Fix
+
+- **backend**: supress non-helpful logging, fix up advisory locks for task-splitter
+
+## 2026.3.3 (2026-05-20)
+
+### Feat
+
+- **frontend**: prompt user to add qfield collaborator after project created
+
+### Fix
+
+- **backend**: timeouts during project creation, more stable
+- **backend**: minor fixes to backend xlsform creation
+
 ## 2026.3.2 (2026-05-13)
 
 ### Fix

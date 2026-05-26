@@ -983,6 +983,11 @@ async def split_aoi(
     # Perform splitting based on algorithm
     log.info(f"Splitting AOI for project {project_id} using algorithm: {algorithm}")
 
+    # Commit before the split worker so the outer connection doesn't sit
+    # idle-in-transaction (with locks/snapshot) for the duration of the
+    # threaded split on its own connection.
+    await db.commit()
+
     if algorithm_enum in (
         SplittingAlgorithm.AVG_BUILDING_VORONOI,
         SplittingAlgorithm.AVG_BUILDING_SKELETON,

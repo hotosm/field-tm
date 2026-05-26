@@ -31,7 +31,7 @@ BEGIN
         OR l.tags->>'man_made' IN ('embankment','dyke','dike')
     );
     IF lines_count > 0 THEN
-    CREATE TABLE polygonsnocount AS (
+    CREATE TEMP TABLE polygonsnocount AS (
         -- The Area of Interest provided by the person creating the project
         WITH aoi AS (
             SELECT * FROM "project_aoi"
@@ -113,7 +113,7 @@ BEGIN
     );
     ELSE
         -- Calculate number of building polygons per cluster
-        CREATE TABLE polygonsnocount AS (
+        CREATE TEMP TABLE polygonsnocount AS (
             WITH aoi AS (
                 SELECT * FROM "project_aoi"
             )

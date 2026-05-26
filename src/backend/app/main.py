@@ -222,6 +222,9 @@ def _build_cors_config() -> CORSConfig:
 
 def _get_logging_config() -> LoggingConfig:
     """Configure server logging config."""
+    # Sentry's transport spams urllib3 DEBUG lines per envelope POST and
+    # drowns out real logs; cap at WARNING.
+    quiet_loggers = ("urllib3", "urllib3.connectionpool", "sentry_sdk")
     logging_config = LoggingConfig(
         root={"level": settings.LOG_LEVEL, "handlers": ["queue_listener"]},
         formatters={
@@ -231,7 +234,18 @@ def _get_logging_config() -> LoggingConfig:
                 "datefmt": "%Y-%m-%d %H:%M:%S",
             }
         },
+        loggers={
+            name: {
+                "level": "WARNING",
+                "handlers": ["queue_listener"],
+                "propagate": False,
+            }
+            for name in quiet_loggers
+        },
         log_exceptions="always",
+        # Skip the noisy "Uncaught exception" traceback for 404s - the bulk
+        # of these are scanner probes (/RDWeb/Pages/, /.git, /wp-login.php).
+        disable_stack_trace={status.HTTP_404_NOT_FOUND},
     )
     return logging_config
 
@@ -266,6 +280,15 @@ def configure_root_router() -> Router:
         return None
 
     @get(
+        "/robots.txt",
+        status_code=status.HTTP_200_OK,
+        media_type="text/plain",
+        sync_to_thread=False,
+    )
+    def robots_txt() -> str:
+        return "User-agent: *\nDisallow: /\n"
+
+    @get(
         "/__heartbeat__",
         dependencies={
             "db": Provide(db_conn),
@@ -292,6 +315,7 @@ def configure_root_router() -> Router:
         route_handlers=[
             deployment_details,
             simple_heartbeat,
+            robots_txt,
             heartbeat_plus_db,
         ],
     )

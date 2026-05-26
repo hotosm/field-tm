@@ -1482,8 +1482,8 @@ msgid "Description is required."
 msgstr "描述为必填项。"
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "快速设置 — OSM 建筑物"
+msgid "Quick Setup - OSM Buildings"
+msgstr "快速设置 - OSM 建筑物"
 
 #: app/templates/new_project_simple.html:9
 msgid ""

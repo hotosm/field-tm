@@ -1587,8 +1587,8 @@ msgid "Description is required."
 msgstr "A chọrọ nkọwa."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "Nhazi ngwa ngwa — Ụlọ OSM"
+msgid "Quick Setup - OSM Buildings"
+msgstr "Nhazi ngwa ngwa - Ụlọ OSM"
 
 #: app/templates/new_project_simple.html:9
 msgid ""
