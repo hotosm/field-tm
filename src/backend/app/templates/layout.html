@@ -233,6 +233,7 @@
       // database and returns the OSM username, which we set as display-name so
       // hotosm-auth shows the username instead of the raw Hanko UUID.
       const hotosmAuth = document.querySelector("hotosm-auth");
+      let _mobileDrawerAuth = null;
       if (hotosmAuth) {
         // Helper: push a display name into hotosm-auth via both attribute and
         // direct Lit property so the component re-renders immediately.
@@ -302,6 +303,10 @@
                 sessionStorage.setItem("ftm_display_name_v2", name);
                 _setDisplayName(name);
                 _patchProfileEmail(name);
+                if (_mobileDrawerAuth) {
+                  _mobileDrawerAuth.setAttribute("display-name", name);
+                  if ("displayNameAttr" in _mobileDrawerAuth) _mobileDrawerAuth.displayNameAttr = name;
+                }
               }
             }
           } catch (e) {
@@ -311,8 +316,57 @@
 
         hotosmAuth.addEventListener("hanko-logout", () => {
           sessionStorage.removeItem("ftm_display_name_v2");
+          if (_mobileDrawerAuth) _mobileDrawerAuth.removeAttribute("display-name");
         });
       }
+
+      customElements.whenDefined("hot-header").then(async () => {
+        const header = document.getElementById("app-header");
+        if (!header?.shadowRoot) return;
+        await header.updateComplete;
+        const drawer = header.shadowRoot.querySelector("#drawer-overview");
+        if (!drawer) return;
+        // ESM modules execute after this inline script, so hotosm-auth may not be defined yet.
+        await customElements.whenDefined("hotosm-auth");
+        const el = document.createElement("hotosm-auth");
+        el.setAttribute("hanko-url", "{{ hanko_public_url }}");
+        el.setAttribute("base-path", "{{ hanko_public_url }}");
+        el.setAttribute("redirect-after-login", "{{ frontend_url }}");
+        el.setAttribute("redirect-after-logout", "{{ frontend_url }}");
+        el.setAttribute("button-variant", "filled");
+        el.setAttribute("lang", "{{ current_locale() }}");
+        const cached = sessionStorage.getItem("ftm_display_name_v2");
+        if (cached) {
+          el.setAttribute("display-name", cached);
+          if ("displayNameAttr" in el) el.displayNameAttr = cached;
+        }
+        function _patchMobile() {
+          const name = sessionStorage.getItem("ftm_display_name_v2");
+          if (!name) return;
+          if ("displayNameAttr" in el) el.displayNameAttr = name;
+          const profileEmail = el.shadowRoot?.querySelector(".profile-email");
+          if (profileEmail && profileEmail.textContent.trim() !== name) profileEmail.textContent = name;
+        }
+        // Add listener before appending so hanko-login is never missed.
+        el.addEventListener("hanko-login", _patchMobile);
+        // Insert after drawer-content so it sits in the body area, not the footer slot.
+        const drawerContent = header.shadowRoot.querySelector(".drawer-content");
+        if (drawerContent) {
+          drawerContent.insertAdjacentElement("afterend", el);
+        } else {
+          drawer.appendChild(el);
+        }
+        _mobileDrawerAuth = el;
+        // After the first Lit render (shadow root populated), patch and watch for re-renders.
+        el.updateComplete?.then(() => {
+          _patchMobile();
+          if (el.shadowRoot) {
+            new MutationObserver(_patchMobile).observe(el.shadowRoot, {
+              subtree: true, childList: true, characterData: true,
+            });
+          }
+        });
+      });
       {% endif %}
 
       // hot-header tabs must be set as a JS property (not an HTML attribute)

@@ -1053,6 +1053,12 @@ hot-header {
   --hot-color-neutral-900: #404248; /* tab active+hover text */
 }
 
+@media (max-width: 768px) {
+  hot-header > [slot="auth"] {
+    display: none;
+  }
+}
+
 /* --- App logo -------------------------------------------- */
 .ftm-app-logo {
   width: 24px;
