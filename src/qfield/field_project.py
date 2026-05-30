@@ -508,6 +508,8 @@ def generate_qgis_project(
     open_in_edit_mode: bool,
     log: logging.Logger,
     plugin_zip: Optional[bytes] = None,
+    description: Optional[str] = "",
+    author: Optional[str] = "",
 ) -> Dict[str, Any]:
     """Generate QGIS project using input files from the database.
 
@@ -548,6 +550,13 @@ def generate_qgis_project(
         _normalize_root_layer_order(project, log)
 
         _apply_plugin_and_styles(project, plugin_zip, final_output_dir, project_file, log)
+
+        # Add metadata details
+        project_metadata = project.metadata()
+        project_metadata.setTitle(title)
+        project_metadata.setAbstract(description)
+        project_metadata.setAuthor(author)
+        project.setMetadata(project_metadata)
 
         # Finalise the project
         project.write()

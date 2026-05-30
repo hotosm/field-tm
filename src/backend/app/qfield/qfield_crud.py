@@ -518,6 +518,11 @@ async def create_qfield_project(
 
     # ── Step 1: Write job inputs to DB and call QGIS wrapper ─────────
     qgis_project_title = project.project_name or f"project-{project.id}"
+    qgis_project_description = (
+        project.description or "Created by the Field Tasking Manager"
+    )
+    qgis_project_author = project.created_by_sub or "Field Tasking Manager"
+
     job_id = uuid4()
     await _insert_qgis_job(db, job_id, xlsform_bytes, features_geojson, tasks_geojson)
     await db.commit()
@@ -526,6 +531,8 @@ async def create_qfield_project(
         await _call_qgis_wrapper(
             job_id=str(job_id),
             title=qgis_project_title,
+            description=qgis_project_description,
+            author=qgis_project_author,
             language=form_language or "",
             extent=bbox_str,
             open_in_edit_mode=open_in_edit_mode,
@@ -602,6 +609,8 @@ async def attach_basemap_to_qfield_project(
         await _call_qgis_wrapper(
             job_id=str(job_id),
             title=project.project_name or f"project-{project.id}",
+            description=project.description or "Created by the Field Tasking Manager",
+            author=project.created_by_sub or "Field Tasking Manager",
             language="",
             extent="0,0,0,0",
             open_in_edit_mode=False,
@@ -807,10 +816,12 @@ async def _wait_for_projectfile_processing(
     )
 
 
-async def _call_qgis_wrapper(
+async def _call_qgis_wrapper(  # noqa: PLR0913
     *,
     job_id: str,
     title: str,
+    description: str,
+    author: str,
     language: str,
     extent: str,
     open_in_edit_mode: bool,
@@ -827,6 +838,8 @@ async def _call_qgis_wrapper(
     payload = {
         "job_id": job_id,
         "title": title,
+        "description": description,
+        "author": author,
         "language": language,
         "extent": extent,
         "open_in_edit_mode": open_in_edit_mode,
