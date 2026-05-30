@@ -178,7 +178,7 @@ Item {
       RowLayout {
         width: parent.width
         height: parent.height
-        spacing: 4
+        spacing: 8
 
         QfToolButton {
           id: releaseButton
@@ -250,7 +250,7 @@ Item {
         }
 
         QfToolButton {
-          id: openPendingFeaturesButton
+          id: openFeaturesButton
           round: true
 
           iconSource: Theme.getThemeVectorIcon("ic_list_black_24dp")
@@ -260,12 +260,11 @@ Item {
 
           Layout.preferredWidth: 36
           Layout.preferredHeight: 36
-          Layout.rightMargin: 8
           Layout.alignment: Qt.AlignVCenter
           visible: fieldTM.currentTask !== undefined
 
           onClicked: {
-            let filterExpression = "\"status\" is null or \"status\" = '' and intersects(@geometry, geom_from_wkt('"+fieldTM.currentTask.geometry.asWkt(8)+"'))"
+            let filterExpression = "intersects(@geometry, geom_from_wkt('"+fieldTM.currentTask.geometry.asWkt(8)+"'))"
             fieldTM.featureListForm.model.setFeatures(fieldTM.surveyLayer, filterExpression);
             featureListForm.extentController.zoomToAllFeatures();
           }
