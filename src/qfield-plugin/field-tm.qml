@@ -21,7 +21,7 @@ Item {
 
   property var qfieldSettings: iface.findItemByObjectName("qfieldSettings")
   property ProjectInfo projectInfo: iface.findItemByObjectName("projectInfo")
-  
+
   property QFieldCloudConnection cloudConnection: iface.findItemByObjectName("cloudConnection")
   property QFieldCloudProjectsModel cloudProjectsModel: iface.findItemByObjectName("cloudProjectsModel")
 
@@ -92,9 +92,7 @@ Item {
           color: "#222222"
           wrapMode: Text.WordWrap
 
-          text: {
-            return qsTranslate("FieldTM", "Tap on an available task area on the map to start surveying.");
-          }
+          text: fieldTM.reader ? qsTranslate("FieldTM", "Tap on an available task area on the map to view surveys.") : qsTranslate("FieldTM", "Tap on an available task area on the map to start surveying.")
         }
 
         Text {
@@ -104,12 +102,7 @@ Item {
           color: "#f67c0f"
           wrapMode: Text.WordWrap
 
-          text: {
-            if (fieldTM.outdated) {
-              return qsTranslate("FieldTM", "Data sync occurred over half an hour ago, synchronizing is recommended.");
-            }
-            return "";
-          }
+          text: fieldTM.outdated ? qsTranslate("FieldTM", "Data sync occurred over half an hour ago, synchronizing is recommended.") : ""
         }
 
         Text {
@@ -120,9 +113,7 @@ Item {
           wrapMode: Text.WordWrap
           linkColor: fieldTM.mainColor
 
-          text: {
-            return fieldTM.cloudConnection.hasToken && fieldTM.cloudConnection.isReachable ? `<a href=\"#synchronize\">${qsTranslate("FieldTM", "Synchronize tasks")}</a>` : '';
-          }
+          text: fieldTM.cloudConnection.hasToken && fieldTM.cloudConnection.isReachable ? `<a href=\"#synchronize\">${qsTranslate("FieldTM", "Synchronize tasks")}</a>` : ""
 
           onLinkActivated: (link) => {
             if (link === "#synchronize") {
@@ -198,7 +189,11 @@ Item {
 
           onClicked: {
             if (fieldTM.currentTask !== undefined) {
-              mainWindow.displayToast(qsTranslate("FieldTM", "Released task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+              if (fieldTM.reader) {
+                mainWindow.displayToast(qsTranslate("FieldTM", "Leaving task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+              } else {
+                mainWindow.displayToast(qsTranslate("FieldTM", "Released task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+              }
               fieldTM.currentTask = undefined;
             }
           }
@@ -238,7 +233,7 @@ Item {
                 fieldTM.tasksLayer.changeAttributeValue(fieldTM.currentTask.id, fieldTM.tasksLayer.fields.indexOf("status"), "completed");
                 fieldTM.tasksLayer.commitChanges();
                 pushToCloud();
-                
+
                 mainWindow.displayToast(qsTranslate("FieldTM", "Marked task #%1 as completed").arg(fieldTM.currentTask.attribute("task_id")));
                 rewardEmitter.reward();
               }
@@ -511,7 +506,11 @@ Item {
                                        pushToCloud();
                                      }
 
-                                     mainWindow.displayToast(qsTranslate("FieldTM", "Assigned task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+                                     if (fieldTM.reader) {
+                                       mainWindow.displayToast(qsTranslate("FieldTM", "Viewing task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+                                     } else {
+                                       mainWindow.displayToast(qsTranslate("FieldTM", "Assigned task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+                                     }
                                    }
                                    return true;
                                  });
