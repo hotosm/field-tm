@@ -564,6 +564,7 @@ async def create_qfield_project(
             qfc_project_name = _sanitize_qfc_project_name(raw_qfc_project_name)
             result = await _upload_to_qfieldcloud(
                 project=project,
+                description=qgis_project_description,
                 qfc_project_name=qfc_project_name,
                 final_project_dir=tmp_dir,
                 custom_qfield_creds=custom_qfield_creds,
@@ -966,6 +967,7 @@ async def _create_qfc_user(username: str, password: str, client) -> bool:
 async def _upload_to_qfieldcloud(
     *,
     project: DbProject,
+    description: str,
     qfc_project_name: str,
     final_project_dir: str,
     custom_qfield_creds: QFieldCloud | None,
@@ -989,7 +991,7 @@ async def _upload_to_qfieldcloud(
                 client.create_project,
                 qfc_project_name,
                 owner=qfc_owner,
-                description="Created by the Field Tasking Manager",
+                description=description,
                 is_public=True,
             ),
         )
