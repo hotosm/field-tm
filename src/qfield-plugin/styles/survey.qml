@@ -1,13 +1,13 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis hasScaleBasedVisibilityFlag="0" labelsEnabled="0" simplifyMaxScale="1" symbologyReferenceScale="-1" autoRefreshMode="Disabled" styleCategories="Symbology|Labeling|MapTips|AttributeTable|Rendering" minScale="100000000" autoRefreshTime="0" simplifyDrawingHints="1" simplifyDrawingTol="1" maxScale="0" simplifyAlgorithm="0" simplifyLocal="1" version="3.44.9-Solothurn">
-  <renderer-v2 forceraster="0" enableorderby="0" symbollevels="0" type="RuleRenderer" referencescale="-1">
+<qgis autoRefreshTime="0" simplifyDrawingTol="1" simplifyMaxScale="1" simplifyAlgorithm="0" simplifyLocal="1" simplifyDrawingHints="1" symbologyReferenceScale="-1" hasScaleBasedVisibilityFlag="0" minScale="100000000" autoRefreshMode="Disabled" labelsEnabled="0" version="3.44.10-Solothurn" styleCategories="Symbology|Labeling|MapTips|AttributeTable|Rendering" maxScale="0">
+  <renderer-v2 symbollevels="0" enableorderby="0" type="RuleRenderer" referencescale="-1" forceraster="0">
     <rules key="{935df469-b919-4b16-bfe9-3a5e7827b181}">
-      <rule symbol="0" label="Mapped" key="{155a5e50-7d10-49ea-816e-745e746205f8}" filter="&quot;status&quot; = 'mapped'"/>
-      <rule symbol="1" label="Invalid" key="{ab21c963-d731-473c-a325-4071e1874767}" filter="&quot;status&quot; = 'invalid'"/>
-      <rule symbol="2" label="Default" key="{cbd0673b-0b73-41e8-91bd-732a1f1bf2bf}" filter="&quot;status&quot; is null or &quot;status&quot; = ''"/>
+      <rule label="Mapped" filter="&quot;status&quot; = 'mapped'" key="{155a5e50-7d10-49ea-816e-745e746205f8}" symbol="0"/>
+      <rule label="Invalid" filter="&quot;status&quot; = 'invalid'" key="{ab21c963-d731-473c-a325-4071e1874767}" symbol="1"/>
+      <rule label="Default" filter="&quot;status&quot; is null or &quot;status&quot; = ''" key="{cbd0673b-0b73-41e8-91bd-732a1f1bf2bf}" symbol="2"/>
     </rules>
     <symbols>
-      <symbol clip_to_extent="1" type="fill" name="0" alpha="1" frame_rate="10" force_rhr="0" is_animated="0">
+      <symbol type="fill" name="0" clip_to_extent="1" alpha="1" force_rhr="0" frame_rate="10" is_animated="0">
         <data_defined_properties>
           <Option type="Map">
             <Option type="QString" name="name" value=""/>
@@ -15,7 +15,7 @@
             <Option type="QString" name="type" value="collection"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleFill" pass="0" enabled="1" id="{a5a08fb1-a4b2-42fc-8fbc-01ce4beb2280}" locked="0">
+        <layer id="{a5a08fb1-a4b2-42fc-8fbc-01ce4beb2280}" locked="0" pass="0" enabled="1" class="SimpleFill">
           <Option type="Map">
             <Option type="QString" name="border_width_map_unit_scale" value="3x:0,0,0,0,0,0"/>
             <Option type="QString" name="color" value="80,193,203,120,rgb:0.3137255,0.7568627,0.7960784,0.4705882"/>
@@ -38,7 +38,7 @@
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" type="fill" name="1" alpha="1" frame_rate="10" force_rhr="0" is_animated="0">
+      <symbol type="fill" name="1" clip_to_extent="1" alpha="1" force_rhr="0" frame_rate="10" is_animated="0">
         <data_defined_properties>
           <Option type="Map">
             <Option type="QString" name="name" value=""/>
@@ -46,7 +46,7 @@
             <Option type="QString" name="type" value="collection"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleFill" pass="0" enabled="1" id="{29a9036c-a835-45df-8c2d-a759c4870782}" locked="0">
+        <layer id="{29a9036c-a835-45df-8c2d-a759c4870782}" locked="0" pass="0" enabled="1" class="SimpleFill">
           <Option type="Map">
             <Option type="QString" name="border_width_map_unit_scale" value="3x:0,0,0,0,0,0"/>
             <Option type="QString" name="color" value="215,63,63,110,rgb:0.8431373,0.2470588,0.2470588,0.4313725"/>
@@ -69,7 +69,7 @@
           </data_defined_properties>
         </layer>
       </symbol>
-      <symbol clip_to_extent="1" type="fill" name="2" alpha="1" frame_rate="10" force_rhr="0" is_animated="0">
+      <symbol type="fill" name="2" clip_to_extent="1" alpha="1" force_rhr="0" frame_rate="10" is_animated="0">
         <data_defined_properties>
           <Option type="Map">
             <Option type="QString" name="name" value=""/>
@@ -77,7 +77,7 @@
             <Option type="QString" name="type" value="collection"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleFill" pass="0" enabled="1" id="{ae310060-e8f9-48ab-abb8-49d789c63226}" locked="0">
+        <layer id="{ae310060-e8f9-48ab-abb8-49d789c63226}" locked="0" pass="0" enabled="1" class="SimpleFill">
           <Option type="Map">
             <Option type="QString" name="border_width_map_unit_scale" value="3x:0,0,0,0,0,0"/>
             <Option type="QString" name="color" value="130,128,133,90,rgb:0.5098039,0.5019608,0.5215686,0.3529412"/>
@@ -112,7 +112,7 @@
   <selection mode="Default">
     <selectionColor invalid="1"/>
     <selectionSymbol>
-      <symbol clip_to_extent="1" type="fill" name="" alpha="1" frame_rate="10" force_rhr="0" is_animated="0">
+      <symbol type="fill" name="" clip_to_extent="1" alpha="1" force_rhr="0" frame_rate="10" is_animated="0">
         <data_defined_properties>
           <Option type="Map">
             <Option type="QString" name="name" value=""/>
@@ -120,7 +120,7 @@
             <Option type="QString" name="type" value="collection"/>
           </Option>
         </data_defined_properties>
-        <layer class="SimpleFill" pass="0" enabled="1" id="{e4944a90-13ec-4f19-9048-107e37a4ba13}" locked="0">
+        <layer id="{e4944a90-13ec-4f19-9048-107e37a4ba13}" locked="0" pass="0" enabled="1" class="SimpleFill">
           <Option type="Map">
             <Option type="QString" name="border_width_map_unit_scale" value="3x:0,0,0,0,0,0"/>
             <Option type="QString" name="color" value="0,0,255,255,rgb:0,0,1,1"/>
@@ -148,62 +148,69 @@
   <blendMode>0</blendMode>
   <featureBlendMode>0</featureBlendMode>
   <layerOpacity>1</layerOpacity>
-  <attributetableconfig sortExpression="" actionWidgetStyle="dropDown" sortOrder="0">
+  <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="&quot;fid&quot;">
     <columns>
-      <column width="-1" hidden="0" type="field" name="fid"/>
-      <column width="-1" hidden="0" type="field" name="uuid"/>
-      <column width="-1" hidden="0" type="field" name="start"/>
-      <column width="-1" hidden="0" type="field" name="end"/>
-      <column width="-1" hidden="0" type="field" name="today"/>
-      <column width="-1" hidden="0" type="field" name="username"/>
-      <column width="-1" hidden="0" type="field" name="email"/>
-      <column width="-1" hidden="0" type="field" name="category"/>
-      <column width="-1" hidden="0" type="field" name="name"/>
-      <column width="-1" hidden="0" type="field" name="building_material"/>
-      <column width="-1" hidden="0" type="field" name="building_levels"/>
-      <column width="-1" hidden="0" type="field" name="religion"/>
-      <column width="-1" hidden="0" type="field" name="denomination"/>
-      <column width="-1" hidden="0" type="field" name="muslim"/>
-      <column width="-1" hidden="0" type="field" name="hindu"/>
-      <column width="-1" hidden="0" type="field" name="religious"/>
-      <column width="-1" hidden="0" type="field" name="service"/>
-      <column width="-1" hidden="0" type="field" name="Shop"/>
-      <column width="-1" hidden="0" type="field" name="tourism"/>
-      <column width="-1" hidden="0" type="field" name="education_details"/>
-      <column width="-1" hidden="0" type="field" name="government"/>
-      <column width="-1" hidden="0" type="field" name="medical"/>
-      <column width="-1" hidden="0" type="field" name="food"/>
-      <column width="-1" hidden="0" type="field" name="cuisine"/>
-      <column width="-1" hidden="0" type="field" name="heritage"/>
-      <column width="-1" hidden="0" type="field" name="emergency"/>
-      <column width="-1" hidden="0" type="field" name="operator"/>
-      <column width="-1" hidden="0" type="field" name="inscription"/>
-      <column width="-1" hidden="0" type="field" name="housing"/>
-      <column width="-1" hidden="0" type="field" name="provider"/>
-      <column width="-1" hidden="0" type="field" name="rooms"/>
-      <column width="-1" hidden="0" type="field" name="ref"/>
-      <column width="-1" hidden="0" type="field" name="building_neighbor"/>
-      <column width="-1" hidden="0" type="field" name="power"/>
-      <column width="-1" hidden="0" type="field" name="generator_source"/>
-      <column width="-1" hidden="0" type="field" name="generator"/>
-      <column width="-1" hidden="0" type="field" name="water"/>
-      <column width="-1" hidden="0" type="field" name="water_source"/>
-      <column width="-1" hidden="0" type="field" name="pump_unit"/>
-      <column width="-1" hidden="0" type="field" name="capacity"/>
-      <column width="-1" hidden="0" type="field" name="age"/>
-      <column width="-1" hidden="0" type="field" name="building_prefab"/>
-      <column width="-1" hidden="0" type="field" name="building_floor"/>
-      <column width="-1" hidden="0" type="field" name="building_roof"/>
-      <column width="-1" hidden="0" type="field" name="condition"/>
-      <column width="-1" hidden="0" type="field" name="access_roof"/>
-      <column width="-1" hidden="0" type="field" name="levels_underground"/>
-      <column width="-1" hidden="0" type="field" name="comment"/>
-      <column width="-1" hidden="0" type="field" name="status"/>
-      <column width="-1" hidden="1" type="actions"/>
+      <column type="field" name="fid" hidden="0" width="-1"/>
+      <column type="field" name="uuid" hidden="0" width="-1"/>
+      <column type="field" name="start" hidden="0" width="-1"/>
+      <column type="field" name="end" hidden="0" width="-1"/>
+      <column type="field" name="today" hidden="0" width="-1"/>
+      <column type="field" name="username" hidden="0" width="-1"/>
+      <column type="field" name="email" hidden="0" width="-1"/>
+      <column type="field" name="category" hidden="0" width="-1"/>
+      <column type="field" name="name" hidden="0" width="-1"/>
+      <column type="field" name="building_material" hidden="0" width="-1"/>
+      <column type="field" name="building_levels" hidden="0" width="-1"/>
+      <column type="field" name="religion" hidden="0" width="-1"/>
+      <column type="field" name="denomination" hidden="0" width="-1"/>
+      <column type="field" name="muslim" hidden="0" width="-1"/>
+      <column type="field" name="hindu" hidden="0" width="-1"/>
+      <column type="field" name="religious" hidden="0" width="-1"/>
+      <column type="field" name="service" hidden="0" width="-1"/>
+      <column type="field" name="Shop" hidden="0" width="-1"/>
+      <column type="field" name="tourism" hidden="0" width="-1"/>
+      <column type="field" name="education_details" hidden="0" width="-1"/>
+      <column type="field" name="government" hidden="0" width="-1"/>
+      <column type="field" name="medical" hidden="0" width="-1"/>
+      <column type="field" name="food" hidden="0" width="-1"/>
+      <column type="field" name="cuisine" hidden="0" width="-1"/>
+      <column type="field" name="heritage" hidden="0" width="-1"/>
+      <column type="field" name="emergency" hidden="0" width="-1"/>
+      <column type="field" name="operator" hidden="0" width="-1"/>
+      <column type="field" name="inscription" hidden="0" width="-1"/>
+      <column type="field" name="housing" hidden="0" width="-1"/>
+      <column type="field" name="provider" hidden="0" width="-1"/>
+      <column type="field" name="rooms" hidden="0" width="-1"/>
+      <column type="field" name="ref" hidden="0" width="-1"/>
+      <column type="field" name="building_neighbor" hidden="0" width="-1"/>
+      <column type="field" name="power" hidden="0" width="-1"/>
+      <column type="field" name="generator_source" hidden="0" width="-1"/>
+      <column type="field" name="generator" hidden="0" width="-1"/>
+      <column type="field" name="water" hidden="0" width="-1"/>
+      <column type="field" name="water_source" hidden="0" width="-1"/>
+      <column type="field" name="pump_unit" hidden="0" width="-1"/>
+      <column type="field" name="capacity" hidden="0" width="-1"/>
+      <column type="field" name="age" hidden="0" width="-1"/>
+      <column type="field" name="building_prefab" hidden="0" width="-1"/>
+      <column type="field" name="building_floor" hidden="0" width="-1"/>
+      <column type="field" name="building_roof" hidden="0" width="-1"/>
+      <column type="field" name="condition" hidden="0" width="-1"/>
+      <column type="field" name="access_roof" hidden="0" width="-1"/>
+      <column type="field" name="levels_underground" hidden="0" width="-1"/>
+      <column type="field" name="comment" hidden="0" width="-1"/>
+      <column type="field" name="status" hidden="0" width="-1"/>
+      <column type="actions" hidden="1" width="-1"/>
     </columns>
   </attributetableconfig>
   <conditionalstyles>
-    <rowstyles/>
+    <rowstyles>
+      <style name="mapped" background_color="#50c1cb" rule="&quot;status&quot; = 'mapped'" background_color_alpha="64">
+        <font description="Fira Sans Condensed,13,-1,5,50,0,0,0,0,0" strikethrough="0" underline="0" italic="0" bold="0" style=""/>
+      </style>
+      <style name="invalid" background_color="#d73f3f" rule="&quot;status&quot; = 'invalid'" background_color_alpha="59">
+        <font description="Fira Sans Condensed,-1,13,255,50,0,0,0,0,0,0" strikethrough="0" underline="0" italic="0" bold="0" style="0"/>
+      </style>
+    </rowstyles>
     <fieldstyles/>
   </conditionalstyles>
   <storedexpressions/>
