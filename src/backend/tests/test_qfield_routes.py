@@ -417,6 +417,8 @@ async def test_attach_basemap_to_qfield_project_inserts_job_with_basemap_url(
         id=7,
         external_project_id="qfc-123",
         project_name="demo",
+        description="description",
+        created_by_sub="user",
         external_project_instance_url=None,
         external_project_username=None,
         external_project_password_encrypted=None,
@@ -497,6 +499,8 @@ async def test_create_qfield_project_passes_resolved_language_to_qgis_wrapper(
     project = SimpleNamespace(
         id=11,
         project_name="demo",
+        description="description",
+        created_by_sub="user",
         outline={
             "type": "Feature",
             "geometry": {"type": "Point", "coordinates": [85.3, 27.7]},
