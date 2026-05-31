@@ -21,11 +21,12 @@ Item {
 
   property var qfieldSettings: iface.findItemByObjectName("qfieldSettings")
   property ProjectInfo projectInfo: iface.findItemByObjectName("projectInfo")
-  
+
   property QFieldCloudConnection cloudConnection: iface.findItemByObjectName("cloudConnection")
   property QFieldCloudProjectsModel cloudProjectsModel: iface.findItemByObjectName("cloudProjectsModel")
 
   property bool outdated: false
+  property bool reader: false
 
   property string currentUser: ""
   property var currentTask: undefined
@@ -91,9 +92,7 @@ Item {
           color: "#222222"
           wrapMode: Text.WordWrap
 
-          text: {
-            return qsTranslate("FieldTM", "Tap on an available task area on the map to start surveying.");
-          }
+          text: fieldTM.reader ? qsTranslate("FieldTM", "Tap on an available task area on the map to view surveys.") : qsTranslate("FieldTM", "Tap on an available task area on the map to start surveying.")
         }
 
         Text {
@@ -103,12 +102,7 @@ Item {
           color: "#f67c0f"
           wrapMode: Text.WordWrap
 
-          text: {
-            if (fieldTM.outdated) {
-              return qsTranslate("FieldTM", "Data sync occurred over half an hour ago, synchronizing is recommended.");
-            }
-            return "";
-          }
+          text: fieldTM.outdated ? qsTranslate("FieldTM", "Data sync occurred over half an hour ago, synchronizing is recommended.") : ""
         }
 
         Text {
@@ -119,9 +113,7 @@ Item {
           wrapMode: Text.WordWrap
           linkColor: fieldTM.mainColor
 
-          text: {
-            return fieldTM.cloudConnection.hasToken && fieldTM.cloudConnection.isReachable ? `<a href=\"#synchronize\">${qsTranslate("FieldTM", "Synchronize tasks")}</a>` : '';
-          }
+          text: fieldTM.cloudConnection.hasToken && fieldTM.cloudConnection.isReachable ? `<a href=\"#synchronize\">${qsTranslate("FieldTM", "Synchronize tasks")}</a>` : ""
 
           onLinkActivated: (link) => {
             if (link === "#synchronize") {
@@ -178,7 +170,7 @@ Item {
       RowLayout {
         width: parent.width
         height: parent.height
-        spacing: 4
+        spacing: 8
 
         QfToolButton {
           id: releaseButton
@@ -197,7 +189,11 @@ Item {
 
           onClicked: {
             if (fieldTM.currentTask !== undefined) {
-              mainWindow.displayToast(qsTranslate("FieldTM", "Released task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+              if (fieldTM.reader) {
+                mainWindow.displayToast(qsTranslate("FieldTM", "Leaving task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+              } else {
+                mainWindow.displayToast(qsTranslate("FieldTM", "Released task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+              }
               fieldTM.currentTask = undefined;
             }
           }
@@ -221,7 +217,7 @@ Item {
             if (fieldTM.currentTask !== undefined) {
               // TODO: should we bail out when detecting incomplete survey features?
 
-              // Check if the task is readu to be marked as complete
+              // Check if the task is ready to be marked as complete
               //let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.surveyLayer, "intersects(@geometry, geom_from_wkt('" + fieldTM.currentTask.geometry.asWkt(8) + "'))")
               //let allowMarkAsCompleted = it.hasNext()
               //while (it.hasNext()) {
@@ -232,13 +228,15 @@ Item {
               //}
               //delete it;
 
-              fieldTM.tasksLayer.startEditing();
-              fieldTM.tasksLayer.changeAttributeValue(fieldTM.currentTask.id, fieldTM.tasksLayer.fields.indexOf("status"), "completed");
-              fieldTM.tasksLayer.commitChanges();
-              pushToCloud();
+              if (!fieldTM.reader) {
+                fieldTM.tasksLayer.startEditing();
+                fieldTM.tasksLayer.changeAttributeValue(fieldTM.currentTask.id, fieldTM.tasksLayer.fields.indexOf("status"), "completed");
+                fieldTM.tasksLayer.commitChanges();
+                pushToCloud();
 
-              mainWindow.displayToast(qsTranslate("FieldTM", "Marked task #%1 as completed").arg(fieldTM.currentTask.attribute("task_id")));
-              rewardEmitter.reward();
+                mainWindow.displayToast(qsTranslate("FieldTM", "Marked task #%1 as completed").arg(fieldTM.currentTask.attribute("task_id")));
+                rewardEmitter.reward();
+              }
 
               fieldTM.currentTask = undefined;
             }
@@ -250,7 +248,7 @@ Item {
         }
 
         QfToolButton {
-          id: openPendingFeaturesButton
+          id: openFeaturesButton
           round: true
 
           iconSource: Theme.getThemeVectorIcon("ic_list_black_24dp")
@@ -260,12 +258,11 @@ Item {
 
           Layout.preferredWidth: 36
           Layout.preferredHeight: 36
-          Layout.rightMargin: 8
           Layout.alignment: Qt.AlignVCenter
           visible: fieldTM.currentTask !== undefined
 
           onClicked: {
-            let filterExpression = "\"status\" is null or \"status\" = '' and intersects(@geometry, geom_from_wkt('"+fieldTM.currentTask.geometry.asWkt(8)+"'))"
+            let filterExpression = "intersects(@geometry, geom_from_wkt('"+fieldTM.currentTask.geometry.asWkt(8)+"'))"
             fieldTM.featureListForm.model.setFeatures(fieldTM.surveyLayer, filterExpression);
             featureListForm.extentController.zoomToAllFeatures();
           }
@@ -362,7 +359,7 @@ Item {
   }
 
   function updateCurrentTaskStatus() {
-    if (fieldTM.currentTask != undefined) {
+    if (fieldTM.currentTask != undefined && !fieldTM.reader) {
       // If it hadn't been assigned yet, lay claim on it
       if (fieldTM.currentTask.attribute("status") === "available") {
         fieldTM.currentTask.setAttribute("status", "in_progress");
@@ -463,6 +460,7 @@ Item {
     fieldTM.qfieldSettings.autoZoomToIdentifiedFeature = true;
 
     fieldTM.currentUser = projectInfo.cloudUserInformation.username;
+    fieldTM.reader = cloudProjectsModel.currentProject && cloudProjectsModel.currentProject.userRole === "reader";
 
     let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, `"status" = 'in_progress' and "assigned_to" = '${fieldTM.currentUser}'`);
     if (it.hasNext()) {
@@ -501,14 +499,18 @@ Item {
                                    if (it.hasNext()) {
                                      fieldTM.currentTask = it.next();
 
-                                     if (fieldTM.currentTask.attribute("assigned_to") == "") {
+                                     if (!fieldTM.reader && fieldTM.currentTask.attribute("assigned_to") == "") {
                                        fieldTM.tasksLayer.startEditing();
                                        fieldTM.tasksLayer.changeAttributeValue(fieldTM.currentTask.id, fieldTM.tasksLayer.fields.indexOf("assigned_to"), fieldTM.currentUser);
                                        fieldTM.tasksLayer.commitChanges();
                                        pushToCloud();
                                      }
 
-                                     mainWindow.displayToast(qsTranslate("FieldTM", "Assigned task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+                                     if (fieldTM.reader) {
+                                       mainWindow.displayToast(qsTranslate("FieldTM", "Viewing task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+                                     } else {
+                                       mainWindow.displayToast(qsTranslate("FieldTM", "Assigned task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+                                     }
                                    }
                                    return true;
                                  });
