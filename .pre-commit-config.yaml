@@ -74,6 +74,7 @@ repos:
         additional_dependencies: ["oxfmt@0.35.0"]
         args:
           [
+            "!cla.json",
             "!chart/**",
             "!CHANGELOG.md",
             "!.all-contributorsrc",
