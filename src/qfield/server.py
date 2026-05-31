@@ -76,6 +76,8 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
                     "db_url": db_url,
                     "job_id": data["job_id"],
                     "title": data["title"],
+                    "description": data.get("description", ""),
+                    "author": data.get("author", ""),
                     "language": data["language"],
                     "extent": data["extent"],
                     "open_in_edit_mode": parse_bool(data.get("open_in_edit_mode"), True),
