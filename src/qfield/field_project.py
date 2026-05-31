@@ -224,7 +224,7 @@ def _add_plugin_survey_fields(project, log: logging.Logger) -> None:
     ('mapped', 'invalid', or empty/null for the default unmapped style)
     and reads it to decide when a task is complete.
     """
-    from qgis.core import QgsField
+    from qgis.core import QgsDefaultValue, QgsField
     from qgis.PyQt.QtCore import QMetaType
 
     layers = project.mapLayersByName("survey")
@@ -233,23 +233,31 @@ def _add_plugin_survey_fields(project, log: logging.Logger) -> None:
         return
     layer = layers[0]
 
-    if layer.fields().indexOf("status") >= 0:
-        log.debug("Survey layer already has 'status' field; skipping")
-        return
-
-    if not layer.startEditing():
-        log.warning("Could not start editing survey layer to add plugin fields")
-        return
-    layer.addAttribute(QgsField("status", QMetaType.Type.QString))
-
     status_idx = layer.fields().indexOf("status")
-    for feature in layer.getFeatures():
-        layer.changeAttributeValue(feature.id(), status_idx, "")
-
-    if not layer.commitChanges():
-        log.warning("Failed to commit plugin fields to survey layer")
+    if status_idx == -1:
+        if not layer.startEditing():
+            log.warning("Could not start editing survey layer to add plugin fields")
+            return
+        layer.addAttribute(QgsField("status", QMetaType.Type.QString))
+    
+        status_idx = layer.fields().indexOf("status")
+        for feature in layer.getFeatures():
+            layer.changeAttributeValue(feature.id(), status_idx, "")
+    
+        if not layer.commitChanges():
+            log.warning("Failed to commit plugin fields to survey layer")
+            return    
+        log.info("Added status field to survey layer")
+    else:
+        log.debug("Survey layer already has 'status' field; skipping creation")
         return
-    log.info("Added status field to survey layer")
+
+    layer.setDefaultValueDefinition(
+        status_idx,
+        QgsDefaultValue(
+            'if("status" is null or "status" = \'\', \'mapped\', "status")', True
+        ),
+    )
 
 
 def _load_generated_project(project_file: str):
