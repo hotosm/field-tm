@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026.3.6 (2026-05-31)
+
+### Fix
+
+- **qfield**: gracefully handle browsing of a FieldTM-powered project in reader mode (#3083)
+- **qfield**: add default expression to the survey layer's status attribute to drive symbology (#3085)
+- **qfield**: add project metadata within QGIS created projects (#3084)
+- **frontend**: add button as well as qrcode for loading qfield project deeplink
+- **qfield-plugin**: ensure the survey layer has a status field to write to
+
 ## 2026.3.5 (2026-05-23)
 
 ### Fix
