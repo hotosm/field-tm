@@ -243,9 +243,13 @@ def _get_logging_config() -> LoggingConfig:
             for name in quiet_loggers
         },
         log_exceptions="always",
-        # Skip the noisy "Uncaught exception" traceback for 404s - the bulk
-        # of these are scanner probes (/RDWeb/Pages/, /.git, /wp-login.php).
-        disable_stack_trace={status.HTTP_404_NOT_FOUND},
+        # Skip the noisy "Uncaught exception" traceback for 404/405s - the bulk
+        # of these are scanner probes (/RDWeb/Pages/, /.git, /wp-login.php,
+        # HEAD /robots.txt, POST /).
+        disable_stack_trace={
+            status.HTTP_404_NOT_FOUND,
+            status.HTTP_405_METHOD_NOT_ALLOWED,
+        },
     )
     return logging_config
 
