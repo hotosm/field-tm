@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-13 04:50+0100\n"
+"POT-Creation-Date: 2026-06-01 14:25+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: zh\n"
@@ -26,7 +26,7 @@ msgstr "验证失败"
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "发生意外错误。请联系管理员。"
 
-#: app/main.py:286
+#: app/main.py:313
 msgid "Could not connect to database"
 msgstr "无法连接到数据库"
 
@@ -52,72 +52,84 @@ msgstr "项目由于处于 %(state)s 状态而被锁定。"
 msgid "User (%(user_sub)s) could not be inserted in db"
 msgstr "用户 (%(user_sub)s) 无法插入数据库"
 
-#: app/central/central_crud.py:151
+#: app/central/central_crud.py:153
 #, python-format
 msgid "Error listing projects on ODK Central: %(error)s"
 msgstr "在 ODK Central 中列出项目时出错：%(error)s"
 
-#: app/central/central_crud.py:182
+#: app/central/central_crud.py:184
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
 msgstr "在 ODK Central 中创建项目时出错：%(error)s"
 
-#: app/central/central_crud.py:244
+#: app/central/central_crud.py:246
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
 msgstr "无法将表单上传到 ODK Central：%(error)s"
 
-#: app/central/central_crud.py:259
+#: app/central/central_crud.py:261
 msgid "form_id is required to list submissions with pyodk."
 msgstr "form_id 才能列出 pyodk 提交的内容。"
 
-#: app/central/central_crud.py:302
+#: app/central/central_crud.py:309
+#, python-format
+msgid "Could not read XLSForm file: %(error)s"
+msgstr "无法读取 XLSForm 文件：%(error)s"
+
+#: app/central/central_crud.py:349
+#, python-format
+msgid ""
+"XLSForm has select questions referencing lists that aren't defined in the"
+" choices sheet: %(rows)s. Check your survey and choices sheets."
+msgstr "XLSForm 具有引用选项表中未定义的列表的选择问题：%(rows)s。检查您的调查和选择表。"
+
+#: app/central/central_crud.py:375
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
 msgstr "XLSForm 无效：%(error)s"
 
-#: app/central/central_crud.py:429
+#: app/central/central_crud.py:507
 msgid "Conversion GeoJSON --> CSV failed"
 msgstr "转换 GeoJSON --> CSV 失败"
 
-#: app/central/central_crud.py:500
+#: app/central/central_crud.py:578
 msgid "Project contains no submissions yet"
 msgstr "项目尚未包含任何提交内容"
 
-#: app/central/central_crud.py:562
+#: app/central/central_crud.py:640
 msgid "'geometry' data field is mandatory"
 msgstr "“几何”数据字段是必需的"
 
-#: app/central/central_crud.py:830
+#: app/central/central_crud.py:908
 msgid "ODK project_id is missing; cannot create/merge entity lists."
 msgstr "ODK 项目 ID 丢失；无法创建/合并实体列表。"
 
-#: app/central/central_crud.py:963
+#: app/central/central_crud.py:1041
 msgid "Could not generate token for app user."
 msgstr "无法为应用程序用户生成令牌。"
 
-#: app/central/central_crud.py:995 app/central/central_crud.py:1001
+#: app/central/central_crud.py:1073 app/central/central_crud.py:1079
 msgid "An error occurred while creating the app user token."
 msgstr "生成二维码时发生意外错误。"
 
-#: app/central/central_crud.py:1015
+#: app/central/central_crud.py:1093
 #, python-format
 msgid "Could not assign %(scope)s role to app user."
 msgstr "无法将 %(scope)s 角色分配给应用程序用户。"
 
-#: app/central/central_crud.py:1054
+#: app/central/central_crud.py:1132
 msgid "Could not find 'Project Manager' role in ODK Central."
 msgstr "在 ODK Central 中打开项目"
 
-#: app/central/central_crud.py:1079
+#: app/central/central_crud.py:1157
 msgid "ODK Central returned no user ID after creation."
 msgstr "ODK Central 创建后未返回用户 ID。"
 
-#: app/central/central_crud.py:1212
+#: app/central/central_crud.py:1290
 msgid "Failed to create ODK Central manager user."
 msgstr "无法创建 ODK Central 管理器用户。"
 
-#: app/central/central_crud.py:1232
+#: app/central/central_crud.py:1310
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "生成二维码时发生意外错误。"
 
@@ -173,113 +185,183 @@ msgstr "不存在几何形状"
 msgid "Your geojson file is invalid."
 msgstr "您的 geojson 文件无效。"
 
-#: app/htmx/project_detail_routes.py:97
+#: app/htmx/project_detail_routes.py:115
 msgid "Mapper Login (QFieldCloud)"
 msgstr "制图员登录（QFieldCloud）"
 
-#: app/htmx/project_detail_routes.py:100
+#: app/htmx/project_detail_routes.py:118
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
 msgid "Username:"
 msgstr "用户名："
 
-#: app/htmx/project_detail_routes.py:103
+#: app/htmx/project_detail_routes.py:121
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
 msgid "Password:"
 msgstr "密码："
 
-#: app/htmx/project_detail_routes.py:106
+#: app/htmx/project_detail_routes.py:124
 msgid "Scan the QR code, then enter these credentials in QField."
 msgstr "扫描二维码，然后在 QField 中输入这些凭据。"
 
-#: app/htmx/project_detail_routes.py:118
+#: app/htmx/project_detail_routes.py:137
 msgid "Scan QR Code"
 msgstr "扫描二维码"
 
-#: app/htmx/project_detail_routes.py:120
+#: app/htmx/project_detail_routes.py:139
 #, python-format
 msgid "Use %(app_name)s to scan this QR code and load the project."
 msgstr "使用 %(app_name)s 扫描此二维码并加载项目。"
 
-#: app/htmx/project_detail_routes.py:122
+#: app/htmx/project_detail_routes.py:141
 msgid "Project QR Code"
 msgstr "项目二维码"
 
-#: app/htmx/project_detail_routes.py:123
+#: app/htmx/project_detail_routes.py:142
 msgid "Download QR Code"
 msgstr "下载二维码"
 
-#: app/htmx/project_detail_routes.py:175
+#: app/htmx/project_detail_routes.py:145
+#, python-format
+msgid "Open in %(app_name)s"
+msgstr "在 %(app_name)s 中打开"
+
+#: app/htmx/project_detail_routes.py:146
+#, python-format
+msgid "If %(app_name)s is installed on this device."
+msgstr "如果此设备上安装了 %(app_name)s。"
+
+#: app/htmx/project_detail_routes.py:212
 msgid ""
 "Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
 " running."
 msgstr "无法连接到制图服务器。请检查 ODK Central 或 QFieldCloud 是否正在运行。"
 
-#: app/htmx/project_detail_routes.py:179
+#: app/htmx/project_detail_routes.py:216
 msgid "The mapping server returned an error. Check its logs for details."
 msgstr "制图服务器返回错误。请查看其日志了解详情。"
 
-#: app/htmx/project_detail_routes.py:182
+#: app/htmx/project_detail_routes.py:219
 msgid ""
 "Authentication failed connecting to the mapping server. Check the "
 "configured credentials."
 msgstr "连接制图服务器时身份验证失败。请检查已配置的凭据。"
 
-#: app/htmx/project_detail_routes.py:185
+#: app/htmx/project_detail_routes.py:222
 msgid "An unexpected error occurred while generating the QR code."
 msgstr "生成二维码时发生意外错误。"
 
-#: app/htmx/project_detail_routes.py:247
+#: app/htmx/project_detail_routes.py:295
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "未找到项目（%(project_id)s）。"
 
-#: app/htmx/project_detail_routes.py:254
+#: app/htmx/project_detail_routes.py:302
 msgid "Only the project manager can delete this project."
 msgstr "只有项目经理可以删除此项目。"
 
-#: app/htmx/project_detail_routes.py:292 app/templates/project_details.html:172
+#: app/htmx/project_detail_routes.py:340 app/templates/project_details.html:172
 msgid "Project not found."
 msgstr "未找到项目。"
 
-#: app/htmx/project_detail_routes.py:321
+#: app/htmx/project_detail_routes.py:376
 #: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "错误：%(error_msg)s"
 
-#: app/htmx/basemap/basemap_attach_flow.py:68
+#: app/htmx/project_detail_routes.py:410
+#, python-format
+msgid "Added the following user(s) as project editors: %(names)s."
+msgstr "添加了以下用户作为项目编辑者：%(names)s。"
+
+#: app/htmx/project_detail_routes.py:414
+#, python-format
+msgid "Could not add '%(username)s': %(reason)s"
+msgstr "无法添加“%(username)s”：%(reason)s"
+
+#: app/htmx/project_detail_routes.py:420
+msgid "Add more collaborators"
+msgstr "添加更多协作者"
+
+#: app/htmx/project_detail_routes.py:435
+msgid "Invite QFieldCloud collaborators"
+msgstr "邀请QFieldCloud合作者"
+
+#: app/htmx/project_detail_routes.py:438
+msgid ""
+"Mappers must have an account on QFieldCloud before you can give them "
+"access to this project."
+msgstr "制图人员必须在 QFieldCloud 上拥有帐户，然后才能授予他们访问此项目的权限。"
+
+#: app/htmx/project_detail_routes.py:444
+msgid ""
+"Have each mapper create a free account at <a "
+"href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
+"class=\"ftm-link--brand\">app.qfield.cloud</a>."
+msgstr "让每个映射器在 <a href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" class=\"ftm-link--brand\">app.qfield.cloud</a> 创建一个免费帐户。"
+
+#: app/htmx/project_detail_routes.py:450
+msgid ""
+"Enter their QFieldCloud usernames below (comma-separated for multiple "
+"users) and click submit. They will be added as editors and can log in to "
+"QField to start mapping."
+msgstr "在下面输入他们的 QFieldCloud 用户名（多个用户用逗号分隔），然后单击“提交”。他们将被添加为编辑者，并可以登录 QField 开始映射。"
+
+#: app/htmx/project_detail_routes.py:456
+msgid "e.g. alice, bob, charlie"
+msgstr "例如爱丽丝、鲍勃、查理"
+
+#: app/htmx/project_detail_routes.py:457
+msgid "Add collaborators"
+msgstr "添加协作者"
+
+#: app/htmx/project_detail_routes.py:549
+msgid "Enter at least one QFieldCloud username."
+msgstr "输入至少一个 QFieldCloud 用户名。"
+
+#: app/htmx/project_detail_routes.py:559
+msgid "QFieldCloud project ID not found for this project."
+msgstr "未找到该项目的 QFieldCloud 项目 ID。"
+
+#: app/htmx/project_detail_routes.py:565
+msgid ""
+"This project was created on a custom QFieldCloud instance. Use the "
+"QFieldCloud Admin tab to manage collaborators."
+msgstr "该项目是在自定义 QFieldCloud 实例上创建的。使用 QFieldCloud 管理选项卡来管理协作者。"
+
+#: app/htmx/basemap/basemap_attach_flow.py:69
 msgid ""
 "Basemap attach failed for now. Your project is ready to use. Please retry"
 " attach."
 msgstr "底图附加暂时失败。您的项目已可使用。请重试附加。"
 
-#: app/htmx/basemap/basemap_attach_flow.py:73
+#: app/htmx/basemap/basemap_attach_flow.py:74
 msgid ""
 "Basemap attach could not complete due to a temporary network issue. Your "
 "project is ready to use. Please retry attach."
 msgstr "由于临时网络问题，无法完成底图附加。您的项目已可使用。请重试附加。"
 
-#: app/htmx/basemap/basemap_attach_flow.py:122
+#: app/htmx/basemap/basemap_attach_flow.py:123
 msgid "Basemap attach is available after publication."
 msgstr "底图附加功能将在发布后可用。"
 
-#: app/htmx/basemap/basemap_attach_flow.py:131
+#: app/htmx/basemap/basemap_attach_flow.py:132
 msgid "Basemap attach is only available for QField projects."
 msgstr "底图附加功能仅适用于 QField 项目。"
 
-#: app/htmx/basemap/basemap_attach_flow.py:141
+#: app/htmx/basemap/basemap_attach_flow.py:142
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "底图尚未准备好。请等待生成完成。"
 
-#: app/htmx/basemap/basemap_attach_flow.py:156
+#: app/htmx/basemap/basemap_attach_flow.py:157
 msgid ""
 "Basemap download URL is not available yet. Please refresh status and try "
 "again shortly."
 msgstr "底图下载 URL 尚不可用。请刷新状态并稍后重试。"
 
-#: app/htmx/basemap/basemap_attach_flow.py:172
+#: app/htmx/basemap/basemap_attach_flow.py:173
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -335,9 +417,9 @@ msgstr "在此区域未找到现有 OSM 建筑。请从头开始继续测绘。"
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr "无法加载用于简化项目创建的默认 OSM Buildings 表单。"
 
-#: app/htmx/project_create/project_create_simple_flow.py:269
+#: app/htmx/project_create/project_create_simple_flow.py:270
 #: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:209
+#: app/htmx/project_create/project_create_submit_routes.py:210
 msgid "An unexpected error occurred. Please try again."
 msgstr "发生了意外错误。请重试。"
 
@@ -361,7 +443,7 @@ msgstr "该用户不存在。请先创建。"
 msgid "This user is already a collaborator on this project."
 msgstr "该用户已是此项目的协作者。"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1360
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1393
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "添加协作者失败：%(exc)s"
@@ -495,7 +577,7 @@ msgid "from this project?"
 msgstr "从此项目中移除？"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
-#: app/templates/new_project_custom.html:156
+#: app/templates/new_project_custom.html:172
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:177
 msgid "Cancel"
@@ -843,75 +925,75 @@ msgstr "XLSForm。"
 msgid "Failed to modify XLSForm for QField."
 msgstr "无法修改 QField 的 XLSForm。"
 
-#: app/qfield/qfield_crud.py:539
+#: app/qfield/qfield_crud.py:547
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS 包装器已完成，但未写入输出文件。"
 
-#: app/qfield/qfield_crud.py:551
+#: app/qfield/qfield_crud.py:559
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS 包装器已完成，但输出中没有 .qgz 文件。"
 
-#: app/qfield/qfield_crud.py:581
+#: app/qfield/qfield_crud.py:590
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField 项目 ID 丢失；无法附加底图。"
 
-#: app/qfield/qfield_crud.py:615
+#: app/qfield/qfield_crud.py:627
 msgid "Basemap attach completed but produced no project files."
 msgstr "底图已附加到 QField 项目。"
 
-#: app/qfield/qfield_crud.py:801
+#: app/qfield/qfield_crud.py:813
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
 " attempts (last status: %(status)s)."
 msgstr "QFieldCloud 在 %(attempts)d 次尝试后仍未完成项目文件处理（最后状态：%(status)s）。"
 
-#: app/qfield/qfield_crud.py:855 app/qfield/qfield_crud.py:869
+#: app/qfield/qfield_crud.py:871 app/qfield/qfield_crud.py:885
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS 项目生成失败：%(error)s"
 
-#: app/qfield/qfield_crud.py:862
+#: app/qfield/qfield_crud.py:878
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS 包装器返回无效的 JSON。"
 
-#: app/qfield/qfield_crud.py:886
+#: app/qfield/qfield_crud.py:902
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "无法下载用于上传的底图 MBTiles (HTTP %(status)s)。"
 
-#: app/qfield/qfield_crud.py:901
+#: app/qfield/qfield_crud.py:917
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "下载二维码"
 
-#: app/qfield/qfield_crud.py:1027
+#: app/qfield/qfield_crud.py:1044
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "无法将文件上传到 QFieldCloud：%(error)s"
 
-#: app/qfield/qfield_crud.py:1309
+#: app/qfield/qfield_crud.py:1218 app/qfield/qfield_crud.py:1380
+#, python-format
+msgid "User '%(username)s' does not exist on QFieldCloud."
+msgstr "QFieldCloud 上不存在用户“%(username)s”。"
+
+#: app/qfield/qfield_crud.py:1338
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "未找到项目（%(project_id)s）。"
 
-#: app/qfield/qfield_crud.py:1329
+#: app/qfield/qfield_crud.py:1362
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
 " to the organization: %(error)s"
 msgstr "项目属于组织“%(owner)s”。无法将“%(username)s”添加到组织：%(error)s"
 
-#: app/qfield/qfield_crud.py:1347
-#, python-format
-msgid "User '%(username)s' does not exist on QFieldCloud."
-msgstr "QFieldCloud 上不存在用户“%(username)s”。"
-
-#: app/qfield/qfield_crud.py:1354
+#: app/qfield/qfield_crud.py:1387
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "用户 '%(username)s' 已是此项目的协作者。"
 
-#: app/qfield/qfield_crud.py:1395
+#: app/qfield/qfield_crud.py:1428
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ 凭据有效！"
 
@@ -972,7 +1054,7 @@ msgid "Search projects…"
 msgstr "搜索项目…"
 
 #: app/templates/home.html:68 app/templates/landing.html:503
-#: app/templates/layout.html:281 app/templates/new_project_chooser.html:1
+#: app/templates/layout.html:282 app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "创建项目"
@@ -1261,15 +1343,15 @@ msgstr "电子邮件："
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "为开放制图活动提供协调一致的外业制图。"
 
-#: app/templates/layout.html:196 app/templates/login.html:1
+#: app/templates/layout.html:197 app/templates/login.html:1
 msgid "Login"
 msgstr "登录"
 
-#: app/templates/layout.html:274
+#: app/templates/layout.html:275
 msgid "Projects"
 msgstr "项目"
 
-#: app/templates/layout.html:288
+#: app/templates/layout.html:289
 msgid "QField Admin"
 msgstr "QField 管理"
 
@@ -1303,60 +1385,107 @@ msgid ""
 " starting over."
 msgstr "选择适合你项目的选项。以后如果改变主意，可以重新开始。"
 
-#: app/templates/new_project_chooser.html:14
-#: app/templates/new_project_chooser.html:26
-#: app/templates/new_project_simple.html:7
-msgid "Map buildings"
-msgstr "OSM 建筑物"
+#: app/templates/new_project_chooser.html:18
+#: app/templates/new_project_chooser.html:30
+msgid "Add tags to OSM buildings"
+msgstr "为 OSM 建筑物添加标签"
 
-#: app/templates/new_project_chooser.html:17
+#: app/templates/new_project_chooser.html:21
 msgid "Quickest way to start. Just draw your area on the map and you're done."
 msgstr "最快的开始方式。只需在地图上绘制区域即可。"
 
-#: app/templates/new_project_chooser.html:21
-msgid "We'll pre-fill the project for you"
-msgstr "我们会为你预先填写项目"
-
-#: app/templates/new_project_chooser.html:22
-msgid "Uses building outlines already in OpenStreetMap"
+#: app/templates/new_project_chooser.html:25
+msgid "Use building outlines already in OpenStreetMap"
 msgstr "使用 OpenStreetMap 中已有的建筑轮廓"
 
-#: app/templates/new_project_chooser.html:23
-msgid "Comes with a ready-made survey for buildings"
-msgstr "包含一个用于建筑的现成调查表"
+#: app/templates/new_project_chooser.html:26
+msgid "Includes a ready-made survey to add OSM tags to existing buildings"
+msgstr "包括现成的调查，以将 OSM 标签添加到现有建筑物"
 
-#: app/templates/new_project_chooser.html:32
+#: app/templates/new_project_chooser.html:27
+msgid "Fill in gaps for unmapped buildings during digitisation"
+msgstr "填补数字化过程中未绘制地图的建筑物的空白"
+
+#: app/templates/new_project_chooser.html:36
+#: app/templates/new_project_chooser.html:83
+msgid "More details about this option"
+msgstr "有关此选项的更多详细信息"
+
+#: app/templates/new_project_chooser.html:42
+msgid "How this option is set up"
+msgstr "如何设置此选项"
+
+#: app/templates/new_project_chooser.html:44
+msgid "Mapping happens in QField on Android."
+msgstr "映射发生在 Android 上的 QField 中。"
+
+#: app/templates/new_project_chooser.html:45
+msgid ""
+"The area is split into tasks of ~10 buildings each, using roads, rivers, "
+"railways and airstrips as boundaries."
+msgstr "该区域被分成约 10 个建筑物，每个任务以道路、河流、铁路和飞机跑道为边界。"
+
+#: app/templates/new_project_chooser.html:46
+msgid "Photo upload is enabled but optional."
+msgstr "照片上传已启用，但可选。"
+
+#: app/templates/new_project_chooser.html:47
+msgid "A basemap is generated automatically for offline use (if available)."
+msgstr "自动生成底图以供离线使用（如果可用）。"
+
+#: app/templates/new_project_chooser.html:53
+msgid "Preview the building survey in XLSForm Editor →"
+msgstr "在 XLSForm 编辑器中预览建筑测量 →"
+
+#: app/templates/new_project_chooser.html:64
 msgid "Something else"
 msgstr "其他内容"
 
-#: app/templates/new_project_chooser.html:35
+#: app/templates/new_project_chooser.html:67
 msgid ""
-"Use this for anything that isn't buildings. You'll get more options to "
-"set things up\n"
-"        the way you want."
-msgstr "用于建筑以外的任何内容。你将获得更多选项，按自己的方式进行设置。"
+"For anything that isn't tagging OSM buildings - bring your own survey, or"
+" use one contributed by the community."
+msgstr "对于任何未标记 OSM 建筑物的内容 - 请携带您自己的调查问卷，或使用社区贡献的调查问卷。"
 
-#: app/templates/new_project_chooser.html:41
+#: app/templates/new_project_chooser.html:71
 msgid ""
-"Map roads, healthcare, water points, toilets, schools, and many other "
-"things"
-msgstr "绘制道路、医疗点、水点、厕所、学校以及许多其他对象"
+"Other OpenStreetMap features - roads, water points, schools, healthcare, "
+"and more"
+msgstr "其他 OpenStreetMap 功能 - 道路、供水点、学校、医疗保健等"
 
-#: app/templates/new_project_chooser.html:43
-msgid "Bring your own survey questions"
-msgstr "使用你自己的调查问题"
+#: app/templates/new_project_chooser.html:72
+msgid ""
+"Non-OSM surveys - vaccination campaigns, census mapping, healthcare "
+"facility audits, infrastructure inspections"
+msgstr "非 OSM 调查 - 疫苗接种活动、人口普查绘图、医疗机构审计、基础设施检查"
 
-#: app/templates/new_project_chooser.html:44
+#: app/templates/new_project_chooser.html:73
 msgid "Bring your own map data, or start with an empty map"
 msgstr "使用你自己的地图数据，或从空地图开始"
 
-#: app/templates/new_project_chooser.html:45
+#: app/templates/new_project_chooser.html:74
 msgid "Control how the area is divided up for mappers"
 msgstr "控制如何为制图员划分区域"
 
-#: app/templates/new_project_chooser.html:48
+#: app/templates/new_project_chooser.html:77
 msgid "Set up a custom project"
 msgstr "搜索项目…"
+
+#: app/templates/new_project_chooser.html:89
+msgid "Where to find a survey"
+msgstr "在哪里可以找到调查"
+
+#: app/templates/new_project_chooser.html:91
+msgid "Upload your own XLSForm, or"
+msgstr "上传您自己的 XLSForm，或者"
+
+#: app/templates/new_project_chooser.html:97
+msgid "Browse the community XLSForm gallery →"
+msgstr "浏览社区 XLSForm 库 →"
+
+#: app/templates/new_project_chooser.html:99
+msgid "Mapping can use QField (iOS + Android) or ODK Collect (Android only)."
+msgstr "映射可以使用 QField (iOS + Android) 或 ODK Collect（仅限 Android）。"
 
 #: app/templates/new_project_custom.html:1
 msgid "Create Custom Project"
@@ -1415,75 +1544,88 @@ msgstr "制图员将使用哪个应用？"
 msgid "Pick the app you want mappers to install on their phone to do the survey."
 msgstr "选择你希望制图员安装到手机上进行调查的应用。"
 
-#: app/templates/new_project_custom.html:89
+#: app/templates/new_project_custom.html:88
+#: app/templates/new_project_custom.html:120
+msgid "Available platforms"
+msgstr "可用平台"
+
+#: app/templates/new_project_custom.html:99
 msgid ""
 "Powerful GIS-style mapping app, including geometry editing, but with a "
 "simple\n"
 "                mapping pathway enabled via our HOT plugin."
 msgstr "功能强大的 GIS 风格制图应用，支持几何编辑，同时通过我们的 HOT 插件提供简单的制图流程。"
 
-#: app/templates/new_project_custom.html:111
+#: app/templates/new_project_custom.html:123
+msgid "Android only"
+msgstr "仅限安卓"
+
+#: app/templates/new_project_custom.html:127
 msgid ""
 "Simple form-based survey app. Best for straightforward question-and-"
 "answer\n"
 "                surveys."
 msgstr "简单的表单式调查应用。最适合直接的问答式调查。"
 
-#: app/templates/new_project_custom.html:120
+#: app/templates/new_project_custom.html:136
 msgid "Where are you mapping?"
 msgstr "已准备好开始制图"
 
-#: app/templates/new_project_custom.html:122
+#: app/templates/new_project_custom.html:138
 msgid "Draw the area mappers will cover. Smaller areas are easier to coordinate."
 msgstr "绘制制图员将覆盖的区域。较小的区域更容易协调。"
 
-#: app/templates/new_project_custom.html:129
+#: app/templates/new_project_custom.html:145
 msgid "Tags"
 msgstr "标签"
 
-#: app/templates/new_project_custom.html:131
+#: app/templates/new_project_custom.html:147
 msgid "optional"
 msgstr "可选"
 
-#: app/templates/new_project_custom.html:135
+#: app/templates/new_project_custom.html:151
 msgid ""
 "Add tags so other people can find your project. Tags are like #buildings "
 "or\n"
 "          #campaign-2026."
 msgstr "添加标签，帮助其他人找到你的项目。标签类似 #buildings 或 #campaign-2026。"
 
-#: app/templates/new_project_custom.html:141
+#: app/templates/new_project_custom.html:157
 msgid "Type a tag and press Enter"
 msgstr "输入标签并按 Enter 或逗号"
 
-#: app/templates/new_project_custom.html:146
+#: app/templates/new_project_custom.html:162
 msgid "Press Enter or comma after each tag. Click × on a tag to remove it."
 msgstr "输入标签并按 Enter 或逗号以添加。点击标签上的 × 可移除。"
 
-#: app/templates/new_project_custom.html:152
+#: app/templates/new_project_custom.html:168
 #: app/templates/partials/project_details/setup_steps/step2_form.html:82
 msgid "Continue"
 msgstr "继续"
 
-#: app/templates/new_project_custom.html:154
+#: app/templates/new_project_custom.html:170
 msgid "Creating..."
 msgstr "正在创建……"
 
-#: app/templates/new_project_custom.html:164
+#: app/templates/new_project_custom.html:180
 msgid "Something went wrong. Please try again."
 msgstr "出现问题。请重试。"
 
-#: app/templates/new_project_custom.html:295
+#: app/templates/new_project_custom.html:311
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "已存在同名项目。请选择其他名称。"
 
-#: app/templates/new_project_custom.html:379
+#: app/templates/new_project_custom.html:395
 msgid "Description is required."
 msgstr "描述为必填项。"
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup - OSM Buildings"
-msgstr "快速设置 - OSM 建筑物"
+msgid "Quick Setup — OSM Buildings"
+msgstr "快速设置 — OSM 建筑"
+
+#: app/templates/new_project_simple.html:7
+msgid "Map buildings"
+msgstr "OSM 建筑物"
 
 #: app/templates/new_project_simple.html:9
 msgid ""
@@ -1515,7 +1657,7 @@ msgstr "附加到 QField 项目"
 msgid "Creating project and preparing map..."
 msgstr "正在创建项目并准备地图..."
 
-#: app/templates/new_project_simple_creating.html:2
+#: app/templates/new_project_simple_creating.html:1
 msgid "Creating Project"
 msgstr "正在创建项目"
 
@@ -1669,12 +1811,10 @@ msgstr "正在设置你的项目..."
 
 #: app/templates/partials/new_project/creating_fragment.html:25
 msgid ""
-"Downloading map data, splitting tasks, and preparing the QField project.\n"
-"    This can take a minute or two - this page will redirect automatically"
-" when ready."
-msgstr ""
-"正在下载地图数据、拆分任务并准备 QField 项目。\n"
-"    这可能需要一两分钟 - 准备就绪后，此页面将自动跳转。"
+"Downloading map data, splitting tasks, and preparing the QField project. "
+"This can take a\n"
+"    minute or two - this page will redirect automatically when ready."
+msgstr "下载地图数据、拆分任务并准备 QField 项目。这可能需要一个\n    一两分钟 - 此页面将在准备好后自动重定向。"
 
 #: app/templates/partials/new_project/map_script.html:3
 msgid "Area"
@@ -1802,7 +1942,7 @@ msgid "Project Location"
 msgstr "项目位置"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-#: app/templates/partials/project_details/setup_steps.html:53
+#: app/templates/partials/project_details/setup_steps.html:65
 msgid "Survey Form"
 msgstr "调查表"
 
@@ -1841,27 +1981,31 @@ msgstr "已准备好开始制图"
 msgid "Loading QR code..."
 msgstr "正在加载二维码……"
 
-#: app/templates/partials/project_details/setup_steps.html:32
+#: app/templates/partials/project_details/setup_steps.html:37
+msgid "Loading collaborator form..."
+msgstr "正在加载协作者表单..."
+
+#: app/templates/partials/project_details/setup_steps.html:44
 msgid "Project Setup"
 msgstr "项目设置"
 
-#: app/templates/partials/project_details/setup_steps.html:44
+#: app/templates/partials/project_details/setup_steps.html:56
 msgid "Project setup progress"
 msgstr "项目设置"
 
-#: app/templates/partials/project_details/setup_steps.html:47
+#: app/templates/partials/project_details/setup_steps.html:59
 msgid "Project Details"
 msgstr "项目 AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:59
+#: app/templates/partials/project_details/setup_steps.html:71
 msgid "Get Data"
 msgstr "步骤 3：获取数据"
 
-#: app/templates/partials/project_details/setup_steps.html:65
+#: app/templates/partials/project_details/setup_steps.html:77
 msgid "Split Tasks"
 msgstr "拆分 AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:69
+#: app/templates/partials/project_details/setup_steps.html:81
 msgid "Finalise"
 msgstr "完成项目"
 
@@ -2606,4 +2750,3 @@ msgstr "可选 - 留空则在你的用户名下创建"
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "保存并继续"
-

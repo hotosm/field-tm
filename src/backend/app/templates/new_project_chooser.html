@@ -7,46 +7,114 @@ endblock %} {% block content %}
     }}
   </p>
 
+  {% set buildings_xlsform_url = frontend_url ~
+  "/api/v1/helpers/download-template-xlsform?form_type=OSM Buildings" %} {% set
+  buildings_xlsform_editor_url = "https://xlsform-editor.field.hotosm.org/?url=" ~
+  (buildings_xlsform_url | urlencode) %}
+
   <div class="ftm-chooser-grid">
-    <a href="/new/simple" class="ftm-chooser-card" id="chooser-simple">
-      <div class="ftm-chooser-card__head">
-        <span class="ftm-chooser-card__icon" aria-hidden="true">🏠</span>
-        <h2 class="ftm-chooser-card__title">{{ _("Map buildings") }}</h2>
-      </div>
-      <p class="ftm-chooser-card__tagline">
-        {{ _("Quickest way to start. Just draw your area on the map and you're done.") }}
-      </p>
+    <div class="ftm-chooser-card-wrapper">
+      <a href="/new/simple" class="ftm-chooser-card" id="chooser-simple">
+        <div class="ftm-chooser-card__head">
+          <span class="ftm-chooser-card__icon" aria-hidden="true">🏠</span>
+          <h2 class="ftm-chooser-card__title">{{ _("Add tags to OSM buildings") }}</h2>
+        </div>
+        <p class="ftm-chooser-card__tagline">
+          {{ _("Quickest way to start. Just draw your area on the map and you're done.") }}
+        </p>
 
-      <ul class="ftm-chooser-card__list">
-        <li>{{ _("We'll pre-fill the project for you") }}</li>
-        <li>{{ _("Uses building outlines already in OpenStreetMap") }}</li>
-        <li>{{ _("Comes with a ready-made survey for buildings") }}</li>
-      </ul>
+        <ul class="ftm-chooser-card__list">
+          <li>{{ _("Use building outlines already in OpenStreetMap") }}</li>
+          <li>{{ _("Includes a ready-made survey to add OSM tags to existing buildings") }}</li>
+          <li>{{ _("Fill in gaps for unmapped buildings during digitisation") }}</li>
+        </ul>
 
-      <span class="ftm-chooser-card__cta">{{ _("Map buildings") }} →</span>
-    </a>
+        <span class="ftm-chooser-card__cta">{{ _("Add tags to OSM buildings") }} →</span>
+      </a>
+      <button
+        type="button"
+        id="chooser-simple-info"
+        class="ftm-chooser-card__info"
+        aria-label="{{ _('More details about this option') }}"
+      >
+        <wa-icon name="circle-info" aria-hidden="true"></wa-icon>
+      </button>
+      <wa-popover for="chooser-simple-info" placement="bottom-end" distance="6">
+        <div class="ftm-chooser-info-popover">
+          <strong>{{ _("How this option is set up") }}</strong>
+          <ul>
+            <li>{{ _("Mapping happens in QField on Android.") }}</li>
+            <li>
+              {{ _("The area is split into tasks of ~10 buildings each, using roads, rivers,
+              railways and airstrips as boundaries.") }}
+            </li>
+            <li>{{ _("Photo upload is enabled but optional.") }}</li>
+            <li>{{ _("A basemap is generated automatically for offline use (if available).") }}</li>
+            <li>
+              <a href="{{ buildings_xlsform_editor_url }}" target="_blank" rel="noopener noreferrer"
+                >{{ _("Preview the building survey in XLSForm Editor →") }}</a
+              >
+            </li>
+          </ul>
+        </div>
+      </wa-popover>
+    </div>
 
-    <a href="/new/custom" class="ftm-chooser-card ftm-chooser-card--secondary" id="chooser-custom">
-      <div class="ftm-chooser-card__head">
-        <span class="ftm-chooser-card__icon" aria-hidden="true">⚙️</span>
-        <h2 class="ftm-chooser-card__title">{{ _("Something else") }}</h2>
-      </div>
-      <p class="ftm-chooser-card__tagline">
-        {{ _("Use this for anything that isn't buildings. You'll get more options to set things up
-        the way you want.") }}
-      </p>
+    <div class="ftm-chooser-card-wrapper">
+      <a
+        href="/new/custom"
+        class="ftm-chooser-card ftm-chooser-card--secondary"
+        id="chooser-custom"
+      >
+        <div class="ftm-chooser-card__head">
+          <span class="ftm-chooser-card__icon" aria-hidden="true">⚙️</span>
+          <h2 class="ftm-chooser-card__title">{{ _("Something else") }}</h2>
+        </div>
+        <p class="ftm-chooser-card__tagline">
+          {{ _("For anything that isn't tagging OSM buildings - bring your own survey, or use one
+          contributed by the community.") }}
+        </p>
 
-      <ul class="ftm-chooser-card__list">
-        <li>
-          {{ _("Map roads, healthcare, water points, toilets, schools, and many other things") }}
-        </li>
-        <li>{{ _("Bring your own survey questions") }}</li>
-        <li>{{ _("Bring your own map data, or start with an empty map") }}</li>
-        <li>{{ _("Control how the area is divided up for mappers") }}</li>
-      </ul>
+        <ul class="ftm-chooser-card__list">
+          <li>
+            {{ _("Other OpenStreetMap features - roads, water points, schools, healthcare, and
+            more") }}
+          </li>
+          <li>
+            {{ _("Non-OSM surveys - vaccination campaigns, census mapping, healthcare facility
+            audits, infrastructure inspections") }}
+          </li>
+          <li>{{ _("Bring your own map data, or start with an empty map") }}</li>
+          <li>{{ _("Control how the area is divided up for mappers") }}</li>
+        </ul>
 
-      <span class="ftm-chooser-card__cta">{{ _("Set up a custom project") }} →</span>
-    </a>
+        <span class="ftm-chooser-card__cta">{{ _("Set up a custom project") }} →</span>
+      </a>
+      <button
+        type="button"
+        id="chooser-custom-info"
+        class="ftm-chooser-card__info"
+        aria-label="{{ _('More details about this option') }}"
+      >
+        <wa-icon name="circle-info" aria-hidden="true"></wa-icon>
+      </button>
+      <wa-popover for="chooser-custom-info" placement="bottom-end" distance="6">
+        <div class="ftm-chooser-info-popover">
+          <strong>{{ _("Where to find a survey") }}</strong>
+          <ul>
+            <li>{{ _("Upload your own XLSForm, or") }}</li>
+            <li>
+              <a href="https://xlsforms.field.hotosm.org" target="_blank" rel="noopener noreferrer"
+                >{{ _("Browse the community XLSForm gallery →") }}</a
+              >
+            </li>
+            <li>
+              {{ _("Mapping can use QField (iOS + Android) or ODK Collect (Android only).") }}
+            </li>
+          </ul>
+        </div>
+      </wa-popover>
+    </div>
   </div>
 </div>
 {% endblock %}

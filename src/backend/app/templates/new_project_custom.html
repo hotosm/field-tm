@@ -85,6 +85,16 @@ Manager{% endblock %} {% block content %}
             />
             <span class="ftm-radio-card__text">
               <span style="font-weight: 600">QField</span>
+              <span class="ftm-platform-chips" aria-label="{{ _('Available platforms') }}">
+                <span class="ftm-platform-chip">
+                  <wa-icon family="brands" name="apple" aria-hidden="true"></wa-icon>
+                  iOS
+                </span>
+                <span class="ftm-platform-chip">
+                  <wa-icon family="brands" name="android" aria-hidden="true"></wa-icon>
+                  Android
+                </span>
+              </span>
               <small class="ftm-form-help" style="margin: 0">
                 {{ _("Powerful GIS-style mapping app, including geometry editing, but with a simple
                 mapping pathway enabled via our HOT plugin.") }}
@@ -107,6 +117,12 @@ Manager{% endblock %} {% block content %}
             />
             <span class="ftm-radio-card__text">
               <span style="font-weight: 600">ODK Collect</span>
+              <span class="ftm-platform-chips" aria-label="{{ _('Available platforms') }}">
+                <span class="ftm-platform-chip">
+                  <wa-icon family="brands" name="android" aria-hidden="true"></wa-icon>
+                  {{ _("Android only") }}
+                </span>
+              </span>
               <small class="ftm-form-help" style="margin: 0">
                 {{ _("Simple form-based survey app. Best for straightforward question-and-answer
                 surveys.") }}

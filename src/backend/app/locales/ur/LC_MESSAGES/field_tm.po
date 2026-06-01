@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-05-13 04:50+0100\n"
+"POT-Creation-Date: 2026-06-01 14:25+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ur\n"
@@ -26,7 +26,7 @@ msgstr "کی توثیق ناکام ہو گئی۔"
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "ایک غیر متوقع خرابی پیش آئی۔ براہ کرم منتظم سے رابطہ کریں۔"
 
-#: app/main.py:286
+#: app/main.py:313
 msgid "Could not connect to database"
 msgstr "ڈیٹا بیس سے منسلک نہیں ہو سکا"
 
@@ -52,72 +52,84 @@ msgstr "پروجیکٹ مقفل ہے کیونکہ یہ %(state)s حالت میں
 msgid "User (%(user_sub)s) could not be inserted in db"
 msgstr "صارف (%(user_sub)s) کو db میں داخل نہیں کیا جا سکا"
 
-#: app/central/central_crud.py:151
+#: app/central/central_crud.py:153
 #, python-format
 msgid "Error listing projects on ODK Central: %(error)s"
 msgstr "ODK Central میں منصوبوں کی فہرست بناتے وقت خرابی: %(error)s"
 
-#: app/central/central_crud.py:182
+#: app/central/central_crud.py:184
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
 msgstr "ODK Central میں منصوبہ بناتے وقت خرابی: %(error)s"
 
-#: app/central/central_crud.py:244
+#: app/central/central_crud.py:246
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
 msgstr "ODK سینٹرل پر فارم اپ لوڈ کرنے میں ناکام: %(error)s"
 
-#: app/central/central_crud.py:259
+#: app/central/central_crud.py:261
 msgid "form_id is required to list submissions with pyodk."
 msgstr "form_id pyodk کے ساتھ گذارشات کی فہرست کے لیے درکار ہے۔"
 
-#: app/central/central_crud.py:302
+#: app/central/central_crud.py:309
+#, python-format
+msgid "Could not read XLSForm file: %(error)s"
+msgstr "XLSForm فائل کو پڑھا نہیں جا سکا: %(error)s"
+
+#: app/central/central_crud.py:349
+#, python-format
+msgid ""
+"XLSForm has select questions referencing lists that aren't defined in the"
+" choices sheet: %(rows)s. Check your survey and choices sheets."
+msgstr "XLSForm میں منتخب سوالات کے حوالے سے فہرستیں ہیں جن کی وضاحت انتخابی شیٹ میں نہیں کی گئی ہے: %(rows)s۔ اپنے سروے اور انتخابی شیٹس کو چیک کریں۔"
+
+#: app/central/central_crud.py:375
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
 msgstr "XLSForm غلط ہے: %(error)s"
 
-#: app/central/central_crud.py:429
+#: app/central/central_crud.py:507
 msgid "Conversion GeoJSON --> CSV failed"
 msgstr "کی تبدیلی GeoJSON --> CSV ناکام ہو گئی۔"
 
-#: app/central/central_crud.py:500
+#: app/central/central_crud.py:578
 msgid "Project contains no submissions yet"
 msgstr "پروجیکٹ میں ابھی تک کوئی گذارشات نہیں ہیں۔"
 
-#: app/central/central_crud.py:562
+#: app/central/central_crud.py:640
 msgid "'geometry' data field is mandatory"
 msgstr "'جیومیٹری' ڈیٹا فیلڈ لازمی ہے۔"
 
-#: app/central/central_crud.py:830
+#: app/central/central_crud.py:908
 msgid "ODK project_id is missing; cannot create/merge entity lists."
 msgstr "ODK پروجیکٹ_id غائب ہے؛ ہستی کی فہرستیں نہیں بنا سکتے/ ضم نہیں کر سکتے۔"
 
-#: app/central/central_crud.py:963
+#: app/central/central_crud.py:1041
 msgid "Could not generate token for app user."
 msgstr "ایپ صارف کے لیے ٹوکن نہیں بنا سکا۔"
 
-#: app/central/central_crud.py:995 app/central/central_crud.py:1001
+#: app/central/central_crud.py:1073 app/central/central_crud.py:1079
 msgid "An error occurred while creating the app user token."
 msgstr "QR کوڈ بناتے وقت ایک غیر متوقع خرابی پیش آئی۔"
 
-#: app/central/central_crud.py:1015
+#: app/central/central_crud.py:1093
 #, python-format
 msgid "Could not assign %(scope)s role to app user."
 msgstr "ایپ صارف کو %(scope)s رول تفویض نہیں کر سکا۔"
 
-#: app/central/central_crud.py:1054
+#: app/central/central_crud.py:1132
 msgid "Could not find 'Project Manager' role in ODK Central."
 msgstr "منصوبہ ODK Central میں کھولیں"
 
-#: app/central/central_crud.py:1079
+#: app/central/central_crud.py:1157
 msgid "ODK Central returned no user ID after creation."
 msgstr "ODK سینٹرل نے تخلیق کے بعد کوئی صارف ID واپس نہیں کی۔"
 
-#: app/central/central_crud.py:1212
+#: app/central/central_crud.py:1290
 msgid "Failed to create ODK Central manager user."
 msgstr "ODK سینٹرل مینیجر صارف بنانے میں ناکام۔"
 
-#: app/central/central_crud.py:1232
+#: app/central/central_crud.py:1310
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "QR کوڈ بناتے وقت ایک غیر متوقع خرابی پیش آئی۔"
 
@@ -173,46 +185,56 @@ msgstr "کوئی جیومیٹریز موجود نہیں ہے۔"
 msgid "Your geojson file is invalid."
 msgstr "آپ کی جیوسن فائل غلط ہے۔"
 
-#: app/htmx/project_detail_routes.py:97
+#: app/htmx/project_detail_routes.py:115
 msgid "Mapper Login (QFieldCloud)"
 msgstr "نقشہ ساز لاگ اِن (QFieldCloud)"
 
-#: app/htmx/project_detail_routes.py:100
+#: app/htmx/project_detail_routes.py:118
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
 msgid "Username:"
 msgstr "صارف نام:"
 
-#: app/htmx/project_detail_routes.py:103
+#: app/htmx/project_detail_routes.py:121
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
 msgid "Password:"
 msgstr "پاس ورڈ:"
 
-#: app/htmx/project_detail_routes.py:106
+#: app/htmx/project_detail_routes.py:124
 msgid "Scan the QR code, then enter these credentials in QField."
 msgstr "QR کوڈ اسکین کریں، پھر یہ معلومات QField میں درج کریں۔"
 
-#: app/htmx/project_detail_routes.py:118
+#: app/htmx/project_detail_routes.py:137
 msgid "Scan QR Code"
 msgstr "QR کوڈ اسکین کریں"
 
-#: app/htmx/project_detail_routes.py:120
+#: app/htmx/project_detail_routes.py:139
 #, python-format
 msgid "Use %(app_name)s to scan this QR code and load the project."
 msgstr ""
 "اس QR کوڈ کو اسکین کرنے اور منصوبہ لوڈ کرنے کے لیے %(app_name)s استعمال "
 "کریں۔"
 
-#: app/htmx/project_detail_routes.py:122
+#: app/htmx/project_detail_routes.py:141
 msgid "Project QR Code"
 msgstr "منصوبے کا QR کوڈ"
 
-#: app/htmx/project_detail_routes.py:123
+#: app/htmx/project_detail_routes.py:142
 msgid "Download QR Code"
 msgstr "QR کوڈ ڈاؤن لوڈ کریں"
 
-#: app/htmx/project_detail_routes.py:175
+#: app/htmx/project_detail_routes.py:145
+#, python-format
+msgid "Open in %(app_name)s"
+msgstr "%(app_name)s میں کھولیں"
+
+#: app/htmx/project_detail_routes.py:146
+#, python-format
+msgid "If %(app_name)s is installed on this device."
+msgstr "اگر %(app_name)s اس آلہ پر انسٹال ہے۔"
+
+#: app/htmx/project_detail_routes.py:212
 msgid ""
 "Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
 " running."
@@ -220,40 +242,100 @@ msgstr ""
 "میپنگ سرور تک رسائی ممکن نہیں۔ چیک کریں کہ ODK Central یا QFieldCloud چل "
 "رہا ہے۔"
 
-#: app/htmx/project_detail_routes.py:179
+#: app/htmx/project_detail_routes.py:216
 msgid "The mapping server returned an error. Check its logs for details."
 msgstr "میپنگ سرور نے خرابی واپس کی۔ تفصیلات کے لیے اس کے لاگز دیکھیں۔"
 
-#: app/htmx/project_detail_routes.py:182
+#: app/htmx/project_detail_routes.py:219
 msgid ""
 "Authentication failed connecting to the mapping server. Check the "
 "configured credentials."
 msgstr "میپنگ سرور سے جڑتے وقت توثیق ناکام ہو گئی۔ ترتیب دی گئی معلومات چیک کریں۔"
 
-#: app/htmx/project_detail_routes.py:185
+#: app/htmx/project_detail_routes.py:222
 msgid "An unexpected error occurred while generating the QR code."
 msgstr "QR کوڈ بناتے وقت ایک غیر متوقع خرابی پیش آئی۔"
 
-#: app/htmx/project_detail_routes.py:247
+#: app/htmx/project_detail_routes.py:295
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "منصوبہ (%(project_id)s) نہیں ملا۔"
 
-#: app/htmx/project_detail_routes.py:254
+#: app/htmx/project_detail_routes.py:302
 msgid "Only the project manager can delete this project."
 msgstr "صرف منصوبہ منتظم ہی اس منصوبے کو حذف کر سکتا ہے۔"
 
-#: app/htmx/project_detail_routes.py:292 app/templates/project_details.html:172
+#: app/htmx/project_detail_routes.py:340 app/templates/project_details.html:172
 msgid "Project not found."
 msgstr "منصوبہ نہیں ملا۔"
 
-#: app/htmx/project_detail_routes.py:321
+#: app/htmx/project_detail_routes.py:376
 #: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "خرابی: %(error_msg)s"
 
-#: app/htmx/basemap/basemap_attach_flow.py:68
+#: app/htmx/project_detail_routes.py:410
+#, python-format
+msgid "Added the following user(s) as project editors: %(names)s."
+msgstr "مندرجہ ذیل صارف (صارفین) کو بطور پروجیکٹ ایڈیٹرز شامل کیا گیا: %(names)s۔"
+
+#: app/htmx/project_detail_routes.py:414
+#, python-format
+msgid "Could not add '%(username)s': %(reason)s"
+msgstr "'%(username)s' کو شامل نہیں کیا جا سکا: %(reason)s"
+
+#: app/htmx/project_detail_routes.py:420
+msgid "Add more collaborators"
+msgstr "مزید ساتھیوں کو شامل کریں۔"
+
+#: app/htmx/project_detail_routes.py:435
+msgid "Invite QFieldCloud collaborators"
+msgstr "QFieldCloud کے ساتھیوں کو مدعو کریں۔"
+
+#: app/htmx/project_detail_routes.py:438
+msgid ""
+"Mappers must have an account on QFieldCloud before you can give them "
+"access to this project."
+msgstr "Mappers کے پاس QFieldCloud پر ایک اکاؤنٹ ہونا ضروری ہے اس سے پہلے کہ آپ انہیں اس پروجیکٹ تک رسائی دے سکیں۔"
+
+#: app/htmx/project_detail_routes.py:444
+msgid ""
+"Have each mapper create a free account at <a "
+"href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
+"class=\"ftm-link--brand\">app.qfield.cloud</a>."
+msgstr "ہر میپر سے <a href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" class=\"ftm-link--brand\">app.qfield.cloud</a> پر ایک مفت اکاؤنٹ بنانے کو کہیں۔"
+
+#: app/htmx/project_detail_routes.py:450
+msgid ""
+"Enter their QFieldCloud usernames below (comma-separated for multiple "
+"users) and click submit. They will be added as editors and can log in to "
+"QField to start mapping."
+msgstr "ذیل میں ان کے QFieldCloud صارف نام درج کریں (متعدد صارفین کے لیے کوما سے الگ) اور جمع کروائیں پر کلک کریں۔ انہیں ایڈیٹرز کے طور پر شامل کیا جائے گا اور وہ میپنگ شروع کرنے کے لیے QField میں لاگ ان کر سکتے ہیں۔"
+
+#: app/htmx/project_detail_routes.py:456
+msgid "e.g. alice, bob, charlie"
+msgstr "جیسے ایلس، باب، چارلی"
+
+#: app/htmx/project_detail_routes.py:457
+msgid "Add collaborators"
+msgstr "ساتھیوں کو شامل کریں۔"
+
+#: app/htmx/project_detail_routes.py:549
+msgid "Enter at least one QFieldCloud username."
+msgstr "کم از کم ایک QFieldCloud صارف نام درج کریں۔"
+
+#: app/htmx/project_detail_routes.py:559
+msgid "QFieldCloud project ID not found for this project."
+msgstr "اس پروجیکٹ کے لیے QFieldCloud پروجیکٹ ID نہیں ملی۔"
+
+#: app/htmx/project_detail_routes.py:565
+msgid ""
+"This project was created on a custom QFieldCloud instance. Use the "
+"QFieldCloud Admin tab to manage collaborators."
+msgstr "یہ پروجیکٹ اپنی مرضی کے مطابق QFieldCloud مثال پر بنایا گیا تھا۔ تعاون کنندگان کا نظم کرنے کے لیے QFieldCloud ایڈمن ٹیب کا استعمال کریں۔"
+
+#: app/htmx/basemap/basemap_attach_flow.py:69
 msgid ""
 "Basemap attach failed for now. Your project is ready to use. Please retry"
 " attach."
@@ -261,7 +343,7 @@ msgstr ""
 "بیس میپ منسلک کرنا فی الحال ناکام ہو گیا ہے۔ آپ کا پروجیکٹ استعمال کے لیے"
 " تیار ہے۔ براہ کرم دوبارہ منسلک کرنے کی کوشش کریں۔"
 
-#: app/htmx/basemap/basemap_attach_flow.py:73
+#: app/htmx/basemap/basemap_attach_flow.py:74
 msgid ""
 "Basemap attach could not complete due to a temporary network issue. Your "
 "project is ready to use. Please retry attach."
@@ -269,19 +351,19 @@ msgstr ""
 "عارضی نیٹ ورک مسئلے کی وجہ سے بیس میپ منسلک کرنا مکمل نہیں ہو سکا۔ آپ کا "
 "پروجیکٹ استعمال کے لیے تیار ہے۔ براہ کرم دوبارہ منسلک کرنے کی کوشش کریں۔"
 
-#: app/htmx/basemap/basemap_attach_flow.py:122
+#: app/htmx/basemap/basemap_attach_flow.py:123
 msgid "Basemap attach is available after publication."
 msgstr "بیس میپ منسلک کرنے کی سہولت اشاعت کے بعد دستیاب ہوتی ہے۔"
 
-#: app/htmx/basemap/basemap_attach_flow.py:131
+#: app/htmx/basemap/basemap_attach_flow.py:132
 msgid "Basemap attach is only available for QField projects."
 msgstr "بیس میپ منسلک کرنا صرف QField پروجیکٹس کے لیے دستیاب ہے۔"
 
-#: app/htmx/basemap/basemap_attach_flow.py:141
+#: app/htmx/basemap/basemap_attach_flow.py:142
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "بیس میپ ابھی تیار نہیں ہے۔ براہ کرم تیاری مکمل ہونے تک انتظار کریں۔"
 
-#: app/htmx/basemap/basemap_attach_flow.py:156
+#: app/htmx/basemap/basemap_attach_flow.py:157
 msgid ""
 "Basemap download URL is not available yet. Please refresh status and try "
 "again shortly."
@@ -289,7 +371,7 @@ msgstr ""
 "بیس میپ ڈاؤن لوڈ URL ابھی دستیاب نہیں۔ براہ کرم اسٹیٹس ریفریش کریں اور "
 "تھوڑی دیر بعد دوبارہ کوشش کریں۔"
 
-#: app/htmx/basemap/basemap_attach_flow.py:172
+#: app/htmx/basemap/basemap_attach_flow.py:173
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -355,9 +437,9 @@ msgstr "اس علاقے میں موجودہ OSM عمارتیں نہیں ملیں
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr "سادہ پروجیکٹ بنانے کے لیے ڈیفالٹ OSM Buildings فارم لوڈ نہیں ہو سکا۔"
 
-#: app/htmx/project_create/project_create_simple_flow.py:269
+#: app/htmx/project_create/project_create_simple_flow.py:270
 #: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:209
+#: app/htmx/project_create/project_create_submit_routes.py:210
 msgid "An unexpected error occurred. Please try again."
 msgstr "ایک غیر متوقع خرابی پیش آئی۔ براہ کرم دوبارہ کوشش کریں۔"
 
@@ -381,7 +463,7 @@ msgstr "یہ صارف موجود نہیں۔ براہ کرم پہلے اسے بن
 msgid "This user is already a collaborator on this project."
 msgstr "یہ صارف پہلے ہی اس منصوبے میں معاون ہے۔"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1360
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1393
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "معاون شامل کرنے میں ناکامی: %(exc)s"
@@ -515,7 +597,7 @@ msgid "from this project?"
 msgstr "اس منصوبے سے؟"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
-#: app/templates/new_project_custom.html:156
+#: app/templates/new_project_custom.html:172
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:177
 msgid "Cancel"
@@ -901,23 +983,23 @@ msgstr "XLSForm درکار ہے۔"
 msgid "Failed to modify XLSForm for QField."
 msgstr "QField کے لیے XLSForm میں ترمیم کرنے میں ناکام۔"
 
-#: app/qfield/qfield_crud.py:539
+#: app/qfield/qfield_crud.py:547
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS ریپر مکمل ہوا لیکن کوئی آؤٹ پٹ فائل نہیں لکھی۔"
 
-#: app/qfield/qfield_crud.py:551
+#: app/qfield/qfield_crud.py:559
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS ریپر مکمل ہو گیا لیکن آؤٹ پٹ میں .qgz فائل نہیں ہے۔"
 
-#: app/qfield/qfield_crud.py:581
+#: app/qfield/qfield_crud.py:590
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField پروجیکٹ ID غائب ہے۔ بیس میپ منسلک نہیں کر سکتے۔"
 
-#: app/qfield/qfield_crud.py:615
+#: app/qfield/qfield_crud.py:627
 msgid "Basemap attach completed but produced no project files."
 msgstr "بیس میپ QField منصوبے کے ساتھ منسلک کر دیا گیا ہے۔"
 
-#: app/qfield/qfield_crud.py:801
+#: app/qfield/qfield_crud.py:813
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -926,35 +1008,40 @@ msgstr ""
 "QFieldCloud نے %(attempts)d کوششوں کے بعد بھی پروجیکٹ فائل کی پروسیسنگ "
 "مکمل نہیں کی (آخری اسٹیٹس: %(status)s)۔"
 
-#: app/qfield/qfield_crud.py:855 app/qfield/qfield_crud.py:869
+#: app/qfield/qfield_crud.py:871 app/qfield/qfield_crud.py:885
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS پروجیکٹ جنریشن ناکام: %(error)s"
 
-#: app/qfield/qfield_crud.py:862
+#: app/qfield/qfield_crud.py:878
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS ریپر نے غلط JSON واپس کیا۔"
 
-#: app/qfield/qfield_crud.py:886
+#: app/qfield/qfield_crud.py:902
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "اپ لوڈ (HTTP %(status)s) کے لیے بیس میپ MBTiles ڈاؤن لوڈ کرنے میں ناکام۔"
 
-#: app/qfield/qfield_crud.py:901
+#: app/qfield/qfield_crud.py:917
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "QR کوڈ ڈاؤن لوڈ کریں"
 
-#: app/qfield/qfield_crud.py:1027
+#: app/qfield/qfield_crud.py:1044
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "QFieldCloud پر فائلیں اپ لوڈ کرنے میں ناکام: %(error)s"
 
-#: app/qfield/qfield_crud.py:1309
+#: app/qfield/qfield_crud.py:1218 app/qfield/qfield_crud.py:1380
+#, python-format
+msgid "User '%(username)s' does not exist on QFieldCloud."
+msgstr "صارف '%(username)s' QFieldCloud پر موجود نہیں ہے۔"
+
+#: app/qfield/qfield_crud.py:1338
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "منصوبہ (%(project_id)s) نہیں ملا۔"
 
-#: app/qfield/qfield_crud.py:1329
+#: app/qfield/qfield_crud.py:1362
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -963,17 +1050,12 @@ msgstr ""
 "پروجیکٹ کا تعلق تنظیم '%(owner)s' سے ہے۔ تنظیم میں '%(username)s' کو شامل"
 " نہیں کیا جا سکا: %(error)s"
 
-#: app/qfield/qfield_crud.py:1347
-#, python-format
-msgid "User '%(username)s' does not exist on QFieldCloud."
-msgstr "صارف '%(username)s' QFieldCloud پر موجود نہیں ہے۔"
-
-#: app/qfield/qfield_crud.py:1354
+#: app/qfield/qfield_crud.py:1387
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "صارف '%(username)s' پہلے ہی اس منصوبے میں معاون ہے۔"
 
-#: app/qfield/qfield_crud.py:1395
+#: app/qfield/qfield_crud.py:1428
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ معلومات درست ہیں!"
 
@@ -1034,7 +1116,7 @@ msgid "Search projects…"
 msgstr "منصوبے تلاش کریں…"
 
 #: app/templates/home.html:68 app/templates/landing.html:503
-#: app/templates/layout.html:281 app/templates/new_project_chooser.html:1
+#: app/templates/layout.html:282 app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "منصوبہ بنائیں"
@@ -1352,15 +1434,15 @@ msgstr "ای میل:"
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "اوپن میپنگ مہمات کے لیے مربوط میدانی نقشہ سازی۔"
 
-#: app/templates/layout.html:196 app/templates/login.html:1
+#: app/templates/layout.html:197 app/templates/login.html:1
 msgid "Login"
 msgstr "لاگ اِن"
 
-#: app/templates/layout.html:274
+#: app/templates/layout.html:275
 msgid "Projects"
 msgstr "منصوبے"
 
-#: app/templates/layout.html:288
+#: app/templates/layout.html:289
 msgid "QField Admin"
 msgstr "QField انتظام"
 
@@ -1396,64 +1478,107 @@ msgstr ""
 "وہ اختیار منتخب کریں جو آپ کے منصوبے کے مطابق ہو۔ آپ بعد میں دوبارہ شروع "
 "کر کے اپنا ارادہ بدل سکتے ہیں۔"
 
-#: app/templates/new_project_chooser.html:14
-#: app/templates/new_project_chooser.html:26
-#: app/templates/new_project_simple.html:7
-msgid "Map buildings"
-msgstr "OSM عمارتیں"
+#: app/templates/new_project_chooser.html:18
+#: app/templates/new_project_chooser.html:30
+msgid "Add tags to OSM buildings"
+msgstr "OSM عمارتوں میں ٹیگ شامل کریں۔"
 
-#: app/templates/new_project_chooser.html:17
+#: app/templates/new_project_chooser.html:21
 msgid "Quickest way to start. Just draw your area on the map and you're done."
 msgstr "شروع کرنے کا تیز ترین طریقہ۔ بس نقشے پر اپنا علاقہ بنائیں اور کام ہو گیا۔"
 
-#: app/templates/new_project_chooser.html:21
-msgid "We'll pre-fill the project for you"
-msgstr "ہم آپ کے لیے منصوبہ پہلے سے بھر دیں گے"
+#: app/templates/new_project_chooser.html:25
+msgid "Use building outlines already in OpenStreetMap"
+msgstr "OpenStreetMap میں پہلے سے ہی عمارت کا خاکہ استعمال کریں۔"
 
-#: app/templates/new_project_chooser.html:22
-msgid "Uses building outlines already in OpenStreetMap"
-msgstr "OpenStreetMap میں پہلے سے موجود عمارتوں کی حد بندی استعمال کرتا ہے"
+#: app/templates/new_project_chooser.html:26
+msgid "Includes a ready-made survey to add OSM tags to existing buildings"
+msgstr "موجودہ عمارتوں میں OSM ٹیگز شامل کرنے کے لیے ایک ریڈی میڈ سروے شامل ہے۔"
 
-#: app/templates/new_project_chooser.html:23
-msgid "Comes with a ready-made survey for buildings"
-msgstr "عمارتوں کے لیے تیار سروے کے ساتھ آتا ہے"
+#: app/templates/new_project_chooser.html:27
+msgid "Fill in gaps for unmapped buildings during digitisation"
+msgstr "ڈیجیٹائزیشن کے دوران بغیر نقشے والی عمارتوں کے خلا کو پُر کریں۔"
 
-#: app/templates/new_project_chooser.html:32
+#: app/templates/new_project_chooser.html:36
+#: app/templates/new_project_chooser.html:83
+msgid "More details about this option"
+msgstr "اس اختیار کے بارے میں مزید تفصیلات"
+
+#: app/templates/new_project_chooser.html:42
+msgid "How this option is set up"
+msgstr "یہ آپشن کیسے ترتیب دیا گیا ہے۔"
+
+#: app/templates/new_project_chooser.html:44
+msgid "Mapping happens in QField on Android."
+msgstr "میپنگ اینڈرائیڈ پر کیو فیلڈ میں ہوتی ہے۔"
+
+#: app/templates/new_project_chooser.html:45
+msgid ""
+"The area is split into tasks of ~10 buildings each, using roads, rivers, "
+"railways and airstrips as boundaries."
+msgstr "یہ علاقہ سڑکوں، ندیوں، ریلوے اور ہوائی پٹیوں کو باؤنڈری کے طور پر استعمال کرتے ہوئے ہر ایک ~ 10 عمارتوں کے کاموں میں تقسیم ہے۔"
+
+#: app/templates/new_project_chooser.html:46
+msgid "Photo upload is enabled but optional."
+msgstr "تصویر اپ لوڈ فعال ہے لیکن اختیاری ہے۔"
+
+#: app/templates/new_project_chooser.html:47
+msgid "A basemap is generated automatically for offline use (if available)."
+msgstr "ایک بیس میپ آف لائن استعمال کے لیے خود بخود تیار ہوتا ہے (اگر دستیاب ہو)۔"
+
+#: app/templates/new_project_chooser.html:53
+msgid "Preview the building survey in XLSForm Editor →"
+msgstr "XLSForm Editor → میں عمارت کے سروے کا جائزہ لیں۔"
+
+#: app/templates/new_project_chooser.html:64
 msgid "Something else"
 msgstr "کچھ اور"
 
-#: app/templates/new_project_chooser.html:35
+#: app/templates/new_project_chooser.html:67
 msgid ""
-"Use this for anything that isn't buildings. You'll get more options to "
-"set things up\n"
-"        the way you want."
-msgstr ""
-"اسے عمارتوں کے علاوہ کسی بھی چیز کے لیے استعمال کریں۔ آپ کو اسے اپنی مرضی"
-" کے مطابق ترتیب دینے کے لیے مزید اختیارات ملیں گے۔"
+"For anything that isn't tagging OSM buildings - bring your own survey, or"
+" use one contributed by the community."
+msgstr "کسی بھی چیز کے لیے جو OSM عمارتوں کو ٹیگ نہیں کر رہی ہے - اپنا سروے لائیں، یا کمیونٹی کی طرف سے تعاون کردہ ایک کا استعمال کریں۔"
 
-#: app/templates/new_project_chooser.html:41
+#: app/templates/new_project_chooser.html:71
 msgid ""
-"Map roads, healthcare, water points, toilets, schools, and many other "
-"things"
-msgstr ""
-"سڑکیں، صحت کی سہولیات، پانی کے مقامات، بیت الخلا، اسکول اور بہت سی دیگر "
-"چیزیں نقشہ کریں"
+"Other OpenStreetMap features - roads, water points, schools, healthcare, "
+"and more"
+msgstr "OpenStreetMap کی دیگر خصوصیات - سڑکیں، پانی کے مقامات، اسکول، صحت کی دیکھ بھال، اور بہت کچھ"
 
-#: app/templates/new_project_chooser.html:43
-msgid "Bring your own survey questions"
-msgstr "اپنے سروے کے سوالات لائیں"
+#: app/templates/new_project_chooser.html:72
+msgid ""
+"Non-OSM surveys - vaccination campaigns, census mapping, healthcare "
+"facility audits, infrastructure inspections"
+msgstr "غیر OSM سروے - ویکسینیشن مہم، مردم شماری کی نقشہ سازی، صحت کی دیکھ بھال کی سہولت کے آڈٹ، بنیادی ڈھانچے کے معائنہ"
 
-#: app/templates/new_project_chooser.html:44
+#: app/templates/new_project_chooser.html:73
 msgid "Bring your own map data, or start with an empty map"
 msgstr "اپنا نقشہ ڈیٹا لائیں، یا خالی نقشے سے شروع کریں"
 
-#: app/templates/new_project_chooser.html:45
+#: app/templates/new_project_chooser.html:74
 msgid "Control how the area is divided up for mappers"
 msgstr "یہ کنٹرول کریں کہ میپرز کے لیے علاقہ کیسے تقسیم ہو"
 
-#: app/templates/new_project_chooser.html:48
+#: app/templates/new_project_chooser.html:77
 msgid "Set up a custom project"
 msgstr "منصوبے تلاش کریں…"
+
+#: app/templates/new_project_chooser.html:89
+msgid "Where to find a survey"
+msgstr "ایک سروے کہاں تلاش کرنا ہے۔"
+
+#: app/templates/new_project_chooser.html:91
+msgid "Upload your own XLSForm, or"
+msgstr "اپنا XLSForm اپ لوڈ کریں، یا"
+
+#: app/templates/new_project_chooser.html:97
+msgid "Browse the community XLSForm gallery →"
+msgstr "کمیونٹی XLSForm گیلری → کو براؤز کریں۔"
+
+#: app/templates/new_project_chooser.html:99
+msgid "Mapping can use QField (iOS + Android) or ODK Collect (Android only)."
+msgstr "میپنگ QField (iOS + Android) یا ODK Collect (صرف Android) استعمال کر سکتی ہے۔"
 
 #: app/templates/new_project_custom.html:1
 msgid "Create Custom Project"
@@ -1521,7 +1646,12 @@ msgstr ""
 "وہ ایپ منتخب کریں جسے آپ چاہتے ہیں کہ میپرز سروے کرنے کے لیے اپنے فون پر "
 "انسٹال کریں۔"
 
-#: app/templates/new_project_custom.html:89
+#: app/templates/new_project_custom.html:88
+#: app/templates/new_project_custom.html:120
+msgid "Available platforms"
+msgstr "دستیاب پلیٹ فارمز"
+
+#: app/templates/new_project_custom.html:99
 msgid ""
 "Powerful GIS-style mapping app, including geometry editing, but with a "
 "simple\n"
@@ -1530,32 +1660,36 @@ msgstr ""
 "طاقتور GIS طرز کی میپنگ ایپ، جس میں جیومیٹری ایڈیٹنگ شامل ہے، مگر ہمارے "
 "HOT پلگ ان کے ذریعے آسان میپنگ راستہ فعال ہے۔"
 
-#: app/templates/new_project_custom.html:111
+#: app/templates/new_project_custom.html:123
+msgid "Android only"
+msgstr "صرف اینڈرائیڈ"
+
+#: app/templates/new_project_custom.html:127
 msgid ""
 "Simple form-based survey app. Best for straightforward question-and-"
 "answer\n"
 "                surveys."
 msgstr "سادہ فارم پر مبنی سروے ایپ۔ براہ راست سوال و جواب والے سروے کے لیے بہترین۔"
 
-#: app/templates/new_project_custom.html:120
+#: app/templates/new_project_custom.html:136
 msgid "Where are you mapping?"
 msgstr "نقشہ سازی کے لیے تیار"
 
-#: app/templates/new_project_custom.html:122
+#: app/templates/new_project_custom.html:138
 msgid "Draw the area mappers will cover. Smaller areas are easier to coordinate."
 msgstr ""
 "وہ علاقہ بنائیں جسے میپرز کور کریں گے۔ چھوٹے علاقوں کو مربوط کرنا آسان "
 "ہوتا ہے۔"
 
-#: app/templates/new_project_custom.html:129
+#: app/templates/new_project_custom.html:145
 msgid "Tags"
 msgstr "ہیش ٹیگز"
 
-#: app/templates/new_project_custom.html:131
+#: app/templates/new_project_custom.html:147
 msgid "optional"
 msgstr "اختیاری"
 
-#: app/templates/new_project_custom.html:135
+#: app/templates/new_project_custom.html:151
 msgid ""
 "Add tags so other people can find your project. Tags are like #buildings "
 "or\n"
@@ -1564,40 +1698,44 @@ msgstr ""
 "ٹیگز شامل کریں تاکہ دوسرے لوگ آپ کا منصوبہ تلاش کر سکیں۔ ٹیگز #buildings "
 "یا #campaign-2026 جیسے ہوتے ہیں۔"
 
-#: app/templates/new_project_custom.html:141
+#: app/templates/new_project_custom.html:157
 msgid "Type a tag and press Enter"
 msgstr "ہیش ٹیگز لکھیں اور Enter یا کوما دبائیں"
 
-#: app/templates/new_project_custom.html:146
+#: app/templates/new_project_custom.html:162
 msgid "Press Enter or comma after each tag. Click × on a tag to remove it."
 msgstr ""
 "ہیش ٹیگز شامل کرنے کے لیے لکھیں اور Enter یا کوما دبائیں۔ ہٹانے کے لیے "
 "ٹیگ پر × دبائیں۔"
 
-#: app/templates/new_project_custom.html:152
+#: app/templates/new_project_custom.html:168
 #: app/templates/partials/project_details/setup_steps/step2_form.html:82
 msgid "Continue"
 msgstr "جاری رکھیں"
 
-#: app/templates/new_project_custom.html:154
+#: app/templates/new_project_custom.html:170
 msgid "Creating..."
 msgstr "بنایا جا رہا ہے..."
 
-#: app/templates/new_project_custom.html:164
+#: app/templates/new_project_custom.html:180
 msgid "Something went wrong. Please try again."
 msgstr "کچھ غلط ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔"
 
-#: app/templates/new_project_custom.html:295
+#: app/templates/new_project_custom.html:311
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "اس نام کا منصوبہ پہلے سے موجود ہے۔ براہ کرم دوسرا نام منتخب کریں۔"
 
-#: app/templates/new_project_custom.html:379
+#: app/templates/new_project_custom.html:395
 msgid "Description is required."
 msgstr "تفصیل ضروری ہے۔"
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup - OSM Buildings"
-msgstr "فوری سیٹ اپ - OSM عمارتیں"
+msgid "Quick Setup — OSM Buildings"
+msgstr "فوری سیٹ اپ - OSM عمارتیں۔"
+
+#: app/templates/new_project_simple.html:7
+msgid "Map buildings"
+msgstr "OSM عمارتیں"
 
 #: app/templates/new_project_simple.html:9
 msgid ""
@@ -1634,7 +1772,7 @@ msgstr "QField پروجیکٹ کے ساتھ منسلک کریں"
 msgid "Creating project and preparing map..."
 msgstr "پروجیکٹ بنایا جا رہا ہے اور نقشہ تیار کیا جا رہا ہے..."
 
-#: app/templates/new_project_simple_creating.html:2
+#: app/templates/new_project_simple_creating.html:1
 msgid "Creating Project"
 msgstr "پروجیکٹ بنایا جا رہا ہے"
 
@@ -1792,14 +1930,10 @@ msgstr "آپ کا پروجیکٹ تیار کیا جا رہا ہے..."
 
 #: app/templates/partials/new_project/creating_fragment.html:25
 msgid ""
-"Downloading map data, splitting tasks, and preparing the QField project.\n"
-"    This can take a minute or two - this page will redirect automatically"
-" when ready."
-msgstr ""
-"نقشے کا ڈیٹا ڈاؤن لوڈ کیا جا رہا ہے، کام تقسیم کیے جا رہے ہیں، اور QField"
-" پروجیکٹ تیار کیا جا رہا ہے۔\n"
-"    اس میں ایک یا دو منٹ لگ سکتے ہیں - تیار ہونے پر یہ صفحہ خود بخود ری "
-"ڈائریکٹ ہو جائے گا۔"
+"Downloading map data, splitting tasks, and preparing the QField project. "
+"This can take a\n"
+"    minute or two - this page will redirect automatically when ready."
+msgstr "نقشہ کا ڈیٹا ڈاؤن لوڈ کرنا، کاموں کو تقسیم کرنا، اور QField پروجیکٹ کی تیاری۔ یہ ایک لے سکتا ہے\n    منٹ یا دو - یہ صفحہ تیار ہونے پر خود بخود ری ڈائریکٹ ہو جائے گا۔"
 
 #: app/templates/partials/new_project/map_script.html:3
 msgid "Area"
@@ -1939,7 +2073,7 @@ msgid "Project Location"
 msgstr "منصوبے کا مقام"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-#: app/templates/partials/project_details/setup_steps.html:53
+#: app/templates/partials/project_details/setup_steps.html:65
 msgid "Survey Form"
 msgstr "سروے فارم"
 
@@ -1981,27 +2115,31 @@ msgstr "نقشہ سازی کے لیے تیار"
 msgid "Loading QR code..."
 msgstr "QR کوڈ لوڈ ہو رہا ہے..."
 
-#: app/templates/partials/project_details/setup_steps.html:32
+#: app/templates/partials/project_details/setup_steps.html:37
+msgid "Loading collaborator form..."
+msgstr "معاون فارم لوڈ ہو رہا ہے..."
+
+#: app/templates/partials/project_details/setup_steps.html:44
 msgid "Project Setup"
 msgstr "منصوبہ سیٹ اپ"
 
-#: app/templates/partials/project_details/setup_steps.html:44
+#: app/templates/partials/project_details/setup_steps.html:56
 msgid "Project setup progress"
 msgstr "منصوبہ سیٹ اپ"
 
-#: app/templates/partials/project_details/setup_steps.html:47
+#: app/templates/partials/project_details/setup_steps.html:59
 msgid "Project Details"
 msgstr "منصوبے کا AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:59
+#: app/templates/partials/project_details/setup_steps.html:71
 msgid "Get Data"
 msgstr "مرحلہ 3: ڈیٹا حاصل کریں"
 
-#: app/templates/partials/project_details/setup_steps.html:65
+#: app/templates/partials/project_details/setup_steps.html:77
 msgid "Split Tasks"
 msgstr "AOI تقسیم کریں"
 
-#: app/templates/partials/project_details/setup_steps.html:69
+#: app/templates/partials/project_details/setup_steps.html:81
 msgid "Finalise"
 msgstr "منصوبہ حتمی بنائیں"
 
@@ -2776,4 +2914,3 @@ msgstr "اختیاری - اپنے صارف نام کے تحت بنانے کے ل
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "محفوظ کریں اور جاری رکھیں"
-

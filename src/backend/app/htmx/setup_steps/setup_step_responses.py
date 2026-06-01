@@ -16,7 +16,6 @@ from app.projects.project_services import (
     ServiceError,
 )
 from app.projects.project_services import ValidationError as SvcValidationError
-from app.qfield.qfield_utils import is_default_qfc_instance_url
 
 from ..htmx_helpers import callout as _callout
 
@@ -215,10 +214,6 @@ def build_qfield_finalize_success_html(
         context={
             "result": result,
             "project_id": project_id,
-            "show_collaborator_form": (
-                project_id is not None
-                and is_default_qfc_instance_url(result.qfield_url)
-            ),
         },
         media_type="text/html",
         status_code=status.HTTP_200_OK,

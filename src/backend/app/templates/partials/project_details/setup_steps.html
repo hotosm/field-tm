@@ -26,6 +26,18 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
       </div>
     </div>
   </div>
+
+  {% if show_qfc_collaborator_form %}
+  <div
+    hx-get="/projects/{{ project.id }}/qfc-collaborator-form"
+    hx-trigger="load"
+    hx-swap="outerHTML"
+  >
+    <div class="ftm-qfc-collab__loading">
+      <p style="color: #666">{{ _("Loading collaborator form...") }}</p>
+    </div>
+  </div>
+  {% endif %}
 </div>
 {% elif status_value == 'DRAFT' %}
 <div class="ftm-published-divider">

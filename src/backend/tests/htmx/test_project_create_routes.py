@@ -727,7 +727,7 @@ async def test_new_project_page_renders_both_workflow_cards(client):
     assert response.status_code == status.HTTP_200_OK
     assert 'href="/new/simple"' in response.text
     assert 'href="/new/custom"' in response.text
-    assert "Map buildings" in response.text
+    assert "Add tags to OSM buildings" in response.text
     assert "Something else" in response.text
 
 

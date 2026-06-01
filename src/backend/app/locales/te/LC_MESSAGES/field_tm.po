@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-05-13 04:50+0100\n"
+"POT-Creation-Date: 2026-06-01 14:25+0100\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: te\n"
@@ -26,7 +26,7 @@ msgstr "ధ్రువీకరణ విఫలమైంది"
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "అనూహ్యమైన లోపం ఏర్పడింది. దయచేసి నిర్వాహకుడిని సంప్రదించండి."
 
-#: app/main.py:286
+#: app/main.py:313
 msgid "Could not connect to database"
 msgstr "డేటాబేస్కు కనెక్ట్ చేయడం సాధ్యపడలేదు"
 
@@ -52,72 +52,84 @@ msgstr "ప్రాజెక్ట్ %(state)s స్థితిలో ఉన
 msgid "User (%(user_sub)s) could not be inserted in db"
 msgstr "వినియోగదారు (%(user_sub)s) dbలో చొప్పించబడలేదు"
 
-#: app/central/central_crud.py:151
+#: app/central/central_crud.py:153
 #, python-format
 msgid "Error listing projects on ODK Central: %(error)s"
 msgstr "ODK Central లో ప్రాజెక్టులను జాబితా చేయడంలో లోపం: %(error)s"
 
-#: app/central/central_crud.py:182
+#: app/central/central_crud.py:184
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
 msgstr "ODK Central లో ప్రాజెక్ట్ సృష్టించడంలో లోపం: %(error)s"
 
-#: app/central/central_crud.py:244
+#: app/central/central_crud.py:246
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
 msgstr "ఫారమ్‌ను ODK సెంట్రల్‌కి అప్‌లోడ్ చేయడంలో విఫలమైంది: %(error)s"
 
-#: app/central/central_crud.py:259
+#: app/central/central_crud.py:261
 msgid "form_id is required to list submissions with pyodk."
 msgstr "form_id అవసరం."
 
-#: app/central/central_crud.py:302
+#: app/central/central_crud.py:309
+#, python-format
+msgid "Could not read XLSForm file: %(error)s"
+msgstr "XLSForm ఫైల్‌ని చదవడం సాధ్యపడలేదు: %(error)s"
+
+#: app/central/central_crud.py:349
+#, python-format
+msgid ""
+"XLSForm has select questions referencing lists that aren't defined in the"
+" choices sheet: %(rows)s. Check your survey and choices sheets."
+msgstr "XLSForm ఎంపికల షీట్‌లో నిర్వచించబడని ఎంపిక చేసిన ప్రశ్నలను సూచించే జాబితాలను కలిగి ఉంది: %(rows)s. మీ సర్వే మరియు ఎంపికల షీట్‌లను తనిఖీ చేయండి."
+
+#: app/central/central_crud.py:375
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
 msgstr "XLSForm చెల్లదు: %(error)s"
 
-#: app/central/central_crud.py:429
+#: app/central/central_crud.py:507
 msgid "Conversion GeoJSON --> CSV failed"
 msgstr "మార్పిడి GeoJSON --> CSV విఫలమైంది"
 
-#: app/central/central_crud.py:500
+#: app/central/central_crud.py:578
 msgid "Project contains no submissions yet"
 msgstr "ప్రాజెక్ట్‌లో ఇంకా సమర్పణలు లేవు"
 
-#: app/central/central_crud.py:562
+#: app/central/central_crud.py:640
 msgid "'geometry' data field is mandatory"
 msgstr "'జ్యామితి' డేటా ఫీల్డ్ తప్పనిసరి"
 
-#: app/central/central_crud.py:830
+#: app/central/central_crud.py:908
 msgid "ODK project_id is missing; cannot create/merge entity lists."
 msgstr "ODK project_id లేదు; ఎంటిటీ జాబితాలను సృష్టించడం/విలీనం చేయడం సాధ్యం కాదు."
 
-#: app/central/central_crud.py:963
+#: app/central/central_crud.py:1041
 msgid "Could not generate token for app user."
 msgstr "యాప్ వినియోగదారు కోసం టోకెన్‌ని రూపొందించలేకపోయింది."
 
-#: app/central/central_crud.py:995 app/central/central_crud.py:1001
+#: app/central/central_crud.py:1073 app/central/central_crud.py:1079
 msgid "An error occurred while creating the app user token."
 msgstr "QR కోడ్‌ను రూపొందిస్తున్నప్పుడు అనూహ్యమైన లోపం ఏర్పడింది."
 
-#: app/central/central_crud.py:1015
+#: app/central/central_crud.py:1093
 #, python-format
 msgid "Could not assign %(scope)s role to app user."
 msgstr "యాప్ వినియోగదారుకు %(scope)s పాత్రను కేటాయించలేకపోయింది."
 
-#: app/central/central_crud.py:1054
+#: app/central/central_crud.py:1132
 msgid "Could not find 'Project Manager' role in ODK Central."
 msgstr "ODK Central లో ప్రాజెక్ట్‌ను తెరవండి"
 
-#: app/central/central_crud.py:1079
+#: app/central/central_crud.py:1157
 msgid "ODK Central returned no user ID after creation."
 msgstr "ODK సెంట్రల్ సృష్టించిన తర్వాత ఏ వినియోగదారు IDని అందించలేదు."
 
-#: app/central/central_crud.py:1212
+#: app/central/central_crud.py:1290
 msgid "Failed to create ODK Central manager user."
 msgstr "ODK Central మేనేజర్ వినియోగదారుని సృష్టించడంలో విఫలమైంది."
 
-#: app/central/central_crud.py:1232
+#: app/central/central_crud.py:1310
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "ODK Central ఆధారాలను పరీక్షిస్తున్నప్పుడు అనూహ్యమైన లోపం ఏర్పడింది."
 
@@ -173,46 +185,56 @@ msgstr "జ్యామితులు లేవు"
 msgid "Your geojson file is invalid."
 msgstr "మీ geojson ఫైల్ చెల్లదు."
 
-#: app/htmx/project_detail_routes.py:97
+#: app/htmx/project_detail_routes.py:115
 msgid "Mapper Login (QFieldCloud)"
 msgstr "మ్యాపర్ లాగిన్ (QFieldCloud)"
 
-#: app/htmx/project_detail_routes.py:100
+#: app/htmx/project_detail_routes.py:118
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
 msgid "Username:"
 msgstr "వినియోగదారు పేరు:"
 
-#: app/htmx/project_detail_routes.py:103
+#: app/htmx/project_detail_routes.py:121
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
 msgid "Password:"
 msgstr "పాస్‌వర్డ్:"
 
-#: app/htmx/project_detail_routes.py:106
+#: app/htmx/project_detail_routes.py:124
 msgid "Scan the QR code, then enter these credentials in QField."
 msgstr "QR కోడ్‌ను స్కాన్ చేసి, ఈ గుర్తింపు వివరాలను QField లో నమోదు చేయండి."
 
-#: app/htmx/project_detail_routes.py:118
+#: app/htmx/project_detail_routes.py:137
 msgid "Scan QR Code"
 msgstr "QR కోడ్‌ను స్కాన్ చేయండి"
 
-#: app/htmx/project_detail_routes.py:120
+#: app/htmx/project_detail_routes.py:139
 #, python-format
 msgid "Use %(app_name)s to scan this QR code and load the project."
 msgstr ""
 "ఈ QR కోడ్‌ను స్కాన్ చేసి ప్రాజెక్ట్‌ను లోడ్ చేయడానికి %(app_name)s ను "
 "ఉపయోగించండి."
 
-#: app/htmx/project_detail_routes.py:122
+#: app/htmx/project_detail_routes.py:141
 msgid "Project QR Code"
 msgstr "ప్రాజెక్ట్ QR కోడ్"
 
-#: app/htmx/project_detail_routes.py:123
+#: app/htmx/project_detail_routes.py:142
 msgid "Download QR Code"
 msgstr "QR కోడ్‌ను డౌన్‌లోడ్ చేయండి"
 
-#: app/htmx/project_detail_routes.py:175
+#: app/htmx/project_detail_routes.py:145
+#, python-format
+msgid "Open in %(app_name)s"
+msgstr "%(app_name)sలో తెరవండి"
+
+#: app/htmx/project_detail_routes.py:146
+#, python-format
+msgid "If %(app_name)s is installed on this device."
+msgstr "ఈ పరికరంలో %(app_name)s ఇన్‌స్టాల్ చేయబడి ఉంటే."
+
+#: app/htmx/project_detail_routes.py:212
 msgid ""
 "Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
 " running."
@@ -220,11 +242,11 @@ msgstr ""
 "మ్యాపింగ్ సర్వర్‌ను చేరుకోలేకపోయాము. ODK Central లేదా QFieldCloud "
 "నడుస్తున్నదో లేదో చూడండి."
 
-#: app/htmx/project_detail_routes.py:179
+#: app/htmx/project_detail_routes.py:216
 msgid "The mapping server returned an error. Check its logs for details."
 msgstr "మ్యాపింగ్ సర్వర్ లోపాన్ని తిరిగి పంపింది. వివరాల కోసం లాగ్‌లను చూడండి."
 
-#: app/htmx/project_detail_routes.py:182
+#: app/htmx/project_detail_routes.py:219
 msgid ""
 "Authentication failed connecting to the mapping server. Check the "
 "configured credentials."
@@ -232,30 +254,90 @@ msgstr ""
 "మ్యాపింగ్ సర్వర్‌కు కనెక్ట్ అవుతున్నప్పుడు ప్రమాణీకరణ విఫలమైంది. సెటప్ "
 "చేసిన గుర్తింపు వివరాలను చూడండి."
 
-#: app/htmx/project_detail_routes.py:185
+#: app/htmx/project_detail_routes.py:222
 msgid "An unexpected error occurred while generating the QR code."
 msgstr "QR కోడ్‌ను రూపొందిస్తున్నప్పుడు అనూహ్యమైన లోపం ఏర్పడింది."
 
-#: app/htmx/project_detail_routes.py:247
+#: app/htmx/project_detail_routes.py:295
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "ప్రాజెక్ట్ (%(project_id)s) కనబడలేదు."
 
-#: app/htmx/project_detail_routes.py:254
+#: app/htmx/project_detail_routes.py:302
 msgid "Only the project manager can delete this project."
 msgstr "ఈ ప్రాజెక్ట్‌ను ప్రాజెక్ట్ మేనేజర్ మాత్రమే తొలగించగలరు."
 
-#: app/htmx/project_detail_routes.py:292 app/templates/project_details.html:172
+#: app/htmx/project_detail_routes.py:340 app/templates/project_details.html:172
 msgid "Project not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/htmx/project_detail_routes.py:321
+#: app/htmx/project_detail_routes.py:376
 #: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "లోపం: %(error_msg)s"
 
-#: app/htmx/basemap/basemap_attach_flow.py:68
+#: app/htmx/project_detail_routes.py:410
+#, python-format
+msgid "Added the following user(s) as project editors: %(names)s."
+msgstr "కింది వినియోగదారు(లు) ప్రాజెక్ట్ ఎడిటర్‌లుగా జోడించబడ్డారు: %(names)s."
+
+#: app/htmx/project_detail_routes.py:414
+#, python-format
+msgid "Could not add '%(username)s': %(reason)s"
+msgstr "'%(username)s'ని జోడించడం సాధ్యపడలేదు: %(reason)s"
+
+#: app/htmx/project_detail_routes.py:420
+msgid "Add more collaborators"
+msgstr "మరింత మంది సహకారులను జోడించండి"
+
+#: app/htmx/project_detail_routes.py:435
+msgid "Invite QFieldCloud collaborators"
+msgstr "QFieldCloud సహకారులను ఆహ్వానించండి"
+
+#: app/htmx/project_detail_routes.py:438
+msgid ""
+"Mappers must have an account on QFieldCloud before you can give them "
+"access to this project."
+msgstr "మీరు ఈ ప్రాజెక్ట్‌కి యాక్సెస్ ఇవ్వడానికి ముందు మ్యాపర్‌లు తప్పనిసరిగా QFieldCloudలో ఖాతాను కలిగి ఉండాలి."
+
+#: app/htmx/project_detail_routes.py:444
+msgid ""
+"Have each mapper create a free account at <a "
+"href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
+"class=\"ftm-link--brand\">app.qfield.cloud</a>."
+msgstr "ప్రతి మ్యాపర్ <a href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" class=\"ftm-link--brand\">app.qfield.cloud</a>లో ఉచిత ఖాతాను సృష్టించేలా చేయండి."
+
+#: app/htmx/project_detail_routes.py:450
+msgid ""
+"Enter their QFieldCloud usernames below (comma-separated for multiple "
+"users) and click submit. They will be added as editors and can log in to "
+"QField to start mapping."
+msgstr "వారి QFieldCloud వినియోగదారు పేర్లను క్రింద నమోదు చేయండి (బహుళ వినియోగదారుల కోసం కామాతో వేరు చేయబడింది) మరియు సమర్పించు క్లిక్ చేయండి. వారు సంపాదకులుగా జోడించబడతారు మరియు మ్యాపింగ్ ప్రారంభించడానికి QFieldకి లాగిన్ చేయవచ్చు."
+
+#: app/htmx/project_detail_routes.py:456
+msgid "e.g. alice, bob, charlie"
+msgstr "ఉదా ఆలిస్, బాబ్, చార్లీ"
+
+#: app/htmx/project_detail_routes.py:457
+msgid "Add collaborators"
+msgstr "సహకారులను జోడించండి"
+
+#: app/htmx/project_detail_routes.py:549
+msgid "Enter at least one QFieldCloud username."
+msgstr "కనీసం ఒక QFieldCloud వినియోగదారు పేరును నమోదు చేయండి."
+
+#: app/htmx/project_detail_routes.py:559
+msgid "QFieldCloud project ID not found for this project."
+msgstr "ఈ ప్రాజెక్ట్ కోసం QFieldCloud ప్రాజెక్ట్ ID కనుగొనబడలేదు."
+
+#: app/htmx/project_detail_routes.py:565
+msgid ""
+"This project was created on a custom QFieldCloud instance. Use the "
+"QFieldCloud Admin tab to manage collaborators."
+msgstr "ఈ ప్రాజెక్ట్ అనుకూల QFieldCloud ఉదాహరణలో సృష్టించబడింది. సహకారులను నిర్వహించడానికి QFieldCloud అడ్మిన్ ట్యాబ్‌ని ఉపయోగించండి."
+
+#: app/htmx/basemap/basemap_attach_flow.py:69
 msgid ""
 "Basemap attach failed for now. Your project is ready to use. Please retry"
 " attach."
@@ -263,7 +345,7 @@ msgstr ""
 "బేస్‌మ్యాప్‌ను జతచేయడం ఇప్పటికి విఫలమైంది. మీ ప్రాజెక్ట్ ఉపయోగించడానికి "
 "సిద్ధంగా ఉంది. దయచేసి మళ్లీ జతచేయడానికి ప్రయత్నించండి."
 
-#: app/htmx/basemap/basemap_attach_flow.py:73
+#: app/htmx/basemap/basemap_attach_flow.py:74
 msgid ""
 "Basemap attach could not complete due to a temporary network issue. Your "
 "project is ready to use. Please retry attach."
@@ -272,19 +354,19 @@ msgstr ""
 "ప్రాజెక్ట్ ఉపయోగించడానికి సిద్ధంగా ఉంది. దయచేసి మళ్లీ జతచేయడానికి "
 "ప్రయత్నించండి."
 
-#: app/htmx/basemap/basemap_attach_flow.py:122
+#: app/htmx/basemap/basemap_attach_flow.py:123
 msgid "Basemap attach is available after publication."
 msgstr "ప్రచురణ తర్వాత బేస్‌మ్యాప్ జతచేయడం అందుబాటులో ఉంటుంది."
 
-#: app/htmx/basemap/basemap_attach_flow.py:131
+#: app/htmx/basemap/basemap_attach_flow.py:132
 msgid "Basemap attach is only available for QField projects."
 msgstr "బేస్‌మ్యాప్ జతచేయడం QField ప్రాజెక్టులకు మాత్రమే అందుబాటులో ఉంటుంది."
 
-#: app/htmx/basemap/basemap_attach_flow.py:141
+#: app/htmx/basemap/basemap_attach_flow.py:142
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "బేస్‌మ్యాప్ ఇంకా సిద్ధంగా లేదు. సృష్టి పూర్తయ్యే వరకు వేచి ఉండండి."
 
-#: app/htmx/basemap/basemap_attach_flow.py:156
+#: app/htmx/basemap/basemap_attach_flow.py:157
 msgid ""
 "Basemap download URL is not available yet. Please refresh status and try "
 "again shortly."
@@ -292,7 +374,7 @@ msgstr ""
 "బేస్‌మ్యాప్ డౌన్‌లోడ్ URL ఇంకా అందుబాటులో లేదు. దయచేసి స్థితిని రిఫ్రెష్ "
 "చేసి కొద్దిసేపటికి మళ్లీ ప్రయత్నించండి."
 
-#: app/htmx/basemap/basemap_attach_flow.py:172
+#: app/htmx/basemap/basemap_attach_flow.py:173
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -360,9 +442,9 @@ msgstr ""
 "సరళమైన ప్రాజెక్ట్ సృష్టి కోసం డిఫాల్ట్ OSM Buildings ఫారమ్‌ను లోడ్ "
 "చేయలేకపోయాము."
 
-#: app/htmx/project_create/project_create_simple_flow.py:269
+#: app/htmx/project_create/project_create_simple_flow.py:270
 #: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:209
+#: app/htmx/project_create/project_create_submit_routes.py:210
 msgid "An unexpected error occurred. Please try again."
 msgstr "అనుకోని లోపం సంభవించింది. దయచేసి మళ్లీ ప్రయత్నించండి."
 
@@ -388,7 +470,7 @@ msgstr "ఈ వినియోగదారు లేరు. దయచేసి �
 msgid "This user is already a collaborator on this project."
 msgstr "ఈ వినియోగదారు ఇప్పటికే ఈ ప్రాజెక్ట్‌లో సహకారిగా ఉన్నారు."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1360
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1393
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "సహకారిని చేర్చడం విఫలమైంది: %(exc)s"
@@ -522,7 +604,7 @@ msgid "from this project?"
 msgstr "ఈ ప్రాజెక్ట్ నుండి?"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:189
-#: app/templates/new_project_custom.html:156
+#: app/templates/new_project_custom.html:172
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:67
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:177
 msgid "Cancel"
@@ -914,23 +996,23 @@ msgstr "XLSForm అవసరం."
 msgid "Failed to modify XLSForm for QField."
 msgstr "QField కోసం XLSFormని సవరించడంలో విఫలమైంది."
 
-#: app/qfield/qfield_crud.py:539
+#: app/qfield/qfield_crud.py:547
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS రేపర్ పూర్తయింది కానీ అవుట్‌పుట్ ఫైల్‌లు లేవు."
 
-#: app/qfield/qfield_crud.py:551
+#: app/qfield/qfield_crud.py:559
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS రేపర్ పూర్తయింది కానీ అవుట్‌పుట్‌లో .qgz ఫైల్ లేదు."
 
-#: app/qfield/qfield_crud.py:581
+#: app/qfield/qfield_crud.py:590
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField ప్రాజెక్ట్ ID లేదు; బేస్‌మ్యాప్‌ను జోడించడం సాధ్యం కాదు."
 
-#: app/qfield/qfield_crud.py:615
+#: app/qfield/qfield_crud.py:627
 msgid "Basemap attach completed but produced no project files."
 msgstr "బేస్‌మ్యాప్ QField ప్రాజెక్ట్‌కు జత చేయబడింది."
 
-#: app/qfield/qfield_crud.py:801
+#: app/qfield/qfield_crud.py:813
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -939,37 +1021,42 @@ msgstr ""
 "%(attempts)d ప్రయత్నాల తర్వాత కూడా QFieldCloud ప్రాజెక్ట్ ఫైల్ "
 "ప్రాసెసింగ్‌ను పూర్తి చేయలేదు (చివరి స్థితి: %(status)s)."
 
-#: app/qfield/qfield_crud.py:855 app/qfield/qfield_crud.py:869
+#: app/qfield/qfield_crud.py:871 app/qfield/qfield_crud.py:885
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS ప్రాజెక్ట్ ఉత్పత్తి విఫలమైంది: %(error)s"
 
-#: app/qfield/qfield_crud.py:862
+#: app/qfield/qfield_crud.py:878
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS రేపర్ చెల్లని JSONని అందించింది."
 
-#: app/qfield/qfield_crud.py:886
+#: app/qfield/qfield_crud.py:902
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr ""
 "అప్‌లోడ్ కోసం బేస్‌మ్యాప్ MBTilesని డౌన్‌లోడ్ చేయడంలో విఫలమైంది (HTTP "
 "%(status)s)."
 
-#: app/qfield/qfield_crud.py:901
+#: app/qfield/qfield_crud.py:917
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "QR కోడ్‌ను డౌన్‌లోడ్ చేయండి"
 
-#: app/qfield/qfield_crud.py:1027
+#: app/qfield/qfield_crud.py:1044
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "QFieldCloudకి ఫైల్‌లను అప్‌లోడ్ చేయడంలో విఫలమైంది: %(error)s"
 
-#: app/qfield/qfield_crud.py:1309
+#: app/qfield/qfield_crud.py:1218 app/qfield/qfield_crud.py:1380
+#, python-format
+msgid "User '%(username)s' does not exist on QFieldCloud."
+msgstr "వినియోగదారు '%(username)s' QFieldCloudలో లేరు."
+
+#: app/qfield/qfield_crud.py:1338
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "ప్రాజెక్ట్ (%(project_id)s) కనబడలేదు."
 
-#: app/qfield/qfield_crud.py:1329
+#: app/qfield/qfield_crud.py:1362
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -978,17 +1065,12 @@ msgstr ""
 "ప్రాజెక్ట్ సంస్థ '%(owner)s'కి చెందినది. సంస్థకు '%(username)s'ని "
 "జోడించడం సాధ్యపడలేదు: %(error)s"
 
-#: app/qfield/qfield_crud.py:1347
-#, python-format
-msgid "User '%(username)s' does not exist on QFieldCloud."
-msgstr "వినియోగదారు '%(username)s' QFieldCloudలో లేరు."
-
-#: app/qfield/qfield_crud.py:1354
+#: app/qfield/qfield_crud.py:1387
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "వినియోగదారు '%(username)s' ఇప్పటికే ఈ ప్రాజెక్ట్‌లో సహకారిగా ఉన్నారు."
 
-#: app/qfield/qfield_crud.py:1395
+#: app/qfield/qfield_crud.py:1428
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ గుర్తింపు వివరాలు చెల్లుబాటు అవుతున్నాయి!"
 
@@ -1049,7 +1131,7 @@ msgid "Search projects…"
 msgstr "ప్రాజెక్టులను శోధించండి…"
 
 #: app/templates/home.html:68 app/templates/landing.html:503
-#: app/templates/layout.html:281 app/templates/new_project_chooser.html:1
+#: app/templates/layout.html:282 app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:43
 msgid "Create Project"
 msgstr "ప్రాజెక్ట్ సృష్టించు"
@@ -1378,15 +1460,15 @@ msgstr "ఇమెయిల్:"
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Open Mapping కార్యక్రమాల కోసం సమన్వయ ఫీల్డ్ మ్యాపింగ్."
 
-#: app/templates/layout.html:196 app/templates/login.html:1
+#: app/templates/layout.html:197 app/templates/login.html:1
 msgid "Login"
 msgstr "లాగిన్"
 
-#: app/templates/layout.html:274
+#: app/templates/layout.html:275
 msgid "Projects"
 msgstr "ప్రాజెక్టులు"
 
-#: app/templates/layout.html:288
+#: app/templates/layout.html:289
 msgid "QField Admin"
 msgstr "QField నిర్వాహకుడు"
 
@@ -1422,64 +1504,107 @@ msgstr ""
 "మీ ప్రాజెక్టుకు సరిపోయే ఎంపికను ఎంచుకోండి. తర్వాత మళ్లీ ప్రారంభించి మీ "
 "అభిప్రాయాన్ని మార్చుకోవచ్చు."
 
-#: app/templates/new_project_chooser.html:14
-#: app/templates/new_project_chooser.html:26
-#: app/templates/new_project_simple.html:7
-msgid "Map buildings"
-msgstr "OSM భవనాలు"
+#: app/templates/new_project_chooser.html:18
+#: app/templates/new_project_chooser.html:30
+msgid "Add tags to OSM buildings"
+msgstr "OSM భవనాలకు ట్యాగ్‌లను జోడించండి"
 
-#: app/templates/new_project_chooser.html:17
+#: app/templates/new_project_chooser.html:21
 msgid "Quickest way to start. Just draw your area on the map and you're done."
 msgstr "ప్రారంభించడానికి వేగవంతమైన మార్గం. మ్యాప్‌పై మీ ప్రాంతాన్ని గీయండి, అంతే."
 
-#: app/templates/new_project_chooser.html:21
-msgid "We'll pre-fill the project for you"
-msgstr "మేము మీ కోసం ప్రాజెక్టును ముందే పూరిస్తాము"
+#: app/templates/new_project_chooser.html:25
+msgid "Use building outlines already in OpenStreetMap"
+msgstr "OpenStreetMapలో ఇప్పటికే బిల్డింగ్ అవుట్‌లైన్‌లను ఉపయోగించండి"
 
-#: app/templates/new_project_chooser.html:22
-msgid "Uses building outlines already in OpenStreetMap"
-msgstr "OpenStreetMap లో ఇప్పటికే ఉన్న భవన ఆకృతులను ఉపయోగిస్తుంది"
+#: app/templates/new_project_chooser.html:26
+msgid "Includes a ready-made survey to add OSM tags to existing buildings"
+msgstr "ఇప్పటికే ఉన్న భవనాలకు OSM ట్యాగ్‌లను జోడించడానికి రెడీమేడ్ సర్వేని కలిగి ఉంటుంది"
 
-#: app/templates/new_project_chooser.html:23
-msgid "Comes with a ready-made survey for buildings"
-msgstr "భవనాల కోసం సిద్ధమైన సర్వేతో వస్తుంది"
+#: app/templates/new_project_chooser.html:27
+msgid "Fill in gaps for unmapped buildings during digitisation"
+msgstr "డిజిటలైజేషన్ సమయంలో మ్యాప్ చేయని భవనాల కోసం ఖాళీలను పూరించండి"
 
-#: app/templates/new_project_chooser.html:32
+#: app/templates/new_project_chooser.html:36
+#: app/templates/new_project_chooser.html:83
+msgid "More details about this option"
+msgstr "ఈ ఎంపిక గురించి మరిన్ని వివరాలు"
+
+#: app/templates/new_project_chooser.html:42
+msgid "How this option is set up"
+msgstr "ఈ ఎంపిక ఎలా సెటప్ చేయబడింది"
+
+#: app/templates/new_project_chooser.html:44
+msgid "Mapping happens in QField on Android."
+msgstr "మ్యాపింగ్ Androidలో QFieldలో జరుగుతుంది."
+
+#: app/templates/new_project_chooser.html:45
+msgid ""
+"The area is split into tasks of ~10 buildings each, using roads, rivers, "
+"railways and airstrips as boundaries."
+msgstr "ఈ ప్రాంతం రోడ్లు, నదులు, రైల్వేలు మరియు ఎయిర్‌స్ట్రిప్‌లను సరిహద్దులుగా ఉపయోగించి ఒక్కొక్కటి ~10 భవనాల పనులుగా విభజించబడింది."
+
+#: app/templates/new_project_chooser.html:46
+msgid "Photo upload is enabled but optional."
+msgstr "ఫోటో అప్‌లోడ్ ప్రారంభించబడింది కానీ ఐచ్ఛికం."
+
+#: app/templates/new_project_chooser.html:47
+msgid "A basemap is generated automatically for offline use (if available)."
+msgstr "ఆఫ్‌లైన్ ఉపయోగం కోసం బేస్‌మ్యాప్ స్వయంచాలకంగా రూపొందించబడుతుంది (అందుబాటులో ఉంటే)."
+
+#: app/templates/new_project_chooser.html:53
+msgid "Preview the building survey in XLSForm Editor →"
+msgstr "XLSForm ఎడిటర్ →లో బిల్డింగ్ సర్వేని ప్రివ్యూ చేయండి"
+
+#: app/templates/new_project_chooser.html:64
 msgid "Something else"
 msgstr "మరేదైనా"
 
-#: app/templates/new_project_chooser.html:35
+#: app/templates/new_project_chooser.html:67
 msgid ""
-"Use this for anything that isn't buildings. You'll get more options to "
-"set things up\n"
-"        the way you want."
-msgstr ""
-"భవనాలు కాని ఏదైనా కోసం దీన్ని ఉపయోగించండి. మీకు కావలసిన విధంగా సెటప్ "
-"చేయడానికి మరిన్ని ఎంపికలు లభిస్తాయి."
+"For anything that isn't tagging OSM buildings - bring your own survey, or"
+" use one contributed by the community."
+msgstr "OSM భవనాలను ట్యాగ్ చేయని దేనికైనా - మీ స్వంత సర్వేని తీసుకురండి లేదా సంఘం అందించిన దాన్ని ఉపయోగించండి."
 
-#: app/templates/new_project_chooser.html:41
+#: app/templates/new_project_chooser.html:71
 msgid ""
-"Map roads, healthcare, water points, toilets, schools, and many other "
-"things"
-msgstr ""
-"రోడ్లు, ఆరోగ్య సేవలు, నీటి పాయింట్లు, మరుగుదొడ్లు, పాఠశాలలు మరియు మరెన్నో"
-" మ్యాప్ చేయండి"
+"Other OpenStreetMap features - roads, water points, schools, healthcare, "
+"and more"
+msgstr "ఇతర OpenStreetMap లక్షణాలు - రోడ్లు, వాటర్ పాయింట్లు, పాఠశాలలు, ఆరోగ్య సంరక్షణ మరియు మరిన్ని"
 
-#: app/templates/new_project_chooser.html:43
-msgid "Bring your own survey questions"
-msgstr "మీ స్వంత సర్వే ప్రశ్నలను తీసుకురండి"
+#: app/templates/new_project_chooser.html:72
+msgid ""
+"Non-OSM surveys - vaccination campaigns, census mapping, healthcare "
+"facility audits, infrastructure inspections"
+msgstr "నాన్-OSM సర్వేలు - టీకా ప్రచారాలు, సెన్సస్ మ్యాపింగ్, హెల్త్‌కేర్ ఫెసిలిటీ ఆడిట్‌లు, ఇన్‌ఫ్రాస్ట్రక్చర్ తనిఖీలు"
 
-#: app/templates/new_project_chooser.html:44
+#: app/templates/new_project_chooser.html:73
 msgid "Bring your own map data, or start with an empty map"
 msgstr "మీ స్వంత మ్యాప్ డేటాను తీసుకురండి, లేదా ఖాళీ మ్యాప్‌తో ప్రారంభించండి"
 
-#: app/templates/new_project_chooser.html:45
+#: app/templates/new_project_chooser.html:74
 msgid "Control how the area is divided up for mappers"
 msgstr "మ్యాపర్ల కోసం ప్రాంతం ఎలా విభజించబడుతుందో నియంత్రించండి"
 
-#: app/templates/new_project_chooser.html:48
+#: app/templates/new_project_chooser.html:77
 msgid "Set up a custom project"
 msgstr "ప్రాజెక్టులను శోధించండి…"
+
+#: app/templates/new_project_chooser.html:89
+msgid "Where to find a survey"
+msgstr "సర్వేను ఎక్కడ కనుగొనాలి"
+
+#: app/templates/new_project_chooser.html:91
+msgid "Upload your own XLSForm, or"
+msgstr "మీ స్వంత XLSFormని అప్‌లోడ్ చేయండి లేదా"
+
+#: app/templates/new_project_chooser.html:97
+msgid "Browse the community XLSForm gallery →"
+msgstr "కమ్యూనిటీని బ్రౌజ్ చేయండి XLSForm గ్యాలరీ →"
+
+#: app/templates/new_project_chooser.html:99
+msgid "Mapping can use QField (iOS + Android) or ODK Collect (Android only)."
+msgstr "మ్యాపింగ్ QField (iOS + Android) లేదా ODK Collect (Android మాత్రమే) ఉపయోగించవచ్చు."
 
 #: app/templates/new_project_custom.html:1
 msgid "Create Custom Project"
@@ -1547,7 +1672,12 @@ msgstr ""
 "సర్వే చేయడానికి మ్యాపర్లు తమ ఫోన్‌లో ఇన్‌స్టాల్ చేయాలని మీరు కోరే యాప్‌ను"
 " ఎంచుకోండి."
 
-#: app/templates/new_project_custom.html:89
+#: app/templates/new_project_custom.html:88
+#: app/templates/new_project_custom.html:120
+msgid "Available platforms"
+msgstr "అందుబాటులో ఉన్న ప్లాట్‌ఫారమ్‌లు"
+
+#: app/templates/new_project_custom.html:99
 msgid ""
 "Powerful GIS-style mapping app, including geometry editing, but with a "
 "simple\n"
@@ -1556,32 +1686,36 @@ msgstr ""
 "జ్యామెట్రీ సవరణతో కూడిన శక్తివంతమైన GIS-శైలి మ్యాపింగ్ యాప్, కానీ మా HOT "
 "ప్లగిన్ ద్వారా సరళమైన మ్యాపింగ్ మార్గం ప్రారంభించబడింది."
 
-#: app/templates/new_project_custom.html:111
+#: app/templates/new_project_custom.html:123
+msgid "Android only"
+msgstr "Android మాత్రమే"
+
+#: app/templates/new_project_custom.html:127
 msgid ""
 "Simple form-based survey app. Best for straightforward question-and-"
 "answer\n"
 "                surveys."
 msgstr "సరళమైన ఫారమ్-ఆధారిత సర్వే యాప్. నేరుగా ప్రశ్న-జవాబు సర్వేలకు ఉత్తమం."
 
-#: app/templates/new_project_custom.html:120
+#: app/templates/new_project_custom.html:136
 msgid "Where are you mapping?"
 msgstr "మ్యాపింగ్‌కు సిద్ధం"
 
-#: app/templates/new_project_custom.html:122
+#: app/templates/new_project_custom.html:138
 msgid "Draw the area mappers will cover. Smaller areas are easier to coordinate."
 msgstr ""
 "మ్యాపర్లు కవర్ చేసే ప్రాంతాన్ని గీయండి. చిన్న ప్రాంతాలు సమన్వయం చేయడం "
 "సులభం."
 
-#: app/templates/new_project_custom.html:129
+#: app/templates/new_project_custom.html:145
 msgid "Tags"
 msgstr "హ్యాష్‌ట్యాగ్‌లు"
 
-#: app/templates/new_project_custom.html:131
+#: app/templates/new_project_custom.html:147
 msgid "optional"
 msgstr "ఐచ్ఛికం"
 
-#: app/templates/new_project_custom.html:135
+#: app/templates/new_project_custom.html:151
 msgid ""
 "Add tags so other people can find your project. Tags are like #buildings "
 "or\n"
@@ -1590,40 +1724,44 @@ msgstr ""
 "ఇతరులు మీ ప్రాజెక్టును కనుగొనడానికి ట్యాగ్‌లు జోడించండి. ట్యాగ్‌లు "
 "#buildings లేదా #campaign-2026 లాంటివి."
 
-#: app/templates/new_project_custom.html:141
+#: app/templates/new_project_custom.html:157
 msgid "Type a tag and press Enter"
 msgstr "హ్యాష్‌ట్యాగ్‌లను టైప్ చేసి Enter లేదా comma నొక్కండి"
 
-#: app/templates/new_project_custom.html:146
+#: app/templates/new_project_custom.html:162
 msgid "Press Enter or comma after each tag. Click × on a tag to remove it."
 msgstr ""
 "హ్యాష్‌ట్యాగ్‌లను జోడించడానికి టైప్ చేసి Enter లేదా comma నొక్కండి. ఒక "
 "ట్యాగ్‌ను తొలగించడానికి × నొక్కండి."
 
-#: app/templates/new_project_custom.html:152
+#: app/templates/new_project_custom.html:168
 #: app/templates/partials/project_details/setup_steps/step2_form.html:82
 msgid "Continue"
 msgstr "కొనసాగించు"
 
-#: app/templates/new_project_custom.html:154
+#: app/templates/new_project_custom.html:170
 msgid "Creating..."
 msgstr "సృష్టిస్తోంది..."
 
-#: app/templates/new_project_custom.html:164
+#: app/templates/new_project_custom.html:180
 msgid "Something went wrong. Please try again."
 msgstr "ఏదో తప్పు జరిగింది. దయచేసి మళ్లీ ప్రయత్నించండి."
 
-#: app/templates/new_project_custom.html:295
+#: app/templates/new_project_custom.html:311
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "ఈ పేరుతో ఒక ప్రాజెక్ట్ ఇప్పటికే ఉంది. దయచేసి వేరే పేరును ఎంచుకోండి."
 
-#: app/templates/new_project_custom.html:379
+#: app/templates/new_project_custom.html:395
 msgid "Description is required."
 msgstr "వివరణ అవసరం."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup - OSM Buildings"
-msgstr "త్వరిత సెటప్ - OSM భవనాలు"
+msgid "Quick Setup — OSM Buildings"
+msgstr "త్వరిత సెటప్ — OSM భవనాలు"
+
+#: app/templates/new_project_simple.html:7
+msgid "Map buildings"
+msgstr "OSM భవనాలు"
 
 #: app/templates/new_project_simple.html:9
 msgid ""
@@ -1661,7 +1799,7 @@ msgstr "QField ప్రాజెక్ట్‌కు జత చేయండి
 msgid "Creating project and preparing map..."
 msgstr "ప్రాజెక్ట్ సృష్టించబడుతోంది మరియు మ్యాప్ సిద్ధం అవుతోంది..."
 
-#: app/templates/new_project_simple_creating.html:2
+#: app/templates/new_project_simple_creating.html:1
 msgid "Creating Project"
 msgstr "ప్రాజెక్ట్ సృష్టిస్తోంది"
 
@@ -1819,14 +1957,10 @@ msgstr "మీ ప్రాజెక్ట్‌ను సెటప్ చేస
 
 #: app/templates/partials/new_project/creating_fragment.html:25
 msgid ""
-"Downloading map data, splitting tasks, and preparing the QField project.\n"
-"    This can take a minute or two - this page will redirect automatically"
-" when ready."
-msgstr ""
-"మ్యాప్ డేటాను డౌన్‌లోడ్ చేస్తోంది, పనులను విభజిస్తోంది, మరియు QField "
-"ప్రాజెక్ట్‌ను సిద్ధం చేస్తోంది.\n"
-"    దీనికి ఒకటి లేదా రెండు నిమిషాలు పట్టవచ్చు - సిద్ధమైనప్పుడు ఈ పేజీ "
-"స్వయంచాలకంగా రీడైరెక్ట్ అవుతుంది."
+"Downloading map data, splitting tasks, and preparing the QField project. "
+"This can take a\n"
+"    minute or two - this page will redirect automatically when ready."
+msgstr "మ్యాప్ డేటాను డౌన్‌లోడ్ చేయడం, టాస్క్‌లను విభజించడం మరియు QField ప్రాజెక్ట్‌ను సిద్ధం చేయడం. ఇది ఒక పట్టవచ్చు\n    నిమిషాలు లేదా రెండు - ఈ పేజీ సిద్ధంగా ఉన్నప్పుడు స్వయంచాలకంగా దారి మళ్లిస్తుంది."
 
 #: app/templates/partials/new_project/map_script.html:3
 msgid "Area"
@@ -1967,7 +2101,7 @@ msgid "Project Location"
 msgstr "ప్రాజెక్ట్ స్థానం"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-#: app/templates/partials/project_details/setup_steps.html:53
+#: app/templates/partials/project_details/setup_steps.html:65
 msgid "Survey Form"
 msgstr "సర్వే ఫారమ్"
 
@@ -2009,27 +2143,31 @@ msgstr "మ్యాపింగ్‌కు సిద్ధం"
 msgid "Loading QR code..."
 msgstr "QR కోడ్ లోడ్ అవుతోంది..."
 
-#: app/templates/partials/project_details/setup_steps.html:32
+#: app/templates/partials/project_details/setup_steps.html:37
+msgid "Loading collaborator form..."
+msgstr "సహకారి ఫారమ్ లోడ్ అవుతోంది..."
+
+#: app/templates/partials/project_details/setup_steps.html:44
 msgid "Project Setup"
 msgstr "ప్రాజెక్ట్ సెటప్"
 
-#: app/templates/partials/project_details/setup_steps.html:44
+#: app/templates/partials/project_details/setup_steps.html:56
 msgid "Project setup progress"
 msgstr "ప్రాజెక్ట్ సెటప్"
 
-#: app/templates/partials/project_details/setup_steps.html:47
+#: app/templates/partials/project_details/setup_steps.html:59
 msgid "Project Details"
 msgstr "ప్రాజెక్ట్ AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:59
+#: app/templates/partials/project_details/setup_steps.html:71
 msgid "Get Data"
 msgstr "దశ 3: డేటాను పొందండి"
 
-#: app/templates/partials/project_details/setup_steps.html:65
+#: app/templates/partials/project_details/setup_steps.html:77
 msgid "Split Tasks"
 msgstr "AOI ని విభజించు"
 
-#: app/templates/partials/project_details/setup_steps.html:69
+#: app/templates/partials/project_details/setup_steps.html:81
 msgid "Finalise"
 msgstr "ప్రాజెక్ట్‌ను పూర్తిచేయండి"
 
@@ -2813,4 +2951,3 @@ msgstr "ఐచ్ఛికం - మీ వినియోగదారు పే�
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "సేవ్ చేసి కొనసాగండి"
-

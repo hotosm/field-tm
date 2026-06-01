@@ -28,30 +28,6 @@
     </p>
     {% endif %}
   </div>
-  {% if show_collaborator_form %}
-  <div id="qfc-collaborator-box" style="{{ box_style }}">
-    <form
-      hx-post="/create-project-htmx/{{ project_id }}/qfc-collaborator"
-      hx-target="#qfc-collaborator-box"
-      hx-swap="outerHTML"
-      style="display: flex; flex-direction: column; gap: 8px"
-    >
-      <h4 style="margin: 0">{{ _("Already have an account on QFieldCloud?") }}</h4>
-      <p style="margin: 0; color: #666">
-        {{ _("Enter your username to add yourself as a project collaborator (editor).") }}
-      </p>
-      <div style="display: flex; gap: 8px; align-items: flex-end">
-        <wa-input
-          name="qfc_username"
-          placeholder="{{ _('QFieldCloud username') }}"
-          required
-          style="flex: 1"
-        ></wa-input>
-        <wa-button type="submit" variant="brand"> {{ _("Add collaborator") }} </wa-button>
-      </div>
-    </form>
-  </div>
-  {% endif %}
   <div style="margin-top: 12px">
     <wa-button type="button" variant="default" id="view-fieldtm-project-btn">
       {{ _("View FieldTM Project") }}
