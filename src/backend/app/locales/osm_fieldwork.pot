@@ -100,25 +100,35 @@ msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
-msgid "split"
+msgid "photos"
 msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:26
 msgctxt "xlsform_label"
-msgid "survey_questions"
+msgid "split"
 msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:27
 msgctxt "xlsform_label"
-msgid "task"
+msgid "survey_photos"
 msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
-msgid "verification"
+msgid "survey_questions"
 msgstr ""
 
 #: i18n/osm_fieldwork_strings.py:29
+msgctxt "xlsform_label"
+msgid "task"
+msgstr ""
+
+#: i18n/osm_fieldwork_strings.py:30
+msgctxt "xlsform_label"
+msgid "verification"
+msgstr ""
+
+#: i18n/osm_fieldwork_strings.py:31
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr ""
