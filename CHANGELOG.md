@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026.4.0 (2026-06-01)
+
+### Feat
+
+- **qfield**: add a data export button for QField
+- replace qfc user addition and move to project details page
+
+### Fix
+
+- **backend**: skip noisy tracebacks for robots.txt 405
+
 ## 2026.3.6 (2026-05-31)
 
 ### Fix
