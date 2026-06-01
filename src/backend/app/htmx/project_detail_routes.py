@@ -54,7 +54,10 @@ from app.projects.project_services import (
     NotFoundError,
     delete_project_with_downstream,
 )
-from app.qfield.qfield_crud import add_qfc_project_collaborator
+from app.qfield.qfield_crud import (
+    add_qfc_project_collaborator,
+    export_qfield_project_geojson,
+)
 from app.qfield.qfield_deps import qfield_client
 from app.qfield.qfield_utils import is_default_qfc_instance_url
 
@@ -589,4 +592,67 @@ async def add_qfc_collaborators_htmx(
         content=_render_collaborator_result(project_id, added=added, failed=failed),
         media_type="text/html",
         status_code=status.HTTP_200_OK,
+    )
+
+
+def _safe_export_filename(project: DbProject) -> str:
+    """Build a safe filename stem for the exported GeoJSON download."""
+    raw_name = (project.project_name or f"project-{project.id}").strip()
+    cleaned = "".join(
+        c if c.isalnum() or c in ("-", "_", ".") else "_" for c in raw_name
+    )
+    cleaned = cleaned.strip("._-") or f"project-{project.id}"
+    return f"{cleaned}_export.geojson"
+
+
+@get(
+    path="/projects/{project_id:int}/export/geojson",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(project_manager),
+    },
+)
+async def export_project_geojson_htmx(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    current_user: ProjectUserDict,
+    auth_user: object,
+    project_id: int = Parameter(),
+) -> Response:
+    """Trigger a QFieldCloud package, .gpkg --> GeoJSON, then download."""
+    project, not_found_response = _authorized_project_or_response(
+        current_user, project_id
+    )
+    if not_found_response:
+        return not_found_response
+
+    if project.field_mapping_app != FieldMappingApp.QFIELD:
+        return _html_error_response(
+            _("GeoJSON export is only available for QField projects."),
+            status.HTTP_400_BAD_REQUEST,
+        )
+    if not project.external_project_id:
+        return _html_error_response(
+            _("This project is not yet linked to a QFieldCloud project."),
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        feature_collection = await export_qfield_project_geojson(db, project)
+    except HTTPException as exc:
+        return _html_error_response(str(exc.detail), exc.status_code)
+    except Exception as exc:
+        log.exception("GeoJSON export failed for project %s: %s", project_id, exc)
+        return _html_error_response(
+            _("Failed to export GeoJSON: %(error)s") % {"error": exc},
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    filename = _safe_export_filename(project)
+    return Response(
+        content=json.dumps(feature_collection),
+        media_type="application/geo+json",
+        status_code=status.HTTP_200_OK,
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )

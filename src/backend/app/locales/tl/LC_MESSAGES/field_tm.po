@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-06-01 14:25+0100\n"
+"POT-Creation-Date: 2026-06-01 17:10+0100\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: tl\n"
@@ -83,7 +83,10 @@ msgstr "Hindi mabasa ang XLSForm file: %(error)s"
 msgid ""
 "XLSForm has select questions referencing lists that aren't defined in the"
 " choices sheet: %(rows)s. Check your survey and choices sheets."
-msgstr "Ang XLSForm ay may mga piling tanong na tumutukoy sa mga listahan ng sanggunian na hindi tinukoy sa sheet ng mga pagpipilian: %(rows)s. Suriin ang iyong survey at mga pagpipiliang sheet."
+msgstr ""
+"Ang XLSForm ay may mga piling tanong na tumutukoy sa mga listahan ng "
+"sanggunian na hindi tinukoy sa sheet ng mga pagpipilian: %(rows)s. Suriin"
+" ang iyong survey at mga pagpipiliang sheet."
 
 #: app/central/central_crud.py:375
 #, python-format
@@ -189,58 +192,58 @@ msgstr "Walang mga geometries na naroroon"
 msgid "Your geojson file is invalid."
 msgstr "Ang iyong geojson file ay hindi wasto."
 
-#: app/htmx/project_detail_routes.py:115
+#: app/htmx/project_detail_routes.py:118
 msgid "Mapper Login (QFieldCloud)"
 msgstr "Pag-login ng Mapper (QFieldCloud)"
 
-#: app/htmx/project_detail_routes.py:118
+#: app/htmx/project_detail_routes.py:121
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
 msgid "Username:"
 msgstr "Pangalan ng User:"
 
-#: app/htmx/project_detail_routes.py:121
+#: app/htmx/project_detail_routes.py:124
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
 msgid "Password:"
 msgstr "Kontrasenyas:"
 
-#: app/htmx/project_detail_routes.py:124
+#: app/htmx/project_detail_routes.py:127
 msgid "Scan the QR code, then enter these credentials in QField."
 msgstr ""
 "I-scan ang QR code, pagkatapos ay ilagay ang mga kredensyal na ito sa "
 "QField."
 
-#: app/htmx/project_detail_routes.py:137
+#: app/htmx/project_detail_routes.py:140
 msgid "Scan QR Code"
 msgstr "I-scan ang QR Code"
 
-#: app/htmx/project_detail_routes.py:139
+#: app/htmx/project_detail_routes.py:142
 #, python-format
 msgid "Use %(app_name)s to scan this QR code and load the project."
 msgstr ""
 "Gamitin ang %(app_name)s para i-scan ang QR code na ito at i-load ang "
 "proyekto."
 
-#: app/htmx/project_detail_routes.py:141
+#: app/htmx/project_detail_routes.py:144
 msgid "Project QR Code"
 msgstr "QR Code ng Proyekto"
 
-#: app/htmx/project_detail_routes.py:142
+#: app/htmx/project_detail_routes.py:145
 msgid "Download QR Code"
 msgstr "I-download ang QR Code"
 
-#: app/htmx/project_detail_routes.py:145
+#: app/htmx/project_detail_routes.py:148
 #, python-format
 msgid "Open in %(app_name)s"
 msgstr "Buksan sa %(app_name)s"
 
-#: app/htmx/project_detail_routes.py:146
+#: app/htmx/project_detail_routes.py:149
 #, python-format
 msgid "If %(app_name)s is installed on this device."
 msgstr "Kung naka-install ang %(app_name)s sa device na ito."
 
-#: app/htmx/project_detail_routes.py:212
+#: app/htmx/project_detail_routes.py:215
 msgid ""
 "Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
 " running."
@@ -248,13 +251,13 @@ msgstr ""
 "Hindi maabot ang mapping server. Tiyaking tumatakbo ang ODK Central o "
 "QFieldCloud."
 
-#: app/htmx/project_detail_routes.py:216
+#: app/htmx/project_detail_routes.py:219
 msgid "The mapping server returned an error. Check its logs for details."
 msgstr ""
 "Nagbalik ng error ang mapping server. Suriin ang logs nito para sa "
 "detalye."
 
-#: app/htmx/project_detail_routes.py:219
+#: app/htmx/project_detail_routes.py:222
 msgid ""
 "Authentication failed connecting to the mapping server. Check the "
 "configured credentials."
@@ -262,90 +265,119 @@ msgstr ""
 "Nabigo ang authentication sa pagkonekta sa mapping server. Suriin ang "
 "naka-configure na mga kredensyal."
 
-#: app/htmx/project_detail_routes.py:222
+#: app/htmx/project_detail_routes.py:225
 msgid "An unexpected error occurred while generating the QR code."
 msgstr "May nangyaring hindi inaasahang error habang ginagawa ang QR code."
 
-#: app/htmx/project_detail_routes.py:295
+#: app/htmx/project_detail_routes.py:298
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "Hindi nahanap ang proyekto (%(project_id)s)."
 
-#: app/htmx/project_detail_routes.py:302
+#: app/htmx/project_detail_routes.py:305
 msgid "Only the project manager can delete this project."
 msgstr ""
 "Tanging ang project manager lamang ang maaaring magtanggal sa proyektong "
 "ito."
 
-#: app/htmx/project_detail_routes.py:340 app/templates/project_details.html:172
+#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:300
 msgid "Project not found."
 msgstr "Hindi nahanap ang proyekto."
 
-#: app/htmx/project_detail_routes.py:376
+#: app/htmx/project_detail_routes.py:379
 #: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Kamalian: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:410
+#: app/htmx/project_detail_routes.py:413
 #, python-format
 msgid "Added the following user(s) as project editors: %(names)s."
-msgstr "Idinagdag ang sumusunod na (mga) user bilang mga editor ng proyekto: %(names)s."
+msgstr ""
+"Idinagdag ang sumusunod na (mga) user bilang mga editor ng proyekto: "
+"%(names)s."
 
-#: app/htmx/project_detail_routes.py:414
+#: app/htmx/project_detail_routes.py:417
 #, python-format
 msgid "Could not add '%(username)s': %(reason)s"
 msgstr "Hindi maidagdag ang '%(username)s': %(reason)s"
 
-#: app/htmx/project_detail_routes.py:420
+#: app/htmx/project_detail_routes.py:423
 msgid "Add more collaborators"
 msgstr "Magdagdag pa ng mga collaborator"
 
-#: app/htmx/project_detail_routes.py:435
+#: app/htmx/project_detail_routes.py:436
 msgid "Invite QFieldCloud collaborators"
 msgstr "Mag-imbita ng mga collaborator ng QFieldCloud"
 
-#: app/htmx/project_detail_routes.py:438
+#: app/htmx/project_detail_routes.py:439
 msgid ""
 "Mappers must have an account on QFieldCloud before you can give them "
 "access to this project."
-msgstr "Dapat ay may account ang mga Mapper sa QFieldCloud bago mo sila mabigyan ng access sa proyektong ito."
+msgstr ""
+"Dapat ay may account ang mga Mapper sa QFieldCloud bago mo sila mabigyan "
+"ng access sa proyektong ito."
 
-#: app/htmx/project_detail_routes.py:444
+#: app/htmx/project_detail_routes.py:445
 msgid ""
 "Have each mapper create a free account at <a "
 "href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
 "class=\"ftm-link--brand\">app.qfield.cloud</a>."
-msgstr "Hayaang gumawa ng libreng account ang bawat mapper sa <a href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" class=\"ftm-link--brand\">app.qfield.cloud</a>."
+msgstr ""
+"Hayaang gumawa ng libreng account ang bawat mapper sa <a "
+"href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
+"class=\"ftm-link--brand\">app.qfield.cloud</a>."
 
-#: app/htmx/project_detail_routes.py:450
+#: app/htmx/project_detail_routes.py:451
 msgid ""
 "Enter their QFieldCloud usernames below (comma-separated for multiple "
 "users) and click submit. They will be added as editors and can log in to "
 "QField to start mapping."
-msgstr "Ilagay ang kanilang mga QFieldCloud username sa ibaba (pinaghihiwalay ng kuwit para sa maraming user) at i-click ang isumite. Idaragdag sila bilang mga editor at maaaring mag-log in sa QField upang simulan ang pagmamapa."
+msgstr ""
+"Ilagay ang kanilang mga QFieldCloud username sa ibaba (pinaghihiwalay ng "
+"kuwit para sa maraming user) at i-click ang isumite. Idaragdag sila "
+"bilang mga editor at maaaring mag-log in sa QField upang simulan ang "
+"pagmamapa."
 
-#: app/htmx/project_detail_routes.py:456
+#: app/htmx/project_detail_routes.py:457
 msgid "e.g. alice, bob, charlie"
 msgstr "hal. alice, bob, charlie"
 
-#: app/htmx/project_detail_routes.py:457
+#: app/htmx/project_detail_routes.py:458
 msgid "Add collaborators"
 msgstr "Magdagdag ng mga collaborator"
 
-#: app/htmx/project_detail_routes.py:549
+#: app/htmx/project_detail_routes.py:550
 msgid "Enter at least one QFieldCloud username."
 msgstr "Maglagay ng kahit isang QFieldCloud username."
 
-#: app/htmx/project_detail_routes.py:559
+#: app/htmx/project_detail_routes.py:560
 msgid "QFieldCloud project ID not found for this project."
 msgstr "Hindi nakita ang project ID ng QFieldCloud para sa proyektong ito."
 
-#: app/htmx/project_detail_routes.py:565
+#: app/htmx/project_detail_routes.py:566
 msgid ""
 "This project was created on a custom QFieldCloud instance. Use the "
 "QFieldCloud Admin tab to manage collaborators."
-msgstr "Ang proyektong ito ay ginawa sa isang custom na halimbawa ng QFieldCloud. Gamitin ang tab na QFieldCloud Admin para pamahalaan ang mga collaborator."
+msgstr ""
+"Ang proyektong ito ay ginawa sa isang custom na halimbawa ng QFieldCloud."
+" Gamitin ang tab na QFieldCloud Admin para pamahalaan ang mga "
+"collaborator."
+
+#: app/htmx/project_detail_routes.py:632
+msgid "GeoJSON export is only available for QField projects."
+msgstr ""
+"Ang pag-export ng GeoJSON ay magagamit lamang para sa mga proyekto ng "
+"QField."
+
+#: app/htmx/project_detail_routes.py:637
+msgid "This project is not yet linked to a QFieldCloud project."
+msgstr "Ang proyektong ito ay hindi pa naka-link sa isang proyekto ng QFieldCloud."
+
+#: app/htmx/project_detail_routes.py:648
+#, python-format
+msgid "Failed to export GeoJSON: %(error)s"
+msgstr "Nabigong i-export ang GeoJSON: %(error)s"
 
 #: app/htmx/basemap/basemap_attach_flow.py:69
 msgid ""
@@ -530,7 +562,7 @@ msgid "Admin"
 msgstr "Administrator"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:10
-#: app/templates/project_details.html:72
+#: app/templates/project_details.html:200
 msgid "Manager"
 msgstr "Tagapamahala"
 
@@ -591,7 +623,7 @@ msgid "Visibility"
 msgstr "Pagiging nakikita"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/project_details.html:58
+#: app/templates/project_details.html:186
 msgid "Description"
 msgstr "Paglalarawan"
 
@@ -1087,6 +1119,50 @@ msgstr "Ang user na '%(username)s' ay collaborator na sa proyektong ito."
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Wasto ang mga kredensyal!"
 
+#: app/qfield/qfield_crud.py:1497
+msgid "This project is not linked to a QFieldCloud project."
+msgstr "Ang proyektong ito ay hindi naka-link sa isang proyekto ng QFieldCloud."
+
+#: app/qfield/qfield_crud.py:1504
+msgid "QFIELDCLOUD_QGIS_URL is not configured."
+msgstr "Ang QFIELDCLOUD_QGIS_URL ay hindi na-configure."
+
+#: app/qfield/qfield_crud.py:1534
+msgid "No GeoPackage files were found in the QFieldCloud package."
+msgstr "Walang nakitang GeoPackage file sa QFieldCloud package."
+
+#: app/qfield/qfield_crud.py:1556
+msgid ""
+"No survey data found in the QFieldCloud package. Mappers may not have "
+"submitted any responses yet."
+msgstr "Walang nakitang data ng survey sa QFieldCloud package. Maaaring hindi pa nagsumite ng anumang mga tugon ang mga Mapper."
+
+#: app/qfield/qfield_crud.py:1579
+msgid "QFieldCloud did not return a package job id."
+msgstr "Ang QFieldCloud ay hindi nagbalik ng isang package job id."
+
+#: app/qfield/qfield_crud.py:1596
+msgid "QFieldCloud failed to package the project."
+msgstr "Nabigo ang QFieldCloud na i-package ang proyekto."
+
+#: app/qfield/qfield_crud.py:1602
+#, python-format
+msgid ""
+"Timed out waiting for QFieldCloud to package the project (last status: "
+"%(status)s)."
+msgstr ""
+"Nag-time out sa paghihintay para sa QFieldCloud na i-package ang proyekto"
+" (huling status: %(status)s)."
+
+#: app/qfield/qfield_crud.py:1626
+#, python-format
+msgid "GeoPackage conversion failed: %(error)s"
+msgstr "Nabigo ang conversion ng GeoPackage: %(error)s"
+
+#: app/qfield/qfield_crud.py:1633
+msgid "QGIS wrapper returned invalid JSON for /export."
+msgstr "Ang QGIS wrapper ay nagbalik ng hindi wastong JSON para sa /export."
+
 #: app/templates/home.html:13
 msgid "Filters"
 msgstr "Mga Filter"
@@ -1519,109 +1595,132 @@ msgstr ""
 "Piliin ang opsiyong akma sa iyong proyekto. Maaari kang magbago ng isip "
 "mamaya sa pamamagitan ng pagsisimula muli."
 
-#: app/templates/new_project_chooser.html:18
-#: app/templates/new_project_chooser.html:30
+#: app/templates/new_project_chooser.html:20
+#: app/templates/new_project_chooser.html:32
 msgid "Add tags to OSM buildings"
 msgstr "Magdagdag ng mga tag sa mga gusali ng OSM"
 
-#: app/templates/new_project_chooser.html:21
+#: app/templates/new_project_chooser.html:23
 msgid "Quickest way to start. Just draw your area on the map and you're done."
 msgstr ""
 "Pinakamabilis na paraan para magsimula. Iguhit lang ang iyong lugar sa "
 "mapa at tapos na."
 
-#: app/templates/new_project_chooser.html:25
+#: app/templates/new_project_chooser.html:27
 msgid "Use building outlines already in OpenStreetMap"
 msgstr "Gumamit ng mga balangkas ng gusali na nasa OpenStreetMap na"
 
-#: app/templates/new_project_chooser.html:26
+#: app/templates/new_project_chooser.html:28
 msgid "Includes a ready-made survey to add OSM tags to existing buildings"
-msgstr "May kasamang handa na survey upang magdagdag ng mga tag ng OSM sa mga kasalukuyang gusali"
+msgstr ""
+"May kasamang handa na survey upang magdagdag ng mga tag ng OSM sa mga "
+"kasalukuyang gusali"
 
-#: app/templates/new_project_chooser.html:27
+#: app/templates/new_project_chooser.html:29
 msgid "Fill in gaps for unmapped buildings during digitisation"
-msgstr "Punan ang mga puwang para sa mga hindi naka-map na gusali sa panahon ng digitization"
+msgstr ""
+"Punan ang mga puwang para sa mga hindi naka-map na gusali sa panahon ng "
+"digitization"
 
-#: app/templates/new_project_chooser.html:36
-#: app/templates/new_project_chooser.html:83
+#: app/templates/new_project_chooser.html:38
+#: app/templates/new_project_chooser.html:97
 msgid "More details about this option"
 msgstr "Higit pang mga detalye tungkol sa opsyong ito"
 
-#: app/templates/new_project_chooser.html:42
+#: app/templates/new_project_chooser.html:44
 msgid "How this option is set up"
 msgstr "Paano naka-set up ang opsyong ito"
 
-#: app/templates/new_project_chooser.html:44
+#: app/templates/new_project_chooser.html:46
 msgid "Mapping happens in QField on Android."
 msgstr "Nangyayari ang pagmamapa sa QField sa Android."
 
-#: app/templates/new_project_chooser.html:45
+#: app/templates/new_project_chooser.html:48
 msgid ""
-"The area is split into tasks of ~10 buildings each, using roads, rivers, "
-"railways and airstrips as boundaries."
-msgstr "Ang lugar ay nahahati sa mga gawain ng ~10 gusali bawat isa, gamit ang mga kalsada, ilog, riles at airstrip bilang mga hangganan."
+"The area is split into tasks of ~10 buildings each, using roads, rivers,\n"
+"              railways and airstrips as boundaries."
+msgstr ""
+"Ang lugar ay nahahati sa mga gawain ng ~10 gusali bawat isa, gamit ang "
+"mga kalsada, ilog,\n"
+"              mga riles at paliparan bilang mga hangganan."
 
-#: app/templates/new_project_chooser.html:46
+#: app/templates/new_project_chooser.html:51
 msgid "Photo upload is enabled but optional."
 msgstr "Ang pag-upload ng larawan ay pinagana ngunit opsyonal."
 
-#: app/templates/new_project_chooser.html:47
+#: app/templates/new_project_chooser.html:52
 msgid "A basemap is generated automatically for offline use (if available)."
-msgstr "Ang isang basemap ay awtomatikong nabuo para sa offline na paggamit (kung magagamit)."
+msgstr ""
+"Ang isang basemap ay awtomatikong nabuo para sa offline na paggamit (kung"
+" magagamit)."
 
-#: app/templates/new_project_chooser.html:53
+#: app/templates/new_project_chooser.html:55
 msgid "Preview the building survey in XLSForm Editor →"
 msgstr "Silipin ang survey ng gusali sa XLSForm Editor →"
 
-#: app/templates/new_project_chooser.html:64
+#: app/templates/new_project_chooser.html:71
 msgid "Something else"
 msgstr "Iba pa"
 
-#: app/templates/new_project_chooser.html:67
+#: app/templates/new_project_chooser.html:74
 msgid ""
 "For anything that isn't tagging OSM buildings - bring your own survey, or"
-" use one contributed by the community."
-msgstr "Para sa anumang bagay na hindi nagta-tag sa mga gusali ng OSM - magdala ng sarili mong survey, o gumamit ng isang iniambag ng komunidad."
+" use one\n"
+"          contributed by the community."
+msgstr ""
+"Para sa anumang bagay na hindi nagta-tag sa mga gusali ng OSM - magdala "
+"ng sarili mong survey, o gumamit ng isa\n"
+"          kontribusyon ng komunidad."
 
-#: app/templates/new_project_chooser.html:71
+#: app/templates/new_project_chooser.html:80
 msgid ""
 "Other OpenStreetMap features - roads, water points, schools, healthcare, "
-"and more"
-msgstr "Iba pang mga tampok ng OpenStreetMap - mga kalsada, water point, paaralan, pangangalagang pangkalusugan, at higit pa"
+"and\n"
+"            more"
+msgstr ""
+"Iba pang mga tampok ng OpenStreetMap - mga kalsada, water point, "
+"paaralan, pangangalaga sa kalusugan, at\n"
+"            higit pa"
 
-#: app/templates/new_project_chooser.html:72
+#: app/templates/new_project_chooser.html:84
 msgid ""
 "Non-OSM surveys - vaccination campaigns, census mapping, healthcare "
-"facility audits, infrastructure inspections"
-msgstr "Mga survey na hindi OSM - mga kampanya sa pagbabakuna, pagmamapa ng census, pag-audit sa pasilidad ng pangangalagang pangkalusugan, mga inspeksyon sa imprastraktura"
+"facility\n"
+"            audits, infrastructure inspections"
+msgstr ""
+"Mga survey na hindi OSM - mga kampanya sa pagbabakuna, pagmamapa ng "
+"census, pasilidad ng pangangalagang pangkalusugan\n"
+"            pag-audit, inspeksyon sa imprastraktura"
 
-#: app/templates/new_project_chooser.html:73
+#: app/templates/new_project_chooser.html:87
 msgid "Bring your own map data, or start with an empty map"
 msgstr "Dalhin ang sarili mong datos ng mapa, o magsimula sa walang laman na mapa"
 
-#: app/templates/new_project_chooser.html:74
+#: app/templates/new_project_chooser.html:88
 msgid "Control how the area is divided up for mappers"
 msgstr "Kontrolin kung paano hahatiin ang lugar para sa mga mapper"
 
-#: app/templates/new_project_chooser.html:77
+#: app/templates/new_project_chooser.html:91
 msgid "Set up a custom project"
 msgstr "Maghanap ng mga proyekto…"
 
-#: app/templates/new_project_chooser.html:89
+#: app/templates/new_project_chooser.html:103
 msgid "Where to find a survey"
 msgstr "Kung saan makakahanap ng survey"
 
-#: app/templates/new_project_chooser.html:91
+#: app/templates/new_project_chooser.html:105
 msgid "Upload your own XLSForm, or"
 msgstr "Mag-upload ng sarili mong XLSForm, o"
 
-#: app/templates/new_project_chooser.html:97
+#: app/templates/new_project_chooser.html:108
 msgid "Browse the community XLSForm gallery →"
 msgstr "I-browse ang komunidad XLSForm gallery →"
 
-#: app/templates/new_project_chooser.html:99
+#: app/templates/new_project_chooser.html:112
 msgid "Mapping can use QField (iOS + Android) or ODK Collect (Android only)."
-msgstr "Maaaring gamitin ng pagmamapa ang QField (iOS + Android) o ODK Collect (Android lang)."
+msgstr ""
+"Maaaring gamitin ng pagmamapa ang QField (iOS + Android) o ODK Collect "
+"(Android lang)."
 
 #: app/templates/new_project_custom.html:1
 msgid "Create Custom Project"
@@ -1778,8 +1877,8 @@ msgid "Description is required."
 msgstr "Kinakailangan ang paglalarawan."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "Mabilis na Pag-setup — Mga Gusali ng OSM"
+msgid "Quick Setup - OSM Buildings"
+msgstr "Mabilis na Pag-setup - Mga Gusali ng OSM"
 
 #: app/templates/new_project_simple.html:7
 msgid "Map buildings"
@@ -1826,71 +1925,101 @@ msgid "Creating Project"
 msgstr "Ginagawa ang proyekto"
 
 #: app/templates/partials/new_project/creating_fragment.html:11
-#: app/templates/project_details.html:6 app/templates/project_details.html:166
-#: app/templates/project_details.html:177
+#: app/templates/project_details.html:6 app/templates/project_details.html:294
+#: app/templates/project_details.html:305
 msgid "Back to Projects"
 msgstr "Bumalik sa Mga Proyekto"
 
-#: app/templates/project_details.html:46
+#: app/templates/project_details.html:41
+msgid ""
+"Trigger a fresh QFieldCloud package and download the project data as a "
+"single GeoJSON file."
+msgstr ""
+"Mag-trigger ng bagong QFieldCloud package at i-download ang data ng "
+"proyekto bilang isang GeoJSON file."
+
+#: app/templates/project_details.html:44
+msgid "Export Data"
+msgstr "I-export ang Data"
+
+#: app/templates/project_details.html:87 app/templates/project_details.html:95
+msgid ""
+"Packaging project on QFieldCloud - this may take a minute, please be "
+"patient..."
+msgstr "Packaging project sa QFieldCloud - maaaring tumagal ito ng isang minuto, mangyaring maging mapagpasensya..."
+
+#: app/templates/project_details.html:96
+msgid "✓ Download started."
+msgstr "✓ Nagsimula ang pag-download."
+
+#: app/templates/project_details.html:97
+msgid "Export failed:"
+msgstr "Nabigo ang pag-export:"
+
+#: app/templates/project_details.html:98
+msgid "Network error while exporting. Please try again."
+msgstr "Error sa network habang nag-e-export. Pakisubukang muli."
+
+#: app/templates/project_details.html:174
 msgid "Project Metadata"
 msgstr "Metadata ng Proyekto"
 
-#: app/templates/project_details.html:48
+#: app/templates/project_details.html:176
 msgid "Project metadata and setup information for managers."
 msgstr "Metadata at impormasyon sa setup ng proyekto para sa mga manager."
 
-#: app/templates/project_details.html:66
+#: app/templates/project_details.html:194
 msgid "Project ID"
 msgstr "ID ng Proyekto"
 
-#: app/templates/project_details.html:77
+#: app/templates/project_details.html:205
 msgid "Created"
 msgstr "Ginawa"
 
-#: app/templates/project_details.html:84
+#: app/templates/project_details.html:212
 msgid "Last Updated"
 msgstr "Huling Na-update"
 
-#: app/templates/project_details.html:95
+#: app/templates/project_details.html:223
 msgid "Hashtags"
 msgstr "Mga Hashtag"
 
-#: app/templates/project_details.html:107
+#: app/templates/project_details.html:235
 msgid "External Project"
 msgstr "Panlabas na Proyekto"
 
-#: app/templates/project_details.html:109
+#: app/templates/project_details.html:237
 msgid "Instance:"
 msgstr "Instansya:"
 
-#: app/templates/project_details.html:111
+#: app/templates/project_details.html:239
 msgid "Project ID:"
 msgstr "ID ng Proyekto:"
 
-#: app/templates/project_details.html:121
-#: app/templates/project_details.html:129
+#: app/templates/project_details.html:249
+#: app/templates/project_details.html:257
 msgid "View Project in ODK Central →"
 msgstr "Tingnan ang Proyekto sa ODK Central →"
 
-#: app/templates/project_details.html:136
+#: app/templates/project_details.html:264
 msgid "Manage QFieldCloud Project →"
 msgstr "Pamahalaan ang Proyekto sa QFieldCloud →"
 
-#: app/templates/project_details.html:144
+#: app/templates/project_details.html:272
 msgid "View Project Externally →"
 msgstr "Tingnan ang Proyekto sa Panlabas na Site →"
 
-#: app/templates/project_details.html:160
+#: app/templates/project_details.html:288
 msgid "Delete this project in downstream and Field-TM? This cannot be undone."
 msgstr ""
 "Tanggalin ang proyektong ito sa downstream at sa Field-TM? Hindi na ito "
 "maaaring ibalik."
 
-#: app/templates/project_details.html:163
+#: app/templates/project_details.html:291
 msgid "Delete Project"
 msgstr "Tanggalin ang Proyekto"
 
-#: app/templates/project_details.html:174
+#: app/templates/project_details.html:302
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view\n"
@@ -1986,7 +2115,11 @@ msgid ""
 "Downloading map data, splitting tasks, and preparing the QField project. "
 "This can take a\n"
 "    minute or two - this page will redirect automatically when ready."
-msgstr "Pag-download ng data ng mapa, paghahati ng mga gawain, at paghahanda ng proyekto ng QField. Ito ay maaaring tumagal ng isang\n    minuto o dalawa - ang pahinang ito ay awtomatikong magre-redirect kapag handa na."
+msgstr ""
+"Pag-download ng data ng mapa, paghahati ng mga gawain, at paghahanda ng "
+"proyekto ng QField. Ito ay maaaring tumagal ng isang\n"
+"    minuto o dalawa - ang pahinang ito ay awtomatikong magre-redirect "
+"kapag handa na."
 
 #: app/templates/partials/new_project/map_script.html:3
 msgid "Area"

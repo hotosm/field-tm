@@ -1456,3 +1456,180 @@ async def delete_qfield_project(db: AsyncConnection, project_id: int) -> str:
             )
 
     return f"Project {project_id} deleted from QFieldCloud."
+
+
+# ---------------------------------------------------------------------------
+# Export project data as GeoJSON
+# ---------------------------------------------------------------------------
+
+
+# Polling cadence for the QFieldCloud ``package`` job.  Packaging usually
+# finishes in a few seconds for small projects; cap at 5 minutes for larger
+# ones so the request doesn't hang forever if the QFC worker stalls.
+_EXPORT_POLL_INTERVAL = 2.0
+_EXPORT_POLL_TIMEOUT = 300.0
+# Timeout for the GPKG→GeoJSON wrapper call (large gpkgs can take a while).
+_GPKG_CONVERT_TIMEOUT = ClientTimeout(total=600)
+# Name of the QGIS layer that holds the survey submissions in every FTM
+# project file (see src/qfield/field_project.py).
+SURVEY_LAYER_NAME = "survey"
+
+
+async def export_qfield_project_geojson(
+    db: AsyncConnection,
+    project: DbProject,
+) -> dict:
+    """Export a QFieldCloud project's data as a GeoJSON FeatureCollection.
+
+    Steps:
+        1. Trigger a ``package`` job on QFieldCloud (force=True so the latest
+           submissions are picked up).
+        2. Poll until the job finishes.
+        3. Download every ``*.gpkg`` from the resulting package.
+        4. POST each .gpkg to the QGIS wrapper's ``/export`` endpoint, which
+           returns one FeatureCollection per layer (reprojected to EPSG:4326).
+        5. Merge all features into a single FeatureCollection, tagging each
+           feature with a ``_layer`` property so downstream tools can split it.
+    """
+    if not project.external_project_id:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=_("This project is not linked to a QFieldCloud project."),
+        )
+
+    qgis_url = (settings.QFIELDCLOUD_QGIS_URL or "").strip()
+    if not qgis_url:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_("QFIELDCLOUD_QGIS_URL is not configured."),
+        )
+
+    custom_creds = _resolve_project_qfield_credentials(project)
+    api_project_id = str(project.external_project_id)
+    loop = get_running_loop()
+
+    async with qfield_client(custom_creds) as client:
+        await _wait_for_package_job(
+            loop=loop, client=client, api_project_id=api_project_id
+        )
+
+        download_dir = tempfile.mkdtemp(prefix="ftm_qfc_export_")
+        try:
+            await loop.run_in_executor(
+                None,
+                partial(
+                    client.package_download,
+                    project_id=api_project_id,
+                    local_dir=download_dir,
+                    filter_glob="*.gpkg",
+                    throw_on_error=True,
+                ),
+            )
+
+            gpkg_paths = sorted(Path(download_dir).rglob("*.gpkg"))
+            if not gpkg_paths:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=_(
+                        "No GeoPackage files were found in the QFieldCloud package."
+                    ),
+                )
+
+            survey_features: list[dict] = []
+            for gpkg_path in gpkg_paths:
+                layers = await _convert_gpkg_via_wrapper(qgis_url, gpkg_path)
+                # FTM consistently names the survey-submission layer "survey"
+                # (see src/qfield/field_project.py).  Everything else - task
+                # areas, XLSForm choice lists, per-task offline data files -
+                # is noise from a "give me my survey data" perspective.
+                survey_fc = layers.get(SURVEY_LAYER_NAME)
+                if not survey_fc:
+                    continue
+                survey_features.extend(survey_fc.get("features", []))
+        finally:
+            shutil.rmtree(download_dir, ignore_errors=True)
+
+    if not survey_features:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=_(
+                "No survey data found in the QFieldCloud package. "
+                "Mappers may not have submitted any responses yet."
+            ),
+        )
+
+    return {"type": "FeatureCollection", "features": survey_features}
+
+
+async def _wait_for_package_job(
+    *,
+    loop,
+    client,
+    api_project_id: str,
+) -> None:
+    """Trigger a ``package`` job on QFieldCloud and poll until it finishes."""
+    job = await loop.run_in_executor(
+        None,
+        partial(client.job_trigger, api_project_id, JobTypes.PACKAGE, force=True),
+    )
+    job_id = job.get("id")
+    if not job_id:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_("QFieldCloud did not return a package job id."),
+        )
+
+    elapsed = 0.0
+    last_status: Optional[str] = None
+    while elapsed < _EXPORT_POLL_TIMEOUT:
+        await asyncio.sleep(_EXPORT_POLL_INTERVAL)
+        elapsed += _EXPORT_POLL_INTERVAL
+        status_resp = await loop.run_in_executor(
+            None, partial(client.job_status, job_id)
+        )
+        last_status = status_resp.get("status")
+        if last_status == "finished":
+            return
+        if last_status == "failed":
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=_("QFieldCloud failed to package the project."),
+            )
+
+    raise HTTPException(
+        status_code=status.HTTP_504_GATEWAY_TIMEOUT,
+        detail=_(
+            "Timed out waiting for QFieldCloud to package the project "
+            "(last status: %(status)s)."
+        )
+        % {"status": last_status or "unknown"},
+    )
+
+
+async def _convert_gpkg_via_wrapper(qgis_url: str, gpkg_path: Path) -> dict:
+    """POST a .gpkg to the QGIS wrapper's /export endpoint, return its layers dict."""
+    gpkg_bytes = gpkg_path.read_bytes()
+    headers = {"Content-Type": "application/octet-stream"}
+    async with (
+        ClientSession(timeout=_GPKG_CONVERT_TIMEOUT) as session,
+        session.post(
+            f"{qgis_url.rstrip('/')}/export",
+            data=gpkg_bytes,
+            headers=headers,
+        ) as response,
+    ):
+        body = await response.text()
+        if response.status != status.HTTP_200_OK:
+            log.error("QGIS wrapper /export returned %s: %s", response.status, body)
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=_("GeoPackage conversion failed: %(error)s") % {"error": body},
+            )
+        try:
+            payload = json.loads(body)
+        except json.JSONDecodeError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=_("QGIS wrapper returned invalid JSON for /export."),
+            ) from exc
+    return payload.get("layers", {}) or {}

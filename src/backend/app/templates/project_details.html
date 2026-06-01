@@ -31,16 +31,143 @@
         />
         {% endif %}
         <h1 style="margin: 0">{{ project.project_name or _('Unnamed Project') }}</h1>
+        <wa-badge
+          variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'PUBLISHED' %}info{% elif status_value == 'COMPLETED' %}success{% else %}error{% endif %}"
+        >
+          {{ status_value }}
+        </wa-badge>
       </div>
-      <wa-badge
-        variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'PUBLISHED' %}info{% elif status_value == 'COMPLETED' %}success{% else %}error{% endif %}"
+      {% if field_mapping_app_upper == 'QFIELD' and project.external_project_id %}
+      <wa-button
+        id="ftm-export-geojson-link"
+        variant="brand"
+        size="small"
+        title="{{ _('Trigger a fresh QFieldCloud package and download the project data as a single GeoJSON file.') }}"
+        onclick="window.exportProjectGeoJSON && window.exportProjectGeoJSON({{ project.id }});"
       >
-        {{ status_value }}
-      </wa-badge>
+        ↓ {{ _("Export Data") }}
+      </wa-button>
+      {% endif %}
     </div>
 
     <div style="padding: 20px">
-      {% if status_value == 'PUBLISHED' %} {% include "partials/project_details/setup_steps.html" %}
+      {% if field_mapping_app_upper == 'QFIELD' and project.external_project_id %}
+      <div
+        id="ftm-export-geojson-status"
+        role="status"
+        aria-live="polite"
+        style="
+          display: none;
+          margin-bottom: 16px;
+          padding: 10px 14px;
+          border: 1px solid #d0d7de;
+          border-radius: 6px;
+          background: #f6f8fa;
+          font-size: 0.9em;
+          color: #333;
+        "
+      >
+        <span
+          id="ftm-export-geojson-spinner"
+          style="display: inline-block; vertical-align: middle; margin-inline-end: 8px"
+        >
+          <svg
+            class="ftm-spinner"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M21 12a9 9 0 11-6.219-8.56" />
+          </svg>
+        </span>
+        <span id="ftm-export-geojson-message"
+          >{{ _("Packaging project on QFieldCloud - this may take a minute, please be patient...")
+          }}</span
+        >
+      </div>
+      <script>
+        (function () {
+          if (window.exportProjectGeoJSON) return;
+          const I18N = {
+            packaging: {{ _("Packaging project on QFieldCloud - this may take a minute, please be patient...")|tojson }},
+            downloadStarted: {{ _("✓ Download started.")|tojson }},
+            failed: {{ _("Export failed:")|tojson }},
+            networkError: {{ _("Network error while exporting. Please try again.")|tojson }},
+          };
+          window.exportProjectGeoJSON = async function (projectId) {
+            const statusEl = document.getElementById("ftm-export-geojson-status");
+            const spinnerEl = document.getElementById("ftm-export-geojson-spinner");
+            const messageEl = document.getElementById("ftm-export-geojson-message");
+            const linkEl = document.getElementById("ftm-export-geojson-link");
+            if (!statusEl || !messageEl || !linkEl) return;
+
+            linkEl.setAttribute("aria-disabled", "true");
+            linkEl.style.pointerEvents = "none";
+            linkEl.style.opacity = "0.6";
+            spinnerEl.style.display = "inline-block";
+            statusEl.style.display = "block";
+            statusEl.style.borderColor = "#d0d7de";
+            statusEl.style.background = "#f6f8fa";
+            statusEl.style.color = "#333";
+            messageEl.textContent = I18N.packaging;
+
+            try {
+              const resp = await fetch(`/projects/${projectId}/export/geojson`, {
+                credentials: "same-origin",
+                headers: { Accept: "application/geo+json" },
+              });
+
+              if (!resp.ok) {
+                const errBody = await resp.text();
+                const tmp = document.createElement("div");
+                tmp.innerHTML = errBody;
+                const detail = (tmp.textContent || "").trim() || resp.statusText;
+                spinnerEl.style.display = "none";
+                statusEl.style.borderColor = "#f5c2c7";
+                statusEl.style.background = "#fff5f5";
+                statusEl.style.color = "#842029";
+                messageEl.textContent = `${I18N.failed} ${detail}`;
+                return;
+              }
+
+              const blob = await resp.blob();
+              let filename = `project-${projectId}_export.geojson`;
+              const disposition = resp.headers.get("Content-Disposition") || "";
+              const match = disposition.match(/filename="?([^";]+)"?/i);
+              if (match) filename = match[1];
+
+              const objUrl = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = objUrl;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              a.remove();
+              setTimeout(() => URL.revokeObjectURL(objUrl), 1000);
+
+              spinnerEl.style.display = "none";
+              statusEl.style.borderColor = "#badbcc";
+              statusEl.style.background = "#f0fff4";
+              statusEl.style.color = "#0a3622";
+              messageEl.textContent = I18N.downloadStarted;
+              setTimeout(() => { statusEl.style.display = "none"; }, 4000);
+            } catch (err) {
+              spinnerEl.style.display = "none";
+              statusEl.style.borderColor = "#f5c2c7";
+              statusEl.style.background = "#fff5f5";
+              statusEl.style.color = "#842029";
+              messageEl.textContent = `${I18N.networkError} (${err && err.message ? err.message : err})`;
+            } finally {
+              linkEl.removeAttribute("aria-disabled");
+              linkEl.style.pointerEvents = "";
+              linkEl.style.opacity = "";
+            }
+          };
+        })();
+      </script>
+      {% endif %} {% if status_value == 'PUBLISHED' %} {% include
+      "partials/project_details/setup_steps.html" %}
 
       <div class="ftm-manager-section">
         <h2 class="ftm-manager-section__title">{{ _("Project Metadata") }}</h2>
@@ -155,7 +282,7 @@
     <div slot="footer" class="ftm-flex-end">
       {% if can_delete_project %}
       <wa-button
-        variant="danger"
+        variant="brand"
         hx-delete="/projects/{{ project.id }}"
         hx-confirm="{{ _('Delete this project in downstream and Field-TM? This cannot be undone.') }}"
         hx-swap="none"
@@ -174,7 +301,7 @@
         {{ _("The project you're looking for doesn't exist or you don't have permission to view
         it.") }}
       </p>
-      <wa-button href="/projects" variant="primary">{{ _("Back to Projects") }}</wa-button>
+      <wa-button href="/projects" variant="brand">{{ _("Back to Projects") }}</wa-button>
     </div>
   </wa-card>
   {% endif %}

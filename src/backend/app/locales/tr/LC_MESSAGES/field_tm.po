@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-06-01 14:25+0100\n"
+"POT-Creation-Date: 2026-06-01 17:10+0100\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: tr\n"
@@ -81,7 +81,10 @@ msgstr "XLSForm dosyası okunamadı: %(error)s"
 msgid ""
 "XLSForm has select questions referencing lists that aren't defined in the"
 " choices sheet: %(rows)s. Check your survey and choices sheets."
-msgstr "XLSForm'da, seçimler sayfasında tanımlanmayan listelere referans veren seçilmiş sorular var: %(rows)s. Anketinizi ve seçim sayfalarınızı kontrol edin."
+msgstr ""
+"XLSForm'da, seçimler sayfasında tanımlanmayan listelere referans veren "
+"seçilmiş sorular var: %(rows)s. Anketinizi ve seçim sayfalarınızı kontrol"
+" edin."
 
 #: app/central/central_crud.py:375
 #, python-format
@@ -185,54 +188,54 @@ msgstr "Geometri yok"
 msgid "Your geojson file is invalid."
 msgstr "Geojson dosyanız geçersiz."
 
-#: app/htmx/project_detail_routes.py:115
+#: app/htmx/project_detail_routes.py:118
 msgid "Mapper Login (QFieldCloud)"
 msgstr "Haritalayıcı Girişi (QFieldCloud)"
 
-#: app/htmx/project_detail_routes.py:118
+#: app/htmx/project_detail_routes.py:121
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
 msgid "Username:"
 msgstr "Kullanıcı adı:"
 
-#: app/htmx/project_detail_routes.py:121
+#: app/htmx/project_detail_routes.py:124
 #: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
 #: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
 msgid "Password:"
 msgstr "Şifre:"
 
-#: app/htmx/project_detail_routes.py:124
+#: app/htmx/project_detail_routes.py:127
 msgid "Scan the QR code, then enter these credentials in QField."
 msgstr "QR kodunu tarayın, ardından bu bilgileri QField'a girin."
 
-#: app/htmx/project_detail_routes.py:137
+#: app/htmx/project_detail_routes.py:140
 msgid "Scan QR Code"
 msgstr "QR Kodunu Tara"
 
-#: app/htmx/project_detail_routes.py:139
+#: app/htmx/project_detail_routes.py:142
 #, python-format
 msgid "Use %(app_name)s to scan this QR code and load the project."
 msgstr "Bu QR kodunu taramak ve projeyi yüklemek için %(app_name)s kullanın."
 
-#: app/htmx/project_detail_routes.py:141
+#: app/htmx/project_detail_routes.py:144
 msgid "Project QR Code"
 msgstr "Proje QR Kodu"
 
-#: app/htmx/project_detail_routes.py:142
+#: app/htmx/project_detail_routes.py:145
 msgid "Download QR Code"
 msgstr "QR Kodunu İndir"
 
-#: app/htmx/project_detail_routes.py:145
+#: app/htmx/project_detail_routes.py:148
 #, python-format
 msgid "Open in %(app_name)s"
 msgstr "%(app_name)s konumunda aç"
 
-#: app/htmx/project_detail_routes.py:146
+#: app/htmx/project_detail_routes.py:149
 #, python-format
 msgid "If %(app_name)s is installed on this device."
 msgstr "Bu cihazda %(app_name)s yüklüyse."
 
-#: app/htmx/project_detail_routes.py:212
+#: app/htmx/project_detail_routes.py:215
 msgid ""
 "Cannot reach the mapping server. Check that ODK Central or QFieldCloud is"
 " running."
@@ -240,13 +243,13 @@ msgstr ""
 "Haritalama sunucusuna ulaşılamıyor. ODK Central veya QFieldCloud'un "
 "çalıştığını kontrol edin."
 
-#: app/htmx/project_detail_routes.py:216
+#: app/htmx/project_detail_routes.py:219
 msgid "The mapping server returned an error. Check its logs for details."
 msgstr ""
 "Haritalama sunucusu hata döndürdü. Ayrıntılar için günlüklerini kontrol "
 "edin."
 
-#: app/htmx/project_detail_routes.py:219
+#: app/htmx/project_detail_routes.py:222
 msgid ""
 "Authentication failed connecting to the mapping server. Check the "
 "configured credentials."
@@ -254,88 +257,112 @@ msgstr ""
 "Haritalama sunucusuna bağlanırken kimlik doğrulama başarısız oldu. "
 "Yapılandırılmış bilgileri kontrol edin."
 
-#: app/htmx/project_detail_routes.py:222
+#: app/htmx/project_detail_routes.py:225
 msgid "An unexpected error occurred while generating the QR code."
 msgstr "QR kodu oluşturulurken beklenmeyen bir hata oluştu."
 
-#: app/htmx/project_detail_routes.py:295
+#: app/htmx/project_detail_routes.py:298
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "Proje (%(project_id)s) bulunamadı."
 
-#: app/htmx/project_detail_routes.py:302
+#: app/htmx/project_detail_routes.py:305
 msgid "Only the project manager can delete this project."
 msgstr "Bu projeyi yalnızca proje yöneticisi silebilir."
 
-#: app/htmx/project_detail_routes.py:340 app/templates/project_details.html:172
+#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:300
 msgid "Project not found."
 msgstr "Proje bulunamadı."
 
-#: app/htmx/project_detail_routes.py:376
+#: app/htmx/project_detail_routes.py:379
 #: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Hata: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:410
+#: app/htmx/project_detail_routes.py:413
 #, python-format
 msgid "Added the following user(s) as project editors: %(names)s."
 msgstr "Şu kullanıcı(lar) proje düzenleyicileri olarak eklendi: %(names)s."
 
-#: app/htmx/project_detail_routes.py:414
+#: app/htmx/project_detail_routes.py:417
 #, python-format
 msgid "Could not add '%(username)s': %(reason)s"
 msgstr "'%(username)s' eklenemedi: %(reason)s"
 
-#: app/htmx/project_detail_routes.py:420
+#: app/htmx/project_detail_routes.py:423
 msgid "Add more collaborators"
 msgstr "Daha fazla ortak çalışan ekleyin"
 
-#: app/htmx/project_detail_routes.py:435
+#: app/htmx/project_detail_routes.py:436
 msgid "Invite QFieldCloud collaborators"
 msgstr "QFieldCloud ortak çalışanlarını davet edin"
 
-#: app/htmx/project_detail_routes.py:438
+#: app/htmx/project_detail_routes.py:439
 msgid ""
 "Mappers must have an account on QFieldCloud before you can give them "
 "access to this project."
-msgstr "Haritacıların bu projeye erişmesine izin vermeden önce QFieldCloud'da bir hesaba sahip olmaları gerekir."
+msgstr ""
+"Haritacıların bu projeye erişmesine izin vermeden önce QFieldCloud'da bir"
+" hesaba sahip olmaları gerekir."
 
-#: app/htmx/project_detail_routes.py:444
+#: app/htmx/project_detail_routes.py:445
 msgid ""
 "Have each mapper create a free account at <a "
 "href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
 "class=\"ftm-link--brand\">app.qfield.cloud</a>."
-msgstr "Her haritacının <a href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" class=\"ftm-link--brand\">app.qfield.cloud</a> adresinde ücretsiz bir hesap oluşturmasını sağlayın."
+msgstr ""
+"Her haritacının <a href=\"https://app.qfield.cloud\" target=\"_blank\" "
+"rel=\"noopener\" class=\"ftm-link--brand\">app.qfield.cloud</a> adresinde"
+" ücretsiz bir hesap oluşturmasını sağlayın."
 
-#: app/htmx/project_detail_routes.py:450
+#: app/htmx/project_detail_routes.py:451
 msgid ""
 "Enter their QFieldCloud usernames below (comma-separated for multiple "
 "users) and click submit. They will be added as editors and can log in to "
 "QField to start mapping."
-msgstr "QFieldCloud kullanıcı adlarını aşağıya girin (birden fazla kullanıcı için virgülle ayrılmış olarak) ve gönder'i tıklayın. Editör olarak eklenecekler ve haritalamayı başlatmak için QField'da oturum açabilecekler."
+msgstr ""
+"QFieldCloud kullanıcı adlarını aşağıya girin (birden fazla kullanıcı için"
+" virgülle ayrılmış olarak) ve gönder'i tıklayın. Editör olarak "
+"eklenecekler ve haritalamayı başlatmak için QField'da oturum "
+"açabilecekler."
 
-#: app/htmx/project_detail_routes.py:456
+#: app/htmx/project_detail_routes.py:457
 msgid "e.g. alice, bob, charlie"
 msgstr "örneğin alice, bob, charlie"
 
-#: app/htmx/project_detail_routes.py:457
+#: app/htmx/project_detail_routes.py:458
 msgid "Add collaborators"
 msgstr "Ortak çalışan ekle"
 
-#: app/htmx/project_detail_routes.py:549
+#: app/htmx/project_detail_routes.py:550
 msgid "Enter at least one QFieldCloud username."
 msgstr "En az bir QFieldCloud kullanıcı adı girin."
 
-#: app/htmx/project_detail_routes.py:559
+#: app/htmx/project_detail_routes.py:560
 msgid "QFieldCloud project ID not found for this project."
 msgstr "Bu proje için QFieldCloud proje kimliği bulunamadı."
 
-#: app/htmx/project_detail_routes.py:565
+#: app/htmx/project_detail_routes.py:566
 msgid ""
 "This project was created on a custom QFieldCloud instance. Use the "
 "QFieldCloud Admin tab to manage collaborators."
-msgstr "Bu proje özel bir QFieldCloud örneğinde oluşturuldu. Ortak çalışanları yönetmek için QFieldCloud Yönetici sekmesini kullanın."
+msgstr ""
+"Bu proje özel bir QFieldCloud örneğinde oluşturuldu. Ortak çalışanları "
+"yönetmek için QFieldCloud Yönetici sekmesini kullanın."
+
+#: app/htmx/project_detail_routes.py:632
+msgid "GeoJSON export is only available for QField projects."
+msgstr "GeoJSON dışa aktarımı yalnızca QField projeleri için kullanılabilir."
+
+#: app/htmx/project_detail_routes.py:637
+msgid "This project is not yet linked to a QFieldCloud project."
+msgstr "Bu proje henüz bir QFieldCloud projesine bağlı değil."
+
+#: app/htmx/project_detail_routes.py:648
+#, python-format
+msgid "Failed to export GeoJSON: %(error)s"
+msgstr "GeoJSON dışa aktarılamadı: %(error)s"
 
 #: app/htmx/basemap/basemap_attach_flow.py:69
 msgid ""
@@ -515,7 +542,7 @@ msgid "Admin"
 msgstr "Yönetici"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:10
-#: app/templates/project_details.html:72
+#: app/templates/project_details.html:200
 msgid "Manager"
 msgstr "Yönetici"
 
@@ -576,7 +603,7 @@ msgid "Visibility"
 msgstr "Görünürlük"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/project_details.html:58
+#: app/templates/project_details.html:186
 msgid "Description"
 msgstr "Açıklama"
 
@@ -1060,6 +1087,50 @@ msgstr "'%(username)s' kullanıcısı zaten bu projede işbirlikçi."
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Kimlik bilgileri geçerli!"
 
+#: app/qfield/qfield_crud.py:1497
+msgid "This project is not linked to a QFieldCloud project."
+msgstr "Bu proje bir QFieldCloud projesine bağlı değil."
+
+#: app/qfield/qfield_crud.py:1504
+msgid "QFIELDCLOUD_QGIS_URL is not configured."
+msgstr "QFIELDCLOUD_QGIS_URL yapılandırılmamış."
+
+#: app/qfield/qfield_crud.py:1534
+msgid "No GeoPackage files were found in the QFieldCloud package."
+msgstr "QFieldCloud paketinde hiçbir GeoPackage dosyası bulunamadı."
+
+#: app/qfield/qfield_crud.py:1556
+msgid ""
+"No survey data found in the QFieldCloud package. Mappers may not have "
+"submitted any responses yet."
+msgstr "QFieldCloud paketinde anket verisi bulunamadı. Haritacılar henüz herhangi bir yanıt göndermemiş olabilir."
+
+#: app/qfield/qfield_crud.py:1579
+msgid "QFieldCloud did not return a package job id."
+msgstr "QFieldCloud bir paket iş kimliği döndürmedi."
+
+#: app/qfield/qfield_crud.py:1596
+msgid "QFieldCloud failed to package the project."
+msgstr "QFieldCloud projeyi paketlemede başarısız oldu."
+
+#: app/qfield/qfield_crud.py:1602
+#, python-format
+msgid ""
+"Timed out waiting for QFieldCloud to package the project (last status: "
+"%(status)s)."
+msgstr ""
+"QFieldCloud'un projeyi paketlemesi beklenirken zaman aşımına uğradı (son "
+"durum: %(status)s)."
+
+#: app/qfield/qfield_crud.py:1626
+#, python-format
+msgid "GeoPackage conversion failed: %(error)s"
+msgstr "GeoPackage dönüşümü başarısız oldu: %(error)s"
+
+#: app/qfield/qfield_crud.py:1633
+msgid "QGIS wrapper returned invalid JSON for /export."
+msgstr "QGIS sarmalayıcısı/dışa aktarma için geçersiz JSON döndürdü."
+
 #: app/templates/home.html:13
 msgid "Filters"
 msgstr "Filtreler"
@@ -1482,107 +1553,127 @@ msgstr ""
 "Projenize uyan seçeneği seçin. Daha sonra baştan başlayarak fikrinizi "
 "değiştirebilirsiniz."
 
-#: app/templates/new_project_chooser.html:18
-#: app/templates/new_project_chooser.html:30
+#: app/templates/new_project_chooser.html:20
+#: app/templates/new_project_chooser.html:32
 msgid "Add tags to OSM buildings"
 msgstr "OSM binalarına etiket ekleyin"
 
-#: app/templates/new_project_chooser.html:21
+#: app/templates/new_project_chooser.html:23
 msgid "Quickest way to start. Just draw your area on the map and you're done."
 msgstr "Başlamanın en hızlı yolu. Haritada alanınızı çizmeniz yeterli."
 
-#: app/templates/new_project_chooser.html:25
+#: app/templates/new_project_chooser.html:27
 msgid "Use building outlines already in OpenStreetMap"
 msgstr "Zaten OpenStreetMap'te bulunan bina ana hatlarını kullanın"
 
-#: app/templates/new_project_chooser.html:26
+#: app/templates/new_project_chooser.html:28
 msgid "Includes a ready-made survey to add OSM tags to existing buildings"
 msgstr "Mevcut binalara OSM etiketleri eklemek için hazır bir anket içerir"
 
-#: app/templates/new_project_chooser.html:27
+#: app/templates/new_project_chooser.html:29
 msgid "Fill in gaps for unmapped buildings during digitisation"
-msgstr "Dijitalleştirme sırasında haritası çıkarılmamış binalardaki boşlukları doldurun"
+msgstr ""
+"Dijitalleştirme sırasında haritası çıkarılmamış binalardaki boşlukları "
+"doldurun"
 
-#: app/templates/new_project_chooser.html:36
-#: app/templates/new_project_chooser.html:83
+#: app/templates/new_project_chooser.html:38
+#: app/templates/new_project_chooser.html:97
 msgid "More details about this option"
 msgstr "Bu seçenek hakkında daha fazla ayrıntı"
 
-#: app/templates/new_project_chooser.html:42
+#: app/templates/new_project_chooser.html:44
 msgid "How this option is set up"
 msgstr "Bu seçenek nasıl ayarlanır?"
 
-#: app/templates/new_project_chooser.html:44
+#: app/templates/new_project_chooser.html:46
 msgid "Mapping happens in QField on Android."
 msgstr "Haritalama Android'de QField'da gerçekleşir."
 
-#: app/templates/new_project_chooser.html:45
+#: app/templates/new_project_chooser.html:48
 msgid ""
-"The area is split into tasks of ~10 buildings each, using roads, rivers, "
-"railways and airstrips as boundaries."
-msgstr "Alan, yollar, nehirler, demiryolları ve uçak pistlerini sınır olarak kullanan, her biri yaklaşık 10 binadan oluşan görevlere bölünmüştür."
+"The area is split into tasks of ~10 buildings each, using roads, rivers,\n"
+"              railways and airstrips as boundaries."
+msgstr ""
+"Alan, yolları, nehirleri,\n"
+"              Sınır olarak demiryolları ve uçak pistleri."
 
-#: app/templates/new_project_chooser.html:46
+#: app/templates/new_project_chooser.html:51
 msgid "Photo upload is enabled but optional."
 msgstr "Fotoğraf yükleme etkindir ancak isteğe bağlıdır."
 
-#: app/templates/new_project_chooser.html:47
+#: app/templates/new_project_chooser.html:52
 msgid "A basemap is generated automatically for offline use (if available)."
-msgstr "Çevrimdışı kullanım için otomatik olarak bir temel harita oluşturulur (varsa)."
+msgstr ""
+"Çevrimdışı kullanım için otomatik olarak bir temel harita oluşturulur "
+"(varsa)."
 
-#: app/templates/new_project_chooser.html:53
+#: app/templates/new_project_chooser.html:55
 msgid "Preview the building survey in XLSForm Editor →"
 msgstr "Bina anketini XLSForm Düzenleyici'de önizleyin →"
 
-#: app/templates/new_project_chooser.html:64
+#: app/templates/new_project_chooser.html:71
 msgid "Something else"
 msgstr "Başka bir şey"
 
-#: app/templates/new_project_chooser.html:67
+#: app/templates/new_project_chooser.html:74
 msgid ""
 "For anything that isn't tagging OSM buildings - bring your own survey, or"
-" use one contributed by the community."
-msgstr "OSM binalarını etiketlemeyen herhangi bir şey için kendi anketinizi getirin veya topluluk tarafından sağlanan anketi kullanın."
+" use one\n"
+"          contributed by the community."
+msgstr ""
+"OSM binalarını etiketlemeyen herhangi bir şey için - kendi anketinizi "
+"getirin veya bir anket kullanın\n"
+"          topluluk tarafından katkıda bulunulmuştur."
 
-#: app/templates/new_project_chooser.html:71
+#: app/templates/new_project_chooser.html:80
 msgid ""
 "Other OpenStreetMap features - roads, water points, schools, healthcare, "
-"and more"
-msgstr "Diğer OpenStreetMap özellikleri - yollar, su noktaları, okullar, sağlık hizmetleri ve daha fazlası"
+"and\n"
+"            more"
+msgstr ""
+"Diğer OpenStreetMap özellikleri - yollar, su noktaları, okullar, sağlık "
+"hizmetleri ve\n"
+"            daha fazla"
 
-#: app/templates/new_project_chooser.html:72
+#: app/templates/new_project_chooser.html:84
 msgid ""
 "Non-OSM surveys - vaccination campaigns, census mapping, healthcare "
-"facility audits, infrastructure inspections"
-msgstr "OSM dışı anketler - aşı kampanyaları, nüfus sayımı haritalaması, sağlık tesisi denetimleri, altyapı denetimleri"
+"facility\n"
+"            audits, infrastructure inspections"
+msgstr ""
+"OSM dışı anketler - aşı kampanyaları, nüfus sayımı haritalaması, sağlık "
+"tesisi\n"
+"            denetimler, altyapı denetimleri"
 
-#: app/templates/new_project_chooser.html:73
+#: app/templates/new_project_chooser.html:87
 msgid "Bring your own map data, or start with an empty map"
 msgstr "Kendi harita verilerinizi getirin veya boş bir haritayla başlayın"
 
-#: app/templates/new_project_chooser.html:74
+#: app/templates/new_project_chooser.html:88
 msgid "Control how the area is divided up for mappers"
 msgstr "Alanının haritacılar için nasıl bölüneceğini kontrol edin"
 
-#: app/templates/new_project_chooser.html:77
+#: app/templates/new_project_chooser.html:91
 msgid "Set up a custom project"
 msgstr "Projeleri ara…"
 
-#: app/templates/new_project_chooser.html:89
+#: app/templates/new_project_chooser.html:103
 msgid "Where to find a survey"
 msgstr "Anket nerede bulunur?"
 
-#: app/templates/new_project_chooser.html:91
+#: app/templates/new_project_chooser.html:105
 msgid "Upload your own XLSForm, or"
 msgstr "Kendi XLSForm'unuzu yükleyin veya"
 
-#: app/templates/new_project_chooser.html:97
+#: app/templates/new_project_chooser.html:108
 msgid "Browse the community XLSForm gallery →"
 msgstr "Topluluğun XLSForm galerisine göz atın →"
 
-#: app/templates/new_project_chooser.html:99
+#: app/templates/new_project_chooser.html:112
 msgid "Mapping can use QField (iOS + Android) or ODK Collect (Android only)."
-msgstr "Eşleme, QField (iOS + Android) veya ODK Collect'i (yalnızca Android) kullanabilir."
+msgstr ""
+"Eşleme, QField (iOS + Android) veya ODK Collect'i (yalnızca Android) "
+"kullanabilir."
 
 #: app/templates/new_project_custom.html:1
 msgid "Create Custom Project"
@@ -1736,8 +1827,8 @@ msgid "Description is required."
 msgstr "Açıklama gereklidir."
 
 #: app/templates/new_project_simple.html:1
-msgid "Quick Setup — OSM Buildings"
-msgstr "Hızlı Kurulum — OSM Binaları"
+msgid "Quick Setup - OSM Buildings"
+msgstr "Hızlı Kurulum - OSM Binaları"
 
 #: app/templates/new_project_simple.html:7
 msgid "Map buildings"
@@ -1784,69 +1875,99 @@ msgid "Creating Project"
 msgstr "Proje oluşturuluyor"
 
 #: app/templates/partials/new_project/creating_fragment.html:11
-#: app/templates/project_details.html:6 app/templates/project_details.html:166
-#: app/templates/project_details.html:177
+#: app/templates/project_details.html:6 app/templates/project_details.html:294
+#: app/templates/project_details.html:305
 msgid "Back to Projects"
 msgstr "Projelere Geri Dön"
 
-#: app/templates/project_details.html:46
+#: app/templates/project_details.html:41
+msgid ""
+"Trigger a fresh QFieldCloud package and download the project data as a "
+"single GeoJSON file."
+msgstr ""
+"Yeni bir QFieldCloud paketini tetikleyin ve proje verilerini tek bir "
+"GeoJSON dosyası olarak indirin."
+
+#: app/templates/project_details.html:44
+msgid "Export Data"
+msgstr "Verileri Dışa Aktar"
+
+#: app/templates/project_details.html:87 app/templates/project_details.html:95
+msgid ""
+"Packaging project on QFieldCloud - this may take a minute, please be "
+"patient..."
+msgstr "QFieldCloud'da paketleme projesi - bu bir dakika sürebilir, lütfen sabırlı olun..."
+
+#: app/templates/project_details.html:96
+msgid "✓ Download started."
+msgstr "✓ İndirme başladı."
+
+#: app/templates/project_details.html:97
+msgid "Export failed:"
+msgstr "Dışa aktarma başarısız oldu:"
+
+#: app/templates/project_details.html:98
+msgid "Network error while exporting. Please try again."
+msgstr "Dışa aktarma sırasında ağ hatası. Lütfen tekrar deneyin."
+
+#: app/templates/project_details.html:174
 msgid "Project Metadata"
 msgstr "Proje Metaverisi"
 
-#: app/templates/project_details.html:48
+#: app/templates/project_details.html:176
 msgid "Project metadata and setup information for managers."
 msgstr "Yöneticiler için proje üstverisi ve kurulum bilgileri."
 
-#: app/templates/project_details.html:66
+#: app/templates/project_details.html:194
 msgid "Project ID"
 msgstr "Proje Kimliği"
 
-#: app/templates/project_details.html:77
+#: app/templates/project_details.html:205
 msgid "Created"
 msgstr "Oluşturuldu"
 
-#: app/templates/project_details.html:84
+#: app/templates/project_details.html:212
 msgid "Last Updated"
 msgstr "Son Güncelleme"
 
-#: app/templates/project_details.html:95
+#: app/templates/project_details.html:223
 msgid "Hashtags"
 msgstr "Etiketler"
 
-#: app/templates/project_details.html:107
+#: app/templates/project_details.html:235
 msgid "External Project"
 msgstr "Harici Proje"
 
-#: app/templates/project_details.html:109
+#: app/templates/project_details.html:237
 msgid "Instance:"
 msgstr "Örnek:"
 
-#: app/templates/project_details.html:111
+#: app/templates/project_details.html:239
 msgid "Project ID:"
 msgstr "Proje Kimliği:"
 
-#: app/templates/project_details.html:121
-#: app/templates/project_details.html:129
+#: app/templates/project_details.html:249
+#: app/templates/project_details.html:257
 msgid "View Project in ODK Central →"
 msgstr "Projeyi ODK Central'da Görüntüle →"
 
-#: app/templates/project_details.html:136
+#: app/templates/project_details.html:264
 msgid "Manage QFieldCloud Project →"
 msgstr "QFieldCloud Projesini Yönet →"
 
-#: app/templates/project_details.html:144
+#: app/templates/project_details.html:272
 msgid "View Project Externally →"
 msgstr "Projeyi Harici Olarak Görüntüle →"
 
-#: app/templates/project_details.html:160
+#: app/templates/project_details.html:288
 msgid "Delete this project in downstream and Field-TM? This cannot be undone."
 msgstr "Bu proje downstream ve Field-TM'de silinsin mi? Bu işlem geri alınamaz."
 
-#: app/templates/project_details.html:163
+#: app/templates/project_details.html:291
 msgid "Delete Project"
 msgstr "Projeyi Sil"
 
-#: app/templates/project_details.html:174
+#: app/templates/project_details.html:302
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view\n"
@@ -1938,7 +2059,11 @@ msgid ""
 "Downloading map data, splitting tasks, and preparing the QField project. "
 "This can take a\n"
 "    minute or two - this page will redirect automatically when ready."
-msgstr "Harita verilerini indirme, görevleri bölme ve QField projesini hazırlama. Bu biraz zaman alabilir\n    bir veya iki dakika - bu sayfa hazır olduğunda otomatik olarak yönlendirilecektir."
+msgstr ""
+"Harita verilerini indirme, görevleri bölme ve QField projesini hazırlama."
+" Bu biraz zaman alabilir\n"
+"    bir veya iki dakika - bu sayfa hazır olduğunda otomatik olarak "
+"yönlendirilecektir."
 
 #: app/templates/partials/new_project/map_script.html:3
 msgid "Area"

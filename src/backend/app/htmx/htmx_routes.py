@@ -16,6 +16,7 @@ from app.htmx.project_create.project_create_xlsform_routes import (
 from app.htmx.project_detail_routes import (
     add_qfc_collaborators_htmx,
     delete_project_htmx,
+    export_project_geojson_htmx,
     project_details,
     project_qrcode_htmx,
     qfc_collaborator_form_htmx,
@@ -78,6 +79,7 @@ htmx_router = Router(
         project_qrcode_htmx,
         qfc_collaborator_form_htmx,
         add_qfc_collaborators_htmx,
+        export_project_geojson_htmx,
         *SETUP_STEP_VALIDATE_HANDLERS,
         *QFC_ADMIN_HANDLERS,
         *BASEMAP_HANDLERS,

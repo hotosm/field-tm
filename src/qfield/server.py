@@ -39,6 +39,8 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
             self._handle_drone()
         elif self.path == "/basemap":
             self._handle_basemap()
+        elif self.path == "/export":
+            self._handle_export()
         else:
             self._send_error(404, f"Unknown endpoint: {self.path}")
 
@@ -158,6 +160,36 @@ class QGISRequestHandler(BaseHTTPRequestHandler):
         except Exception as e:
             self.log.error(f"Request handling error: {e}")
             self._send_error(500, f"Internal server error: {e}")
+
+    def _handle_export(self):
+        """Handle /export POST - convert a GeoPackage upload to GeoJSON.
+
+        Body is the raw .gpkg bytes (Content-Type: application/octet-stream).
+        Response is a JSON object keyed by layer name, with each value being a
+        FeatureCollection reprojected to EPSG:4326.
+        """
+        try:
+            content_length = int(self.headers.get("Content-Length", 0))
+            if content_length == 0:
+                self._send_error(400, "Empty request body")
+                return
+
+            gpkg_bytes = self.rfile.read(content_length)
+            if not gpkg_bytes.startswith(b"SQLite format 3"):
+                self._send_error(400, "Uploaded body is not a valid GeoPackage")
+                return
+
+            from gpkg_to_geojson import convert_gpkg_to_geojson_layers
+
+            self.log.info("Processing /export request (%d bytes)", len(gpkg_bytes))
+            layers = convert_gpkg_to_geojson_layers(gpkg_bytes, log=self.log)
+            self._send_json_response(
+                200,
+                {"status": "success", "layers": layers},
+            )
+        except Exception as e:
+            self.log.error("Export error: %s", e)
+            self._send_error(500, f"GeoPackage conversion failed: {e}")
 
     def _handle_basemap(self):
         """Handle /basemap POST - attach MBTiles to existing QField project."""
@@ -362,6 +394,7 @@ def run_server(host: str = "0.0.0.0", port: int = 8080):
         log.info("  POST /field - Generate field mapping project")
         log.info("  POST /drone - Generate drone mapping project")
         log.info("  POST /basemap - Attach basemap to existing project")
+        log.info("  POST /export - Convert a GeoPackage upload to GeoJSON")
         log.info("  GET /health - Health check")
 
         # Main-thread loop: process QGIS work items dispatched by handlers
