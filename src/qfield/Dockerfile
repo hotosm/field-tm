@@ -10,7 +10,8 @@ RUN apt-get update --quiet \
     && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-warn-script-location --break-system-packages \
       --no-cache-dir \
-      git+https://github.com/opengisch/xlsform2qgis.git \
+      # Switch to master branch after https://github.com/opengisch/convert2qgis/pull/79 merged
+      git+https://github.com/opengisch/xlsform2qgis.git#use_tabs_imp \
       git+https://github.com/opengisch/libqfieldsync.git \
       psycopg[c]
 
