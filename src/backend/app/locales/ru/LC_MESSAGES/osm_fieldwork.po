@@ -102,25 +102,35 @@ msgstr "Разделить"
 
 #: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
+msgid "photos"
+msgstr "Фотографии"
+
+#: i18n/osm_fieldwork_strings.py:26
+msgctxt "xlsform_label"
 msgid "split"
 msgstr "Вопросы опроса"
 
-#: i18n/osm_fieldwork_strings.py:26
+#: i18n/osm_fieldwork_strings.py:27
+msgctxt "xlsform_label"
+msgid "survey_photos"
+msgstr "Фотографии опроса"
+
+#: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
 msgid "survey_questions"
 msgstr "Задача"
 
-#: i18n/osm_fieldwork_strings.py:27
+#: i18n/osm_fieldwork_strings.py:29
 msgctxt "xlsform_label"
 msgid "task"
 msgstr "Проверка"
 
-#: i18n/osm_fieldwork_strings.py:28
+#: i18n/osm_fieldwork_strings.py:30
 msgctxt "xlsform_label"
 msgid "verification"
 msgstr "Да"
 
-#: i18n/osm_fieldwork_strings.py:29
+#: i18n/osm_fieldwork_strings.py:31
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "Да"

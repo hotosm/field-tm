@@ -35,9 +35,7 @@ dependencies = [
     "cryptography==46.0.7",
     "pyxform==4.0.0",
     "pyodk==1.2.1",
-    # TODO replace with official version, once PR merged
-    # https://github.com/opengisch/QFieldCloud/pull/1506
-    "qfieldcloud-sdk",
+    "qfieldcloud-sdk==26.14",
     "osm-login-python==2.0.0",
     "pg-nearest-city==2.0.0",
     "raw-data-api-py==0.3.0",

@@ -100,25 +100,35 @@ msgstr "Autre"
 
 #: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
+msgid "photos"
+msgstr "Photos"
+
+#: i18n/osm_fieldwork_strings.py:26
+msgctxt "xlsform_label"
 msgid "split"
 msgstr "Diviser"
 
-#: i18n/osm_fieldwork_strings.py:26
+#: i18n/osm_fieldwork_strings.py:27
+msgctxt "xlsform_label"
+msgid "survey_photos"
+msgstr "Photos de l'enquête"
+
+#: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
 msgid "survey_questions"
 msgstr "Questions d'enquête"
 
-#: i18n/osm_fieldwork_strings.py:27
+#: i18n/osm_fieldwork_strings.py:29
 msgctxt "xlsform_label"
 msgid "task"
 msgstr "Tâche"
 
-#: i18n/osm_fieldwork_strings.py:28
+#: i18n/osm_fieldwork_strings.py:30
 msgctxt "xlsform_label"
 msgid "verification"
 msgstr "Vérification"
 
-#: i18n/osm_fieldwork_strings.py:29
+#: i18n/osm_fieldwork_strings.py:31
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "Oui"

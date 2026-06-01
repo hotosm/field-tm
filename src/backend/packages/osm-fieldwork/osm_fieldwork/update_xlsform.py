@@ -37,11 +37,9 @@ from python_calamine.pandas import pandas_monkeypatch
 from osm_fieldwork.enums import DbGeomType
 from osm_fieldwork.form_components.choice_fields import get_choice_fields
 from osm_fieldwork.form_components.mandatory_fields import (
-    get_photo_repeat_end,
     meta_df,
     create_survey_df,
-    get_photo_collection_field,
-    get_photo_repeat_field,
+    get_photo_fields,
     create_entity_df,
 )
 from osm_fieldwork.form_components.digitisation_fields import (
@@ -418,9 +416,8 @@ async def _process_all_form_tabs(
             for choice in get_choice_fields(use_odk_collect)
         ])
         photo_collection_df = pd.DataFrame([
-            add_label_translations(get_photo_collection_field(mandatory_photo_upload), label_cols),
-            add_label_translations(get_photo_repeat_field()),
-            add_label_translations(get_photo_repeat_end())
+            add_label_translations(field, label_cols)
+            for field in get_photo_fields(mandatory_photo_upload)
         ])
     else:
         add_label = True
@@ -437,9 +434,8 @@ async def _process_all_form_tabs(
             for choice in get_choice_fields(use_odk_collect)
         ])
         photo_collection_df = pd.DataFrame([
-            add_label_translations(get_photo_collection_field(mandatory_photo_upload), label_cols),
-            add_label_translations(get_photo_repeat_field()),
-            add_label_translations(get_photo_repeat_end())
+            add_label_translations(field)
+            for field in get_photo_fields(mandatory_photo_upload)
         ])
 
     # Configure form settings

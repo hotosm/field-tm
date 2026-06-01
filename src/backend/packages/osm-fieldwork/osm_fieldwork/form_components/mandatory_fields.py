@@ -73,26 +73,31 @@ meta_df = pd.DataFrame(
 )
 
 
-def get_photo_collection_field(mandatory_photo_upload: bool = False):
-    return {
-    "type": "begin repeat",
-    "name": "photos",
-    "required": "yes" if mandatory_photo_upload else "no",
-}
-
-def get_photo_repeat_field():
-    return {
-    "type": "image",
-    "name": "image",
-    "appearance": "minimal",
-    "parameters": "max-pixels=1000",
-}
-
-def get_photo_repeat_end():
-    return {
-    "type": "end repeat",
-    "name": "photos",
-    }
+def get_photo_fields(mandatory_photo_upload: bool = False):
+    return [
+        {
+            "type": "begin group",
+            "name": "survey_photos",
+        },
+        {
+            "type": "begin repeat",
+            "name": "photos",
+            "required": "yes" if mandatory_photo_upload else "no",
+        },
+        {
+            "type": "image",
+            "name": "image",
+            "appearance": "minimal",
+            "parameters": "max-pixels=1000",
+        },
+        {
+            "type": "end repeat",
+            "name": "photos",
+        },
+        {
+            "type": "end group",
+        },
+    ]
 
 
 def _get_mandatory_fields(

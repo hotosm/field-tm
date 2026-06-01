@@ -104,25 +104,35 @@ msgstr "अन्य"
 
 #: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
+msgid "photos"
+msgstr "फोटोहरू"
+
+#: i18n/osm_fieldwork_strings.py:26
+msgctxt "xlsform_label"
 msgid "split"
 msgstr "विभाजन - एउटा भवन (एउटा भवन एक भन्दा बढी बहुभुजको रूपमा डिजिटाइज गरिएको)"
 
-#: i18n/osm_fieldwork_strings.py:26
+#: i18n/osm_fieldwork_strings.py:27
+msgctxt "xlsform_label"
+msgid "survey_photos"
+msgstr "सर्वेक्षणका फोटोहरू"
+
+#: i18n/osm_fieldwork_strings.py:28
 msgctxt "xlsform_label"
 msgid "survey_questions"
 msgstr "सर्वेक्षण प्रश्नहरू"
 
-#: i18n/osm_fieldwork_strings.py:27
+#: i18n/osm_fieldwork_strings.py:29
 msgctxt "xlsform_label"
 msgid "task"
 msgstr "आफ्नो कार्य क्षेत्र चयन गर्नुहोस्"
 
-#: i18n/osm_fieldwork_strings.py:28
+#: i18n/osm_fieldwork_strings.py:30
 msgctxt "xlsform_label"
 msgid "verification"
 msgstr "प्रमाणीकरण"
 
-#: i18n/osm_fieldwork_strings.py:29
+#: i18n/osm_fieldwork_strings.py:31
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "छ"
