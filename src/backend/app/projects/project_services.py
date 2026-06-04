@@ -172,6 +172,10 @@ class SplitAoiOptions:
     include_rivers: bool = True
     include_railways: bool = True
     include_aeroways: bool = True
+    # None = splitter default (270s, sized for the sync route behind nginx).
+    # 0 = disable the cap entirely; set this from background-task callers
+    # where there is no proxy budget to protect.
+    statement_timeout_ms: Optional[int] = None
 
 
 @dataclass(slots=True)
@@ -642,8 +646,13 @@ def _configure_extract_sources(
 
 async def _download_extract_geojson(download_url: str) -> dict:
     """Download and parse the GeoJSON payload from the raw-data extract URL."""
+    # aiohttp's default ClientTimeout caps total=300s, which kills downloads of
+    # large (e.g. 88MB+) extracts even when bytes are still arriving. The simple
+    # project create flow runs in a background task, so the total cap is not
+    # protecting any request budget - drop it and bound on stalls only.
+    timeout = aiohttp.ClientTimeout(total=None, sock_connect=30, sock_read=300)
     async with (
-        aiohttp.ClientSession() as session,
+        aiohttp.ClientSession(timeout=timeout) as session,
         session.get(download_url) as response,
     ):
         if not response.ok:
@@ -867,7 +876,7 @@ def _validate_split_extract(parsed_extract) -> None:
         )
 
 
-async def _split_with_building_algorithm(
+async def _split_with_building_algorithm(  # noqa: PLR0913
     aoi_featcol: dict,
     parsed_extract: dict,
     algorithm_enum: SplittingAlgorithm,
@@ -876,6 +885,7 @@ async def _split_with_building_algorithm(
     include_rivers: bool,
     include_railways: bool,
     include_aeroways: bool,
+    statement_timeout_ms: Optional[int] = None,
 ) -> dict:
     """Run one of the SQL-backed building-based split algorithms."""
     _validate_split_extract(parsed_extract)
@@ -895,6 +905,7 @@ async def _split_with_building_algorithm(
         osm_extract=parsed_extract,
         algorithm=algorithm_enum,
         algorithm_params=algorithm_params,
+        statement_timeout_ms=statement_timeout_ms,
     )
     return await to_thread.run_sync(split_sql_call)
 
@@ -1001,6 +1012,7 @@ async def split_aoi(
             options.include_rivers,
             options.include_railways,
             options.include_aeroways,
+            statement_timeout_ms=options.statement_timeout_ms,
         )
     elif algorithm_enum == SplittingAlgorithm.DIVIDE_BY_SQUARE:
         features = await _split_with_square_algorithm(

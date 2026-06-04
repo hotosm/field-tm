@@ -43,6 +43,11 @@ _SIMPLE_EMPTY_EXTRACT_VALIDATION_MARKERS = (
     "No valid geometries found in OSM",
 )
 
+# CG_StraightSkeleton runtime is superlinear in vertex count and times
+# out for large extracts even with per-splitpolygon scoping; above this
+# many buildings, fall back to the cheaper Voronoi splitter.
+_SIMPLE_SKELETON_FEATURE_LIMIT = 5000
+
 
 def extract_has_features(data_extract_geojson: dict | None) -> bool:
     """Return whether a data extract contains at least one feature."""
@@ -171,21 +176,39 @@ async def finalize_simple_project_creation(
     await prepare_simple_project_data_extract(db=db, project_id=project_id)
 
     refreshed_project = await DbProject.one(db, project_id)
-    has_features = extract_has_features(
+    data_extract_geojson = (
         refreshed_project.data_extract_geojson if refreshed_project else None
     )
+    has_features = extract_has_features(data_extract_geojson)
 
     if has_features:
+        feature_count = len(data_extract_geojson.get("features", []))
+        algorithm = (
+            SplittingAlgorithm.AVG_BUILDING_VORONOI
+            if feature_count > _SIMPLE_SKELETON_FEATURE_LIMIT
+            else SplittingAlgorithm.AVG_BUILDING_SKELETON
+        )
+        log.info(
+            "Simple project %s: %s features -> using %s splitter",
+            project_id,
+            feature_count,
+            algorithm.value,
+        )
         tasks_geojson = await split_aoi(
             db,
             project_id,
             SplitAoiOptions(
-                algorithm=SplittingAlgorithm.AVG_BUILDING_SKELETON.value,
+                algorithm=algorithm.value,
                 no_of_buildings=10,
                 include_roads=True,
                 include_rivers=True,
                 include_railways=True,
                 include_aeroways=True,
+                # Simple flow runs in a background task (see
+                # run_simple_project_creation_background); no reverse-proxy
+                # budget to protect, so let CG_StraightSkeleton run to
+                # completion instead of capping at 270s.
+                statement_timeout_ms=0,
             ),
         )
         await save_task_areas(db, project_id, tasks_geojson)

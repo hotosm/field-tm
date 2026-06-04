@@ -183,24 +183,23 @@ if has_task_areas %}
       </div>
     </div>
   </form>
-  <div id="split-status" class="ftm-step__status">
-    <div id="split-loading" class="htmx-indicator ftm-loading">
-      <div style="display: inline-block">
-        <svg
-          class="ftm-spinner ftm-spinner--lg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M21 12a9 9 0 11-6.219-8.56" />
-        </svg>
-        <p style="margin-top: 10px; color: #666">
-          {{ _("Splitting area into tasks... This may take a moment.") }}
-        </p>
-      </div>
+  <div id="split-loading" class="htmx-indicator ftm-loading">
+    <div style="display: inline-block">
+      <svg
+        class="ftm-spinner ftm-spinner--lg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M21 12a9 9 0 11-6.219-8.56" />
+      </svg>
+      <p style="margin-top: 10px; color: #666">
+        {{ _("Splitting area into tasks... This may take a moment.") }}
+      </p>
     </div>
   </div>
+  <div id="split-status" class="ftm-step__status"></div>
   <div id="tasks-and-data-preview-container" style="margin-top: 15px"></div>
 </div>
 {% endif %} {% endif %}

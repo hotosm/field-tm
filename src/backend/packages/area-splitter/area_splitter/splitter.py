@@ -736,6 +736,7 @@ class AreaSplitter:
         algorithm: SplittingAlgorithm = SplittingAlgorithm.AVG_BUILDING_SKELETON,
         algorithm_params: Optional[dict] = None,
         osm_extract: Optional[dict] = None,
+        statement_timeout_ms: Optional[int] = None,
     ) -> dict:
         """Split the polygon by features in the database using an SQL query.
 
@@ -751,6 +752,10 @@ class AreaSplitter:
                 or 'num_enumerators', depending on the selected algorithm.
             osm_extract (dict, FeatureCollection): an OSM extract geojson,
                 containing building polygons, or linestrings.
+            statement_timeout_ms (int, optional): Override the per-transaction
+                statement_timeout. ``None`` uses the package default; ``0``
+                disables the cap entirely (e.g. when the caller runs in a
+                background task and is not subject to a reverse-proxy budget).
 
         Returns:
             data (FeatureCollection): A multipolygon of all the task boundaries.
@@ -765,7 +770,10 @@ class AreaSplitter:
         # capped by the short lock_timeout window; lock_timeout then
         # applies to the subsequent DDL.
         with conn.cursor() as setup_cur:
-            configure_statement_timeout(setup_cur)
+            if statement_timeout_ms is None:
+                configure_statement_timeout(setup_cur)
+            else:
+                configure_statement_timeout(setup_cur, statement_timeout_ms)
             log.debug("Acquiring splitter serialization lock")
             acquire_splitter_serialization_lock(setup_cur)
             configure_lock_timeout(setup_cur)
@@ -965,6 +973,7 @@ def split_by_sql(
     osm_extract: Optional[Union[str, dict]] = None,
     algorithm: Optional[SplittingAlgorithm] = None,
     algorithm_params: Optional[dict] = None,
+    statement_timeout_ms: Optional[int] = None,
 ) -> dict:
     """Split an AOI with a field-tm algorithm.
 
@@ -1007,6 +1016,9 @@ def split_by_sql(
             (see algorithm.required_params).
             If not provided, it will be constructed from num_buildings or
             num_enumerators for backward compatibility.
+        statement_timeout_ms (int, optional): Override the per-transaction
+            statement_timeout. ``None`` uses the package default; ``0``
+            disables the cap entirely.
 
     Returns:
         features (FeatureCollection): A multipolygon of all the task boundaries.
@@ -1039,13 +1051,18 @@ def split_by_sql(
                 osm_extract=osm_extract,
                 algorithm=algorithm,
                 algorithm_params=algorithm_params,
+                statement_timeout_ms=statement_timeout_ms,
             ),
         )
 
     splitter = AreaSplitter(aoi_featcol)
     split_features = _require_split_output(
         splitter.splitBySQL(
-            db, algorithm, algorithm_params, osm_extract=extract_geojson
+            db,
+            algorithm,
+            algorithm_params,
+            osm_extract=extract_geojson,
+            statement_timeout_ms=statement_timeout_ms,
         )
     )
     if outfile:
