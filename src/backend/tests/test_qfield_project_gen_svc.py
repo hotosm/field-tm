@@ -45,26 +45,14 @@ def _load_project_gen_svc_module():
         "src/qfield/sanitize.py",
         "qfield/sanitize.py",
     )
-    styling_path = _find_existing_file(
-        repo_root,
-        "src/qfield/styling.py",
-        "qfield/styling.py",
-    )
 
     sanitize_spec = spec_from_file_location("qfield_sanitize", sanitize_path)
-    styling_spec = spec_from_file_location("qfield_styling", styling_path)
     assert sanitize_spec is not None and sanitize_spec.loader is not None
-    assert styling_spec is not None and styling_spec.loader is not None
 
     sanitize_module = module_from_spec(sanitize_spec)
-    styling_module = module_from_spec(styling_spec)
     sanitize_spec.loader.exec_module(sanitize_module)
-    styling_spec.loader.exec_module(styling_module)
 
     return SimpleNamespace(
-        _resolve_over_point_label_placement=(
-            styling_module._resolve_over_point_label_placement
-        ),
         sanitize_generated_qgis_metadata=sanitize_module.sanitize_generated_qgis_metadata,
         logging=sanitize_module.logging,
     )
@@ -100,7 +88,6 @@ def _load_field_project_module():
     sys_modules.setdefault(
         "styling",
         SimpleNamespace(
-            configure_drone_task_layer_style=lambda *args, **kwargs: None,
             apply_styles_from_dir=lambda *args, **kwargs: set(),
             set_layer_not_identifiable=lambda *args, **kwargs: None,
             unpack_plugin_zip=lambda *args, **kwargs: None,
@@ -120,70 +107,6 @@ def _load_field_project_module():
 
     spec.loader.exec_module(module)
     return module
-
-
-def _install_fake_qgis(monkeypatch, qgis_obj, pal_settings_obj):
-    """Install a fake qgis.core module for helper tests."""
-    fake_qgis_core = SimpleNamespace(
-        Qgis=qgis_obj, QgsPalLayerSettings=pal_settings_obj
-    )
-    monkeypatch.setitem(
-        __import__("sys").modules, "qgis", SimpleNamespace(core=fake_qgis_core)
-    )
-    monkeypatch.setitem(__import__("sys").modules, "qgis.core", fake_qgis_core)
-
-
-def test_resolve_over_point_label_placement_prefers_qgis_labelplacement_enum(
-    monkeypatch,
-):
-    """Modern PyQGIS should use Qgis.LabelPlacement.OverPoint."""
-    module = _load_project_gen_svc_module()
-
-    class MockQgis:
-        class LabelPlacement:
-            OverPoint = object()
-
-    class MockQgsPalLayerSettings:
-        OverPoint = object()
-
-    _install_fake_qgis(monkeypatch, MockQgis, MockQgsPalLayerSettings)
-    assert (
-        module._resolve_over_point_label_placement()
-        is MockQgis.LabelPlacement.OverPoint
-    )
-
-
-def test_resolve_over_point_label_placement_falls_back_to_legacy_shape(monkeypatch):
-    """Older PyQGIS should fall back to QgsPalLayerSettings.OverPoint."""
-    module = _load_project_gen_svc_module()
-
-    class MockQgis:
-        class LabelPlacement:
-            pass
-
-    class MockQgsPalLayerSettings:
-        OverPoint = object()
-
-    _install_fake_qgis(monkeypatch, MockQgis, MockQgsPalLayerSettings)
-    assert (
-        module._resolve_over_point_label_placement()
-        is MockQgsPalLayerSettings.OverPoint
-    )
-
-
-def test_resolve_over_point_label_placement_last_resort_value(monkeypatch):
-    """Missing enum members should return the documented raw fallback integer."""
-    module = _load_project_gen_svc_module()
-
-    class MockQgis:
-        class LabelPlacement:
-            pass
-
-    class MockQgsPalLayerSettings:
-        pass
-
-    _install_fake_qgis(monkeypatch, MockQgis, MockQgsPalLayerSettings)
-    assert module._resolve_over_point_label_placement() == 1
 
 
 _MINIMAL_QGS_WITH_PROJECT_CRS = """\
@@ -582,7 +505,11 @@ def test_normalize_root_layer_order_in_drone_project_places_vectors_above_raster
     )
     sys_modules.setdefault(
         "styling",
-        SimpleNamespace(configure_drone_task_layer_style=lambda *args, **kwargs: None),
+        SimpleNamespace(
+            apply_styles_from_dir=lambda *args, **kwargs: set(),
+            set_layer_not_identifiable=lambda *args, **kwargs: None,
+            unpack_plugin_zip=lambda *args, **kwargs: None,
+        ),
     )
 
     drone_spec.loader.exec_module(drone_module)
@@ -609,140 +536,6 @@ def test_normalize_root_layer_order_in_drone_project_places_vectors_above_raster
     ]
 
 
-class _FakeSymbol:
-    def __init__(self, props):
-        self._props = props
-
-    def symbolLayer(self, _index):
-        return self
-
-    def properties(self):
-        return self._props
-
-
-class _FakeRenderer:
-    def __init__(self):
-        self.symbol = None
-
-    def setSymbol(self, symbol):
-        self.symbol = symbol
-
-
-class _FakeLayerForStyling:
-    def __init__(self):
-        self._renderer = _FakeRenderer()
-        self._flags = 0b1111
-        self.labeling = None
-        self.labels_enabled = False
-
-    def renderer(self):
-        return self._renderer
-
-    def setLabeling(self, labeling):
-        self.labeling = labeling
-
-    def setLabelsEnabled(self, enabled):
-        self.labels_enabled = enabled
-
-    def triggerRepaint(self):
-        return None
-
-    def flags(self):
-        return self._flags
-
-    def setFlags(self, flags):
-        self._flags = flags
-
-    def geometryType(self):
-        return "polygon"
-
-
-class _FakeQgsFillSymbol:
-    @staticmethod
-    def createSimple(props):
-        return _FakeSymbol(props)
-
-
-class _FakeQgsLineSymbol:
-    @staticmethod
-    def createSimple(props):
-        return _FakeSymbol(props)
-
-
-class _FakeQgsMarkerSymbol:
-    @staticmethod
-    def createSimple(props):
-        return _FakeSymbol(props)
-
-
-class _FakePalLayerSettings:
-    def __init__(self):
-        self.fieldName = ""
-        self.isExpression = False
-        self.enabled = False
-        self.placement = None
-        self.centroidInside = False
-        self.centroidWhole = False
-        self._format = None
-
-    def setFormat(self, fmt):
-        self._format = fmt
-
-
-class _FakeTextBufferSettings:
-    def __init__(self):
-        self.enabled = False
-        self.size = 0
-        self.color = None
-
-    def setEnabled(self, enabled):
-        self.enabled = enabled
-
-    def setSize(self, size):
-        self.size = size
-
-    def setColor(self, color):
-        self.color = color
-
-
-class _FakeTextFormat:
-    def __init__(self):
-        self.font = None
-        self.size = 0
-        self.color = None
-        self.buffer = None
-
-    def setFont(self, font):
-        self.font = font
-
-    def setSize(self, size):
-        self.size = size
-
-    def setColor(self, color):
-        self.color = color
-
-    def setBuffer(self, buffer):
-        self.buffer = buffer
-
-
-class _FakeVectorLayerSimpleLabeling:
-    def __init__(self, settings):
-        self.settings = settings
-
-
-class _FakeQColor:
-    def __init__(self, r, g, b, a=255):
-        self.rgba = (r, g, b, a)
-
-
-class _FakeQFont:
-    def __init__(self):
-        self.bold = False
-
-    def setBold(self, bold):
-        self.bold = bold
-
-
 def _load_styling_module_with_fakes(monkeypatch):
     repo_root = _find_repo_root(Path(__file__).resolve())
     styling_path = _find_existing_file(
@@ -757,49 +550,20 @@ def _load_styling_module_with_fakes(monkeypatch):
 
     fake_core = SimpleNamespace(
         Qgis=SimpleNamespace(
-            GeometryType=SimpleNamespace(Polygon="polygon", Line="line"),
-            LabelPlacement=SimpleNamespace(OverPoint="over-point"),
             MapLayerFlag=SimpleNamespace(Identifiable=0b0010),
         ),
-        QgsFillSymbol=_FakeQgsFillSymbol,
-        QgsLineSymbol=_FakeQgsLineSymbol,
-        QgsMarkerSymbol=_FakeQgsMarkerSymbol,
-        QgsPalLayerSettings=_FakePalLayerSettings,
-        QgsTextBufferSettings=_FakeTextBufferSettings,
-        QgsTextFormat=_FakeTextFormat,
-        QgsVectorLayerSimpleLabeling=_FakeVectorLayerSimpleLabeling,
         QgsMapLayer=SimpleNamespace(
             StyleCategory=SimpleNamespace(Labeling=0b01, Symbology=0b10),
         ),
     )
-    fake_qt_gui = SimpleNamespace(QColor=_FakeQColor, QFont=_FakeQFont)
 
     monkeypatch.setitem(
         __import__("sys").modules, "qgis", SimpleNamespace(core=fake_core)
     )
     monkeypatch.setitem(__import__("sys").modules, "qgis.core", fake_core)
-    monkeypatch.setitem(
-        __import__("sys").modules, "qgis.PyQt", SimpleNamespace(QtGui=fake_qt_gui)
-    )
-    monkeypatch.setitem(__import__("sys").modules, "qgis.PyQt.QtGui", fake_qt_gui)
 
     spec.loader.exec_module(module)
     return module
-
-
-def test_configure_drone_task_layer_style_sets_blue_stroke_and_non_identifiable(
-    monkeypatch,
-):
-    """Drone task style uses transparent fill, blue stroke, and disables identify."""
-    styling = _load_styling_module_with_fakes(monkeypatch)
-    layer = _FakeLayerForStyling()
-
-    styling.configure_drone_task_layer_style(layer, logging.getLogger(__name__))
-
-    symbol_props = layer.renderer().symbol.symbolLayer(0).properties()
-    assert symbol_props["color"] == "0,0,0,0"
-    assert symbol_props["outline_color"] == "66,133,244,255"
-    assert layer.flags() == 0b1101
 
 
 def test_unpack_plugin_zip_renames_main_qml_and_returns_styles_dir(

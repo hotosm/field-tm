@@ -446,9 +446,13 @@ Item {
 
     if (currentTask != undefined) {
       ExpressionContextUtils.setLayerVariable(tasksLayer,"current_task_id", currentTask.id);
+      // Hide tasks from identify while inside a task so taps land on buildings
+      // without a disambiguation popup. Bit 0 = QgsMapLayer::Identifiable.
+      tasksLayer.flags = tasksLayer.flags & ~1;
     } else {
       ExpressionContextUtils.setLayerVariable(tasksLayer, "current_task_id", -1);
       fieldTM.featureListForm.model.clear();
+      tasksLayer.flags = tasksLayer.flags | 1;
     }
 
     tasksLayer.triggerRepaint();

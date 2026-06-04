@@ -62,6 +62,15 @@ DEFAULT_LANGUAGE_NAME = "english"
 DEFAULT_LANGUAGE_TOKEN = (
     f"{DEFAULT_LANGUAGE_NAME}({INCLUDED_LANGUAGES[DEFAULT_LANGUAGE_NAME]})"
 )
+QFIELD_METADATA_NAMES_TO_REMOVE = {
+    "start",
+    "end",
+    "today",
+    "phonenumber",
+    "deviceid",
+    "username",
+    "email",
+}
 
 
 def _normalize_language_token(value: object) -> Optional[str]:
@@ -72,7 +81,7 @@ def _normalize_language_token(value: object) -> Optional[str]:
     if not isinstance(value, str):
         return None
 
-    candidate = value.strip().lower()
+    candidate = value.strip().lower().replace("-", "_")
     if not candidate:
         return None
 
@@ -103,6 +112,20 @@ def _normalize_language_token(value: object) -> Optional[str]:
     )
     if normalized_by_code:
         return f"{normalized_by_code}({candidate})"
+
+    # Base-language fallback: "pt" → "portuguese(pt_br)", "es_mx" → "spanish(es)".
+    candidate_base = candidate.split("_", maxsplit=1)[0]
+    normalized_by_base = next(
+        (
+            (name, code)
+            for name, code in INCLUDED_LANGUAGES.items()
+            if code.split("_", maxsplit=1)[0] == candidate_base
+        ),
+        None,
+    )
+    if normalized_by_base:
+        name, code = normalized_by_base
+        return f"{name}({code})"
 
     return None
 
@@ -602,6 +625,8 @@ async def modify_form_for_qfield(
     if "save_to" in qf_survey_df.columns:
         qf_survey_df = qf_survey_df[qf_survey_df["save_to"].isna()].reset_index(drop=True)
 
+    qf_survey_df = _drop_group_from_survey(qf_survey_df, "verification")
+
     names_to_remove = {
         "feature_exists",
         "verification",
@@ -613,6 +638,14 @@ async def modify_form_for_qfield(
     qf_survey_df = qf_survey_df[
         ~qf_survey_df["name"].isin(names_to_remove)
     ].reset_index(drop=True)
+    qf_survey_df = qf_survey_df[
+        ~qf_survey_df[NAME_COLUMN].isin(QFIELD_METADATA_NAMES_TO_REMOVE)
+    ].reset_index(drop=True)
+    qf_survey_df = _move_row_into_group(
+        qf_survey_df,
+        row_name="feature",
+        group_name="survey_questions",
+    )
 
     survey_group_mask = (
         (qf_survey_df["type"] == "begin group")
@@ -627,21 +660,79 @@ async def modify_form_for_qfield(
     if start_geopoint_mask.any():
         qf_survey_df = qf_survey_df[~start_geopoint_mask].reset_index(drop=True)
 
-    # 4. Wrap the final two rows (typically the photo repeat) in a group,
-    #    so they display correctly as the final QField tab.
-    last_two_rows = qf_survey_df.tail(2)
-    begin_row = pd.DataFrame([{"type": "begin group", "name": "final"}])
-    end_row = pd.DataFrame([{"type": "end group", "name": None}])
-    # Rebuild: all rows except last two + begin + last two + end
-    qf_survey_df = pd.concat(
-        [qf_survey_df.iloc[:-2], begin_row, last_two_rows, end_row],
-        ignore_index=True,
-    )
-
-    # 5. Update survey sheet in updated_form
+    # 4. Update survey sheet in updated_form
     custom_sheets["survey"] = qf_survey_df
 
     return (form_language, await write_xlsform(custom_sheets))
+
+
+def _find_matching_end_group(df: pd.DataFrame, begin_idx: int) -> Optional[int]:
+    """Return the matching ``end group`` row for a ``begin group`` row."""
+    depth = 0
+    for idx in range(begin_idx, len(df)):
+        field_type = df.at[idx, TYPE_COLUMN]
+        if field_type == "begin group":
+            depth += 1
+        elif field_type == "end group":
+            depth -= 1
+            if depth == 0:
+                return idx
+    return None
+
+
+def _drop_group_from_survey(df: pd.DataFrame, group_name: str) -> pd.DataFrame:
+    """Remove a named group including its matching closing row."""
+    group_mask = (df[TYPE_COLUMN] == "begin group") & (df[NAME_COLUMN] == group_name)
+    begin_indices = list(df.index[group_mask])
+    if not begin_indices:
+        return df
+
+    drop_indices: set[int] = set()
+    for begin_idx in begin_indices:
+        end_idx = _find_matching_end_group(df, begin_idx)
+        if end_idx is None:
+            drop_indices.add(begin_idx)
+        else:
+            drop_indices.update(range(begin_idx, end_idx + 1))
+
+    return df.drop(index=sorted(drop_indices)).reset_index(drop=True)
+
+
+def _move_row_into_group(
+    df: pd.DataFrame,
+    row_name: str,
+    group_name: str,
+) -> pd.DataFrame:
+    """Move a named row directly after a named group's opening row."""
+    row_indices = list(df.index[df[NAME_COLUMN] == row_name])
+    group_indices = list(
+        df.index[(df[TYPE_COLUMN] == "begin group") & (df[NAME_COLUMN] == group_name)]
+    )
+    if not row_indices or not group_indices:
+        return df
+
+    row_idx = row_indices[0]
+    group_idx = group_indices[0]
+    if row_idx == group_idx + 1:
+        return df
+
+    row = df.iloc[[row_idx]]
+    without_row = df.drop(index=row_idx).reset_index(drop=True)
+    group_idx = int(
+        without_row.index[
+            (without_row[TYPE_COLUMN] == "begin group")
+            & (without_row[NAME_COLUMN] == group_name)
+        ][0]
+    )
+
+    return pd.concat(
+        [
+            without_row.iloc[:group_idx + 1],
+            row,
+            without_row.iloc[group_idx + 1:],
+        ],
+        ignore_index=True,
+    )
 
 
 def _get_form_components(

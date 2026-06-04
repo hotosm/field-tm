@@ -112,13 +112,22 @@ def _validate_fixed_geometries(fixed_geojson: Path, log: logging.Logger) -> None
     log.info("All geometries are valid")
 
 
-def analyse_and_fix_geometries(input_geojson_path: str, log: logging.Logger) -> str:
+def analyse_and_fix_geometries(
+    input_geojson_path: str,
+    log: logging.Logger,
+    populate_uuid: bool = False,
+) -> str:
     """
     Analyse geometry types, filter, fix geometries, and convert to GeoPackage.
 
     Args:
         input_geojson_path: Path to input GeoJSON file
         log: Logger instance
+        populate_uuid: When True, add a ``uuid`` column populated with a
+            generated UUID v4 per feature. Required for layers that xlsform2qgis
+            turns into a survey layer with photo repeats — QField's relation
+            editor refuses to add a child feature when the parent's ``uuid``
+            linking field is NULL.
 
     Returns:
         Path to output GeoPackage file
@@ -155,11 +164,33 @@ def analyse_and_fix_geometries(input_geojson_path: str, log: logging.Logger) -> 
         log.info("Validating fixed geometries...")
         _validate_fixed_geometries(fixed_geojson, log)
 
+        savefeatures_input = str(fixed_geojson)
+        if populate_uuid:
+            log.info("Populating uuid column...")
+            uuid_geojson = fixed_geojson.with_name(f"{fixed_geojson.stem}_uuid.geojson")
+            processing.run(
+                "native:fieldcalculator",
+                {
+                    "INPUT": savefeatures_input,
+                    "FIELD_NAME": "uuid",
+                    "FIELD_TYPE": 2,
+                    "FIELD_LENGTH": 36,
+                    "FIELD_PRECISION": 0,
+                    "FORMULA": "uuid('WithoutBraces')",
+                    "OUTPUT": str(uuid_geojson),
+                },
+            )
+            savefeatures_input = str(uuid_geojson)
+
         log.info("Converting to GeoPackage...")
+        # The chained QGIS algorithms above leave the output gpkg with both a
+        # `fid` and `fid_1` column (one is the OGR-assigned primary key, the
+        # other is a passed-through copy). Harmless but redundant; could be
+        # collapsed later via `native:refactorfields` if it starts mattering.
         processing.run(
             "native:savefeatures",
             {
-                "INPUT": str(fixed_geojson),
+                "INPUT": savefeatures_input,
                 "OUTPUT": str(fixed_gpkg),
             }
         )

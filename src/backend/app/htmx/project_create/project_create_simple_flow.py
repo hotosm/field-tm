@@ -176,6 +176,7 @@ async def finalize_simple_project_creation(
     project_id: int,
     outline: dict,
     autostart_callback,
+    ui_locale: str | None = None,
 ) -> tuple[bool, dict[str, str]]:
     """Finalize simple project setup and return redirect/event response headers."""
     default_template_bytes = await get_default_buildings_template_bytes(db)
@@ -192,7 +193,7 @@ async def finalize_simple_project_creation(
         include_photo_upload=True,
         mandatory_photo_upload=False,
         use_odk_collect=False,
-        default_language=None,
+        default_language=ui_locale,
     )
 
     await prepare_simple_project_data_extract(db=db, project_id=project_id)
@@ -237,7 +238,11 @@ async def finalize_simple_project_creation(
         )
         await save_task_areas(db, project_id, tasks_geojson)
 
-    await finalize_qfield_project(db=db, project_id=project_id)
+    await finalize_qfield_project(
+        db=db,
+        project_id=project_id,
+        default_language=ui_locale,
+    )
 
     claimed = await claim_simple_project_basemap_generation(
         db=db, project_id=project_id
@@ -283,7 +288,9 @@ async def _persist_creation_terminal_state(
 
 
 async def run_simple_project_creation_background(
-    project_id: int, outline: dict
+    project_id: int,
+    outline: dict,
+    ui_locale: str | None = None,
 ) -> None:
     """Run simple-flow finalize in the background and persist terminal state.
 
@@ -298,6 +305,7 @@ async def run_simple_project_creation_background(
                 project_id=project_id,
                 outline=outline,
                 autostart_callback=autostart_basemap_for_simple_project,
+                ui_locale=ui_locale,
             )
             await DbProject.update(
                 db,

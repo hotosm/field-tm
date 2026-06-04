@@ -29,6 +29,7 @@ from app.htmx.project_create.project_create_submit_routes import (
     project_creation_status,
 )
 from app.htmx.project_create.project_create_xlsform_routes import upload_xlsform_htmx
+from app.i18n import _current_locale
 from app.projects.project_services import (
     ConflictError,
     ServiceError,
@@ -87,8 +88,12 @@ async def test_create_simple_project_htmx_success(monkeypatch):
 
     captured: dict = {}
 
-    async def fake_run_background(project_id, outline):
-        captured["background_call"] = (project_id, outline)
+    async def noop_background():
+        return None
+
+    def fake_run_background(project_id, outline, ui_locale=None):
+        captured["background_call"] = (project_id, outline, ui_locale)
+        return noop_background()
 
     def fake_create_task(coro, *, name=None):
         captured["enqueued_coro"] = coro
@@ -119,12 +124,16 @@ async def test_create_simple_project_htmx_success(monkeypatch):
     )
 
     db = AsyncMock()
-    response = await create_simple_project_htmx.fn(
-        request=Mock(),
-        db=db,
-        auth_user=Mock(),
-        data={"outline": json.dumps({"type": "Polygon", "coordinates": []})},
-    )
+    token = _current_locale.set("es")
+    try:
+        response = await create_simple_project_htmx.fn(
+            request=Mock(),
+            db=db,
+            auth_user=Mock(),
+            data={"outline": json.dumps({"type": "Polygon", "coordinates": []})},
+        )
+    finally:
+        _current_locale.reset(token)
 
     assert response.status_code == status.HTTP_200_OK
     assert response.headers["HX-Redirect"] == "/projects/321/creating"
@@ -135,6 +144,7 @@ async def test_create_simple_project_htmx_success(monkeypatch):
     assert project_update.creation_updated_at is not None
     db.commit.assert_awaited_once()
     assert "enqueued_coro" in captured
+    assert captured["background_call"][2] == "es"
 
 
 async def test_create_simple_project_htmx_rejects_invalid_outline():
@@ -317,6 +327,65 @@ async def test_create_simple_project_htmx_handles_service_error(monkeypatch):
     assert "Failed to create simple project" in response.content
 
 
+async def test_finalize_simple_project_creation_passes_ui_locale_as_language(
+    monkeypatch,
+):
+    """The UI locale should flow straight through as the form default_language."""
+    process_mock = AsyncMock()
+    finalize_mock = AsyncMock()
+
+    monkeypatch.setattr(
+        project_create_simple_flow,
+        "get_default_buildings_template_bytes",
+        AsyncMock(return_value=b"fake-xls"),
+    )
+    monkeypatch.setattr(
+        project_create_simple_flow,
+        "process_xlsform",
+        process_mock,
+    )
+    monkeypatch.setattr(
+        project_create_simple_flow,
+        "prepare_simple_project_data_extract",
+        AsyncMock(),
+    )
+    monkeypatch.setattr(
+        project_create_simple_flow.DbProject,
+        "one",
+        AsyncMock(
+            return_value=SimpleNamespace(
+                data_extract_geojson={"type": "FeatureCollection", "features": []}
+            )
+        ),
+    )
+    monkeypatch.setattr(
+        project_create_simple_flow,
+        "finalize_qfield_project",
+        finalize_mock,
+    )
+    monkeypatch.setattr(
+        project_create_simple_flow,
+        "claim_simple_project_basemap_generation",
+        AsyncMock(return_value=False),
+    )
+
+    (
+        has_features,
+        headers,
+    ) = await project_create_simple_flow.finalize_simple_project_creation(
+        db=Mock(),
+        project_id=42,
+        outline={"type": "Polygon", "coordinates": []},
+        autostart_callback=Mock(),
+        ui_locale="es",
+    )
+
+    assert has_features is False
+    assert headers["HX-Redirect"] == "/projects/42"
+    assert process_mock.await_args.kwargs["default_language"] == "es"
+    assert finalize_mock.await_args.kwargs["default_language"] == "es"
+
+
 class _ConnCtx:
     """Async context manager that hands back a single mock DB connection."""
 
@@ -349,10 +418,13 @@ async def test_run_simple_project_creation_background_marks_ready(monkeypatch):
     monkeypatch.setattr(project_create_simple_flow.DbProject, "update", update_mock)
 
     await project_create_simple_flow.run_simple_project_creation_background(
-        42, {"type": "Polygon", "coordinates": []}
+        42,
+        {"type": "Polygon", "coordinates": []},
+        "es",
     )
 
     finalize_mock.assert_awaited_once()
+    assert finalize_mock.await_args.kwargs["ui_locale"] == "es"
     assert update_mock.await_count == 1
     project_update = update_mock.await_args.args[2]
     assert project_update.creation_status == "ready"

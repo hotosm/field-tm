@@ -156,7 +156,9 @@ def _prepare_features_layer(
         )
         return None
 
-    return analyse_and_fix_geometries(str(features_geojson_path), log)
+    return analyse_and_fix_geometries(
+        str(features_geojson_path), log, populate_uuid=True
+    )
 
 
 def _prepare_tasks_layer(

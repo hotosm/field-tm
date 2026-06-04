@@ -19,7 +19,7 @@ from app.auth.auth_deps import get_user_sub, login_required
 from app.db.database import db_conn
 from app.db.models import DbProject
 from app.helpers.background_tasks import spawn as _spawn_bg_task
-from app.i18n import _
+from app.i18n import _, get_current_locale
 from app.projects import project_schemas
 from app.projects.project_services import (
     ConflictError,
@@ -190,7 +190,11 @@ async def create_simple_project_htmx(
         await db.commit()
 
         _spawn_bg_task(
-            _run_simple_project_creation_background(project.id, outline),
+            _run_simple_project_creation_background(
+                project.id,
+                outline,
+                get_current_locale(),
+            ),
             name=f"simple-project-create:{project.id}",
         )
 

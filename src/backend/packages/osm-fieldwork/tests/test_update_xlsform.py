@@ -27,6 +27,7 @@ from pyxform.xls2xform import convert as xform_convert
 
 from osm_fieldwork.update_xlsform import (
     _configure_form_settings,
+    _normalize_language_token,
     _resolve_qfield_form_language,
     append_field_mapping_fields,
     modify_form_for_qfield,
@@ -66,6 +67,13 @@ async def test_merge_mandatory_fields():
     xform_convert(updated_form)
     check_translation_fields(workbook)
 
+
+def test_normalize_language_token_matches_base_language():
+    """Region variants and bare codes should fall back to a supported base."""
+    assert _normalize_language_token("es_MX") == "spanish(es)"
+    assert _normalize_language_token("pt") == "portuguese(pt_br)"
+    assert _normalize_language_token("pt-BR") == "portuguese(pt_br)"
+    assert _normalize_language_token("am") is None
 
 
 async def test_add_extra_select_from_file():
@@ -118,6 +126,53 @@ async def test_qfield_form_removes_odk_bookkeeping_fields():
     assert "feature_exists" not in name_col
     assert "created_by" not in name_col
     assert "fill" not in name_col
+
+
+async def test_qfield_form_preserves_photo_group_and_repeat_structure():
+    """The QField photo tab should preserve the photo group and repeat."""
+    form_bytes = io.BytesIO(convert_to_xlsform(str(buildings)))
+    _, updated_form = await append_field_mapping_fields(form_bytes, "buildings")
+    _, qfield_form = await modify_form_for_qfield(updated_form)
+
+    survey = pd.read_excel(
+        BytesIO(qfield_form.getvalue()),
+        sheet_name="survey",
+        engine="calamine",
+    )
+
+    stack: list[str] = []
+    expected_openers = {"end group": "begin group", "end repeat": "begin repeat"}
+    for row in survey[["type", "name"]].itertuples(index=False):
+        if row.type in {"begin group", "begin repeat"}:
+            stack.append(row.type)
+        elif row.type in expected_openers:
+            assert stack, f"Unmatched {row.type} for {row.name}"
+            assert stack.pop() == expected_openers[row.type]
+    assert stack == []
+
+    assert survey.loc[0, "type"] == "begin group"
+    assert survey.loc[0, "name"] == "survey_questions"
+    assert survey.loc[1, "name"] == "feature"
+
+    photo_start = survey.index[
+        (survey["type"] == "begin group") & (survey["name"] == "survey_photos")
+    ][0]
+    photo_rows = survey.loc[photo_start:photo_start + 4, ["type", "name"]]
+
+    assert list(photo_rows["type"]) == [
+        "begin group",
+        "begin repeat",
+        "image",
+        "end repeat",
+        "end group",
+    ]
+    assert list(photo_rows["name"].fillna("")) == [
+        "survey_photos",
+        "photos",
+        "image",
+        "photos",
+        "",
+    ]
 
 
 async def test_odk_collect_entity_task_selection():

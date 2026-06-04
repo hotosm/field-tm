@@ -161,6 +161,102 @@ def _inject_map_canvas(
     return qgs_data, False
 
 
+_SURVEY_TAB_OPEN_RE = re.compile(
+    rb'<attributeEditorContainer\b'
+    rb'(?=[^>]*\bname="Survey")'
+    rb'(?=[^>]*\btype="Tab")'
+    rb'[^>]*>',
+    re.DOTALL,
+)
+_EDITOR_CONTAINER_OPEN_RE = re.compile(rb"<attributeEditorContainer\b[^>]*>")
+_EDITOR_CONTAINER_CLOSE_RE = re.compile(rb"</attributeEditorContainer>")
+_TAB_CONTENT_RE = re.compile(
+    rb"<(attributeEditorField|attributeEditorRelation|attributeEditorContainer)\b"
+)
+_EDITOR_CONTAINER_CLOSE = b"</attributeEditorContainer>"
+
+
+def _find_editor_container_end(
+    qgs_data: bytes, open_m: re.Match, log: logging.Logger
+) -> int | None:
+    """Find the closing tag paired with an opened attribute editor container."""
+    depth = 1
+    scan_pos = open_m.end()
+
+    while depth > 0:
+        next_close = _EDITOR_CONTAINER_CLOSE_RE.search(qgs_data, scan_pos)
+        if not next_close:
+            log.warning(
+                "Unmatched <attributeEditorContainer>; aborting empty-tab strip"
+            )
+            return None
+
+        next_open = _EDITOR_CONTAINER_OPEN_RE.search(
+            qgs_data, scan_pos, next_close.start()
+        )
+        if next_open:
+            depth += 1
+            scan_pos = next_open.end()
+            continue
+
+        depth -= 1
+        scan_pos = next_close.end()
+
+    return scan_pos
+
+
+def _survey_tab_has_content(qgs_data: bytes, open_m: re.Match, block_end: int) -> bool:
+    """Return whether a Survey root tab contains visible editor content."""
+    body = qgs_data[open_m.end():block_end - len(_EDITOR_CONTAINER_CLOSE)]
+    return _TAB_CONTENT_RE.search(body) is not None
+
+
+def _after_removed_container(qgs_data: bytes, block_end: int) -> int:
+    """Skip whitespace directly following a removed XML container."""
+    trail = re.match(rb"[ \t]*\n?", qgs_data[block_end:])
+    return block_end + (trail.end() if trail else 0)
+
+
+def _strip_empty_survey_root_tabs(
+    qgs_data: bytes, log: logging.Logger
+) -> tuple[bytes, bool]:
+    """Remove empty ``<attributeEditorContainer name="Survey" type="Tab">`` blocks.
+
+    xlsform2qgis always seeds a root "Survey" tab on every layer's edit form
+    before walking the XLSForm rows. When every visible field lives inside a
+    group (e.g. survey_questions, survey_photos), the root tab is empty but
+    still rendered in QField as a leading blank tab.
+    """
+    pieces: list[bytes] = []
+    pos = 0
+    removed = 0
+
+    while True:
+        open_m = _SURVEY_TAB_OPEN_RE.search(qgs_data, pos)
+        if not open_m:
+            break
+
+        block_end = _find_editor_container_end(qgs_data, open_m, log)
+        if block_end is None:
+            return qgs_data, False
+
+        if _survey_tab_has_content(qgs_data, open_m, block_end):
+            pieces.append(qgs_data[pos:block_end])
+            pos = block_end
+            continue
+
+        pieces.append(qgs_data[pos:open_m.start()])
+        pos = _after_removed_container(qgs_data, block_end)
+        removed += 1
+
+    if removed == 0:
+        return qgs_data, False
+
+    pieces.append(qgs_data[pos:])
+    log.info("Removed %s empty 'Survey' root tab(s) from layer forms", removed)
+    return b"".join(pieces), True
+
+
 def _apply_qgs_metadata_fixes(
     qgs_data: bytes,
     bundled: set[str],
@@ -170,6 +266,7 @@ def _apply_qgs_metadata_fixes(
     """Apply all in-memory metadata fixes to a qgs payload."""
     qgs_data, icc_changed = _fix_dangling_icc_refs(qgs_data, bundled, log)
     qgs_data, tree_fixed = _fix_task_layer_tree(qgs_data, log)
+    qgs_data, tab_stripped = _strip_empty_survey_root_tabs(qgs_data, log)
 
     if extent_bbox is not None:
         qgs_data, canvas_injected = _inject_map_canvas(qgs_data, extent_bbox, log)
@@ -181,7 +278,7 @@ def _apply_qgs_metadata_fixes(
                 "extent_bbox was provided; QFieldCloud may fail to parse metadata"
             )
 
-    return qgs_data, icc_changed or tree_fixed or canvas_injected
+    return qgs_data, icc_changed or tree_fixed or tab_stripped or canvas_injected
 
 
 def _sanitize_qgz_project(
