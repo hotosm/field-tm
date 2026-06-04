@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026.4.1 (2026-06-04)
+
+### Feat
+
+- add option to load aoi from tasking manager
+
+### Fix
+
+- **qfield**: add extra drone-tm qfield logic to load bundled .qml style
+- **qfield**: omit redundant Survey tab + identify only survey layer in qfield
+- **backend**: improve resiliency of task splitting by implementing poll approach
+- small tweaks to improve survivability of long running project gen
+- improve resiliency of task splitting step
+- **qfield**: cleanup qgis gpkg wal and shm files on finalise project
+
 ## 2026.4.0 (2026-06-01)
 
 ### Feat
