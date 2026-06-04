@@ -9,6 +9,8 @@
     failedToValidateGeoJSON: {{ _("Failed to validate GeoJSON")|tojson }},
     noGeoJSONReturned: {{ _("No GeoJSON returned from validation")|tojson }},
     mustDrawAOI: {{ _("You must draw or upload a project area on the map before submitting.")|tojson }},
+    tmProjectIdRequired: {{ _("Enter a Tasking Manager project ID first.")|tojson }},
+    tmAoiLoadFailed: {{ _("Could not load AOI from Tasking Manager.")|tojson }},
   };
 
   // Stash drawn AOI in sessionStorage so users don't lose work if they
@@ -405,6 +407,67 @@
       }
     };
     reader.readAsText(file);
+  });
+
+  const loadTmAoiBtn = document.getElementById("load-tm-aoi-btn");
+  const tmProjectIdInput = document.getElementById("tm-project-id-input");
+
+  async function loadTaskingManagerAoi() {
+    if (!tmProjectIdInput) return;
+
+    const rawValue = (tmProjectIdInput.value ?? "").toString().trim();
+    const projectId = parseInt(rawValue, 10);
+    if (!rawValue || Number.isNaN(projectId) || projectId <= 0) {
+      setMapError(MAP_I18N.tmProjectIdRequired);
+      return;
+    }
+
+    setMapError("");
+
+    if (loadTmAoiBtn) {
+      loadTmAoiBtn.setAttribute("loading", "");
+      loadTmAoiBtn.setAttribute("disabled", "");
+    }
+
+    try {
+      const response = await fetch(
+        `/tasking-manager-aoi/${encodeURIComponent(projectId)}`,
+        { headers: { accept: "application/json" } },
+      );
+      const result = await response.json();
+
+      if (!response.ok) {
+        setMapError(result.error || MAP_I18N.tmAoiLoadFailed);
+        return;
+      }
+
+      if (!result.geojson) {
+        setMapError(MAP_I18N.noGeoJSONReturned);
+        return;
+      }
+
+      loadGeoJSONOnMap(result.geojson);
+      showAreaInfo(result.area_km2, result.warning);
+    } catch (error) {
+      console.error("Error loading Tasking Manager AOI:", error);
+      setMapError(error.message || MAP_I18N.tmAoiLoadFailed);
+    } finally {
+      if (loadTmAoiBtn) {
+        loadTmAoiBtn.removeAttribute("loading");
+        loadTmAoiBtn.removeAttribute("disabled");
+      }
+    }
+  }
+
+  loadTmAoiBtn?.addEventListener("click", function () {
+    loadTaskingManagerAoi();
+  });
+
+  tmProjectIdInput?.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      loadTaskingManagerAoi();
+    }
   });
 
   document.getElementById("clear-map-btn")?.addEventListener("click", function () {

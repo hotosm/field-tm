@@ -329,6 +329,10 @@ class Settings(BaseSettings):
     RAW_DATA_API_URL: HttpUrlStr = "https://api-prod.raw-data.hotosm.org/v1"
     RAW_DATA_API_AUTH_TOKEN: Optional[SecretStr] = None
 
+    TASKING_MANAGER_API_URL: HttpUrlStr = (
+        "https://tasking-manager-production-api.hotosm.org/api/v2"
+    )
+
     # Offline basemap providers
     OAM_STAC_URL: HttpUrlStr = "https://api.imagery.hotosm.org/stac"
     OAM_TILEPACK_URL: HttpUrlStr = "https://packager.imagery.hotosm.org"

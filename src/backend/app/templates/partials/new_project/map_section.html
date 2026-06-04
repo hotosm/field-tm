@@ -34,17 +34,51 @@
   </div>
   <div id="aoi-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
     <div class="ftm-advanced-config__content">
-      <div class="ftm-step__actions" style="margin-bottom: 10px">
-        <wa-button type="button" id="upload-geojson-btn" variant="default" style="min-width: 200px">
-          {{ _("Upload your own map file (GeoJSON)") }}
-        </wa-button>
+      <div class="ftm-aoi-option">
+        <div class="ftm-aoi-option__title">{{ _("Upload a GeoJSON file") }}</div>
+        <small class="ftm-form-help" style="display: block; margin-bottom: 10px">
+          {{ _("If you already have a map file with your area boundary, upload it here instead of
+          drawing.") }}
+        </small>
+        <div class="ftm-step__actions">
+          <wa-button
+            type="button"
+            id="upload-geojson-btn"
+            variant="default"
+            style="min-width: 200px"
+          >
+            {{ _("Upload your own map file (GeoJSON)") }}
+          </wa-button>
+        </div>
       </div>
-      <small class="ftm-form-help" style="display: block; margin-bottom: 10px">
-        {{ _("If you already have a map file with your area boundary, upload it here instead of
-        drawing.") }}
-      </small>
+
+      <div class="ftm-aoi-divider" role="separator" aria-label="{{ _('or') }}">
+        <span class="ftm-aoi-divider__label">{{ _("or") }}</span>
+      </div>
+
+      <div class="ftm-aoi-option">
+        <div class="ftm-aoi-option__title">{{ _("Load from a HOT Tasking Manager project") }}</div>
+        <small class="ftm-form-help" style="display: block; margin-bottom: 10px">
+          {{ _("Enter a HOT Tasking Manager project ID to load its area of interest.") }}
+        </small>
+        <div style="display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap">
+          <wa-input
+            type="number"
+            id="tm-project-id-input"
+            min="1"
+            step="1"
+            inputmode="numeric"
+            placeholder="{{ _('Tasking Manager project ID') }}"
+            style="flex: 1; min-width: 180px"
+          ></wa-input>
+          <wa-button type="button" id="load-tm-aoi-btn" variant="default" style="min-width: 160px">
+            {{ _("Load AOI") }}
+          </wa-button>
+        </div>
+      </div>
+
       {% if not hide_advanced_config %}
-      <div class="ftm-checkbox-row" style="margin-top: 12px">
+      <div class="ftm-checkbox-row" style="margin-top: 16px">
         <input type="checkbox" id="merge-geometries-checkbox" style="margin: 0; cursor: pointer" />
         <label for="merge-geometries-checkbox" class="ftm-checkbox-label">
           {{ _("Combine multiple shapes into one") }}

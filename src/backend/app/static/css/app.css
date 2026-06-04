@@ -492,6 +492,8 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .ftm-flex-center {
@@ -515,6 +517,7 @@ body {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+  flex-wrap: wrap;
 }
 
 /* --- Form styles ------------------------------------------ */
@@ -546,6 +549,7 @@ body {
   gap: 10px;
   margin-top: 30px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .ftm-radio-group {
@@ -567,6 +571,15 @@ body {
   transition:
     border-color 0.2s,
     background-color 0.2s;
+}
+
+/* On narrow screens give each radio card its own row - they hold a logo,
+   title, platform chips and description, so side-by-side gets too cramped. */
+@media (max-width: 720px) {
+  .ftm-radio-card {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
 }
 
 .ftm-radio-card:hover,
@@ -800,6 +813,42 @@ body {
   margin-top: 0;
   padding-top: 0;
   border-top: 0;
+}
+
+.ftm-aoi-option {
+  padding: 12px;
+  background-color: white;
+  border: 1px solid var(--ftm-border);
+  border-radius: var(--ftm-radius-sm);
+}
+
+.ftm-aoi-option__title {
+  font-weight: var(--hot-font-weight-semibold);
+  color: var(--ftm-text);
+  margin-bottom: 6px;
+}
+
+.ftm-aoi-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0;
+  color: var(--ftm-text-muted);
+  font-size: var(--hot-font-size-small);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ftm-aoi-divider::before,
+.ftm-aoi-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background-color: var(--ftm-border);
+}
+
+.ftm-aoi-divider__label {
+  flex: 0 0 auto;
 }
 
 .ftm-split-feature-options {

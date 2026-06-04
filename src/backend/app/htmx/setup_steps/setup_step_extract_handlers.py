@@ -1,6 +1,5 @@
 """Handlers for setup-step data extract HTMX workflow."""
 
-import json
 import logging
 
 from geojson_aoi import parse_aoi
@@ -26,7 +25,6 @@ from ..htmx_helpers import callout as _callout
 from .setup_step_extract_helpers import (
     get_submitted_geojson_data as _get_submitted_geojson_data,
 )
-from .setup_step_parsing import parse_json_payload as _parse_json_payload
 from .setup_step_responses import (
     build_data_extract_preview_response as _build_data_extract_preview_response,
 )
@@ -46,7 +44,13 @@ async def handle_download_osm_data(
     geom_type: str,
     centroid: bool,
 ) -> Response:
-    """Download an OSM extract and return the review preview fragment."""
+    """Download an OSM extract and return the review preview fragment.
+
+    The extract is persisted to ``data_extract_geojson`` here (replacing any
+    prior staged extract) so the Accept form is a no-body confirm rather than
+    a round-trip of the entire GeoJSON. If the user discards or re-downloads
+    before accepting, the staged extract is overwritten or cleared.
+    """
     try:
         featcol_single_geom_type = await download_osm_data(
             db=db,
@@ -55,8 +59,11 @@ async def handle_download_osm_data(
             geom_type=geom_type,
             centroid=centroid,
         )
-        feature_count = len(featcol_single_geom_type.get("features", []))
-        geojson_str = json.dumps(featcol_single_geom_type)
+        feature_count = await save_data_extract(
+            db=db,
+            project_id=project_id,
+            geojson_data=featcol_single_geom_type,
+        )
 
         map_html_content = render_leaflet_map(
             map_id="leaflet-map-download",
@@ -86,7 +93,6 @@ async def handle_download_osm_data(
             status_message=status_message,
             preview_message=preview_message,
             map_html_content=map_html_content,
-            geojson_str=geojson_str,
             project_id=project_id,
         )
     except (SvcValidationError, ServiceError) as e:
@@ -97,10 +103,15 @@ async def handle_download_osm_data(
 
 
 async def handle_upload_geojson(
+    db: AsyncConnection,
     data: UploadFile,
     project_id: int,
 ) -> Response:
-    """Validate an uploaded GeoJSON extract and return the preview fragment."""
+    """Validate an uploaded GeoJSON extract and return the preview fragment.
+
+    Like the OSM download path, the parsed extract is persisted to
+    ``data_extract_geojson`` here so Accept is a no-body confirm.
+    """
     try:
         file_content = await data.read()
 
@@ -139,8 +150,11 @@ async def handle_upload_geojson(
 
         await check_crs(featcol)
 
-        feature_count = len(featcol.get("features", []))
-        geojson_str = json.dumps(featcol)
+        feature_count = await save_data_extract(
+            db=db,
+            project_id=project_id,
+            geojson_data=featcol,
+        )
 
         map_html_content = render_leaflet_map(
             map_id="leaflet-map-upload",
@@ -170,7 +184,6 @@ async def handle_upload_geojson(
             status_message=upload_success_msg,
             preview_message=upload_preview_msg,
             map_html_content=map_html_content,
-            geojson_str=geojson_str,
             project_id=project_id,
         )
 
@@ -362,35 +375,36 @@ async def handle_submit_geojson_data_extract(
 async def handle_accept_data_extract(
     db: AsyncConnection,
     project_id: int,
-    data: dict,
 ) -> Response:
-    """Persist an accepted downloaded or uploaded data extract."""
+    """Confirm the staged data extract and advance to step 4.
+
+    The extract was already persisted on download/upload. Accept is a
+    no-body POST that verifies an extract is present and emits the
+    step3-complete event; the client reloads to /projects/{id}.
+    """
     try:
-        geojson_str = data.get("data_extract_geojson", "")
-        if not geojson_str:
-            data_keys = list(data.keys()) if data else "None"
-            log.debug(f"Accept data extract data keys: {data_keys}")
+        project = await DbProject.one(db, project_id)
+        geojson_data = project.data_extract_geojson if project else None
+        features = (
+            geojson_data.get("features", []) if isinstance(geojson_data, dict) else []
+        )
+
+        if not features:
             return Response(
-                content=_callout("danger", _("No data extract provided.")),
+                content=_callout(
+                    "warning",
+                    _(
+                        "No data extract is staged. Please download OSM data "
+                        "or upload a GeoJSON file first."
+                    ),
+                ),
                 media_type="text/html",
-                status_code=status.HTTP_400_BAD_REQUEST,
+                status_code=status.HTTP_404_NOT_FOUND,
             )
 
-        geojson_data, error_response = _parse_json_payload(
-            geojson_str,
-            _("Invalid data extract format."),
-            "Error parsing data extract GeoJSON",
-        )
-        if error_response:
-            return error_response
-
-        feature_count = await save_data_extract(
-            db=db,
-            project_id=project_id,
-            geojson_data=geojson_data,
-        )
+        feature_count = len(features)
         log.info(
-            f"Accepted and saved data extract with {feature_count} "
+            f"Accepted staged data extract with {feature_count} "
             f"features for project {project_id}"
         )
 
@@ -410,8 +424,40 @@ async def handle_accept_data_extract(
             },
         )
 
-    except ServiceError as e:
-        return _service_error_response(e)
     except Exception as e:
         log.error(f"Error accepting data extract via HTMX: {e}", exc_info=True)
+        return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)
+
+
+async def handle_discard_data_extract(
+    db: AsyncConnection,
+    project_id: int,
+) -> Response:
+    """Clear the staged extract so the user can choose a data source again.
+
+    Called when the user clicks "Discard" on the preview. Also nulls
+    ``task_areas_geojson`` because any split would have been based on the
+    discarded extract.
+    """
+    try:
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(
+                data_extract_geojson=None,
+                task_areas_geojson=None,
+            ),
+        )
+        await db.commit()
+        log.info(f"Discarded staged data extract for project {project_id}")
+        return Response(
+            content=_callout(
+                "info",
+                _("Data extract discarded. Choose a data source above to try again."),
+            ),
+            media_type="text/html",
+            status_code=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        log.error(f"Error discarding data extract via HTMX: {e}", exc_info=True)
         return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)

@@ -19,6 +19,7 @@ from app.db.database import db_conn
 from .setup_step_extract_handlers import (
     handle_accept_data_extract,
     handle_collect_new_data_only,
+    handle_discard_data_extract,
     handle_download_osm_data,
     handle_preview_geojson,
     handle_submit_geojson_data_extract,
@@ -78,7 +79,7 @@ async def upload_geojson_htmx(
     )
     if not_found_response:
         return not_found_response
-    return await handle_upload_geojson(data, project_id)
+    return await handle_upload_geojson(db, data, project_id)
 
 
 @get(
@@ -164,7 +165,6 @@ async def accept_data_extract_htmx(
     db: AsyncConnection,
     current_user: ProjectUserDict,
     auth_user: object,
-    data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
     project_id: int = Parameter(),
 ) -> Response:
     _project, not_found_response = _authorized_project_or_response(
@@ -172,7 +172,30 @@ async def accept_data_extract_htmx(
     )
     if not_found_response:
         return not_found_response
-    return await handle_accept_data_extract(db, project_id, data or {})
+    return await handle_accept_data_extract(db, project_id)
+
+
+@post(
+    path="/discard-data-extract-htmx",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+        "current_user": Provide(mapper),
+    },
+)
+async def discard_data_extract_htmx(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    current_user: ProjectUserDict,
+    auth_user: object,
+    project_id: int = Parameter(),
+) -> Response:
+    _project, not_found_response = _authorized_project_or_response(
+        current_user, project_id
+    )
+    if not_found_response:
+        return not_found_response
+    return await handle_discard_data_extract(db, project_id)
 
 
 ROUTE_HANDLERS = [
@@ -182,4 +205,5 @@ ROUTE_HANDLERS = [
     collect_new_data_only_htmx,
     submit_geojson_data_extract_htmx,
     accept_data_extract_htmx,
+    discard_data_extract_htmx,
 ]

@@ -5,8 +5,10 @@
 import json
 import logging
 
+import httpx
 from geojson_aoi import parse_aoi
-from litestar import post
+from litestar import get, post
+from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
 from litestar.exceptions import HTTPException
@@ -29,6 +31,70 @@ from ..setup_steps.setup_step_responses import (
 )
 
 log = logging.getLogger(__name__)
+
+TM_AOI_REQUEST_TIMEOUT_SECONDS = 30
+
+
+def _tasking_manager_aoi_url(project_id: int) -> str:
+    return (
+        f"{str(settings.TASKING_MANAGER_API_URL).rstrip('/')}"
+        f"/projects/{project_id}/queries/aoi/?as_file=false"
+    )
+
+
+async def _fetch_tasking_manager_aoi(
+    tm_url: str, project_id: int
+) -> httpx.Response | Response:
+    try:
+        async with httpx.AsyncClient(timeout=TM_AOI_REQUEST_TIMEOUT_SECONDS) as client:
+            tm_response = await client.get(
+                tm_url, headers={"accept": "application/json"}
+            )
+    except httpx.HTTPError as exc:
+        log.error(f"Failed to reach Tasking Manager API: {exc}", exc_info=True)
+        return _json_error_response(
+            _("Could not reach Tasking Manager. Please try again later."), 502
+        )
+
+    if tm_response.status_code == status.HTTP_404_NOT_FOUND:
+        return _json_error_response(
+            _("Tasking Manager project %(id)s was not found.") % {"id": project_id},
+            404,
+        )
+    if tm_response.status_code >= status.HTTP_400_BAD_REQUEST:
+        return _json_error_response(
+            _("Tasking Manager returned an error (HTTP %(status)s).")
+            % {"status": tm_response.status_code},
+            502,
+        )
+
+    return tm_response
+
+
+def _parse_tasking_manager_aoi_response(tm_response: httpx.Response) -> dict | Response:
+    try:
+        tm_geojson = tm_response.json()
+    except ValueError:
+        return _json_error_response(
+            _("Tasking Manager returned an invalid response."), 502
+        )
+
+    try:
+        merged_featcol = parse_aoi(settings.FTM_DB_URL, tm_geojson, merge=False)
+    except ValueError as exc:
+        return _json_error_response(str(exc), 422)
+
+    if not merged_featcol.get("features", []):
+        return _json_error_response(
+            _("Tasking Manager project AOI did not contain any polygon geometries."),
+            422,
+        )
+
+    return (
+        merged_featcol["features"][0]
+        if len(merged_featcol.get("features", [])) == 1
+        else merged_featcol
+    )
 
 
 async def _normalize_geojson_response_body(
@@ -112,6 +178,42 @@ async def validate_geojson(
         return _json_error_response(error_msg, 500)
 
 
+@get(
+    path="/tasking-manager-aoi/{project_id:int}",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+)
+async def load_tasking_manager_aoi(
+    request: HTMXRequest,
+    db: AsyncConnection,
+    auth_user: object,
+    project_id: int,
+) -> Response:
+    if project_id <= 0:
+        return _json_error_response(
+            _("Tasking Manager project ID must be a positive integer."), 400
+        )
+
+    tm_response = await _fetch_tasking_manager_aoi(
+        _tasking_manager_aoi_url(project_id), project_id
+    )
+    if isinstance(tm_response, Response):
+        return tm_response
+
+    result_geojson = _parse_tasking_manager_aoi_response(tm_response)
+    if isinstance(result_geojson, Response):
+        return result_geojson
+
+    return Response(
+        content=json.dumps(await _normalize_geojson_response_body(db, result_geojson)),
+        media_type="application/json",
+        status_code=200,
+    )
+
+
 ROUTE_HANDLERS = [
     validate_geojson,
+    load_tasking_manager_aoi,
 ]

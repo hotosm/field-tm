@@ -229,7 +229,6 @@ def build_data_extract_preview_response(
     status_message: str,
     preview_message: str,
     map_html_content: str,
-    geojson_str: str,
     project_id: int,
 ) -> Template:
     return Template(
@@ -239,7 +238,6 @@ def build_data_extract_preview_response(
             "status_message": status_message,
             "preview_message": preview_message,
             "map_html_content": map_html_content,
-            "geojson_str": geojson_str,
             "project_id": project_id,
         },
         media_type="text/html",

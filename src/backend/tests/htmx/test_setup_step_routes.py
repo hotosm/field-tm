@@ -206,6 +206,7 @@ async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypat
     }
     uploaded_bytes = json.dumps(uploaded_geojson, ensure_ascii=False).encode("utf-8")
     captured: dict = {}
+    saved: dict = {}
     project = Mock(id=42)
 
     def fake_parse_aoi(_db_url, input_geojson, merge=True):
@@ -216,6 +217,12 @@ async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypat
     async def fake_check_crs(_featcol):
         return None
 
+    async def fake_save_data_extract(*, db, project_id, geojson_data):
+        saved["db"] = db
+        saved["project_id"] = project_id
+        saved["geojson_data"] = geojson_data
+        return len(geojson_data["features"])
+
     class FakeUploadFile:
         filename = "osm-export.geojson"
 
@@ -224,6 +231,9 @@ async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypat
 
     monkeypatch.setattr(setup_step_extract_handlers, "parse_aoi", fake_parse_aoi)
     monkeypatch.setattr(setup_step_extract_handlers, "check_crs", fake_check_crs)
+    monkeypatch.setattr(
+        setup_step_extract_handlers, "save_data_extract", fake_save_data_extract
+    )
 
     response = await upload_geojson_htmx.fn(
         request=Mock(),
@@ -244,31 +254,23 @@ async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypat
     assert "Accept Data Extract" in response.context["preview_message"]
     assert captured["payload"] == uploaded_bytes
     assert captured["merge"] is False
+    assert saved["project_id"] == project.id
+    assert saved["geojson_data"] == uploaded_geojson
 
 
-async def test_accept_data_extract_htmx_decodes_html_escaped_geojson(monkeypatch):
-    """Accept-data route should tolerate HTML-escaped JSON form values."""
-    saved: dict = {}
+async def test_accept_data_extract_htmx_confirms_staged_extract(monkeypatch):
+    """Accept reads the staged extract from the DB and emits step3-complete."""
     project = Mock(id=42)
-    escaped_geojson = (
-        '{&quot;type&quot;: "FeatureCollection", '
-        '&quot;features&quot;: [{&quot;type&quot;: "Feature", '
-        "&quot;geometry&quot;: null, &quot;properties&quot;: {}}]}"
-    )
-    feature_collection = {
+    staged_geojson = {
         "type": "FeatureCollection",
         "features": [{"type": "Feature", "geometry": None, "properties": {}}],
     }
 
-    async def fake_save_data_extract(*, db, project_id, geojson_data):
-        saved["db"] = db
-        saved["project_id"] = project_id
-        saved["geojson_data"] = geojson_data
-        return len(geojson_data["features"])
+    async def fake_db_project_one(_db, _project_id):
+        return SimpleNamespace(data_extract_geojson=staged_geojson)
 
     monkeypatch.setattr(
-        "app.htmx.setup_steps.setup_step_extract_handlers.save_data_extract",
-        fake_save_data_extract,
+        setup_step_extract_handlers.DbProject, "one", fake_db_project_one
     )
 
     response = await accept_data_extract_htmx.fn(
@@ -276,7 +278,6 @@ async def test_accept_data_extract_htmx_decodes_html_escaped_geojson(monkeypatch
         db=Mock(),
         current_user={"project": project},
         auth_user=Mock(),
-        data={"data_extract_geojson": escaped_geojson},
         project_id=project.id,
     )
 
@@ -285,8 +286,29 @@ async def test_accept_data_extract_htmx_decodes_html_escaped_geojson(monkeypatch
     trigger_payload = hx_trigger.get("project-setup:step3-complete")
     assert trigger_payload is not None
     assert trigger_payload["projectId"] == project.id
-    assert saved["project_id"] == project.id
-    assert saved["geojson_data"] == feature_collection
+    assert trigger_payload["featureCount"] == 1
+
+
+async def test_accept_data_extract_htmx_404_without_staged_extract(monkeypatch):
+    """Accept must refuse if no extract has been staged on the project."""
+    project = Mock(id=42)
+
+    async def fake_db_project_one(_db, _project_id):
+        return SimpleNamespace(data_extract_geojson=None)
+
+    monkeypatch.setattr(
+        setup_step_extract_handlers.DbProject, "one", fake_db_project_one
+    )
+
+    response = await accept_data_extract_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=project.id,
+    )
+
+    assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
 def test_task_boundaries_layer_uses_translated_popup_labels():
