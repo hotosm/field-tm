@@ -17,6 +17,7 @@
   hx-get="/projects/{{ project.id }}/creation-status"
   hx-trigger="every 10s"
   hx-swap="outerHTML"
+  hx-on::before-swap="if (event.detail.xhr.status >= 400) { event.detail.shouldSwap = false; event.detail.isError = false; }"
   style="text-align: center"
 >
   <wa-spinner style="font-size: 32px"></wa-spinner>

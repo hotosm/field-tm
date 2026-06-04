@@ -61,8 +61,9 @@ from app.qfield.qfield_utils import resolve_backend_qfc_url
 
 log = logging.getLogger(__name__)
 
-# Timeout for QGIS wrapper HTTP calls (project generation can be slow)
-QGIS_REQUEST_TIMEOUT = ClientTimeout(total=300)  # 5 minutes
+# Slightly longer than the wrapper's QGIS_DISPATCH_TIMEOUT_SECONDS so the
+# server-side timeout fires first with its descriptive error message.
+QGIS_REQUEST_TIMEOUT = ClientTimeout(total=660)
 QFC_NAME_SANITIZE_PATTERN = re.compile(r"[^A-Za-z0-9_.-]+")
 
 # Field-TM QField plugin: bundled and sent to the QGIS wrapper on every

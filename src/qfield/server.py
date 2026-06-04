@@ -21,7 +21,7 @@ from utils import parse_bool, parse_and_validate_extent
 # checks stay responsive, but POST handlers dispatch QGIS work to the main
 # thread via this queue and wait for the result.
 _work_queue: queue.Queue = queue.Queue()
-QGIS_DISPATCH_TIMEOUT_SECONDS = 180
+QGIS_DISPATCH_TIMEOUT_SECONDS = 600
 
 
 class QGISRequestHandler(BaseHTTPRequestHandler):
