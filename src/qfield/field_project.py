@@ -568,9 +568,18 @@ def generate_qgis_project(
 
         # Finalise the project
         project.write()
+        # Drop layer references so SQLite WAL is checkpointed back into the
+        # main .gpkg and the -wal/-shm sidecars can be released.
+        project.clear()
         sanitize_generated_qgis_metadata(project_file, log, extent_bbox=extent_bbox)
 
-        num_files = _write_job_outputs(db_url, job_id, final_output_dir, log)
+        num_files = _write_job_outputs(
+            db_url,
+            job_id,
+            final_output_dir,
+            log,
+            excluded_suffixes=(".gpkg-wal", ".gpkg-shm"),
+        )
         log.info("Project generation complete, wrote %d output files to DB", num_files)
         return {
             "status": "success",
@@ -736,6 +745,9 @@ def _attach_mbtiles_layer_to_project(
 
     if not project.write(str(project_file)):
         raise RuntimeError("Failed to save QGIS project after basemap attach")
+    # Drop layer references so SQLite WAL is checkpointed back into each .gpkg
+    # before the working dir is copied to final/ for re-upload.
+    project.clear()
 
 
 def attach_basemap_to_qgis_project(
@@ -794,7 +806,7 @@ def attach_basemap_to_qgis_project(
             job_id,
             final_dir,
             log,
-            excluded_suffixes=(".mbtiles",),
+            excluded_suffixes=(".mbtiles", ".gpkg-wal", ".gpkg-shm"),
         )
         return {
             "status": "success",
