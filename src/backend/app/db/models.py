@@ -100,17 +100,24 @@ def _add_encrypted_odk_credentials(
 
 def _normalize_project_jsonb_fields(model_dump: dict[str, Any]) -> None:
     """Serialize project GeoJSON dicts for JSONB columns."""
-    jsonb_fields = ("data_extract_geojson", "task_areas_geojson")
+    jsonb_fields = (
+        "data_extract_geojson",
+        "task_areas_geojson",
+        "split_result_geojson",
+    )
     for key in jsonb_fields:
         if isinstance(model_dump.get(key), dict):
             model_dump[key] = json.dumps(model_dump[key])
+
+
+_JSONB_CAST_FIELDS = ("task_areas_geojson", "split_result_geojson")
 
 
 def _project_update_placeholders(model_dump: dict[str, Any]) -> list[sql.Composable]:
     """Build SQL placeholder assignments for project updates."""
     placeholders: list[sql.Composable] = []
     for key in model_dump:
-        if key == "task_areas_geojson":
+        if key in _JSONB_CAST_FIELDS:
             placeholders.append(
                 sql.SQL("{column} = {value}::jsonb").format(
                     column=sql.Identifier(key),
@@ -412,6 +419,8 @@ class DbProject:
     creation_status: Optional[str] = None
     creation_error: Optional[str] = None
     creation_updated_at: Optional[AwareDatetime] = None
+    split_error: Optional[str] = None
+    split_result_geojson: Optional[dict] = None
     created_at: Optional[AwareDatetime] = None
     updated_at: Optional[AwareDatetime] = None
     # Encrypted ODK appuser token (may be null until generated)

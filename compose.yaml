@@ -159,8 +159,9 @@ services:
       field.localhost_REVERSE_PROXY_HOST: http://backend:8000
       field.localhost_MAX_CLIENT_SIZE: 1G
       field.localhost_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
-      # Increase timeout slightly for long project creation requests
-      field.localhost_REVERSE_PROXY_READ_TIMEOUT: 90s
+      # Match the production ingress budget for long project creation requests
+      field.localhost_REVERSE_PROXY_READ_TIMEOUT: 300s
+      field.localhost_REVERSE_PROXY_SEND_TIMEOUT: 300s
       # Prevent bunkerweb page handling login errors (handle via Vue router)
       odk.field.localhost_REVERSE_PROXY_INTERCEPT_ERRORS: "no"
       odk.field.localhost_ERRORS: "404=/index.html"

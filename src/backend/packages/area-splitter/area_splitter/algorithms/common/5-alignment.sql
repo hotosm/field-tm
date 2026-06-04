@@ -53,7 +53,7 @@ BEGIN
 
     END IF;
 
-    FOR small_polygon IN 
+    FOR small_polygon IN
         SELECT * FROM leastfeaturepolygons
     LOOP
         -- If the required # of polygons are merged, we are done.
@@ -61,30 +61,60 @@ BEGIN
           EXIT;
         END IF;
 
-        -- Find the nearest neighbor to merge the small polygon with
-        FOR nearest_neighbor IN
-        SELECT taskid, geom, ST_LENGTH2D(ST_Intersection(small_polygon.geom, geom)) as shared_bound
-        FROM taskpolygons
-        WHERE taskid NOT IN (SELECT taskid FROM leastfeaturepolygons)
-        AND ST_Touches(small_polygon.geom, geom)
-        AND ST_GEOMETRYTYPE(ST_INTERSECTION(small_polygon.geom, geom)) != 'ST_Point'
-        ORDER BY shared_bound DESC  -- Find neighbor polygon based on shared boundary distance
-        LIMIT 1
-        LOOP
-            -- Merge the small polygon into the neighboring polygon
-            UPDATE taskpolygons
-            SET geom = ST_Union(geom, small_polygon.geom)
-            WHERE taskid = nearest_neighbor.taskid;
+        -- Per-polygon block so a GEOS TopologyException on one neighbour
+        -- pair skips this small polygon (leaves it unmerged) instead of
+        -- aborting the entire alignment step.
+        BEGIN
+            -- Find the nearest neighbor to merge the small polygon with.
+            --
+            -- ST_Intersection uses a fixed precision grid (3rd arg, ~1 mm
+            -- at the equator) to avoid GEOS "side location conflict"
+            -- topology exceptions from sub-precision degeneracies in the
+            -- Voronoi + clip output. ST_MakeValid repairs any remaining
+            -- micro-invalidities (e.g. ring self-touches) before the
+            -- operation. Both are cheap per call; the inner SELECT is
+            -- already gated by ST_Touches + the gist index so only a few
+            -- candidate neighbours are scanned per small polygon.
+            FOR nearest_neighbor IN
+            SELECT taskid, geom,
+                ST_LENGTH2D(
+                    ST_Intersection(
+                        ST_MakeValid(small_polygon.geom),
+                        ST_MakeValid(geom),
+                        0.00000001
+                    )
+                ) as shared_bound
+            FROM taskpolygons
+            WHERE taskid NOT IN (SELECT taskid FROM leastfeaturepolygons)
+            AND ST_Touches(small_polygon.geom, geom)
+            AND ST_GEOMETRYTYPE(
+                ST_Intersection(
+                    ST_MakeValid(small_polygon.geom),
+                    ST_MakeValid(geom),
+                    0.00000001
+                )
+            ) != 'ST_Point'
+            ORDER BY shared_bound DESC  -- Find neighbor polygon based on shared boundary distance
+            LIMIT 1
+            LOOP
+                -- Merge the small polygon into the neighboring polygon
+                UPDATE taskpolygons
+                SET geom = ST_MakeValid(ST_Union(geom, small_polygon.geom))
+                WHERE taskid = nearest_neighbor.taskid;
 
-            DELETE FROM taskpolygons WHERE taskid = small_polygon.taskid;
+                DELETE FROM taskpolygons WHERE taskid = small_polygon.taskid;
 
-            IF merges_remaining IS NOT NULL THEN -- Fixed number of mappers
-              merges_remaining = merges_remaining - 1;
-            END IF;
+                IF merges_remaining IS NOT NULL THEN -- Fixed number of mappers
+                  merges_remaining = merges_remaining - 1;
+                END IF;
 
-            -- Exit the neighboring polygon loop after one successful merge
-            EXIT;
-        END LOOP;
+                -- Exit the neighboring polygon loop after one successful merge
+                EXIT;
+            END LOOP;
+        EXCEPTION WHEN OTHERS THEN
+            RAISE NOTICE 'Skipping merge for taskid % due to geometry error: %',
+                small_polygon.taskid, SQLERRM;
+        END;
     END LOOP;
 END $$;
 

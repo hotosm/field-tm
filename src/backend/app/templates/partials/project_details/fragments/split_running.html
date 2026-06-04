@@ -1,0 +1,15 @@
+<div
+  id="split-running-fragment"
+  hx-get="/split-aoi-htmx/status?project_id={{ project_id }}&algorithm={{ algorithm }}&mode={{ mode }}"
+  hx-trigger="every 5s"
+  hx-swap="outerHTML"
+  hx-on::before-swap="if (event.detail.xhr.status >= 400) { event.detail.shouldSwap = false; event.detail.isError = false; }"
+  style="text-align: center; padding: 24px 0"
+>
+  <wa-spinner style="font-size: 32px"></wa-spinner>
+  <h3 style="margin-top: 16px">{{ _("Splitting the AOI into tasks...") }}</h3>
+  <p style="margin-top: 6px; color: var(--wa-color-neutral-fill-loud)">
+    {{ _("Large areas can take several minutes. This page will update automatically when the preview
+    is ready - feel free to leave the tab open.") }}
+  </p>
+</div>

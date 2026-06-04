@@ -2,6 +2,7 @@
 
 import json
 import logging
+import math
 from datetime import datetime, timezone
 from io import BytesIO
 
@@ -47,6 +48,27 @@ _SIMPLE_EMPTY_EXTRACT_VALIDATION_MARKERS = (
 # out for large extracts even with per-splitpolygon scoping; above this
 # many buildings, fall back to the cheaper Voronoi splitter.
 _SIMPLE_SKELETON_FEATURE_LIMIT = 5000
+
+# Floor / ceiling for buildings-per-task in the simple flow.
+# 5 keeps tiny AOIs from collapsing to a single task; 100 keeps mega-AOIs
+# from producing tasks too large to map in one go.
+_SIMPLE_BPT_MIN = 5
+_SIMPLE_BPT_MAX = 100
+
+
+def _simple_buildings_per_task(feature_count: int) -> int:
+    """Scale buildings-per-task by feature count.
+
+    Square-root interpolation anchored at f=1k → 10/task and f=100k → 100/task.
+    Smoother task-count growth than linear scaling: a 10k-feature AOI gets
+    ~32/task (~312 tasks) rather than the same 100 tasks a 1k AOI would.
+    Clamped to [5, 100] so very small AOIs don't collapse and very large
+    ones don't produce unmappably-large tasks.
+    """
+    if feature_count <= 0:
+        return _SIMPLE_BPT_MIN
+    raw = round(10 * math.sqrt(feature_count / 1000))
+    return max(_SIMPLE_BPT_MIN, min(_SIMPLE_BPT_MAX, raw))
 
 
 def extract_has_features(data_extract_geojson: dict | None) -> bool:
@@ -188,18 +210,20 @@ async def finalize_simple_project_creation(
             if feature_count > _SIMPLE_SKELETON_FEATURE_LIMIT
             else SplittingAlgorithm.AVG_BUILDING_SKELETON
         )
+        buildings_per_task = _simple_buildings_per_task(feature_count)
         log.info(
-            "Simple project %s: %s features -> using %s splitter",
+            "Simple project %s: %s features -> %s splitter, %s buildings/task",
             project_id,
             feature_count,
             algorithm.value,
+            buildings_per_task,
         )
         tasks_geojson = await split_aoi(
             db,
             project_id,
             SplitAoiOptions(
                 algorithm=algorithm.value,
-                no_of_buildings=10,
+                no_of_buildings=buildings_per_task,
                 include_roads=True,
                 include_rivers=True,
                 include_railways=True,

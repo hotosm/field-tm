@@ -402,3 +402,9 @@ class ProjectUpdate(ProjectInBase, ODKCentral):
     creation_status: Optional[str] = None
     creation_error: Optional[str] = None
     creation_updated_at: Optional[AwareDatetime] = None
+
+    # Async advanced-flow split workflow state. Status is derived from
+    # these two columns: both NULL = running, error set = failed,
+    # result set = ready for preview.
+    split_error: Optional[str] = None
+    split_result_geojson: Optional[dict] = None
