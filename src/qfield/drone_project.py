@@ -13,7 +13,11 @@ from urllib.error import URLError
 
 from basemaps import create_osm_basemap
 from sanitize import sanitize_generated_qgis_metadata
-from styling import configure_drone_task_layer_style
+from styling import (
+    apply_styles_from_dir,
+    set_layer_not_identifiable,
+    unpack_plugin_zip,
+)
 
 
 def generate_drone_project(
@@ -71,6 +75,9 @@ def generate_drone_project(
         _add_osm_basemap(project, root, log)
         _normalize_root_layer_order(project, log)
         _set_flight_variables(project, flight_params)
+        plugin_dir = _apply_plugin_and_styles(
+            project, plugin_zip, tmp, project_name, log
+        )
 
         qgs_path = tmp / f"{project_name}.qgs"
         project.write(str(qgs_path))
@@ -78,7 +85,7 @@ def generate_drone_project(
         log.info("QGIS project written: %s", qgs_path)
 
         zip_bytes = _bundle_zip(
-            project_name, qgs_path, tasks_gpkg_path, dem_path, plugin_zip, log,
+            project_name, qgs_path, tasks_gpkg_path, dem_path, plugin_dir, log,
         )
         log.info("Drone project zip built (%d bytes)", len(zip_bytes))
         return zip_bytes
@@ -132,17 +139,17 @@ def _add_task_layer(
     crs: Any,
     log: logging.Logger,
 ) -> None:
-    """Load the tasks layer, apply styling, and set the default extent."""
+    """Load the tasks layer and set the default extent.
+
+    Styling is applied later via the caller-supplied plugin_zip's
+    ``styles/dtm-tasks.qml``; see ``_apply_plugin_and_styles``.
+    """
     task_layer = vector_layer_cls(str(tasks_gpkg_path), "dtm-tasks", "ogr")
     if not task_layer.isValid():
         raise RuntimeError(f"Failed to load tasks layer from {tasks_gpkg_path}")
     project.addMapLayer(task_layer)
 
-    configure_drone_task_layer_style(
-        task_layer,
-        log,
-        label_field='coalesce("project_task_id", $id)',
-    )
+    set_layer_not_identifiable(task_layer, log)
 
     project.viewSettings().setDefaultViewExtent(
         referenced_rectangle_cls(task_layer.extent(), crs)
@@ -264,87 +271,78 @@ def _set_flight_variables(project: Any, flight_params: Dict[str, Any]) -> None:
     project.setCustomVariables(scope)
 
 
+def _apply_plugin_and_styles(
+    project: Any,
+    plugin_zip: Optional[bytes],
+    tmp: Path,
+    project_name: str,
+    log: logging.Logger,
+) -> Optional[Path]:
+    """Unpack ``plugin_zip`` and apply bundled QML styles to the project.
+
+    ``main.qml`` is renamed to ``{project_name}.qml`` so QField discovers
+    it as the project plugin; ``styles/{layer_name}.qml`` files are
+    applied to matching layers via ``loadNamedStyle``.
+
+    Returns the unpacked plugin directory for downstream bundling, or
+    ``None`` if no plugin was supplied.
+    """
+    if not plugin_zip:
+        log.info("No plugin_zip supplied; skipping plugin/style application")
+        return None
+
+    plugin_dir = tmp / "plugin"
+    plugin_dir.mkdir(exist_ok=True)
+    styles_dir = unpack_plugin_zip(plugin_zip, plugin_dir, project_name, log)
+    if styles_dir is not None:
+        apply_styles_from_dir(project, styles_dir, log)
+    return plugin_dir
+
+
 def _bundle_zip(
     project_name: str,
     qgs_path: Path,
     tasks_gpkg_path: Path,
     dem_path: Optional[Path],
-    plugin_zip: Optional[bytes],
+    plugin_dir: Optional[Path],
     log: logging.Logger,
 ) -> bytes:
-    """Build the final zip with project files and an optional plugin.
+    """Build the final zip with project files and any unpacked plugin files.
 
     Zip structure:
         {project_name}/
             {project_name}.qgs
             dtm-tasks.gpkg
             dem.tif                    (if available)
-            <plugin files>             (if plugin_zip provided)
-
-    Plugin convention: if the plugin zip contains a file named ``main.qml``
-    it is renamed to ``{project_name}.qml`` so QField discovers it as the
-    project plugin.  All other files keep their original paths.
+            <plugin files>             (if plugin_dir provided)
     """
     buf = io.BytesIO()
     prefix = f"{project_name}/"
 
     with zipfile.ZipFile(buf, "w", compression=zipfile.ZIP_DEFLATED) as zf:
-        # Project files
         zf.write(qgs_path, f"{prefix}{project_name}.qgs")
         zf.write(tasks_gpkg_path, f"{prefix}dtm-tasks.gpkg")
         if dem_path and dem_path.exists():
             zf.write(dem_path, f"{prefix}dem.tif")
 
-        # Plugin files from caller-supplied zip
-        if plugin_zip:
-            _merge_plugin_zip(zf, prefix, project_name, plugin_zip, log)
+        if plugin_dir and plugin_dir.is_dir():
+            _add_plugin_files(zf, prefix, plugin_dir, log)
 
     return buf.getvalue()
 
 
-def _merge_plugin_zip(
+def _add_plugin_files(
     output_zf: zipfile.ZipFile,
     prefix: str,
-    project_name: str,
-    plugin_zip: bytes,
+    plugin_dir: Path,
     log: logging.Logger,
 ) -> None:
-    """Extract a plugin zip and merge its contents into the output zip.
-
-    ``main.qml`` is renamed to ``{project_name}.qml``; everything else
-    is copied with its original relative path.
-    """
-    try:
-        with zipfile.ZipFile(io.BytesIO(plugin_zip), "r") as pz:
-            for info in pz.infolist():
-                if info.is_dir():
-                    continue
-                # Strip any single wrapping directory if every entry shares one
-                arc_name = _strip_common_prefix(info.filename, pz.namelist())
-                # Rename main.qml -> {project_name}.qml
-                if arc_name == "main.qml":
-                    arc_name = f"{project_name}.qml"
-                data = pz.read(info.filename)
-                output_zf.writestr(f"{prefix}{arc_name}", data)
-            log.info("Merged %d plugin files into project zip", len(pz.namelist()))
-    except zipfile.BadZipFile:
-        log.error("plugin_zip is not a valid zip file; skipping plugin bundling")
-
-
-def _strip_common_prefix(filename: str, all_names: list[str]) -> str:
-    """If every entry in the zip shares a single top-level directory, strip it.
-
-    This handles both flat zips (files at root) and wrapped zips
-    (everything under one directory like ``qfield-plugin/``).
-    """
-    parts = [n for n in all_names if not n.endswith("/")]
-    if not parts:
-        return filename
-    first_dirs = {p.split("/", 1)[0] for p in parts if "/" in p}
-    roots_without_dir = {p for p in parts if "/" not in p}
-    # Only strip if every file is under exactly one common directory
-    if len(first_dirs) == 1 and not roots_without_dir:
-        common = first_dirs.pop() + "/"
-        if filename.startswith(common):
-            return filename[len(common):]
-    return filename
+    """Add each file under ``plugin_dir`` into the output zip."""
+    count = 0
+    for file_path in sorted(plugin_dir.rglob("*")):
+        if not file_path.is_file():
+            continue
+        rel = file_path.relative_to(plugin_dir).as_posix()
+        output_zf.write(file_path, f"{prefix}{rel}")
+        count += 1
+    log.info("Added %d plugin files to project zip", count)
