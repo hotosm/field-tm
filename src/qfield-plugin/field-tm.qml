@@ -37,6 +37,20 @@ Item {
 
   property string mainColor: "#d73f3f"
 
+  // Skip-list uuids match what QField's PluginManager would assign if the user
+  // installed the upstream version, so we don't create duplicate toolbar buttons.
+  property var _companionPlugins: [
+    {
+      "uuid": "livefield",
+      "source": Qt.resolvedUrl("./plugins/livefield/main.qml")
+    },
+    {
+      "uuid": "qfield-next-theme-plugin",
+      "source": Qt.resolvedUrl("./plugins/next-theme/main.qml")
+    }
+  ]
+  property var _companionInstances: []
+
   Rectangle {
     id: fieldTMContainer
     parent: mapCanvasContainer
@@ -335,6 +349,52 @@ Item {
     }
   }
 
+  function _isCompanionInstalled(uuid) {
+    const apps = pluginManager.availableAppPlugins;
+    if (!apps) {
+      return false;
+    }
+    for (let i = 0; i < apps.length; ++i) {
+      if (apps[i].uuid === uuid) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function _instantiateCompanion(plugin, component) {
+    const instance = component.createObject(fieldTM);
+    if (instance) {
+      _companionInstances.push(instance);
+    } else {
+      mainWindow.displayToast(qsTranslate("FieldTM", "Failed to load companion plugin: %1").arg(plugin.uuid));
+    }
+  }
+
+  function loadCompanionPlugins() {
+    for (let i = 0; i < _companionPlugins.length; ++i) {
+      const plugin = _companionPlugins[i];
+      // Upstream version already installed via the plugin manager — leave the user in control.
+      if (_isCompanionInstalled(plugin.uuid)) {
+        continue;
+      }
+      const component = Qt.createComponent(plugin.source);
+      if (component.status === Component.Ready) {
+        _instantiateCompanion(plugin, component);
+      } else if (component.status === Component.Loading) {
+        component.statusChanged.connect(function() {
+          if (component.status === Component.Ready) {
+            _instantiateCompanion(plugin, component);
+          } else if (component.status === Component.Error) {
+            mainWindow.displayToast(qsTranslate("FieldTM", "Failed to load companion plugin %1: %2").arg(plugin.uuid).arg(component.errorString()));
+          }
+        });
+      } else {
+        mainWindow.displayToast(qsTranslate("FieldTM", "Failed to load companion plugin %1: %2").arg(plugin.uuid).arg(component.errorString()));
+      }
+    }
+  }
+
   function pushToCloud() {
     if (fieldTM.cloudProjectsModel.currentProject && fieldTM.cloudProjectsModel.currentProject.status === QFieldCloudProject.Idle) {
       fieldTM.cloudProjectsModel.projectPush(fieldTM.cloudProjectsModel.currentProjectId, false);
@@ -520,6 +580,7 @@ Item {
                                  });
 
     checkOutdated();
+    loadCompanionPlugins();
   }
 
   Component.onDestruction: {

@@ -482,6 +482,159 @@ def test_normalize_root_layer_order_in_field_project_places_basemap_above_osm():
     ]
 
 
+def test_write_job_outputs_preserves_subdirectory_paths(monkeypatch, tmp_path):
+    """Plugin tree (``plugins/livefield/main.qml`` etc.) must survive the DB roundtrip.
+
+    Regression: ``_write_job_outputs`` previously used ``iterdir`` and keyed by
+    ``file_path.name``, so QField companion plugins under ``plugins/`` were
+    silently dropped before upload to QFieldCloud.
+    """
+    import base64
+    import json
+
+    field_project = _load_field_project_module()
+
+    final_dir = tmp_path / "final"
+    final_dir.mkdir()
+    (final_dir / "project.qgz").write_bytes(b"qgz body")
+    (final_dir / "project.qml").write_bytes(b"plugin body")
+    (final_dir / "styles").mkdir()
+    (final_dir / "styles" / "tasks.qml").write_bytes(b"<qgis tasks/>")
+    (final_dir / "plugins" / "livefield").mkdir(parents=True)
+    (final_dir / "plugins" / "livefield" / "main.qml").write_bytes(b"livefield body")
+    (final_dir / "plugins" / "livefield" / "metadata.txt").write_bytes(b"meta")
+    (final_dir / "plugins" / "next-theme").mkdir(parents=True)
+    (final_dir / "plugins" / "next-theme" / "main.qml").write_bytes(b"next-theme body")
+    (final_dir / "skipme.mbtiles").write_bytes(b"large")
+
+    captured: dict = {}
+
+    class FakeCursor:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def execute(self, _query, params):
+            captured["payload"] = params[0]
+            captured["job_id"] = params[1]
+
+    class FakeConn:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb):
+            return False
+
+        def cursor(self):
+            return FakeCursor()
+
+        def commit(self):
+            return None
+
+    monkeypatch.setattr(field_project.psycopg, "connect", lambda _db_url: FakeConn())
+
+    num_files = field_project._write_job_outputs(
+        "db-url",
+        "job-1",
+        final_dir,
+        field_project.logging.getLogger(__name__),
+        excluded_suffixes=(".mbtiles",),
+    )
+
+    output_files = json.loads(captured["payload"])
+    assert num_files == len(output_files)
+    assert set(output_files.keys()) == {
+        "project.qgz",
+        "project.qml",
+        "styles/tasks.qml",
+        "plugins/livefield/main.qml",
+        "plugins/livefield/metadata.txt",
+        "plugins/next-theme/main.qml",
+    }
+    assert (
+        base64.b64decode(output_files["plugins/livefield/main.qml"])
+        == b"livefield body"
+    )
+    assert (
+        base64.b64decode(output_files["plugins/next-theme/main.qml"])
+        == b"next-theme body"
+    )
+
+
+def test_register_plugin_data_dirs_adds_top_level_subdirs_to_project_entry(tmp_path):
+    """QFieldSync/dataDirs must list every unpacked plugin subdir.
+
+    Without this entry, libqfieldsync's OfflineConverter strips plugin
+    subdirs (``plugins/``, ``styles/``) during QFieldCloud packaging --
+    only the .qgz and the ``{basename}.qml`` project plugin survive --
+    so QField's plugin loader on the device hits "file doesn't exist".
+    """
+    field_project = _load_field_project_module()
+
+    (tmp_path / "project.qgz").write_bytes(b"qgz body")
+    (tmp_path / "project.qml").write_bytes(b"plugin body")
+    (tmp_path / "plugins" / "livefield").mkdir(parents=True)
+    (tmp_path / "plugins" / "livefield" / "main.qml").write_bytes(b"livefield")
+    (tmp_path / "plugins" / "next-theme").mkdir(parents=True)
+    (tmp_path / "plugins" / "next-theme" / "main.qml").write_bytes(b"next-theme")
+    (tmp_path / "styles").mkdir()
+    (tmp_path / "styles" / "tasks.qml").write_bytes(b"<qgis/>")
+
+    written: dict = {}
+
+    class FakeProject:
+        def readListEntry(self, scope, key, default):  # noqa: N802
+            return list(default), True
+
+        def writeEntry(self, scope, key, value):  # noqa: N802
+            written[(scope, key)] = value
+            return True
+
+    field_project._register_plugin_data_dirs(
+        FakeProject(), tmp_path, field_project.logging.getLogger(__name__)
+    )
+
+    assert written.get(("QFieldSync", "dataDirs")) == ["plugins", "styles"]
+
+
+def test_register_plugin_data_dirs_merges_existing_and_skips_unchanged_write(
+    tmp_path,
+):
+    """Existing dataDirs are preserved; no write happens when nothing new is added."""
+    field_project = _load_field_project_module()
+
+    (tmp_path / "plugins").mkdir()
+    (tmp_path / "styles").mkdir()
+
+    write_calls: list = []
+
+    class FakeProject:
+        def __init__(self, existing):
+            self.existing = existing
+
+        def readListEntry(self, scope, key, default):  # noqa: N802
+            return list(self.existing), True
+
+        def writeEntry(self, scope, key, value):  # noqa: N802
+            write_calls.append((scope, key, value))
+            return True
+
+    field_project._register_plugin_data_dirs(
+        FakeProject(["DCIM"]), tmp_path, field_project.logging.getLogger(__name__)
+    )
+    assert write_calls == [("QFieldSync", "dataDirs", ["DCIM", "plugins", "styles"])]
+
+    write_calls.clear()
+    field_project._register_plugin_data_dirs(
+        FakeProject(["plugins", "styles"]),
+        tmp_path,
+        field_project.logging.getLogger(__name__),
+    )
+    assert write_calls == []
+
+
 def test_normalize_root_layer_order_in_drone_project_places_vectors_above_rasters():
     """Drone ordering keeps task vectors above rasters and OSM at bottom."""
     repo_root = _find_repo_root(Path(__file__).resolve())

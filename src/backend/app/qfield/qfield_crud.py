@@ -551,7 +551,9 @@ async def create_qfield_project(
         tmp_dir = tempfile.mkdtemp(prefix="qfield_upload_")
         try:
             for filename, b64_content in output_files.items():
-                (Path(tmp_dir) / filename).write_bytes(base64.b64decode(b64_content))
+                target = Path(tmp_dir) / filename
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(base64.b64decode(b64_content))
 
             qgz_files = list(Path(tmp_dir).glob("*.qgz"))
             if not qgz_files:
@@ -563,7 +565,7 @@ async def create_qfield_project(
 
             raw_qfc_project_name = f"FieldTM-{qgis_project_title}-{getrandbits(32)}"
             qfc_project_name = _sanitize_qfc_project_name(raw_qfc_project_name)
-            result = await _upload_to_qfieldcloud(
+            return await _upload_to_qfieldcloud(
                 project=project,
                 description=qgis_project_description,
                 qfc_project_name=qfc_project_name,
@@ -571,7 +573,6 @@ async def create_qfield_project(
                 custom_qfield_creds=custom_qfield_creds,
                 db=db,
             )
-            return result
         finally:
             shutil.rmtree(tmp_dir, ignore_errors=True)
     finally:
@@ -631,7 +632,9 @@ async def attach_basemap_to_qfield_project(
         upload_dir = tempfile.mkdtemp(prefix="qfield_basemap_upload_")
         try:
             for filename, b64_content in output_files.items():
-                (Path(upload_dir) / filename).write_bytes(base64.b64decode(b64_content))
+                target = Path(upload_dir) / filename
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(base64.b64decode(b64_content))
 
             await _download_file_for_qfield_upload(
                 basemap_url,
