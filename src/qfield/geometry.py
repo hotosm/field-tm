@@ -125,7 +125,7 @@ def analyse_and_fix_geometries(
         log: Logger instance
         populate_uuid: When True, add a ``uuid`` column populated with a
             generated UUID v4 per feature. Required for layers that xlsform2qgis
-            turns into a survey layer with photo repeats — QField's relation
+            turns into a survey layer with photo repeats - QField's relation
             editor refuses to add a child feature when the parent's ``uuid``
             linking field is NULL.
 

@@ -117,7 +117,7 @@ if has_task_areas %}
           <option value="" disabled selected>{{ _("Choose a method...") }}</option>
           <option value="AVG_BUILDING_VORONOI">{{ _("By number of buildings (faster)") }}</option>
           <option value="AVG_BUILDING_SKELETON" {% if skeleton_disabled %}disabled{% endif %}>
-            {% if skeleton_disabled %}{{ _("By number of buildings (cleaner shapes) — unavailable
+            {% if skeleton_disabled %}{{ _("By number of buildings (cleaner shapes) - unavailable
             for large areas") }}{% else %}{{ _("By number of buildings (cleaner shapes)") }}{% endif
             %}
           </option>
@@ -218,7 +218,7 @@ if has_task_areas %}
     {# If the user reloaded the page mid-split, surface the polling fragment immediately. The
     "running" state is implicit: the split_result_geojson column has been initialised to {} but the
     background task hasn't written real features yet. We don't know the algorithm here on page
-    reload — the polling endpoint tolerates an empty value and only uses it for the preview success
+    reload - the polling endpoint tolerates an empty value and only uses it for the preview success
     message. #} {% if project and project.split_result_geojson == {} and not project.split_error %}
     {% with project_id=project.id, algorithm='', mode='fragment' %} {% include
     "partials/project_details/fragments/split_running.html" %} {% endwith %} {% endif %}

@@ -48,7 +48,7 @@ async def run_split_aoi_background(project_id: int, options: SplitAoiOptions) ->
     try:
         async with await AsyncConnection.connect(settings.FTM_DB_URL) as db:
             tasks_featcol = await split_aoi(db, project_id, options)
-            # "" rather than None — ProjectUpdate strips Nones via
+            # "" rather than None - ProjectUpdate strips Nones via
             # exclude_none=True so we can't write SQL NULL through the
             # schema. "" reads the same as NULL ("no error") in the
             # status endpoint.

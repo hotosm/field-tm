@@ -563,7 +563,7 @@ async def accept_split_htmx(
 
         # Clear the temp split state now that the user has committed;
         # keeps the JSONB column from holding stale GeoJSON until the
-        # next split. The {} marker is fine here — without an explicit
+        # next split. The {} marker is fine here - without an explicit
         # request kickoff there's no polling fragment in the DOM, so the
         # "running" reading of {} is moot.
         await DbProject.update(
