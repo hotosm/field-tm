@@ -29,6 +29,7 @@ import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
 
+from app.auth.auth_deps import get_local_admin_auth_user
 from app.auth.auth_schemas import AuthUser
 from app.auth.user_crud import get_or_create_user
 from app.central import central_crud, central_schemas
@@ -105,12 +106,13 @@ async def db():
 @pytest_asyncio.fixture(scope="function")
 async def admin_user(db):
     """A test user."""
+    local_admin = get_local_admin_auth_user()
     return await get_or_create_user(
         db,
         AuthUser(
-            sub="custom|1",
-            username="localadmin",
-            is_admin=True,
+            sub=local_admin.sub,
+            username=local_admin.username,
+            is_admin=local_admin.is_admin,
         ),
     )
 

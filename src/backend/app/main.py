@@ -28,6 +28,7 @@ from psycopg import AsyncConnection
 from psycopg.rows import tuple_row
 
 from app.__version__ import __version__
+from app.auth.auth_deps import get_local_admin_auth_user
 from app.auth.auth_routes import auth_router
 from app.central.central_routes import central_router
 from app.config import AuthProvider, MonitoringTypes, settings
@@ -88,9 +89,10 @@ async def server_init(server: Litestar) -> None:
 
 async def create_local_admin_user(server: Litestar) -> None:
     """Init admin user on application startup."""
+    local_admin = get_local_admin_auth_user()
     admin_user = DbUser(
-        sub="custom|1",
-        username="localadmin",
+        sub=local_admin.sub,
+        username=local_admin.username,
         is_admin=True,
         name="Admin",
         email_address="admin@field-tm.dev",

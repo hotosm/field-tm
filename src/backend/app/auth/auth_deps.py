@@ -29,6 +29,9 @@ from litestar.exceptions import HTTPException
 from app.config import AuthProvider, settings
 from app.i18n import _
 
+_LOCAL_ADMIN_RAW_SUB = "custom|1"
+_LOCAL_ADMIN_USERNAME = "localadmin"
+
 
 def _pick_attr(obj: object, *names: str) -> Any:
     """Read the first non-empty field from object attributes/dict keys."""
@@ -46,6 +49,7 @@ def get_user_sub(user: object) -> str:
     - HOTOSM  → ``hotosm|<id>``
     - BUNDLED → ``fieldtm|<id>``
     - others  → preserve any existing ``provider|id`` form or fall back to ``osm|<id>``
+    - ``custom|<id>`` is preserved for the internal local admin/debug user.
     """
     provider_prefixes = {
         AuthProvider.HOTOSM: "hotosm",
@@ -57,9 +61,11 @@ def get_user_sub(user: object) -> str:
     if sub:
         sub_value = str(sub)
         if "|" in sub_value:
+            existing_prefix, raw_id = sub_value.split("|", 1)
+            if existing_prefix == AuthProvider.CUSTOM.value:
+                return sub_value
             if prefix:
                 # Re-prefix the raw ID with the correct provider name.
-                raw_id = sub_value.split("|", 1)[1]
                 return f"{prefix}|{raw_id}"
             return sub_value
         return f"{prefix or 'osm'}|{sub_value}"
@@ -92,10 +98,19 @@ def get_user_is_admin(user: object) -> bool:
     return bool(_pick_attr(user, "is_admin", "is_superuser", "admin", "superuser"))
 
 
+def get_local_admin_auth_user() -> SimpleNamespace:
+    """Return the internal local admin principal used by debug/disabled auth."""
+    return SimpleNamespace(
+        sub=_LOCAL_ADMIN_RAW_SUB,
+        username=_LOCAL_ADMIN_USERNAME,
+        is_admin=True,
+    )
+
+
 async def login_required(request: Request) -> object:
     """Dependency for endpoints requiring login."""
     if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
-        return SimpleNamespace(sub="custom|1", username="localadmin", is_admin=True)
+        return get_local_admin_auth_user()
     return await get_current_user(request)
 
 
@@ -106,14 +121,14 @@ async def get_optional_auth_user(request: Request) -> object | None:
     manager workflows remain accessible without a session.
     """
     if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
-        return SimpleNamespace(sub="custom|1", username="localadmin", is_admin=True)
+        return get_local_admin_auth_user()
     return await get_current_user_optional(request)
 
 
 async def public_endpoint(request: Request) -> object:
     """Optional-auth dependency with a service-account fallback."""
     if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
-        return SimpleNamespace(sub="custom|1", username="localadmin", is_admin=True)
+        return get_local_admin_auth_user()
     user = await get_current_user_optional(request)
     if user:
         return user
