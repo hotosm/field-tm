@@ -37,21 +37,19 @@ Item {
 
   property string mainColor: "#d73f3f"
 
-  // Companion plugins to bootstrap on first project load.
-  // ``uuid`` must match the directory name PluginManager derives from the
-  // zip (flat zip → filename minus ``-vX.Y.Z`` suffix; wrapped zip → top dir).
+  // Skip-list uuids match what QField's PluginManager would assign if the user
+  // installed the upstream version, so we don't create duplicate toolbar buttons.
   property var _companionPlugins: [
     {
       "uuid": "livefield",
-      "sourceUrl": "https://drive.usercontent.google.com/download?id=1BAgVILWVXapNapwBh0qmXUMI6LqXS1L7&export=download"
+      "source": Qt.resolvedUrl("./plugins/livefield/main.qml")
     },
     {
       "uuid": "qfield-next-theme-plugin",
-      "sourceUrl": "https://github.com/hotosm/qfield-next-theme-plugin/releases/download/1.0/qfield-next-theme-plugin.zip"
+      "source": Qt.resolvedUrl("./plugins/next-theme/main.qml")
     }
   ]
-  property int _companionIdx: -1
-  property string _pendingCompanionUuid: ""
+  property var _companionInstances: []
 
   Rectangle {
     id: fieldTMContainer
@@ -364,41 +362,36 @@ Item {
     return false;
   }
 
-  function bootstrapNextCompanion() {
-    while (++_companionIdx < _companionPlugins.length) {
-      const plugin = _companionPlugins[_companionIdx];
-      // Once installed (enabled or user-disabled), leave the user in control.
+  function _instantiateCompanion(plugin, component) {
+    const instance = component.createObject(fieldTM);
+    if (instance) {
+      _companionInstances.push(instance);
+    } else {
+      mainWindow.displayToast(qsTranslate("FieldTM", "Failed to load companion plugin: %1").arg(plugin.uuid));
+    }
+  }
+
+  function loadCompanionPlugins() {
+    for (let i = 0; i < _companionPlugins.length; ++i) {
+      const plugin = _companionPlugins[i];
+      // Upstream version already installed via the plugin manager — leave the user in control.
       if (_isCompanionInstalled(plugin.uuid)) {
         continue;
       }
-      if (!plugin.sourceUrl) {
-        continue;
-      }
-      _pendingCompanionUuid = plugin.uuid;
-      pluginManager.installFromUrl(plugin.sourceUrl);
-      return;
-    }
-    _pendingCompanionUuid = "";
-  }
-
-  Connections {
-    target: pluginManager
-
-    function onInstallEnded(uuid, error) {
-      if (_pendingCompanionUuid === "") {
-        return;
-      }
-      // Concurrent install from the Plugin Manager UI: ignore until ours fires.
-      if (uuid && uuid !== _pendingCompanionUuid) {
-        return;
-      }
-      if (uuid === _pendingCompanionUuid) {
-        pluginManager.enableAppPlugin(uuid);
+      const component = Qt.createComponent(plugin.source);
+      if (component.status === Component.Ready) {
+        _instantiateCompanion(plugin, component);
+      } else if (component.status === Component.Loading) {
+        component.statusChanged.connect(function() {
+          if (component.status === Component.Ready) {
+            _instantiateCompanion(plugin, component);
+          } else if (component.status === Component.Error) {
+            mainWindow.displayToast(qsTranslate("FieldTM", "Failed to load companion plugin %1: %2").arg(plugin.uuid).arg(component.errorString()));
+          }
+        });
       } else {
-        mainWindow.displayToast(qsTranslate("FieldTM", "Failed to install companion plugin: %1").arg(_pendingCompanionUuid));
+        mainWindow.displayToast(qsTranslate("FieldTM", "Failed to load companion plugin %1: %2").arg(plugin.uuid).arg(component.errorString()));
       }
-      _pendingCompanionUuid = "";
-      bootstrapNextCompanion();
     }
   }
 
@@ -587,7 +580,7 @@ Item {
                                  });
 
     checkOutdated();
-    bootstrapNextCompanion();
+    loadCompanionPlugins();
   }
 
   Component.onDestruction: {

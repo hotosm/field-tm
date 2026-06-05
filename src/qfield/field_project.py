@@ -418,12 +418,44 @@ def _apply_plugin_and_styles(
 
     project_basename = Path(project_file).stem
     styles_dir = unpack_plugin_zip(plugin_zip, final_output_dir, project_basename, log)
+    _register_plugin_data_dirs(project, final_output_dir, log)
     if styles_dir is None:
         log.info("Plugin zip has no styles/ directory; nothing to apply")
         return
 
     apply_styles_from_dir(project, styles_dir, log)
     _load_bundled_basemaps(project, styles_dir, log)
+
+
+def _register_plugin_data_dirs(
+    project, final_output_dir: Path, log: logging.Logger
+) -> None:
+    """Declare every top-level subdir as a QFieldSync data dir.
+
+    libqfieldsync's ``OfflineConverter`` only recursively copies subdirs
+    that the project file lists in ``QFieldSync/dataDirs`` (alongside
+    ``attachmentDirs``).  Without this entry, QFieldCloud's packaging
+    step strips everything except the ``.qgz``, the ``{basename}.qml``
+    project plugin, and layer-attached files -- so bundled subdir trees
+    like ``plugins/livefield/`` never reach the device, and QField's
+    plugin loader errors with "file doesn't exist".
+    """
+    if not final_output_dir.is_dir():
+        return
+
+    subdirs = sorted(
+        entry.name for entry in final_output_dir.iterdir() if entry.is_dir()
+    )
+    if not subdirs:
+        return
+
+    existing, _ok = project.readListEntry("QFieldSync", "dataDirs", [])
+    merged = sorted({*existing, *subdirs})
+    if merged == sorted(existing):
+        return
+
+    project.writeEntry("QFieldSync", "dataDirs", merged)
+    log.info("Registered QFieldSync dataDirs for device packaging: %s", merged)
 
 
 def _load_bundled_basemaps(project, styles_dir: Path, log: logging.Logger) -> None:
@@ -552,10 +584,15 @@ def _write_job_outputs(
     log: logging.Logger,
     excluded_suffixes: tuple[str, ...] = (),
 ) -> int:
-    """Read output files from final/ dir and write as base64 dict to DB."""
+    """Read output files from final/ dir and write as base64 dict to DB.
+
+    Recurses into subdirectories so the bundled QField plugin tree
+    (``plugins/livefield/main.qml`` etc.) and styles dir survive the
+    DB roundtrip. Dict keys are POSIX relative paths from ``final_dir``.
+    """
     excluded = {suffix.lower() for suffix in excluded_suffixes}
     output_files = {}
-    for file_path in final_dir.iterdir():
+    for file_path in sorted(final_dir.rglob("*")):
         if not file_path.is_file():
             continue
 
@@ -566,12 +603,13 @@ def _write_job_outputs(
             )
             continue
 
-        output_files[file_path.name] = base64.b64encode(
+        relative_key = file_path.relative_to(final_dir).as_posix()
+        output_files[relative_key] = base64.b64encode(
             file_path.read_bytes()
         ).decode("ascii")
         log.debug(
             "Collected output file: %s (%d bytes)",
-            file_path.name,
+            relative_key,
             file_path.stat().st_size,
         )
 

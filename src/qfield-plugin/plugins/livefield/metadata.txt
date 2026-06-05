@@ -1,0 +1,7 @@
+[general]
+name=LiveField
+description=Keep track of your team in the field
+author=OPENGIS.ch
+icon=icon.svg
+version=1.6
+homepage=https://www.opengis.ch/
