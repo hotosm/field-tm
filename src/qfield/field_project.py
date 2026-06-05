@@ -78,7 +78,6 @@ def xlsform_to_project(
 
     converter.set_custom_title(title)
     converter.set_preferred_language(language)
-    converter.set_basemap("OpenStreetMap")
     converter.set_groups_as_tabs(True)
     converter.set_crs(crs)
     converter.set_extent(extent_rect)
@@ -424,6 +423,85 @@ def _apply_plugin_and_styles(
         return
 
     apply_styles_from_dir(project, styles_dir, log)
+    _load_bundled_basemaps(project, styles_dir, log)
+
+
+def _load_bundled_basemaps(project, styles_dir: Path, log: logging.Logger) -> None:
+    """Load the bundled ``basemaps.qlr`` (mutually-exclusive Sat/OSM group).
+
+    Appending to the root tree puts the ``Background`` group at the bottom of
+    the rendering stack, beneath any OpenAerialMap orthophoto attached later.
+    """
+    from qgis.core import QgsLayerDefinition
+
+    qlr_path = styles_dir / "basemaps.qlr"
+    if not qlr_path.is_file():
+        log.debug("No basemaps.qlr in plugin styles dir; skipping bundled basemap group")
+        return
+
+    ok, message = QgsLayerDefinition.loadLayerDefinition(
+        str(qlr_path), project, project.layerTreeRoot()
+    )
+    if not ok:
+        log.warning("Failed to load basemaps.qlr: %s", message)
+        return
+    log.info("Loaded bundled basemaps.qlr into project root tree")
+    _set_basemap_map_themes(project, log)
+
+
+def _set_basemap_map_themes(project, log: logging.Logger) -> None:
+    """Define ``OpenStreetMap`` and ``Satellite`` map themes for basemap cycling.
+
+    Each theme records the currently-visible non-basemap layers plus exactly
+    one of the two ``Background`` group children. The next-theme QField plugin
+    cycles the project through these to swap the backdrop.
+
+    Idempotent: existing themes with the same names are overwritten so we can
+    call this again after attaching the OpenAerialMap MBTiles, ensuring the
+    orthophoto stays visible across both themes.
+    """
+    from qgis.core import QgsMapThemeCollection
+
+    layers_by_name = {layer.name(): layer for layer in project.mapLayers().values()}
+    google_sat = layers_by_name.get("Google Satellite")
+    osm = layers_by_name.get("OpenStreetMap")
+    if google_sat is None or osm is None:
+        log.warning(
+            "Cannot create basemap map themes; Background group layers not found "
+            "(Google Satellite=%s, OpenStreetMap=%s)",
+            google_sat is not None,
+            osm is not None,
+        )
+        return
+
+    excluded_ids = {google_sat.id(), osm.id()}
+    base_records = []
+    for tree_layer in project.layerTreeRoot().findLayers():
+        layer = tree_layer.layer()
+        if layer is None or layer.id() in excluded_ids:
+            continue
+        if not tree_layer.isVisible():
+            continue
+        layer_record = QgsMapThemeCollection.MapThemeLayerRecord(layer)
+        layer_record.isVisible = True
+        base_records.append(layer_record)
+
+    themes = project.mapThemeCollection()
+    for theme_name, active_basemap_layer in (
+        ("OpenStreetMap", osm),
+        ("Satellite", google_sat),
+    ):
+        record = QgsMapThemeCollection.MapThemeRecord()
+        for r in base_records:
+            record.addLayerRecord(r)
+        active_record = QgsMapThemeCollection.MapThemeLayerRecord(active_basemap_layer)
+        active_record.isVisible = True
+        record.addLayerRecord(active_record)
+        if themes.hasMapTheme(theme_name):
+            themes.update(theme_name, record)
+        else:
+            themes.insert(theme_name, record)
+    log.info("Defined OpenStreetMap and Satellite map themes")
 
 
 def _read_job_inputs(db_url: str, job_id: str, project_path: Path, log: logging.Logger) -> None:
@@ -744,6 +822,9 @@ def _attach_mbtiles_layer_to_project(
     root = project.layerTreeRoot()
     root.addLayer(basemap_layer)
     _normalize_root_layer_order(project, log)
+    # Refresh the basemap-cycling themes so the newly-attached MBTiles is
+    # visible under both ``OpenStreetMap`` and ``Satellite``.
+    _set_basemap_map_themes(project, log)
 
     if not project.write(str(project_file)):
         raise RuntimeError("Failed to save QGIS project after basemap attach")

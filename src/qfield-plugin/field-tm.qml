@@ -37,6 +37,22 @@ Item {
 
   property string mainColor: "#d73f3f"
 
+  // Companion plugins to bootstrap on first project load.
+  // ``uuid`` must match the directory name PluginManager derives from the
+  // zip (flat zip → filename minus ``-vX.Y.Z`` suffix; wrapped zip → top dir).
+  property var _companionPlugins: [
+    {
+      "uuid": "livefield",
+      "sourceUrl": "https://drive.usercontent.google.com/download?id=1BAgVILWVXapNapwBh0qmXUMI6LqXS1L7&export=download"
+    },
+    {
+      "uuid": "qfield-next-theme-plugin",
+      "sourceUrl": "https://github.com/hotosm/qfield-next-theme-plugin/releases/download/1.0/qfield-next-theme-plugin.zip"
+    }
+  ]
+  property int _companionIdx: -1
+  property string _pendingCompanionUuid: ""
+
   Rectangle {
     id: fieldTMContainer
     parent: mapCanvasContainer
@@ -335,6 +351,57 @@ Item {
     }
   }
 
+  function _isCompanionInstalled(uuid) {
+    const apps = pluginManager.availableAppPlugins;
+    if (!apps) {
+      return false;
+    }
+    for (let i = 0; i < apps.length; ++i) {
+      if (apps[i].uuid === uuid) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function bootstrapNextCompanion() {
+    while (++_companionIdx < _companionPlugins.length) {
+      const plugin = _companionPlugins[_companionIdx];
+      // Once installed (enabled or user-disabled), leave the user in control.
+      if (_isCompanionInstalled(plugin.uuid)) {
+        continue;
+      }
+      if (!plugin.sourceUrl) {
+        continue;
+      }
+      _pendingCompanionUuid = plugin.uuid;
+      pluginManager.installFromUrl(plugin.sourceUrl);
+      return;
+    }
+    _pendingCompanionUuid = "";
+  }
+
+  Connections {
+    target: pluginManager
+
+    function onInstallEnded(uuid, error) {
+      if (_pendingCompanionUuid === "") {
+        return;
+      }
+      // Concurrent install from the Plugin Manager UI: ignore until ours fires.
+      if (uuid && uuid !== _pendingCompanionUuid) {
+        return;
+      }
+      if (uuid === _pendingCompanionUuid) {
+        pluginManager.enableAppPlugin(uuid);
+      } else {
+        mainWindow.displayToast(qsTranslate("FieldTM", "Failed to install companion plugin: %1").arg(_pendingCompanionUuid));
+      }
+      _pendingCompanionUuid = "";
+      bootstrapNextCompanion();
+    }
+  }
+
   function pushToCloud() {
     if (fieldTM.cloudProjectsModel.currentProject && fieldTM.cloudProjectsModel.currentProject.status === QFieldCloudProject.Idle) {
       fieldTM.cloudProjectsModel.projectPush(fieldTM.cloudProjectsModel.currentProjectId, false);
@@ -520,6 +587,7 @@ Item {
                                  });
 
     checkOutdated();
+    bootstrapNextCompanion();
   }
 
   Component.onDestruction: {
