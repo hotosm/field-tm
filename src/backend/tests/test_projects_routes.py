@@ -207,6 +207,9 @@ async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
             return False
 
     class FakeSession:
+        def __init__(self, **_kwargs):
+            pass
+
         async def __aenter__(self):
             return self
 
@@ -296,6 +299,9 @@ async def test_download_osm_data_handles_null_features_as_no_matches(monkeypatch
             return False
 
     class FakeSession:
+        def __init__(self, **_kwargs):
+            pass
+
         async def __aenter__(self):
             return self
 
@@ -385,6 +391,9 @@ async def test_download_osm_data_maps_invalid_geometry_parse_to_validation_error
             return False
 
     class FakeSession:
+        def __init__(self, **_kwargs):
+            pass
+
         async def __aenter__(self):
             return self
 

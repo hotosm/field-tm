@@ -10,6 +10,16 @@ from app.db.enums import FieldMappingApp, ProjectStatus
 from app.htmx.basemap import basemap_attach_flow, basemap_routes
 
 
+def _closing_spawn_mock() -> Mock:
+    """Return a spawn mock that records and closes background coroutines."""
+
+    def _close_coro(coro, *, name=None):
+        coro.close()
+        return Mock()
+
+    return Mock(side_effect=_close_coro)
+
+
 def _render_template(template_name: str, context: dict) -> str:
     """Render a backend template with minimal globals for route-level assertions."""
     templates_dir = Path(__file__).resolve().parents[1] / "app" / "templates"
@@ -711,7 +721,7 @@ async def test_basemap_status_auto_attaches_for_pending_autostart_project(
     monkeypatch.setattr(
         basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
     )
-    create_task_mock = Mock()
+    create_task_mock = _closing_spawn_mock()
     monkeypatch.setattr(basemap_attach_flow, "_spawn_bg_task", create_task_mock)
 
     response = await basemap_routes.basemap_status_htmx.fn(
@@ -1016,7 +1026,7 @@ async def test_basemap_attach_self_heals_missing_url_from_upstream(monkeypatch):
     monkeypatch.setattr(
         basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
     )
-    monkeypatch.setattr(basemap_attach_flow, "_spawn_bg_task", Mock())
+    monkeypatch.setattr(basemap_attach_flow, "_spawn_bg_task", _closing_spawn_mock())
 
     response = await basemap_routes.basemap_attach_htmx.fn(
         request=Mock(),

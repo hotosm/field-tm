@@ -365,7 +365,14 @@ def test_split_by_sql_total_tasks_passes_num_enumerators(
     """Target-task splitting should pass num_enumerators to the SQL runner."""
     captured = {}
 
-    def fake_split_by_sql(self, db, algorithm, algorithm_params, osm_extract):
+    def fake_split_by_sql(
+        self,
+        db,
+        algorithm,
+        algorithm_params,
+        osm_extract,
+        **_kwargs,
+    ):
         captured["db"] = db
         captured["algorithm"] = algorithm
         captured["algorithm_params"] = algorithm_params

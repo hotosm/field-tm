@@ -110,7 +110,11 @@ def _normalize_project_jsonb_fields(model_dump: dict[str, Any]) -> None:
             model_dump[key] = json.dumps(model_dump[key])
 
 
-_JSONB_CAST_FIELDS = ("task_areas_geojson", "split_result_geojson")
+_JSONB_CAST_FIELDS = (
+    "data_extract_geojson",
+    "task_areas_geojson",
+    "split_result_geojson",
+)
 
 
 def _project_update_placeholders(model_dump: dict[str, Any]) -> list[sql.Composable]:
