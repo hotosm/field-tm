@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026.4.3 (2026-06-06)
+
+### Fix
+
+- **backend**: merging of aois uploaded with multiple geoms
+- **qfield**: add single task mode to plugin
+- **backend**: ensure it's possible to map points only via osm data download
+- **qfield**: register qfieldcloud plugin data dirs for drone-tm too
+- ensure centroids can be used and hashtags are saved during proj create
+
 ## 2026.4.2 (2026-06-05)
 
 ## 2026.4.1 (2026-06-04)
