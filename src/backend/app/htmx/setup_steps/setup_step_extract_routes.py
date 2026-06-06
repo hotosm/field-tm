@@ -30,6 +30,28 @@ from .setup_step_responses import (
 )
 
 
+def _submitted_value(data: dict | None, key: str, default):
+    """Return a submitted form value, tolerating missing HTMX form params."""
+    if not isinstance(data, dict) or key not in data:
+        return default
+    value = data.get(key)
+    if isinstance(value, list):
+        value = value[0] if value else default
+    if value is None or value == "":
+        return default
+    return value
+
+
+def _submitted_bool(data: dict | None, key: str, default: bool) -> bool:
+    """Parse checkbox-style values from HTMX form params."""
+    value = _submitted_value(data, key, default)
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on"}
+    return bool(value)
+
+
 @post(
     path="/download-osm-data-htmx",
     dependencies={
@@ -38,7 +60,7 @@ from .setup_step_responses import (
         "current_user": Provide(mapper),
     },
 )
-async def download_osm_data_htmx(
+async def download_osm_data_htmx(  # noqa: PLR0913
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -47,12 +69,19 @@ async def download_osm_data_htmx(
     osm_category: str = Parameter(default="buildings"),
     geom_type: str = Parameter(default="POLYGON"),
     centroid: bool = Parameter(default=False),
+    data: dict | None = Body(
+        default=None,
+        media_type=RequestEncodingType.URL_ENCODED,
+    ),
 ) -> Response:
     _project, not_found_response = _authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
         return not_found_response
+    osm_category = _submitted_value(data, "osm_category", osm_category)
+    geom_type = _submitted_value(data, "geom_type", geom_type)
+    centroid = _submitted_bool(data, "centroid", centroid)
     return await handle_download_osm_data(
         db, project_id, osm_category, geom_type, centroid
     )

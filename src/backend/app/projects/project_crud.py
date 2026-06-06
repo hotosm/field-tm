@@ -64,7 +64,7 @@ log = logging.getLogger(__name__)
 async def generate_data_extract(
     project_id: int,
     aoi: dict,
-    geom_type: str,
+    geom_types: list[str],
     config_json=None,
     centroid: bool = False,
     use_st_within: bool = True,
@@ -75,7 +75,9 @@ async def generate_data_extract(
         project_id (int): Id (primary key) of the project.
         aoi (dict):
             Area of interest for data extraction.
-        geom_type (str): Type of geometry to extract.
+        geom_types (list[str]): Raw-data-api ``geometryType`` values to query
+            (any combination of ``point``/``line``/``polygon``). Multiple
+            entries UNION across the matching OSM tables.
         config_json (Optional[json], optional):
             Configuration for data extraction. Defaults to None.
         centroid (bool): Generate centroid of polygons.
@@ -108,10 +110,10 @@ async def generate_data_extract(
             else f"ftm_extract_{project_id}"
         ),
         "outputType": "geojson",
-        "geometryType": [geom_type],
+        "geometryType": geom_types,
         "bindZip": False,
         "centroid": centroid,
-        "use_st_within": (False if geom_type == "line" else use_st_within),
+        "use_st_within": (False if "line" in geom_types else use_st_within),
         "filters": config_json,
     }
 

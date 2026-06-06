@@ -109,7 +109,7 @@ def featcol_keep_single_geom_type(
     features_filtered = [
         feature
         for feature in features
-        if feature.get("geometry", {}).get("type", "") == geom_type
+        if (feature.get("geometry") or {}).get("type", "") == geom_type
     ]
 
     return {"type": "FeatureCollection", "features": features_filtered}

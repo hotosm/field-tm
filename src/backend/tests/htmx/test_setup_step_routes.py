@@ -10,6 +10,7 @@ from litestar import status_codes as status
 from app.db.models import DbProject
 from app.htmx.setup_steps import (
     setup_step_extract_handlers,
+    setup_step_extract_routes,
     setup_step_finalize_routes,
 )
 from app.htmx.setup_steps.setup_step_extract_routes import (
@@ -82,6 +83,13 @@ async def test_project_setup_shows_step2_advanced_config_options(client, db, pro
     assert "Use OSM data" in response.text
     assert "Start with empty map" in response.text
     assert "upload your own map file (GeoJSON)" in response.text
+    assert (
+        'hx-include="#osm-category-select, #osm-geom-type-select, '
+        '#osm-centroid-checkbox"' in response.text
+    )
+    assert 'id="osm-category-select" name="osm_category"' in response.text
+    assert 'id="osm-geom-type-select" name="geom_type"' in response.text
+    assert 'id="osm-centroid-checkbox" name="centroid" value="true"' in response.text
     assert response.text.index("data-advanced-config-toggle") < response.text.index(
         'id="osm-data-status"'
     )
@@ -171,6 +179,50 @@ async def test_download_osm_data_htmx_returns_requested_no_data_message(monkeypa
         "No data found in OSM. Please continue with the Collect New Data Only option."
         in str(response.content)
     )
+
+
+async def test_download_osm_data_htmx_form_values_override_stale_query(monkeypatch):
+    """Included HTMX form controls should win over the default polygon URL."""
+    project = Mock(id=42)
+    captured: dict = {}
+
+    async def fake_handle_download_osm_data(
+        db, project_id, osm_category, geom_type, centroid
+    ):
+        captured["db"] = db
+        captured["project_id"] = project_id
+        captured["osm_category"] = osm_category
+        captured["geom_type"] = geom_type
+        captured["centroid"] = centroid
+        return Mock(status_code=status.HTTP_200_OK)
+
+    monkeypatch.setattr(
+        setup_step_extract_routes,
+        "handle_download_osm_data",
+        fake_handle_download_osm_data,
+    )
+
+    response = await download_osm_data_htmx.fn(
+        request=Mock(),
+        db=Mock(),
+        current_user={"project": project},
+        auth_user=Mock(),
+        project_id=project.id,
+        osm_category="buildings",
+        geom_type="POLYGON",
+        centroid=False,
+        data={
+            "osm_category": "buildings",
+            "geom_type": "POINT",
+            "centroid": "true",
+        },
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert captured["project_id"] == project.id
+    assert captured["osm_category"] == "buildings"
+    assert captured["geom_type"] == "POINT"
+    assert captured["centroid"] is True
 
 
 async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypatch):

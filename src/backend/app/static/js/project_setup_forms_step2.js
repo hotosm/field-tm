@@ -83,6 +83,11 @@ export function initProjectSetupDataExtract({
     }
   }
 
+  function syncDownloadRequestUrl() {
+    if (!downloadOsmDataBtn) return;
+    downloadOsmDataBtn.setAttribute("hx-post", buildDownloadUrl(readStep2DownloadConfig()));
+  }
+
   if (!hasXlsform && downloadOsmDataBtn) downloadOsmDataBtn.disabled = true;
   if (!hasXlsform && collectNewDataBtn) collectNewDataBtn.disabled = true;
   if (!hasXlsform && uploadGeojsonBtn) uploadGeojsonBtn.disabled = true;
@@ -99,6 +104,9 @@ export function initProjectSetupDataExtract({
           }
         : { ...defaultDownloadPreset(), sourceMode: "template" };
     applyStep2DownloadConfig(defaults, defaults.sourceMode);
+    downloadOsmDataBtn.addEventListener("click", syncDownloadRequestUrl, {
+      capture: true,
+    });
 
     downloadOsmDataBtn.addEventListener("htmx:beforeRequest", function () {
       if (downloadLoading) downloadLoading.style.display = "block";

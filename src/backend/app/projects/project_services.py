@@ -629,23 +629,42 @@ def _configure_extract_sources(
     config_data: dict,
     geom_type: str,
     centroid: bool,
-) -> tuple[dict, str]:
-    """Apply the source-table selection for the requested geometry mode."""
+) -> tuple[dict, list[str]]:
+    """Apply the source-table selection for the requested geometry mode.
+
+    Returns the config dict plus the list of raw-data-api ``geometryType``
+    values to request. raw-data-api uses that list to pick OSM tables
+    (``point`` -> nodes, ``line`` -> ways_line, ``polygon`` -> ways_poly);
+    ``centroid=True`` then runs ST_Centroid on the selected geometries.
+
+    ``point + centroid`` unions ``polygon`` (so ways_poly is queried and
+    centroid-ified) with ``point`` (so existing OSM nodes come along), which
+    delivers polygon centroids plus existing point nodes in a single Point
+    FeatureCollection.
+    """
     geom_type_lower = geom_type.lower()
-    # NOTE polygon/polyline + centroid still drive ST_Centroid in raw-data-api;
-    # the matching from entries keep the config self-consistent for the request.
-    data_config = {
+    source_table_config = {
         ("polygon", False): ["ways_poly"],
         ("polygon", True): ["ways_poly"],
-        ("point", True): ["ways_poly", "nodes"],
         ("point", False): ["nodes"],
+        ("point", True): ["ways_poly", "nodes"],
         ("polyline", False): ["ways_line"],
         ("polyline", True): ["ways_line"],
     }
-    config_data["from"] = data_config.get((geom_type_lower, centroid))
-    if geom_type_lower == "polyline":
-        geom_type_lower = "line"
-    return config_data, geom_type_lower
+    config_data["from"] = source_table_config.get((geom_type_lower, centroid))
+
+    geometry_types_config = {
+        ("polygon", False): ["polygon"],
+        ("polygon", True): ["polygon"],
+        ("point", False): ["point"],
+        ("point", True): ["polygon", "point"],
+        ("polyline", False): ["line"],
+        ("polyline", True): ["line"],
+    }
+    geometry_types = geometry_types_config.get(
+        (geom_type_lower, centroid), [geom_type_lower]
+    )
+    return config_data, geometry_types
 
 
 async def _download_extract_geojson(download_url: str) -> dict:
@@ -689,6 +708,86 @@ def _validate_downloaded_geojson(geojson_data: dict) -> dict:
     return geojson_data
 
 
+def _expected_extract_output_geom(geometry_types: list[str], centroid: bool) -> str:
+    """Return the GeoJSON geometry type expected from raw-data-api."""
+    # raw-data-api emits Points when centroid=True (ST_Centroid) or when the
+    # only source is `point`; `line` stays as LineString; otherwise Polygon.
+    if centroid or geometry_types == ["point"]:
+        return "Point"
+    if geometry_types == ["line"]:
+        return "LineString"
+    return "Polygon"
+
+
+async def _request_osm_data_extract(
+    project_id: int,
+    aoi_featcol: dict,
+    geometry_types: list[str],
+    config_data: dict,
+    centroid: bool,
+):
+    """Request a raw-data-api extract and map common failures to service errors."""
+    try:
+        return await project_crud.generate_data_extract(
+            project_id,
+            aoi_featcol,
+            geometry_types,
+            config_data,
+            centroid,
+            True,
+        )
+    except HTTPException as exc:
+        if (
+            exc.status_code == status.HTTP_400_BAD_REQUEST
+            and "Failed to generate data extract from the raw data API."
+            in str(exc.detail)
+        ):
+            raise ServiceError(
+                "OSM data extraction timed out or failed upstream. "
+                "Please reduce the AOI size or choose Collect New Data Only."
+            ) from exc
+        raise
+    except AsyncTimeoutError as exc:
+        raise ServiceError(
+            "OSM data extraction timed out. "
+            "Please reduce the AOI size or choose Collect New Data Only."
+        ) from exc
+
+
+def _parse_polygon_extract_geojson(geojson_data: dict) -> dict:
+    """Run polygon-only PostGIS normalization for polygon extracts."""
+    try:
+        return parse_aoi(settings.FTM_DB_URL, geojson_data)
+    except TypeError as exc:
+        raise ValidationError(
+            "No valid geometries found in OSM for the selected extract "
+            "settings. Please continue with the Collect New Data Only option."
+        ) from exc
+
+
+def _normalize_downloaded_extract(
+    geojson_data: dict,
+    expected_output_geom: str,
+) -> dict:
+    """Normalize and filter downloaded extract GeoJSON to one output geometry."""
+    # parse_aoi runs PostGIS normalization but discards any non-Polygon geometry,
+    # so it can only run on a polygon extract. Point and line extracts (including
+    # centroid-ified outputs) skip it and go straight to per-geom-type filtering.
+    featcol = (
+        _parse_polygon_extract_geojson(geojson_data)
+        if expected_output_geom == "Polygon"
+        else geojson_data
+    )
+
+    if not featcol or not isinstance(featcol, dict) or not featcol.get("features"):
+        raise ValidationError(
+            "No valid geometries found in OSM for the selected extract settings. "
+            "Please continue with the Collect New Data Only option."
+        )
+
+    return featcol_keep_single_geom_type(featcol, expected_output_geom)
+
+
 async def download_osm_data(
     db: AsyncConnection,
     project_id: int,
@@ -726,38 +825,21 @@ async def download_osm_data(
 
     with open(_extract_config_path(osm_category), encoding="utf-8") as f:
         config_data = json.load(f)
-    config_data, geom_type_lower = _configure_extract_sources(
+    config_data, geometry_types = _configure_extract_sources(
         config_data,
         geom_type,
         centroid,
     )
+    expected_output_geom = _expected_extract_output_geom(geometry_types, centroid)
 
     # Generate data extract
-    try:
-        result = await project_crud.generate_data_extract(
-            project.id,
-            aoi_featcol,
-            geom_type_lower,
-            config_data,
-            centroid,
-            True,
-        )
-    except HTTPException as exc:
-        if (
-            exc.status_code == status.HTTP_400_BAD_REQUEST
-            and "Failed to generate data extract from the raw data API."
-            in str(exc.detail)
-        ):
-            raise ServiceError(
-                "OSM data extraction timed out or failed upstream. "
-                "Please reduce the AOI size or choose Collect New Data Only."
-            ) from exc
-        raise
-    except AsyncTimeoutError as exc:
-        raise ServiceError(
-            "OSM data extraction timed out. "
-            "Please reduce the AOI size or choose Collect New Data Only."
-        ) from exc
+    result = await _request_osm_data_extract(
+        project.id,
+        aoi_featcol,
+        geometry_types,
+        config_data,
+        centroid,
+    )
 
     # Download GeoJSON from URL
     download_url = result.data.get("download_url")
@@ -766,23 +848,10 @@ async def download_osm_data(
 
     geojson_data = await _download_extract_geojson(download_url)
     geojson_data = _validate_downloaded_geojson(geojson_data)
-
-    # Validate and clean GeoJSON
-    try:
-        featcol = parse_aoi(settings.FTM_DB_URL, geojson_data)
-    except TypeError as exc:
-        raise ValidationError(
-            "No valid geometries found in OSM for the selected extract settings. "
-            "Please continue with the Collect New Data Only option."
-        ) from exc
-
-    if not featcol or not isinstance(featcol, dict) or not featcol.get("features"):
-        raise ValidationError(
-            "No valid geometries found in OSM for the selected extract settings. "
-            "Please continue with the Collect New Data Only option."
-        )
-
-    featcol_single_geom_type = featcol_keep_single_geom_type(featcol)
+    featcol_single_geom_type = _normalize_downloaded_extract(
+        geojson_data,
+        expected_output_geom,
+    )
 
     if not featcol_single_geom_type:
         raise ServiceError("Could not process GeoJSON data.")

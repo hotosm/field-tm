@@ -17,7 +17,8 @@
   <div class="ftm-step__actions">
     <button
       id="download-osm-data-btn"
-      hx-post="/download-osm-data-htmx?project_id={% if project %}{{ project.id }}{% endif %}&osm_category=buildings&geom_type=POLYGON"
+      hx-post="/download-osm-data-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+      hx-include="#osm-category-select, #osm-geom-type-select, #osm-centroid-checkbox"
       hx-target="#osm-data-status"
       hx-swap="innerHTML"
       hx-indicator="#download-spinner"
@@ -84,7 +85,7 @@
           <label for="osm-category-select" class="ftm-step-field__label"
             >{{ _("What to download") }}</label
           >
-          <select id="osm-category-select" class="ftm-split-select">
+          <select id="osm-category-select" name="osm_category" class="ftm-split-select">
             <option value="buildings">{{ _("OSM Buildings") }}</option>
             <option value="highways">{{ _("OSM Highways") }}</option>
             <option value="health">{{ _("OSM Healthcare") }}</option>
@@ -103,7 +104,7 @@
           <label for="osm-geom-type-select" class="ftm-step-field__label"
             >{{ _("Feature shape") }}</label
           >
-          <select id="osm-geom-type-select" class="ftm-split-select">
+          <select id="osm-geom-type-select" name="geom_type" class="ftm-split-select">
             <option value="POLYGON">{{ _("Polygon (area)") }}</option>
             <option value="POLYLINE">{{ _("Line") }}</option>
             <option value="POINT">{{ _("Point") }}</option>
@@ -111,7 +112,7 @@
         </div>
         <div>
           <label class="ftm-step-option" style="margin-top: 28px">
-            <input type="checkbox" id="osm-centroid-checkbox" />
+            <input type="checkbox" id="osm-centroid-checkbox" name="centroid" value="true" />
             <span class="ftm-step-option__text">
               <span class="ftm-step-option__title"
                 >{{ _("Use Centroids (For OSM Data Download)") }}</span

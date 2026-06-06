@@ -225,7 +225,7 @@ async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
         captured_input["value"] = input_geojson
         return input_geojson
 
-    def fake_featcol_keep_single_geom_type(featcol):
+    def fake_featcol_keep_single_geom_type(featcol, geom_type=None):
         return featcol
 
     async def fake_check_crs(_featcol):
@@ -429,8 +429,8 @@ async def test_download_osm_data_maps_invalid_geometry_parse_to_validation_error
         await project_services.download_osm_data(
             db=Mock(),
             project_id=1,
-            osm_category="waterways",
-            geom_type="POLYLINE",
+            osm_category="buildings",
+            geom_type="POLYGON",
             centroid=False,
         )
 
@@ -521,9 +521,9 @@ async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
     captured: dict = {}
 
     async def fake_generate_data_extract(
-        project_id, aoi, geom_type, config_data, centroid, use_st_within
+        project_id, aoi, geom_types, config_data, centroid, use_st_within
     ):
-        captured["geom_type"] = geom_type
+        captured["geom_types"] = geom_types
         captured["centroid"] = centroid
         captured["config_from"] = config_data.get("from")
         return Mock(data={"download_url": "https://example.test/extract.geojson"})
@@ -556,7 +556,7 @@ async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
     def fake_parse_aoi(_db_url, input_geojson, merge=True):
         return input_geojson
 
-    def fake_featcol_keep_single_geom_type(featcol):
+    def fake_featcol_keep_single_geom_type(featcol, geom_type=None):
         return featcol
 
     async def fake_check_crs(_featcol):
@@ -590,7 +590,7 @@ async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
     )
 
     assert captured["centroid"] is True
-    assert captured["geom_type"] == "polygon"
+    assert captured["geom_types"] == ["polygon"]
     # POLYGON + centroid must resolve to ways_poly, not None
     assert captured["config_from"] == ["ways_poly"]
     assert result["features"][0]["geometry"]["type"] == "Point"
@@ -598,20 +598,38 @@ async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
 
 def test_configure_extract_sources_polygon_centroid_maps_to_ways_poly():
     """Polygon + centroid should select ways_poly so the config isn't malformed."""
-    config, geom_type = project_services._configure_extract_sources(
+    config, geom_types = project_services._configure_extract_sources(
         {}, "POLYGON", centroid=True
     )
     assert config["from"] == ["ways_poly"]
-    assert geom_type == "polygon"
+    assert geom_types == ["polygon"]
 
 
 def test_configure_extract_sources_polyline_centroid_maps_to_ways_line():
-    """Polyline + centroid should select ways_line and lowercase to 'line'."""
-    config, geom_type = project_services._configure_extract_sources(
+    """Polyline + centroid should select ways_line and report 'line' to raw-data-api."""
+    config, geom_types = project_services._configure_extract_sources(
         {}, "POLYLINE", centroid=True
     )
     assert config["from"] == ["ways_line"]
-    assert geom_type == "line"
+    assert geom_types == ["line"]
+
+
+def test_configure_extract_sources_point_centroid_unions_polygon_and_point():
+    """Point + centroid should union ways_poly (centroid-ified) with OSM nodes."""
+    config, geom_types = project_services._configure_extract_sources(
+        {}, "POINT", centroid=True
+    )
+    assert config["from"] == ["ways_poly", "nodes"]
+    assert geom_types == ["polygon", "point"]
+
+
+def test_configure_extract_sources_point_no_centroid_queries_nodes_only():
+    """Point without centroid should only query OSM nodes."""
+    config, geom_types = project_services._configure_extract_sources(
+        {}, "POINT", centroid=False
+    )
+    assert config["from"] == ["nodes"]
+    assert geom_types == ["point"]
 
 
 @pytest.mark.parametrize(
