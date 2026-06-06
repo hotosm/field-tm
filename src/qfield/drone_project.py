@@ -18,6 +18,7 @@ from styling import (
     set_layer_not_identifiable,
     unpack_plugin_zip,
 )
+from utils import register_plugin_data_dirs
 
 
 def generate_drone_project(
@@ -294,6 +295,10 @@ def _apply_plugin_and_styles(
     plugin_dir = tmp / "plugin"
     plugin_dir.mkdir(exist_ok=True)
     styles_dir = unpack_plugin_zip(plugin_zip, plugin_dir, project_name, log)
+    # plugin_dir's contents are flattened into the project root in the final
+    # zip, so its subdirs (plugin/, styles/) become the top-level dirs we need
+    # libqfieldsync to recursively copy to the device.
+    register_plugin_data_dirs(project, plugin_dir, log)
     if styles_dir is not None:
         apply_styles_from_dir(project, styles_dir, log)
     return plugin_dir

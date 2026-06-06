@@ -20,7 +20,11 @@ from styling import (
     unpack_plugin_zip,
 )
 from sanitize import sanitize_generated_qgis_metadata
-from utils import parse_and_validate_extent, set_project_file_permissions
+from utils import (
+    parse_and_validate_extent,
+    register_plugin_data_dirs,
+    set_project_file_permissions,
+)
 
 
 def xlsform_to_project(
@@ -418,44 +422,13 @@ def _apply_plugin_and_styles(
 
     project_basename = Path(project_file).stem
     styles_dir = unpack_plugin_zip(plugin_zip, final_output_dir, project_basename, log)
-    _register_plugin_data_dirs(project, final_output_dir, log)
+    register_plugin_data_dirs(project, final_output_dir, log)
     if styles_dir is None:
         log.info("Plugin zip has no styles/ directory; nothing to apply")
         return
 
     apply_styles_from_dir(project, styles_dir, log)
     _load_bundled_basemaps(project, styles_dir, log)
-
-
-def _register_plugin_data_dirs(
-    project, final_output_dir: Path, log: logging.Logger
-) -> None:
-    """Declare every top-level subdir as a QFieldSync data dir.
-
-    libqfieldsync's ``OfflineConverter`` only recursively copies subdirs
-    that the project file lists in ``QFieldSync/dataDirs`` (alongside
-    ``attachmentDirs``).  Without this entry, QFieldCloud's packaging
-    step strips everything except the ``.qgz``, the ``{basename}.qml``
-    project plugin, and layer-attached files -- so bundled subdir trees
-    like ``plugins/livefield/`` never reach the device, and QField's
-    plugin loader errors with "file doesn't exist".
-    """
-    if not final_output_dir.is_dir():
-        return
-
-    subdirs = sorted(
-        entry.name for entry in final_output_dir.iterdir() if entry.is_dir()
-    )
-    if not subdirs:
-        return
-
-    existing, _ok = project.readListEntry("QFieldSync", "dataDirs", [])
-    merged = sorted({*existing, *subdirs})
-    if merged == sorted(existing):
-        return
-
-    project.writeEntry("QFieldSync", "dataDirs", merged)
-    log.info("Registered QFieldSync dataDirs for device packaging: %s", merged)
 
 
 def _load_bundled_basemaps(project, styles_dir: Path, log: logging.Logger) -> None:
