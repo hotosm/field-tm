@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-01 17:10+0100\n"
+"POT-Creation-Date: 2026-06-06 03:42+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -19,19 +19,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:144
+#: app/main.py:146
 msgid "Validation failed"
 msgstr "Проверка не удалась"
 
-#: app/main.py:168
+#: app/main.py:170
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "Произошла непредвиденная ошибка. Обратитесь к администратору."
 
-#: app/main.py:313
+#: app/main.py:315
 msgid "Could not connect to database"
 msgstr "Не удалось подключиться к базе данных"
 
-#: app/auth/auth_deps.py:73
+#: app/auth/auth_deps.py:79
 msgid "Authenticated user is missing a valid identifier."
 msgstr ""
 "У аутентифицированного пользователя отсутствует действительный "
@@ -278,7 +278,7 @@ msgstr "Проект (%(project_id)s) не найден."
 msgid "Only the project manager can delete this project."
 msgstr "Удалить этот проект может только менеджер проекта."
 
-#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:300
+#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:299
 msgid "Project not found."
 msgstr "Проект не найден."
 
@@ -462,7 +462,7 @@ msgstr ""
 "Область проекта должна быть корректным JSON (GeoJSON Polygon, "
 "MultiPolygon, Feature или FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:60
+#: app/htmx/project_create/project_create_simple_flow.py:87
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -470,15 +470,16 @@ msgstr ""
 "В этой области не найдены существующие здания OSM. Продолжайте "
 "картографирование с нуля."
 
-#: app/htmx/project_create/project_create_simple_flow.py:157
+#: app/htmx/project_create/project_create_simple_flow.py:185
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 "Не удалось загрузить форму OSM Buildings по умолчанию для упрощённого "
 "создания проекта."
 
-#: app/htmx/project_create/project_create_simple_flow.py:270
+#: app/htmx/project_create/project_create_simple_flow.py:325
 #: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:210
+#: app/htmx/project_create/project_create_submit_routes.py:214
+#: app/htmx/setup_steps/setup_step_split_background.py:69
 msgid "An unexpected error occurred. Please try again."
 msgstr "Произошла непредвиденная ошибка. Пожалуйста, попробуйте ещё раз."
 
@@ -502,7 +503,7 @@ msgstr "Такого пользователя не существует. Сна�
 msgid "This user is already a collaborator on this project."
 msgstr "Этот пользователь уже является участником проекта."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1393
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1397
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "Не удалось добавить участника: %(exc)s"
@@ -552,7 +553,7 @@ msgid "Admin"
 msgstr "Администратор"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:10
-#: app/templates/project_details.html:200
+#: app/templates/project_details.html:199
 msgid "Manager"
 msgstr "Менеджер"
 
@@ -613,7 +614,7 @@ msgid "Visibility"
 msgstr "Видимость"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/project_details.html:186
+#: app/templates/project_details.html:185
 msgid "Description"
 msgstr "Описание"
 
@@ -678,17 +679,17 @@ msgstr "Закрыть"
 msgid "Collaborators"
 msgstr "Участники"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:66
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:150
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:73
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:164
 msgid "Data Extract"
 msgstr "Выгрузка данных"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:78
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:85
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "Данные OSM успешно загружены. Найдено %(feature_count)s объектов."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:81
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:88
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -699,21 +700,21 @@ msgstr ""
 "Если всё подходит, нажмите \"Accept Data Extract\" для сохранения. Иначе "
 "попробуйте скачать снова с другими параметрами."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:111
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:122
 #: app/templates/partials/project_details/style_and_scripts.html:26
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "Неверный тип файла. Загрузите файл .geojson или .json."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:134
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:145
 msgid "No valid geometries found in GeoJSON."
 msgstr "В GeoJSON не найдено корректных геометрий."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:162
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:176
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ GeoJSON успешно загружен. Найдено %(feature_count)s объектов."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:165
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:179
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -724,8 +725,8 @@ msgstr ""
 "Если всё подходит, нажмите \"Accept Data Extract\" для сохранения. Иначе "
 "попробуйте загрузить другой файл."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:195
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:317
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:208
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:330
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -733,17 +734,17 @@ msgstr ""
 "Данные GeoJSON не найдены. Сначала скачайте данные OSM или загрузите файл"
 " GeoJSON."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:216
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:229
 #: app/htmx/setup_steps/setup_step_map_layers.py:27
 msgid "Project AOI"
 msgstr "Область интереса проекта"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:227
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:240
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "Выгрузка данных (%(feature_count)s объектов)"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:244
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:257
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
@@ -752,7 +753,7 @@ msgstr ""
 "Предпросмотр %(feature_count)s объектов данных на карте. Проверьте данные"
 " и переходите к следующему шагу."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:294
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
@@ -760,7 +761,7 @@ msgstr ""
 "✓ Выбран режим сбора новых данных. Разделение на задачи пропущено, можно "
 "продолжать."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:349
 msgid ""
 "✓ Data extract successfully saved! You can now proceed to Step 4 (split "
 "tasks)."
@@ -768,15 +769,13 @@ msgstr ""
 "✓ Выгрузка данных успешно сохранена! Теперь можно перейти к шагу 4 "
 "(разделение задач)."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:374
-msgid "No data extract provided."
-msgstr "Выгрузка данных не предоставлена."
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:397
+msgid ""
+"No data extract is staged. Please download OSM data or upload a GeoJSON "
+"file first."
+msgstr ""
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:381
-msgid "Invalid data extract format."
-msgstr "Неверный формат выгрузки данных."
-
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:398
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:412
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
@@ -784,6 +783,10 @@ msgid ""
 msgstr ""
 "✓ Извлечение данных принято! Сохранено %(feature_count)s объектов. Шаг 3 "
 "теперь завершён."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:456
+msgid "Data extract discarded. Choose a data source above to try again."
+msgstr ""
 
 #: app/htmx/setup_steps/setup_step_extract_helpers.py:42
 msgid "Invalid GeoJSON data in request. Please try uploading again."
@@ -867,7 +870,7 @@ msgstr ""
 " проблема сохраняется, отправьте приведённые ниже технические сведения "
 "администратору экземпляра или в службу поддержки."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:99
+#: app/htmx/setup_steps/setup_step_split_routes.py:110
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -875,7 +878,7 @@ msgstr ""
 "Выгрузка данных не найдена. Сначала скачайте данные OSM или загрузите "
 "файл GeoJSON."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:130
+#: app/htmx/setup_steps/setup_step_split_routes.py:141
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -885,7 +888,7 @@ msgstr ""
 "%(data_feature_count)s объектами данных. Вся область будет использоваться"
 " как одна задача."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:137
+#: app/htmx/setup_steps/setup_step_split_routes.py:148
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -894,11 +897,11 @@ msgstr ""
 "Предпросмотр %(task_count)s границ задач и %(data_feature_count)s "
 "объектов данных вместе."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:190
+#: app/htmx/setup_steps/setup_step_split_routes.py:201
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "Контур проекта не найден. Нельзя пропустить разделение на задачи."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:215
+#: app/htmx/setup_steps/setup_step_split_routes.py:226
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
@@ -906,27 +909,55 @@ msgstr ""
 "✓ Разделение на задачи пропущено. Вся область интереса будет "
 "использоваться как одна задача. Можно перейти к шагу 5."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:270
+#: app/htmx/setup_steps/setup_step_split_routes.py:284
 msgid "Please select a splitting option."
 msgstr "Выберите вариант разделения."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:294
+#: app/htmx/setup_steps/setup_step_split_routes.py:335
+msgid ""
+"Cleaner shapes is unavailable for this area (too many features). Please "
+"choose a different option."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_split_routes.py:388
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ Для этой конфигурации проекта разделение на задачи не требуется."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:344
+#: app/htmx/setup_steps/setup_step_split_routes.py:547
 msgid "No task areas data provided."
 msgstr "Данные областей задач не предоставлены."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:348
+#: app/htmx/setup_steps/setup_step_split_routes.py:551
 msgid "Invalid task areas data format."
 msgstr "Неверный формат данных областей задач."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:371
+#: app/htmx/setup_steps/setup_step_split_routes.py:589
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ Разделённые задачи успешно сохранены"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:47
+#: app/htmx/setup_steps/setup_step_validate_routes.py:56
+msgid "Could not reach Tasking Manager. Please try again later."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:61
+#, python-format
+msgid "Tasking Manager project %(id)s was not found."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:66
+#, python-format
+msgid "Tasking Manager returned an error (HTTP %(status)s)."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:79
+msgid "Tasking Manager returned an invalid response."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:89
+msgid "Tasking Manager project AOI did not contain any polygon geometries."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:113
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -935,7 +966,7 @@ msgstr ""
 "Площадь составляет %(area_km2)s км², что превышает лимит %(area_limit)s "
 "км². Уменьшите область проекта."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:52
+#: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -944,13 +975,17 @@ msgstr ""
 "Площадь составляет %(area_km2)s км². Большие области (>%(area_warn)s км²)"
 " могут обрабатываться дольше."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:77
+#: app/htmx/setup_steps/setup_step_validate_routes.py:143
 msgid "GeoJSON is required"
 msgstr "Требуется GeoJSON"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:87
+#: app/htmx/setup_steps/setup_step_validate_routes.py:153
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "Полигональные геометрии не найдены. Область проекта должна быть полигоном."
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:196
+msgid "Tasking Manager project ID must be a positive integer."
+msgstr ""
 
 #: app/projects/project_crud.py:136
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
@@ -1000,50 +1035,50 @@ msgstr "Безымянная область"
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "Область {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:408
+#: app/projects/project_services.py:412
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:166
+#: app/qfield/qfield_crud.py:167
 msgid "Project outline is missing or has no geometry."
 msgstr "Контур проекта отсутствует или не имеет геометрии."
 
-#: app/qfield/qfield_crud.py:172
+#: app/qfield/qfield_crud.py:173
 msgid "Project outline geometry has no coordinates."
 msgstr "Геометрия контура проекта не имеет координат."
 
-#: app/qfield/qfield_crud.py:476
+#: app/qfield/qfield_crud.py:477
 msgid "Project outline is required for QField project creation."
 msgstr "✓ Для этой конфигурации проекта разделение на задачи не требуется."
 
-#: app/qfield/qfield_crud.py:481
+#: app/qfield/qfield_crud.py:482
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm необходим для создания проекта QField."
 
-#: app/qfield/qfield_crud.py:498
+#: app/qfield/qfield_crud.py:499
 msgid "Failed to modify XLSForm for QField."
 msgstr "Не удалось изменить XLSForm для QField."
 
-#: app/qfield/qfield_crud.py:547
+#: app/qfield/qfield_crud.py:548
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS завершена, но выходные файлы не записаны."
 
-#: app/qfield/qfield_crud.py:559
+#: app/qfield/qfield_crud.py:562
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS завершена, но на выходе нет файла .qgz."
 
-#: app/qfield/qfield_crud.py:590
+#: app/qfield/qfield_crud.py:592
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr ""
 "Идентификатор проекта QField отсутствует; не могу прикрепить базовую "
 "карту."
 
-#: app/qfield/qfield_crud.py:627
+#: app/qfield/qfield_crud.py:629
 msgid "Basemap attach completed but produced no project files."
 msgstr "Базовая карта прикреплена к проекту QField."
 
-#: app/qfield/qfield_crud.py:813
+#: app/qfield/qfield_crud.py:817
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -1052,40 +1087,40 @@ msgstr ""
 "QFieldCloud не завершил обработку файла проекта после %(attempts)d "
 "попыток (последний статус: %(status)s)."
 
-#: app/qfield/qfield_crud.py:871 app/qfield/qfield_crud.py:885
+#: app/qfield/qfield_crud.py:875 app/qfield/qfield_crud.py:889
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS: %(error)s"
 
-#: app/qfield/qfield_crud.py:878
+#: app/qfield/qfield_crud.py:882
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "вернула неверный JSON."
 
-#: app/qfield/qfield_crud.py:902
+#: app/qfield/qfield_crud.py:906
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "Не удалось загрузить базовую карту MBTiles для загрузки (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:917
+#: app/qfield/qfield_crud.py:921
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "Скачать QR-код"
 
-#: app/qfield/qfield_crud.py:1044
+#: app/qfield/qfield_crud.py:1048
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "Не удалось загрузить файлы в QFieldCloud: %(error)s."
 
-#: app/qfield/qfield_crud.py:1218 app/qfield/qfield_crud.py:1380
+#: app/qfield/qfield_crud.py:1222 app/qfield/qfield_crud.py:1384
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "Пользователь «%(username)s» не существует в QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1338
+#: app/qfield/qfield_crud.py:1342
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "Проект (%(project_id)s) не найден."
 
-#: app/qfield/qfield_crud.py:1362
+#: app/qfield/qfield_crud.py:1366
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -1094,42 +1129,44 @@ msgstr ""
 "принадлежит организации %(owner)s. Не удалось добавить %(username)s в "
 "организацию: %(error)s."
 
-#: app/qfield/qfield_crud.py:1387
+#: app/qfield/qfield_crud.py:1391
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "Пользователь '%(username)s' уже является участником этого проекта."
 
-#: app/qfield/qfield_crud.py:1428
+#: app/qfield/qfield_crud.py:1432
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Учетные данные действительны."
 
-#: app/qfield/qfield_crud.py:1497
+#: app/qfield/qfield_crud.py:1501
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "Этот проект не связан с проектом QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1504
+#: app/qfield/qfield_crud.py:1508
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "QFIELDCLOUD_QGIS_URL не настроен."
 
-#: app/qfield/qfield_crud.py:1534
+#: app/qfield/qfield_crud.py:1538
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr "В пакете QFieldCloud не найдены файлы GeoPackage."
 
-#: app/qfield/qfield_crud.py:1556
+#: app/qfield/qfield_crud.py:1560
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
-msgstr "В пакете QFieldCloud не найдены данные опроса. Возможно, картографы еще не предоставили никаких ответов."
+msgstr ""
+"В пакете QFieldCloud не найдены данные опроса. Возможно, картографы еще "
+"не предоставили никаких ответов."
 
-#: app/qfield/qfield_crud.py:1579
+#: app/qfield/qfield_crud.py:1583
 msgid "QFieldCloud did not return a package job id."
 msgstr "QFieldCloud не вернул идентификатор задания пакета."
 
-#: app/qfield/qfield_crud.py:1596
+#: app/qfield/qfield_crud.py:1600
 msgid "QFieldCloud failed to package the project."
 msgstr "QFieldCloud не удалось упаковать проект."
 
-#: app/qfield/qfield_crud.py:1602
+#: app/qfield/qfield_crud.py:1606
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
@@ -1138,12 +1175,12 @@ msgstr ""
 "Истекло время ожидания QFieldCloud для упаковки проекта (последний "
 "статус: %(status)s)."
 
-#: app/qfield/qfield_crud.py:1626
+#: app/qfield/qfield_crud.py:1630
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "Не удалось преобразовать GeoPackage: %(error)s."
 
-#: app/qfield/qfield_crud.py:1633
+#: app/qfield/qfield_crud.py:1637
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "Оболочка QGIS вернула неверный JSON для /export."
 
@@ -1841,11 +1878,11 @@ msgstr "Создание..."
 msgid "Something went wrong. Please try again."
 msgstr "Что-то пошло не так. Попробуйте снова."
 
-#: app/templates/new_project_custom.html:311
+#: app/templates/new_project_custom.html:334
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Проект с таким названием уже существует. Выберите другое имя."
 
-#: app/templates/new_project_custom.html:395
+#: app/templates/new_project_custom.html:418
 msgid "Description is required."
 msgstr "Описание обязательно."
 
@@ -1897,12 +1934,12 @@ msgid "Creating Project"
 msgstr "Создание проекта"
 
 #: app/templates/partials/new_project/creating_fragment.html:11
-#: app/templates/project_details.html:6 app/templates/project_details.html:294
-#: app/templates/project_details.html:305
+#: app/templates/project_details.html:6 app/templates/project_details.html:293
+#: app/templates/project_details.html:304
 msgid "Back to Projects"
 msgstr "Назад к проектам"
 
-#: app/templates/project_details.html:41
+#: app/templates/project_details.html:45
 msgid ""
 "Trigger a fresh QFieldCloud package and download the project data as a "
 "single GeoJSON file."
@@ -1910,86 +1947,88 @@ msgstr ""
 "Запустите новый пакет QFieldCloud и загрузите данные проекта в виде "
 "одного файла GeoJSON."
 
-#: app/templates/project_details.html:44
+#: app/templates/project_details.html:48
 msgid "Export Data"
 msgstr "Экспортировать данные"
 
-#: app/templates/project_details.html:87 app/templates/project_details.html:95
+#: app/templates/project_details.html:85 app/templates/project_details.html:93
 msgid ""
 "Packaging project on QFieldCloud - this may take a minute, please be "
 "patient..."
-msgstr "Проект упаковки в QFieldCloud – это может занять минуту, наберитесь терпения..."
+msgstr ""
+"Проект упаковки в QFieldCloud – это может занять минуту, наберитесь "
+"терпения..."
 
-#: app/templates/project_details.html:96
+#: app/templates/project_details.html:94
 msgid "✓ Download started."
 msgstr "✓ Загрузка началась."
 
-#: app/templates/project_details.html:97
+#: app/templates/project_details.html:95
 msgid "Export failed:"
 msgstr "Экспорт не удался:"
 
-#: app/templates/project_details.html:98
+#: app/templates/project_details.html:96
 msgid "Network error while exporting. Please try again."
 msgstr "Ошибка сети при экспорте. Пожалуйста, попробуйте еще раз."
 
-#: app/templates/project_details.html:174
+#: app/templates/project_details.html:173
 msgid "Project Metadata"
 msgstr "Метаданные проекта"
 
-#: app/templates/project_details.html:176
+#: app/templates/project_details.html:175
 msgid "Project metadata and setup information for managers."
 msgstr "Метаданные проекта и информация о настройке для менеджеров."
 
-#: app/templates/project_details.html:194
+#: app/templates/project_details.html:193
 msgid "Project ID"
 msgstr "Идентификатор проекта"
 
-#: app/templates/project_details.html:205
+#: app/templates/project_details.html:204
 msgid "Created"
 msgstr "Создан"
 
-#: app/templates/project_details.html:212
+#: app/templates/project_details.html:211
 msgid "Last Updated"
 msgstr "Последнее обновление"
 
-#: app/templates/project_details.html:223
+#: app/templates/project_details.html:222
 msgid "Hashtags"
 msgstr "Хэштеги"
 
-#: app/templates/project_details.html:235
+#: app/templates/project_details.html:234
 msgid "External Project"
 msgstr "Внешний проект"
 
-#: app/templates/project_details.html:237
+#: app/templates/project_details.html:236
 msgid "Instance:"
 msgstr "Экземпляр:"
 
-#: app/templates/project_details.html:239
+#: app/templates/project_details.html:238
 msgid "Project ID:"
 msgstr "Идентификатор проекта:"
 
-#: app/templates/project_details.html:249
-#: app/templates/project_details.html:257
+#: app/templates/project_details.html:248
+#: app/templates/project_details.html:256
 msgid "View Project in ODK Central →"
 msgstr "Открыть проект в ODK Central →"
 
-#: app/templates/project_details.html:264
+#: app/templates/project_details.html:263
 msgid "Manage QFieldCloud Project →"
 msgstr "Управлять проектом QFieldCloud →"
 
-#: app/templates/project_details.html:272
+#: app/templates/project_details.html:271
 msgid "View Project Externally →"
 msgstr "Открыть проект во внешней системе →"
 
-#: app/templates/project_details.html:288
+#: app/templates/project_details.html:287
 msgid "Delete this project in downstream and Field-TM? This cannot be undone."
 msgstr "Удалить этот проект в downstream и Field-TM? Это действие нельзя отменить."
 
-#: app/templates/project_details.html:291
+#: app/templates/project_details.html:290
 msgid "Delete Project"
 msgstr "Удалить проект"
 
-#: app/templates/project_details.html:302
+#: app/templates/project_details.html:301
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view\n"
@@ -2074,11 +2113,11 @@ msgstr "Произошла непредвиденная ошибка."
 msgid "Try Again"
 msgstr "Попробовать снова"
 
-#: app/templates/partials/new_project/creating_fragment.html:23
+#: app/templates/partials/new_project/creating_fragment.html:24
 msgid "Setting up your project..."
 msgstr "Настройка вашего проекта..."
 
-#: app/templates/partials/new_project/creating_fragment.html:25
+#: app/templates/partials/new_project/creating_fragment.html:26
 msgid ""
 "Downloading map data, splitting tasks, and preparing the QField project. "
 "This can take a\n"
@@ -2127,6 +2166,14 @@ msgstr ""
 "Перед отправкой нужно нарисовать или загрузить область интереса (AOI) на "
 "карте."
 
+#: app/templates/partials/new_project/map_script.html:12
+msgid "Enter a Tasking Manager project ID first."
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:13
+msgid "Could not load AOI from Tasking Manager."
+msgstr ""
+
 #: app/templates/partials/new_project/map_section.html:3
 msgid "Project Area"
 msgstr "Область проекта"
@@ -2150,24 +2197,49 @@ msgstr "Очистить"
 msgid "More options"
 msgstr "Параметры формы:"
 
-#: app/templates/partials/new_project/map_section.html:39
-msgid "Upload your own map file (GeoJSON)"
-msgstr "Загрузить собственный GeoJSON"
+#: app/templates/partials/new_project/map_section.html:38
+msgid "Upload a GeoJSON file"
+msgstr ""
 
-#: app/templates/partials/new_project/map_section.html:43
+#: app/templates/partials/new_project/map_section.html:40
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
-"        drawing."
+"          drawing."
 msgstr ""
-"Если у вас уже есть файл карты с границей области, загрузите его здесь "
-"вместо рисования."
 
 #: app/templates/partials/new_project/map_section.html:50
+msgid "Upload your own map file (GeoJSON)"
+msgstr "Загрузить собственный GeoJSON"
+
+#: app/templates/partials/new_project/map_section.html:55
+#: app/templates/partials/new_project/map_section.html:56
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+msgid "or"
+msgstr "или"
+
+#: app/templates/partials/new_project/map_section.html:60
+msgid "Load from a HOT Tasking Manager project"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:62
+msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:71
+msgid "Tasking Manager project ID"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:75
+msgid "Load AOI"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:84
 msgid "Combine multiple shapes into one"
 msgstr "Объединить несколько фигур в одну"
 
-#: app/templates/partials/new_project/map_section.html:55
+#: app/templates/partials/new_project/map_section.html:89
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2352,6 +2424,7 @@ msgstr "полилинии"
 msgid "points"
 msgstr "точки"
 
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
 #: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
 msgstr "объекты"
@@ -2404,7 +2477,7 @@ msgstr "Разделить на квадраты"
 msgid "Split by buildings"
 msgstr "Разделить по зданиям"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/setup_steps/step4_split.html:179
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split area"
 msgstr "Разделить снова"
@@ -2634,9 +2707,17 @@ msgstr "Использовать этот снимок"
 msgid "No imagery items were found for this AOI."
 msgstr "Для этой области не найдено ни одного снимка."
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:22
 msgid "Accept Data Extract"
 msgstr "Принять выгрузку данных"
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:30
+msgid "Discard the downloaded data extract?"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:33
+msgid "Discard"
+msgstr ""
 
 #: app/templates/partials/project_details/fragments/finalize_error.html:7
 msgid "View technical details"
@@ -2689,6 +2770,17 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "Принять выбор задач"
 
+#: app/templates/partials/project_details/fragments/split_running.html:10
+msgid "Splitting the AOI into tasks..."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/split_running.html:12
+msgid ""
+"Large areas can take several minutes. This page will update automatically"
+" when the preview\n"
+"    is ready - feel free to leave the tab open."
+msgstr ""
+
 #: app/templates/partials/project_details/setup_steps/step2_form.html:4
 msgid "Survey form ready"
 msgstr "Форма опроса готова"
@@ -2713,11 +2805,6 @@ msgstr "Форма опроса"
 #: app/templates/partials/project_details/setup_steps/step2_form.html:28
 msgid "Loading survey types..."
 msgstr "Загрузка типов опросов..."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
-msgid "or"
-msgstr "или"
 
 #: app/templates/partials/project_details/setup_steps/step2_form.html:36
 msgid "upload your own survey file (.xls / .xlsx)"
@@ -2883,15 +2970,15 @@ msgstr "Полилиния"
 msgid "Point"
 msgstr "Точка"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:116
-msgid "Use centroids"
-msgstr "Использовать центроиды"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:117
+msgid "Use Centroids (For OSM Data Download)"
+msgstr "Использовать центроиды (Для загрузки данных OSM)"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+#: app/templates/partials/project_details/setup_steps/step3_data.html:120
 msgid "Convert polygons to single points."
 msgstr "Преобразовать полигоны в отдельные точки."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:140
+#: app/templates/partials/project_details/setup_steps/step3_data.html:142
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "Формирование выгрузки данных OSM... Это может занять некоторое время."
 
@@ -2954,47 +3041,63 @@ msgstr "Включить железные дороги"
 msgid "Include aeroways"
 msgstr "Включить воздушные пути"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:109
+#: app/templates/partials/project_details/setup_steps/step4_split.html:115
 msgid "How to split"
 msgstr "Как разделить"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+#: app/templates/partials/project_details/setup_steps/step4_split.html:117
 msgid "Choose a method..."
 msgstr "Выберите метод..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:112
+#: app/templates/partials/project_details/setup_steps/step4_split.html:118
 msgid "By number of buildings (faster)"
 msgstr "По количеству зданий (быстрее)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:114
+#: app/templates/partials/project_details/setup_steps/step4_split.html:120
+msgid ""
+"By number of buildings (cleaner shapes) - unavailable\n"
+"            for large areas"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 msgid "By number of buildings (cleaner shapes)"
 msgstr "По количеству зданий (более аккуратные формы)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:116
+#: app/templates/partials/project_details/setup_steps/step4_split.html:124
 msgid "By a regular grid"
 msgstr "По регулярной сетке"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+#: app/templates/partials/project_details/setup_steps/step4_split.html:125
 msgid "Into a fixed number of tasks"
 msgstr "Разделить на заданное число задач (скоро)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:122
+#: app/templates/partials/project_details/setup_steps/step4_split.html:129
+msgid "Cleaner shapes is disabled for this area."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+msgid ""
+"It becomes geometrically unstable above ~5,000 features. Use the\n"
+"          faster option instead."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:137
 msgid "Buildings per task"
 msgstr "Среднее число зданий на задачу:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:133
+#: app/templates/partials/project_details/setup_steps/step4_split.html:148
 msgid "Number of tasks"
 msgstr "Количество задач:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:145
+#: app/templates/partials/project_details/setup_steps/step4_split.html:160
 msgid "Grid square size (metres)"
 msgstr "Размер квадрата сетки (метры)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/setup_steps/step4_split.html:179
 msgid "Split Again"
 msgstr "Разделить снова"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:199
+#: app/templates/partials/project_details/setup_steps/step4_split.html:213
 msgid "Splitting area into tasks... This may take a moment."
 msgstr "Разделение AOI на задачи... Это может занять некоторое время."
 
@@ -3080,3 +3183,4 @@ msgstr ""
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "Сохранить и продолжить"
+

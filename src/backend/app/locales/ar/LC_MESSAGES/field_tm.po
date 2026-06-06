@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-01 17:10+0100\n"
+"POT-Creation-Date: 2026-06-06 03:42+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ar\n"
@@ -19,19 +19,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:144
+#: app/main.py:146
 msgid "Validation failed"
 msgstr "فشل التحقق من الصحة"
 
-#: app/main.py:168
+#: app/main.py:170
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "حدث خطأ غير متوقع. يرجى التواصل مع المسؤول."
 
-#: app/main.py:313
+#: app/main.py:315
 msgid "Could not connect to database"
 msgstr "لا يمكن الاتصال بقاعدة البيانات"
 
-#: app/auth/auth_deps.py:73
+#: app/auth/auth_deps.py:79
 msgid "Authenticated user is missing a valid identifier."
 msgstr "المستخدم الذي تمت مصادقته يفتقد معرفًا صالحًا."
 
@@ -266,7 +266,7 @@ msgstr "لم يتم العثور على المشروع (%(project_id)s)."
 msgid "Only the project manager can delete this project."
 msgstr "لا يمكن حذف هذا المشروع إلا من قبل مدير المشروع."
 
-#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:300
+#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:299
 msgid "Project not found."
 msgstr "لم يتم العثور على المشروع."
 
@@ -443,7 +443,7 @@ msgstr ""
 "يجب أن تكون منطقة المشروع JSON صالحًا (GeoJSON Polygon أو MultiPolygon أو"
 " Feature أو FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:60
+#: app/htmx/project_create/project_create_simple_flow.py:87
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -451,13 +451,14 @@ msgstr ""
 "لم يتم العثور على مبانٍ موجودة في OSM ضمن هذه المنطقة. تابع رسم الخرائط "
 "من البداية."
 
-#: app/htmx/project_create/project_create_simple_flow.py:157
+#: app/htmx/project_create/project_create_simple_flow.py:185
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr "تعذر تحميل نموذج OSM Buildings الافتراضي لإنشاء مشروع بسيط."
 
-#: app/htmx/project_create/project_create_simple_flow.py:270
+#: app/htmx/project_create/project_create_simple_flow.py:325
 #: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:210
+#: app/htmx/project_create/project_create_submit_routes.py:214
+#: app/htmx/setup_steps/setup_step_split_background.py:69
 msgid "An unexpected error occurred. Please try again."
 msgstr "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى."
 
@@ -481,7 +482,7 @@ msgstr "هذا المستخدم غير موجود. يرجى إنشاؤه أول�
 msgid "This user is already a collaborator on this project."
 msgstr "هذا المستخدم متعاون بالفعل في هذا المشروع."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1393
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1397
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "فشل إضافة المتعاون: %(exc)s"
@@ -531,7 +532,7 @@ msgid "Admin"
 msgstr "مسؤول"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:10
-#: app/templates/project_details.html:200
+#: app/templates/project_details.html:199
 msgid "Manager"
 msgstr "مدير"
 
@@ -592,7 +593,7 @@ msgid "Visibility"
 msgstr "الظهور"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/project_details.html:186
+#: app/templates/project_details.html:185
 msgid "Description"
 msgstr "الوصف"
 
@@ -657,17 +658,17 @@ msgstr "إغلاق"
 msgid "Collaborators"
 msgstr "المتعاونون"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:66
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:150
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:73
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:164
 msgid "Data Extract"
 msgstr "استخراج البيانات"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:78
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:85
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "تم تنزيل بيانات OSM بنجاح! تم العثور على %(feature_count)s معالم."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:81
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:88
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -678,21 +679,21 @@ msgstr ""
 " مناسبة، انقر \"قبول استخراج البيانات\" للحفظ. وإلا فحاول التنزيل مرة "
 "أخرى بمعلمات مختلفة."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:111
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:122
 #: app/templates/partials/project_details/style_and_scripts.html:26
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "نوع الملف غير صالح. يرجى رفع ملف .geojson أو .json."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:134
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:145
 msgid "No valid geometries found in GeoJSON."
 msgstr "لم يتم العثور على أشكال هندسية صالحة في GeoJSON."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:162
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:176
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ تم رفع GeoJSON بنجاح! تم العثور على %(feature_count)s معالم."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:165
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:179
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -702,8 +703,8 @@ msgstr ""
 "معاينة %(feature_count)s معالم على الخريطة. راجع البيانات أدناه. إذا كانت"
 " مناسبة، انقر \"قبول استخراج البيانات\" للحفظ. وإلا فحاول رفع ملف مختلف."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:195
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:317
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:208
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:330
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -711,17 +712,17 @@ msgstr ""
 "لم يتم العثور على بيانات GeoJSON. يرجى تنزيل بيانات OSM أو رفع ملف "
 "GeoJSON أولاً."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:216
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:229
 #: app/htmx/setup_steps/setup_step_map_layers.py:27
 msgid "Project AOI"
 msgstr "منطقة اهتمام المشروع"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:227
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:240
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "استخراج البيانات (%(feature_count)s معالم)"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:244
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:257
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
@@ -730,7 +731,7 @@ msgstr ""
 "معاينة %(feature_count)s من معالم البيانات على الخريطة. راجع البيانات ثم "
 "تابع إلى الخطوة التالية."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:294
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
@@ -738,7 +739,7 @@ msgstr ""
 "✓ تم اختيار وضع جمع البيانات الجديدة. تم تخطي تقسيم المهام ويمكنك "
 "المتابعة."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:349
 msgid ""
 "✓ Data extract successfully saved! You can now proceed to Step 4 (split "
 "tasks)."
@@ -746,15 +747,13 @@ msgstr ""
 "✓ تم حفظ استخراج البيانات بنجاح! يمكنك الآن المتابعة إلى الخطوة 4 (تقسيم "
 "المهام)."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:374
-msgid "No data extract provided."
-msgstr "لم يتم توفير استخراج بيانات."
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:397
+msgid ""
+"No data extract is staged. Please download OSM data or upload a GeoJSON "
+"file first."
+msgstr ""
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:381
-msgid "Invalid data extract format."
-msgstr "تنسيق استخراج البيانات غير صالح."
-
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:398
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:412
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
@@ -762,6 +761,10 @@ msgid ""
 msgstr ""
 "✓ تم قبول مستخرج البيانات! تم حفظ %(feature_count)s معالم. اكتملت الخطوة "
 "3 الآن."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:456
+msgid "Data extract discarded. Choose a data source above to try again."
+msgstr ""
 
 #: app/htmx/setup_steps/setup_step_extract_helpers.py:42
 msgid "Invalid GeoJSON data in request. Please try uploading again."
@@ -844,7 +847,7 @@ msgstr ""
 "استمرت المشكلة، فأرسل التفاصيل التقنية أدناه إلى مسؤول النظام أو فريق "
 "الدعم."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:99
+#: app/htmx/setup_steps/setup_step_split_routes.py:110
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -852,7 +855,7 @@ msgstr ""
 "لم يتم العثور على استخراج بيانات. يرجى تنزيل بيانات OSM أو رفع ملف "
 "GeoJSON أولاً."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:130
+#: app/htmx/setup_steps/setup_step_split_routes.py:141
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -861,18 +864,18 @@ msgstr ""
 "معاينة AOI بالكامل (دون تقسيم) مع %(data_feature_count)s معالم بيانات. "
 "سيتم استخدام AOI بالكامل كمهمة واحدة."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:137
+#: app/htmx/setup_steps/setup_step_split_routes.py:148
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
 " features together."
 msgstr "معاينة %(task_count)s حدود مهام و%(data_feature_count)s معالم بيانات معًا."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:190
+#: app/htmx/setup_steps/setup_step_split_routes.py:201
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "لم يتم العثور على حدود المشروع. لا يمكن تخطي تقسيم المهام."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:215
+#: app/htmx/setup_steps/setup_step_split_routes.py:226
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
@@ -880,27 +883,55 @@ msgstr ""
 "✓ تم تخطي تقسيم المهام. سيتم استخدام AOI بالكامل كمهمة واحدة. يمكنك "
 "المتابعة إلى الخطوة 5."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:270
+#: app/htmx/setup_steps/setup_step_split_routes.py:284
 msgid "Please select a splitting option."
 msgstr "يرجى اختيار خيار للتقسيم."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:294
+#: app/htmx/setup_steps/setup_step_split_routes.py:335
+msgid ""
+"Cleaner shapes is unavailable for this area (too many features). Please "
+"choose a different option."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_split_routes.py:388
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ تقسيم المهام غير مطلوب لهذا الإعداد."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:344
+#: app/htmx/setup_steps/setup_step_split_routes.py:547
 msgid "No task areas data provided."
 msgstr "لم يتم توفير بيانات مناطق المهام."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:348
+#: app/htmx/setup_steps/setup_step_split_routes.py:551
 msgid "Invalid task areas data format."
 msgstr "تنسيق بيانات مناطق المهام غير صالح."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:371
+#: app/htmx/setup_steps/setup_step_split_routes.py:589
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ تم حفظ المهام المقسمة بنجاح"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:47
+#: app/htmx/setup_steps/setup_step_validate_routes.py:56
+msgid "Could not reach Tasking Manager. Please try again later."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:61
+#, python-format
+msgid "Tasking Manager project %(id)s was not found."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:66
+#, python-format
+msgid "Tasking Manager returned an error (HTTP %(status)s)."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:79
+msgid "Tasking Manager returned an invalid response."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:89
+msgid "Tasking Manager project AOI did not contain any polygon geometries."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:113
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -909,7 +940,7 @@ msgstr ""
 "تبلغ المساحة %(area_km2)s كم²، وهذا يتجاوز حد %(area_limit)s كم². يُرجى "
 "تقليل مساحة المشروع."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:52
+#: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -918,13 +949,17 @@ msgstr ""
 "تبلغ المساحة %(area_km2)s كم². قد تستغرق المساحات الكبيرة (>%(area_warn)s"
 " كم²) وقتًا أطول للمعالجة."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:77
+#: app/htmx/setup_steps/setup_step_validate_routes.py:143
 msgid "GeoJSON is required"
 msgstr "ملف GeoJSON مطلوب"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:87
+#: app/htmx/setup_steps/setup_step_validate_routes.py:153
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "لم يتم العثور على أشكال مضلعة. يجب أن تكون منطقة المشروع مضلعًا."
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:196
+msgid "Tasking Manager project ID must be a positive integer."
+msgstr ""
 
 #: app/projects/project_crud.py:136
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
@@ -971,48 +1006,48 @@ msgstr "منطقة بدون اسم"
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "المنطقة {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:408
+#: app/projects/project_services.py:412
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:166
+#: app/qfield/qfield_crud.py:167
 msgid "Project outline is missing or has no geometry."
 msgstr "مخطط المشروع مفقود أو ليس له أي شكل هندسي."
 
-#: app/qfield/qfield_crud.py:172
+#: app/qfield/qfield_crud.py:173
 msgid "Project outline geometry has no coordinates."
 msgstr "هندسة المخطط التفصيلي للمشروع ليس لها إحداثيات."
 
-#: app/qfield/qfield_crud.py:476
+#: app/qfield/qfield_crud.py:477
 msgid "Project outline is required for QField project creation."
 msgstr "مخطط المشروع مطلوب لإنشاء مشروع QField."
 
-#: app/qfield/qfield_crud.py:481
+#: app/qfield/qfield_crud.py:482
 msgid "XLSForm is required for QField project creation."
 msgstr "مطلوب XLSForm لإنشاء مشروع QField."
 
-#: app/qfield/qfield_crud.py:498
+#: app/qfield/qfield_crud.py:499
 msgid "Failed to modify XLSForm for QField."
 msgstr "فشل تعديل XLSForm لـ QField."
 
-#: app/qfield/qfield_crud.py:547
+#: app/qfield/qfield_crud.py:548
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "اكتمل غلاف QGIS ولكنه لم يكتب أي ملفات إخراج."
 
-#: app/qfield/qfield_crud.py:559
+#: app/qfield/qfield_crud.py:562
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "اكتمل غلاف QGIS ولكن لا يوجد ملف .qgz في الإخراج."
 
-#: app/qfield/qfield_crud.py:590
+#: app/qfield/qfield_crud.py:592
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "معرف مشروع QField مفقود؛ لا يمكن إرفاق خريطة الأساس."
 
-#: app/qfield/qfield_crud.py:627
+#: app/qfield/qfield_crud.py:629
 msgid "Basemap attach completed but produced no project files."
 msgstr "تم إرفاق الخريطة الأساسية بمشروع QField."
 
-#: app/qfield/qfield_crud.py:813
+#: app/qfield/qfield_crud.py:817
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -1021,40 +1056,40 @@ msgstr ""
 "لم يكمل QFieldCloud معالجة ملف المشروع بعد %(attempts)d محاولات (آخر "
 "حالة: %(status)s)."
 
-#: app/qfield/qfield_crud.py:871 app/qfield/qfield_crud.py:885
+#: app/qfield/qfield_crud.py:875 app/qfield/qfield_crud.py:889
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "فشل إنشاء مشروع QGIS: %(error)s"
 
-#: app/qfield/qfield_crud.py:878
+#: app/qfield/qfield_crud.py:882
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "قام مجمّع QGIS بإرجاع JSON غير صالح."
 
-#: app/qfield/qfield_crud.py:902
+#: app/qfield/qfield_crud.py:906
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "فشل تنزيل خريطة الأساس MBTiles للتحميل (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:917
+#: app/qfield/qfield_crud.py:921
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "تنزيل رمز QR"
 
-#: app/qfield/qfield_crud.py:1044
+#: app/qfield/qfield_crud.py:1048
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "فشل تحميل الملفات إلى QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1218 app/qfield/qfield_crud.py:1380
+#: app/qfield/qfield_crud.py:1222 app/qfield/qfield_crud.py:1384
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "المستخدم \"%(username)s\" غير موجود على QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1338
+#: app/qfield/qfield_crud.py:1342
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "لم يتم العثور على المشروع (%(project_id)s)."
 
-#: app/qfield/qfield_crud.py:1362
+#: app/qfield/qfield_crud.py:1366
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -1063,54 +1098,56 @@ msgstr ""
 "ينتمي المشروع إلى منظمة \"%(owner)s\". تعذر إضافة \"%(username)s\" إلى "
 "المؤسسة: %(error)s"
 
-#: app/qfield/qfield_crud.py:1387
+#: app/qfield/qfield_crud.py:1391
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "المستخدم '%(username)s' متعاون بالفعل في هذا المشروع."
 
-#: app/qfield/qfield_crud.py:1428
+#: app/qfield/qfield_crud.py:1432
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ بيانات الاعتماد صالحة!"
 
-#: app/qfield/qfield_crud.py:1497
+#: app/qfield/qfield_crud.py:1501
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "هذا المشروع غير مرتبط بمشروع QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1504
+#: app/qfield/qfield_crud.py:1508
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "لم يتم تكوين QFIELDCLOUD_QGIS_URL."
 
-#: app/qfield/qfield_crud.py:1534
+#: app/qfield/qfield_crud.py:1538
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr "لم يتم العثور على ملفات GeoPackage في حزمة QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1556
+#: app/qfield/qfield_crud.py:1560
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
-msgstr "لم يتم العثور على بيانات المسح في حزمة QFieldCloud. ربما لم يرسل مصممو الخرائط أي ردود حتى الآن."
+msgstr ""
+"لم يتم العثور على بيانات المسح في حزمة QFieldCloud. ربما لم يرسل مصممو "
+"الخرائط أي ردود حتى الآن."
 
-#: app/qfield/qfield_crud.py:1579
+#: app/qfield/qfield_crud.py:1583
 msgid "QFieldCloud did not return a package job id."
 msgstr "لم يُرجع QFieldCloud معرف مهمة الحزمة."
 
-#: app/qfield/qfield_crud.py:1596
+#: app/qfield/qfield_crud.py:1600
 msgid "QFieldCloud failed to package the project."
 msgstr "فشل QFieldCloud في حزم المشروع."
 
-#: app/qfield/qfield_crud.py:1602
+#: app/qfield/qfield_crud.py:1606
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
 "%(status)s)."
 msgstr "انتهت مهلة انتظار QFieldCloud لحزم المشروع (الحالة الأخيرة: %(status)s)."
 
-#: app/qfield/qfield_crud.py:1626
+#: app/qfield/qfield_crud.py:1630
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "فشل تحويل GeoPackage: %(error)s"
 
-#: app/qfield/qfield_crud.py:1633
+#: app/qfield/qfield_crud.py:1637
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "قام مجمّع QGIS بإرجاع JSON غير صالح لـ /export."
 
@@ -1786,11 +1823,11 @@ msgstr "جارٍ الإنشاء..."
 msgid "Something went wrong. Please try again."
 msgstr "حدث خطأ ما. يرجى المحاولة مرة أخرى."
 
-#: app/templates/new_project_custom.html:311
+#: app/templates/new_project_custom.html:334
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "يوجد مشروع بهذا الاسم بالفعل. يرجى اختيار اسم مختلف."
 
-#: app/templates/new_project_custom.html:395
+#: app/templates/new_project_custom.html:418
 msgid "Description is required."
 msgstr "الوصف مطلوب."
 
@@ -1841,12 +1878,12 @@ msgid "Creating Project"
 msgstr "جارٍ إنشاء المشروع"
 
 #: app/templates/partials/new_project/creating_fragment.html:11
-#: app/templates/project_details.html:6 app/templates/project_details.html:294
-#: app/templates/project_details.html:305
+#: app/templates/project_details.html:6 app/templates/project_details.html:293
+#: app/templates/project_details.html:304
 msgid "Back to Projects"
 msgstr "العودة إلى المشاريع"
 
-#: app/templates/project_details.html:41
+#: app/templates/project_details.html:45
 msgid ""
 "Trigger a fresh QFieldCloud package and download the project data as a "
 "single GeoJSON file."
@@ -1854,88 +1891,90 @@ msgstr ""
 "قم بتشغيل حزمة QFieldCloud جديدة وقم بتنزيل بيانات المشروع كملف GeoJSON "
 "واحد."
 
-#: app/templates/project_details.html:44
+#: app/templates/project_details.html:48
 msgid "Export Data"
 msgstr "تصدير البيانات"
 
-#: app/templates/project_details.html:87 app/templates/project_details.html:95
+#: app/templates/project_details.html:85 app/templates/project_details.html:93
 msgid ""
 "Packaging project on QFieldCloud - this may take a minute, please be "
 "patient..."
-msgstr "مشروع التعبئة والتغليف على QFieldCloud - قد يستغرق هذا دقيقة، يرجى التحلي بالصبر..."
+msgstr ""
+"مشروع التعبئة والتغليف على QFieldCloud - قد يستغرق هذا دقيقة، يرجى التحلي"
+" بالصبر..."
 
-#: app/templates/project_details.html:96
+#: app/templates/project_details.html:94
 msgid "✓ Download started."
 msgstr "✓ بدأ التنزيل."
 
-#: app/templates/project_details.html:97
+#: app/templates/project_details.html:95
 msgid "Export failed:"
 msgstr "فشل التصدير:"
 
-#: app/templates/project_details.html:98
+#: app/templates/project_details.html:96
 msgid "Network error while exporting. Please try again."
 msgstr "حدث خطأ في الشبكة أثناء التصدير. يرجى المحاولة مرة أخرى."
 
-#: app/templates/project_details.html:174
+#: app/templates/project_details.html:173
 msgid "Project Metadata"
 msgstr "بيانات المشروع الوصفية"
 
-#: app/templates/project_details.html:176
+#: app/templates/project_details.html:175
 msgid "Project metadata and setup information for managers."
 msgstr "بيانات المشروع الوصفية ومعلومات الإعداد للمديرين."
 
-#: app/templates/project_details.html:194
+#: app/templates/project_details.html:193
 msgid "Project ID"
 msgstr "معرّف المشروع"
 
-#: app/templates/project_details.html:205
+#: app/templates/project_details.html:204
 msgid "Created"
 msgstr "أُنشئ"
 
-#: app/templates/project_details.html:212
+#: app/templates/project_details.html:211
 msgid "Last Updated"
 msgstr "آخر تحديث"
 
-#: app/templates/project_details.html:223
+#: app/templates/project_details.html:222
 msgid "Hashtags"
 msgstr "الوسوم"
 
-#: app/templates/project_details.html:235
+#: app/templates/project_details.html:234
 msgid "External Project"
 msgstr "مشروع خارجي"
 
-#: app/templates/project_details.html:237
+#: app/templates/project_details.html:236
 msgid "Instance:"
 msgstr "النسخة:"
 
-#: app/templates/project_details.html:239
+#: app/templates/project_details.html:238
 msgid "Project ID:"
 msgstr "معرّف المشروع:"
 
-#: app/templates/project_details.html:249
-#: app/templates/project_details.html:257
+#: app/templates/project_details.html:248
+#: app/templates/project_details.html:256
 msgid "View Project in ODK Central →"
 msgstr "عرض المشروع في ODK Central →"
 
-#: app/templates/project_details.html:264
+#: app/templates/project_details.html:263
 msgid "Manage QFieldCloud Project →"
 msgstr "إدارة مشروع QFieldCloud →"
 
-#: app/templates/project_details.html:272
+#: app/templates/project_details.html:271
 msgid "View Project Externally →"
 msgstr "عرض المشروع خارجيًا →"
 
-#: app/templates/project_details.html:288
+#: app/templates/project_details.html:287
 msgid "Delete this project in downstream and Field-TM? This cannot be undone."
 msgstr ""
 "حذف هذا المشروع في النظام اللاحق وفي Field-TM؟ لا يمكن التراجع عن هذا "
 "الإجراء."
 
-#: app/templates/project_details.html:291
+#: app/templates/project_details.html:290
 msgid "Delete Project"
 msgstr "حذف المشروع"
 
-#: app/templates/project_details.html:302
+#: app/templates/project_details.html:301
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view\n"
@@ -2016,11 +2055,11 @@ msgstr "حدث خطأ غير متوقع."
 msgid "Try Again"
 msgstr "حاول مرة أخرى"
 
-#: app/templates/partials/new_project/creating_fragment.html:23
+#: app/templates/partials/new_project/creating_fragment.html:24
 msgid "Setting up your project..."
 msgstr "جارٍ إعداد مشروعك..."
 
-#: app/templates/partials/new_project/creating_fragment.html:25
+#: app/templates/partials/new_project/creating_fragment.html:26
 msgid ""
 "Downloading map data, splitting tasks, and preparing the QField project. "
 "This can take a\n"
@@ -2067,6 +2106,14 @@ msgstr "لم يُرجع التحقق أي GeoJSON"
 msgid "You must draw or upload a project area on the map before submitting."
 msgstr "يجب عليك رسم أو رفع منطقة الاهتمام (AOI) على الخريطة قبل الإرسال."
 
+#: app/templates/partials/new_project/map_script.html:12
+msgid "Enter a Tasking Manager project ID first."
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:13
+msgid "Could not load AOI from Tasking Manager."
+msgstr ""
+
 #: app/templates/partials/new_project/map_section.html:3
 msgid "Project Area"
 msgstr "منطقة المشروع"
@@ -2090,24 +2137,49 @@ msgstr "مسح"
 msgid "More options"
 msgstr "خيارات النموذج:"
 
-#: app/templates/partials/new_project/map_section.html:39
-msgid "Upload your own map file (GeoJSON)"
-msgstr "رفع GeoJSON مخصص"
+#: app/templates/partials/new_project/map_section.html:38
+msgid "Upload a GeoJSON file"
+msgstr ""
 
-#: app/templates/partials/new_project/map_section.html:43
+#: app/templates/partials/new_project/map_section.html:40
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
-"        drawing."
+"          drawing."
 msgstr ""
-"إذا كان لديك بالفعل ملف خريطة يحتوي على حدود منطقتك، فارفعه هنا بدلًا من "
-"رسمها."
 
 #: app/templates/partials/new_project/map_section.html:50
+msgid "Upload your own map file (GeoJSON)"
+msgstr "رفع GeoJSON مخصص"
+
+#: app/templates/partials/new_project/map_section.html:55
+#: app/templates/partials/new_project/map_section.html:56
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+msgid "or"
+msgstr "أو"
+
+#: app/templates/partials/new_project/map_section.html:60
+msgid "Load from a HOT Tasking Manager project"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:62
+msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:71
+msgid "Tasking Manager project ID"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:75
+msgid "Load AOI"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:84
 msgid "Combine multiple shapes into one"
 msgstr "ادمج عدة أشكال في شكل واحد"
 
-#: app/templates/partials/new_project/map_section.html:55
+#: app/templates/partials/new_project/map_section.html:89
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2280,6 +2352,7 @@ msgstr "خطوط متعددة"
 msgid "points"
 msgstr "نقاط"
 
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
 #: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
 msgstr "معالم"
@@ -2331,7 +2404,7 @@ msgstr "التقسيم حسب المربع"
 msgid "Split by buildings"
 msgstr "التقسيم حسب المباني"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/setup_steps/step4_split.html:179
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split area"
 msgstr "إعادة التقسيم"
@@ -2556,9 +2629,17 @@ msgstr "استخدم هذه الصورة"
 msgid "No imagery items were found for this AOI."
 msgstr "لم يتم العثور على أي عناصر صور لهذه المنطقة."
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:22
 msgid "Accept Data Extract"
 msgstr "قبول استخراج البيانات"
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:30
+msgid "Discard the downloaded data extract?"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:33
+msgid "Discard"
+msgstr ""
 
 #: app/templates/partials/project_details/fragments/finalize_error.html:7
 msgid "View technical details"
@@ -2611,6 +2692,17 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "قبول خيارات المهام"
 
+#: app/templates/partials/project_details/fragments/split_running.html:10
+msgid "Splitting the AOI into tasks..."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/split_running.html:12
+msgid ""
+"Large areas can take several minutes. This page will update automatically"
+" when the preview\n"
+"    is ready - feel free to leave the tab open."
+msgstr ""
+
 #: app/templates/partials/project_details/setup_steps/step2_form.html:4
 msgid "Survey form ready"
 msgstr "نموذج الاستبيان جاهز"
@@ -2635,11 +2727,6 @@ msgstr "نموذج الاستبيان"
 #: app/templates/partials/project_details/setup_steps/step2_form.html:28
 msgid "Loading survey types..."
 msgstr "جارٍ تحميل أنواع الاستبيان..."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
-msgid "or"
-msgstr "أو"
 
 #: app/templates/partials/project_details/setup_steps/step2_form.html:36
 msgid "upload your own survey file (.xls / .xlsx)"
@@ -2804,15 +2891,15 @@ msgstr "خط متعدد"
 msgid "Point"
 msgstr "نقطة"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:116
-msgid "Use centroids"
-msgstr "استخدم مراكز الأشكال"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:117
+msgid "Use Centroids (For OSM Data Download)"
+msgstr "استخدم مراكز الأشكال (لتنزيل بيانات OSM)"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+#: app/templates/partials/project_details/setup_steps/step3_data.html:120
 msgid "Convert polygons to single points."
 msgstr "حوّل المضلعات إلى نقاط منفردة."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:140
+#: app/templates/partials/project_details/setup_steps/step3_data.html:142
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "جارٍ إنشاء استخراج بيانات OSM... قد يستغرق ذلك بعض الوقت."
 
@@ -2874,47 +2961,63 @@ msgstr "تضمين السكك الحديدية"
 msgid "Include aeroways"
 msgstr "تضمين المسارات الجوية"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:109
+#: app/templates/partials/project_details/setup_steps/step4_split.html:115
 msgid "How to split"
 msgstr "كيفية التقسيم"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+#: app/templates/partials/project_details/setup_steps/step4_split.html:117
 msgid "Choose a method..."
 msgstr "اختر طريقة..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:112
+#: app/templates/partials/project_details/setup_steps/step4_split.html:118
 msgid "By number of buildings (faster)"
 msgstr "حسب عدد المباني (أسرع)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:114
+#: app/templates/partials/project_details/setup_steps/step4_split.html:120
+msgid ""
+"By number of buildings (cleaner shapes) - unavailable\n"
+"            for large areas"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 msgid "By number of buildings (cleaner shapes)"
 msgstr "حسب عدد المباني (أشكال أنظف)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:116
+#: app/templates/partials/project_details/setup_steps/step4_split.html:124
 msgid "By a regular grid"
 msgstr "حسب شبكة منتظمة"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+#: app/templates/partials/project_details/setup_steps/step4_split.html:125
 msgid "Into a fixed number of tasks"
 msgstr "التقسيم حسب عدد محدد من المهام (قريبًا)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:122
+#: app/templates/partials/project_details/setup_steps/step4_split.html:129
+msgid "Cleaner shapes is disabled for this area."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+msgid ""
+"It becomes geometrically unstable above ~5,000 features. Use the\n"
+"          faster option instead."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:137
 msgid "Buildings per task"
 msgstr "متوسط المباني لكل مهمة:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:133
+#: app/templates/partials/project_details/setup_steps/step4_split.html:148
 msgid "Number of tasks"
 msgstr "عدد المهام:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:145
+#: app/templates/partials/project_details/setup_steps/step4_split.html:160
 msgid "Grid square size (metres)"
 msgstr "حجم مربع الشبكة (بالمتر)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/setup_steps/step4_split.html:179
 msgid "Split Again"
 msgstr "إعادة التقسيم"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:199
+#: app/templates/partials/project_details/setup_steps/step4_split.html:213
 msgid "Splitting area into tasks... This may take a moment."
 msgstr "جارٍ تقسيم AOI إلى مهام... قد يستغرق ذلك بعض الوقت."
 
@@ -2996,3 +3099,4 @@ msgstr "اختياري - اتركه فارغًا للإنشاء باسم الم�
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "حفظ ومتابعة"
+

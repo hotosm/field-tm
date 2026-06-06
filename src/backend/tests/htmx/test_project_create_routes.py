@@ -55,6 +55,37 @@ async def test_create_project_htmx(client, stub_project_data):
     assert "/projects/" in location
 
 
+async def test_create_project_htmx_persists_user_hashtags(
+    client, db, stub_project_data
+):
+    """Hashtags submitted via the form should be saved on the new project."""
+    from app.db.models import DbProject
+
+    payload = dict(stub_project_data)
+    payload["hashtags"] = "#campaign-2026, #buildings"
+
+    response = await client.post(
+        "/projects/create",
+        data=payload,
+        headers={"HX-Request": "true"},
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "HX-Redirect" in response.headers
+    location = response.headers["HX-Redirect"]
+    assert "/projects/" in location
+    project_id = int(location.rsplit("/", 1)[-1])
+
+    try:
+        project = await DbProject.one(db, project_id)
+        assert project.hashtags, "Hashtags should be persisted on the project record"
+        assert "#campaign-2026" in project.hashtags
+        assert "#buildings" in project.hashtags
+    finally:
+        await DbProject.delete(db, project_id)
+        await db.commit()
+
+
 async def test_create_project_htmx_returns_inline_error_for_missing_description(
     client, stub_project_data
 ):

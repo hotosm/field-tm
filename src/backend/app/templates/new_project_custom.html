@@ -187,6 +187,27 @@ Manager{% endblock %} {% block content %}
   const hashtagsContainer = document.getElementById("hashtags-container");
   const hashtags = new Set();
 
+  // Keep a hidden input always in the DOM so htmx serializes hashtags
+  // regardless of submit-listener ordering.
+  function ensureHashtagsHiddenInput() {
+    let hidden = document.getElementById("hashtags-hidden");
+    if (!hidden) {
+      hidden = document.createElement("input");
+      hidden.type = "hidden";
+      hidden.name = "hashtags";
+      hidden.id = "hashtags-hidden";
+      if (form) form.appendChild(hidden);
+    }
+    return hidden;
+  }
+
+  function syncHashtagsHiddenInput() {
+    const hidden = ensureHashtagsHiddenInput();
+    if (hidden) hidden.value = Array.from(hashtags).join(", ");
+  }
+
+  ensureHashtagsHiddenInput();
+
   function renderCallout(container, variant, message) {
     if (!container) return;
     container.textContent = "";
@@ -219,11 +240,13 @@ Manager{% endblock %} {% block content %}
 
     hashtags.add(hashtag);
     renderHashtags();
+    syncHashtagsHiddenInput();
   }
 
   function removeHashtag(tag) {
     hashtags.delete(tag);
     renderHashtags();
+    syncHashtagsHiddenInput();
   }
 
   function renderHashtags() {
@@ -403,16 +426,7 @@ Manager{% endblock %} {% block content %}
         return false;
       }
 
-      const hashtagsArray = Array.from(hashtags);
-      let hashtagsInput = document.getElementById("hashtags-hidden");
-      if (!hashtagsInput) {
-        hashtagsInput = document.createElement("input");
-        hashtagsInput.type = "hidden";
-        hashtagsInput.name = "hashtags";
-        hashtagsInput.id = "hashtags-hidden";
-        form.appendChild(hashtagsInput);
-      }
-      hashtagsInput.value = hashtagsArray.join(", ");
+      syncHashtagsHiddenInput();
 
       return true;
     });

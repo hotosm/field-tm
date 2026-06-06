@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-06-01 17:10+0100\n"
+"POT-Creation-Date: 2026-06-06 03:42+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ha\n"
@@ -18,19 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:144
+#: app/main.py:146
 msgid "Validation failed"
 msgstr "ya gaza"
 
-#: app/main.py:168
+#: app/main.py:170
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "An samu kuskuren da ba a zata ba. Da fatan a tuntuɓi mai gudanarwa."
 
-#: app/main.py:313
+#: app/main.py:315
 msgid "Could not connect to database"
 msgstr "Ba zai iya haɗawa zuwa bayanan bayanai ba"
 
-#: app/auth/auth_deps.py:73
+#: app/auth/auth_deps.py:79
 msgid "Authenticated user is missing a valid identifier."
 msgstr "ingantaccen mai amfani ya rasa ingantaccen mai ganowa."
 
@@ -267,7 +267,7 @@ msgstr "Ba a samu aikin (%(project_id)s) ba."
 msgid "Only the project manager can delete this project."
 msgstr "Mai kula da aikin kaɗai zai iya share wannan aikin."
 
-#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:300
+#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:299
 msgid "Project not found."
 msgstr "Ba a samu aikin ba."
 
@@ -452,7 +452,7 @@ msgstr ""
 "Dole ne yankin aikin ya zama ingantaccen JSON (GeoJSON Polygon, "
 "MultiPolygon, Feature, ko FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:60
+#: app/htmx/project_create/project_create_simple_flow.py:87
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -460,13 +460,14 @@ msgstr ""
 "Ba a sami gine-ginen OSM da ke akwai a wannan yanki ba. Ci gaba da "
 "taswira daga farko."
 
-#: app/htmx/project_create/project_create_simple_flow.py:157
+#: app/htmx/project_create/project_create_simple_flow.py:185
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr "Ba a iya loda tsohon fom na OSM Buildings don kirkirar aiki mai sauki ba."
 
-#: app/htmx/project_create/project_create_simple_flow.py:270
+#: app/htmx/project_create/project_create_simple_flow.py:325
 #: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:210
+#: app/htmx/project_create/project_create_submit_routes.py:214
+#: app/htmx/setup_steps/setup_step_split_background.py:69
 msgid "An unexpected error occurred. Please try again."
 msgstr "An samu kuskuren da ba a zata ba. Da fatan a sake gwadawa."
 
@@ -490,7 +491,7 @@ msgstr "Wannan mai amfani bai wanzu ba. Da fatan a fara ƙirƙirarsa."
 msgid "This user is already a collaborator on this project."
 msgstr "Wannan mai amfani tuni yana cikin masu haɗin gwiwa na wannan aikin."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1393
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1397
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "An kasa ƙara mai haɗin gwiwa: %(exc)s"
@@ -540,7 +541,7 @@ msgid "Admin"
 msgstr "Mai gudanarwa"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:10
-#: app/templates/project_details.html:200
+#: app/templates/project_details.html:199
 msgid "Manager"
 msgstr "Mai kula"
 
@@ -601,7 +602,7 @@ msgid "Visibility"
 msgstr "Bayyanuwa"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/project_details.html:186
+#: app/templates/project_details.html:185
 msgid "Description"
 msgstr "Bayani"
 
@@ -666,17 +667,17 @@ msgstr "Rufe"
 msgid "Collaborators"
 msgstr "Masu haɗin gwiwa"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:66
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:150
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:73
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:164
 msgid "Data Extract"
 msgstr "Cire bayanai"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:78
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:85
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "An sauke bayanan OSM cikin nasara! An samu siffofi %(feature_count)s."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:81
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:88
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -687,21 +688,21 @@ msgstr ""
 "ƙasa. Idan ka gamsu, danna \"Accept Data Extract\" don ajiye. In ba haka "
 "ba, sake gwada saukewa da wasu sigogi dabam."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:111
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:122
 #: app/templates/partials/project_details/style_and_scripts.html:26
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "Nau'in fayil ba daidai ba ne. Da fatan a ɗora fayil .geojson ko .json."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:134
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:145
 msgid "No valid geometries found in GeoJSON."
 msgstr "Ba a samu ingantattun geometry a cikin GeoJSON ba."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:162
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:176
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ An ɗora GeoJSON cikin nasara! An samu siffofi %(feature_count)s."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:165
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:179
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -712,8 +713,8 @@ msgstr ""
 "ƙasa. Idan ka gamsu, danna \"Accept Data Extract\" don ajiye. In ba haka "
 "ba, gwada ɗora wani fayil dabam."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:195
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:317
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:208
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:330
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -721,17 +722,17 @@ msgstr ""
 "Ba a samu bayanan GeoJSON ba. Da fatan a fara sauke bayanan OSM ko a ɗora"
 " fayil GeoJSON."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:216
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:229
 #: app/htmx/setup_steps/setup_step_map_layers.py:27
 msgid "Project AOI"
 msgstr "AOI na aikin"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:227
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:240
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "Cire bayanai (%(feature_count)s siffofi)"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:244
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:257
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
@@ -740,7 +741,7 @@ msgstr ""
 "Ana duba siffofin bayanai %(feature_count)s a kan taswira. Duba bayanan, "
 "sannan a ci gaba zuwa mataki na gaba."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:294
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
@@ -748,7 +749,7 @@ msgstr ""
 "✓ An zaɓi yanayin tattara sabbin bayanai. An tsallake rabon aiki kuma za "
 "ka iya ci gaba."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:349
 msgid ""
 "✓ Data extract successfully saved! You can now proceed to Step 4 (split "
 "tasks)."
@@ -756,15 +757,13 @@ msgstr ""
 "✓ An adana fitar da bayanai cikin nasara! Yanzu za ka iya ci gaba zuwa "
 "Mataki na 4 (raba ayyuka)."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:374
-msgid "No data extract provided."
-msgstr "Ba a bayar da cire bayanai ba."
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:397
+msgid ""
+"No data extract is staged. Please download OSM data or upload a GeoJSON "
+"file first."
+msgstr ""
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:381
-msgid "Invalid data extract format."
-msgstr "Tsarin cire bayanai ba daidai ba ne."
-
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:398
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:412
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
@@ -772,6 +771,10 @@ msgid ""
 msgstr ""
 "✓ An karɓi fitar da bayanai! An adana fasali %(feature_count)s. Mataki na"
 " 3 ya kammala yanzu."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:456
+msgid "Data extract discarded. Choose a data source above to try again."
+msgstr ""
 
 #: app/htmx/setup_steps/setup_step_extract_helpers.py:42
 msgid "Invalid GeoJSON data in request. Please try uploading again."
@@ -855,7 +858,7 @@ msgstr ""
 "matsalar ta ci gaba, a aika da bayanan fasaha da ke ƙasa zuwa ga mai "
 "gudanar da instans ko ƙungiyar tallafi."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:99
+#: app/htmx/setup_steps/setup_step_split_routes.py:110
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -863,7 +866,7 @@ msgstr ""
 "Ba a samu cire bayanai ba. Da fatan a fara sauke bayanan OSM ko a ɗora "
 "fayil GeoJSON."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:130
+#: app/htmx/setup_steps/setup_step_split_routes.py:141
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -873,7 +876,7 @@ msgstr ""
 "%(data_feature_count)s. Za a yi amfani da dukan AOI a matsayin aiki guda "
 "ɗaya."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:137
+#: app/htmx/setup_steps/setup_step_split_routes.py:148
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -882,11 +885,11 @@ msgstr ""
 "Ana duba iyakokin aiki %(task_count)s da siffofin bayanai "
 "%(data_feature_count)s tare."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:190
+#: app/htmx/setup_steps/setup_step_split_routes.py:201
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "Ba a samu iyakar aikin ba. Ba za a iya tsallake rabon aiki ba."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:215
+#: app/htmx/setup_steps/setup_step_split_routes.py:226
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
@@ -894,27 +897,55 @@ msgstr ""
 "✓ An tsallake rabon aiki. Za a yi amfani da dukan AOI a matsayin aiki "
 "guda ɗaya. Za ka iya ci gaba zuwa Mataki na 5."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:270
+#: app/htmx/setup_steps/setup_step_split_routes.py:284
 msgid "Please select a splitting option."
 msgstr "Da fatan a zaɓi wani zaɓin rabawa."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:294
+#: app/htmx/setup_steps/setup_step_split_routes.py:335
+msgid ""
+"Cleaner shapes is unavailable for this area (too many features). Please "
+"choose a different option."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_split_routes.py:388
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ Rabon aiki ba ya da muhimmanci ga wannan tsarin aikin."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:344
+#: app/htmx/setup_steps/setup_step_split_routes.py:547
 msgid "No task areas data provided."
 msgstr "Ba a bayar da bayanan yankunan aiki ba."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:348
+#: app/htmx/setup_steps/setup_step_split_routes.py:551
 msgid "Invalid task areas data format."
 msgstr "Tsarin bayanan yankunan aiki ba daidai ba ne."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:371
+#: app/htmx/setup_steps/setup_step_split_routes.py:589
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ An ajiye rababbun ayyuka cikin nasara"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:47
+#: app/htmx/setup_steps/setup_step_validate_routes.py:56
+msgid "Could not reach Tasking Manager. Please try again later."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:61
+#, python-format
+msgid "Tasking Manager project %(id)s was not found."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:66
+#, python-format
+msgid "Tasking Manager returned an error (HTTP %(status)s)."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:79
+msgid "Tasking Manager returned an invalid response."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:89
+msgid "Tasking Manager project AOI did not contain any polygon geometries."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:113
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -923,7 +954,7 @@ msgstr ""
 "Yankin yana da %(area_km2)s km², wanda ya wuce iyakar %(area_limit)s km²."
 " Da fatan a rage yankin aikin."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:52
+#: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -932,13 +963,17 @@ msgstr ""
 "Yankin yana da %(area_km2)s km². Manyan yankuna (>%(area_warn)s km²) na "
 "iya ɗaukar lokaci mai tsawo wajen sarrafawa."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:77
+#: app/htmx/setup_steps/setup_step_validate_routes.py:143
 msgid "GeoJSON is required"
 msgstr "Ana buƙatar GeoJSON"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:87
+#: app/htmx/setup_steps/setup_step_validate_routes.py:153
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "Ba a samu polygon geometries ba. Yankin aikin dole ne ya kasance polygon."
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:196
+msgid "Tasking Manager project ID must be a positive integer."
+msgstr ""
 
 #: app/projects/project_crud.py:136
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
@@ -985,48 +1020,48 @@ msgstr "Yanki mara suna"
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "Yanki {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:408
+#: app/projects/project_services.py:412
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:166
+#: app/qfield/qfield_crud.py:167
 msgid "Project outline is missing or has no geometry."
 msgstr "ya ɓace ko bashi da lissafi."
 
-#: app/qfield/qfield_crud.py:172
+#: app/qfield/qfield_crud.py:173
 msgid "Project outline geometry has no coordinates."
 msgstr "jigon jigo na aikin aikin ba shi da haɗin kai."
 
-#: app/qfield/qfield_crud.py:476
+#: app/qfield/qfield_crud.py:477
 msgid "Project outline is required for QField project creation."
 msgstr "✓ Rabon aiki ba ya da muhimmanci ga wannan tsarin aikin."
 
-#: app/qfield/qfield_crud.py:481
+#: app/qfield/qfield_crud.py:482
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm don ƙirƙirar aikin QField."
 
-#: app/qfield/qfield_crud.py:498
+#: app/qfield/qfield_crud.py:499
 msgid "Failed to modify XLSForm for QField."
 msgstr "ya kasa gyara XLSForm don QField."
 
-#: app/qfield/qfield_crud.py:547
+#: app/qfield/qfield_crud.py:548
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS an kammala amma ba a rubuta fayilolin fitarwa ba."
 
-#: app/qfield/qfield_crud.py:559
+#: app/qfield/qfield_crud.py:562
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS wrapper an kammala amma babu fayil .qgz a fitarwa."
 
-#: app/qfield/qfield_crud.py:590
+#: app/qfield/qfield_crud.py:592
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField ID aikin ya ɓace; ba zai iya haɗa taswirar tushe ba."
 
-#: app/qfield/qfield_crud.py:627
+#: app/qfield/qfield_crud.py:629
 msgid "Basemap attach completed but produced no project files."
 msgstr "An haɗa taswirar tushe da aikin QField."
 
-#: app/qfield/qfield_crud.py:813
+#: app/qfield/qfield_crud.py:817
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -1035,40 +1070,40 @@ msgstr ""
 "QFieldCloud bai gama sarrafa fayil ɗin aikin ba bayan gwaji %(attempts)d "
 "(matsayi na ƙarshe: %(status)s)."
 
-#: app/qfield/qfield_crud.py:871 app/qfield/qfield_crud.py:885
+#: app/qfield/qfield_crud.py:875 app/qfield/qfield_crud.py:889
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS ya gaza: %(error)s"
 
-#: app/qfield/qfield_crud.py:878
+#: app/qfield/qfield_crud.py:882
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS ya dawo JSON mara inganci."
 
-#: app/qfield/qfield_crud.py:902
+#: app/qfield/qfield_crud.py:906
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "ya kasa sauke taswirar tushe MBTiles don lodawa (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:917
+#: app/qfield/qfield_crud.py:921
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "Sauke lambar QR"
 
-#: app/qfield/qfield_crud.py:1044
+#: app/qfield/qfield_crud.py:1048
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "ya kasa loda fayiloli zuwa QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1218 app/qfield/qfield_crud.py:1380
+#: app/qfield/qfield_crud.py:1222 app/qfield/qfield_crud.py:1384
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "'%(username)s' akan QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1338
+#: app/qfield/qfield_crud.py:1342
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "Ba a samu aikin (%(project_id)s) ba."
 
-#: app/qfield/qfield_crud.py:1362
+#: app/qfield/qfield_crud.py:1366
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -1077,56 +1112,58 @@ msgstr ""
 "na ƙungiyar '%(owner)s' ne. Ba za a iya ƙara '%(username)s' ga ƙungiyar "
 "ba: %(error)s"
 
-#: app/qfield/qfield_crud.py:1387
+#: app/qfield/qfield_crud.py:1391
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr ""
 "Mai amfani '%(username)s' tuni yana cikin masu haɗin gwiwa na wannan "
 "aikin."
 
-#: app/qfield/qfield_crud.py:1428
+#: app/qfield/qfield_crud.py:1432
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Bayanan shaida suna da inganci!"
 
-#: app/qfield/qfield_crud.py:1497
+#: app/qfield/qfield_crud.py:1501
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "Wannan aikin ba shi da alaƙa da aikin QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1504
+#: app/qfield/qfield_crud.py:1508
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "QFIELDCLOUD_QGIS_URL ba a saita shi ba."
 
-#: app/qfield/qfield_crud.py:1534
+#: app/qfield/qfield_crud.py:1538
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr "Ba a sami fayilolin GeoPackage a cikin fakitin QFieldCloud ba."
 
-#: app/qfield/qfield_crud.py:1556
+#: app/qfield/qfield_crud.py:1560
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
-msgstr "Babu bayanan binciken da aka samu a cikin fakitin QFieldCloud. Wataƙila masu taswirar ba su ƙaddamar da kowane martani ba tukuna."
+msgstr ""
+"Babu bayanan binciken da aka samu a cikin fakitin QFieldCloud. Wataƙila "
+"masu taswirar ba su ƙaddamar da kowane martani ba tukuna."
 
-#: app/qfield/qfield_crud.py:1579
+#: app/qfield/qfield_crud.py:1583
 msgid "QFieldCloud did not return a package job id."
 msgstr "QFieldCloud bai dawo da id aikin fakitin ba."
 
-#: app/qfield/qfield_crud.py:1596
+#: app/qfield/qfield_crud.py:1600
 msgid "QFieldCloud failed to package the project."
 msgstr "QFieldCloud ya kasa shirya aikin."
 
-#: app/qfield/qfield_crud.py:1602
+#: app/qfield/qfield_crud.py:1606
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
 "%(status)s)."
 msgstr "An ƙare jiran QFieldCloud don haɗa aikin (Matsalar ƙarshe: %(status)s)."
 
-#: app/qfield/qfield_crud.py:1626
+#: app/qfield/qfield_crud.py:1630
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "Ba a yi nasarar sauya fasalin GeoPackage: %(error)s"
 
-#: app/qfield/qfield_crud.py:1633
+#: app/qfield/qfield_crud.py:1637
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "Kundin QGIS ya dawo JSON mara inganci don /fitarwa."
 
@@ -1816,11 +1853,11 @@ msgstr "Ana ƙirƙira..."
 msgid "Something went wrong. Please try again."
 msgstr "Wani abu ya tafi ba daidai ba. Da fatan a sake gwadawa."
 
-#: app/templates/new_project_custom.html:311
+#: app/templates/new_project_custom.html:334
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Akwai aikin da ke da wannan suna tuni. Da fatan a zaɓi wani suna dabam."
 
-#: app/templates/new_project_custom.html:395
+#: app/templates/new_project_custom.html:418
 msgid "Description is required."
 msgstr "Ana buƙatar bayani."
 
@@ -1872,12 +1909,12 @@ msgid "Creating Project"
 msgstr "Ana ƙirƙirar aiki"
 
 #: app/templates/partials/new_project/creating_fragment.html:11
-#: app/templates/project_details.html:6 app/templates/project_details.html:294
-#: app/templates/project_details.html:305
+#: app/templates/project_details.html:6 app/templates/project_details.html:293
+#: app/templates/project_details.html:304
 msgid "Back to Projects"
 msgstr "Koma zuwa ayyuka"
 
-#: app/templates/project_details.html:41
+#: app/templates/project_details.html:45
 msgid ""
 "Trigger a fresh QFieldCloud package and download the project data as a "
 "single GeoJSON file."
@@ -1885,86 +1922,88 @@ msgstr ""
 "Fara sabon fakitin QFieldCloud kuma zazzage bayanan aikin azaman fayil "
 "ɗin GeoJSON guda ɗaya."
 
-#: app/templates/project_details.html:44
+#: app/templates/project_details.html:48
 msgid "Export Data"
 msgstr "Export Data"
 
-#: app/templates/project_details.html:87 app/templates/project_details.html:95
+#: app/templates/project_details.html:85 app/templates/project_details.html:93
 msgid ""
 "Packaging project on QFieldCloud - this may take a minute, please be "
 "patient..."
-msgstr "Aikin tattara kaya akan QFieldCloud - wannan na iya ɗaukar minti ɗaya, da fatan za a yi haƙuri..."
+msgstr ""
+"Aikin tattara kaya akan QFieldCloud - wannan na iya ɗaukar minti ɗaya, da"
+" fatan za a yi haƙuri..."
 
-#: app/templates/project_details.html:96
+#: app/templates/project_details.html:94
 msgid "✓ Download started."
 msgstr "✓ An fara saukewa."
 
-#: app/templates/project_details.html:97
+#: app/templates/project_details.html:95
 msgid "Export failed:"
 msgstr "An gaza fitarwa zuwa fitarwa:"
 
-#: app/templates/project_details.html:98
+#: app/templates/project_details.html:96
 msgid "Network error while exporting. Please try again."
 msgstr "Kuskuren hanyar sadarwa yayin fitarwa. Da fatan za a sake gwadawa."
 
-#: app/templates/project_details.html:174
+#: app/templates/project_details.html:173
 msgid "Project Metadata"
 msgstr "Bayanan aikin"
 
-#: app/templates/project_details.html:176
+#: app/templates/project_details.html:175
 msgid "Project metadata and setup information for managers."
 msgstr "Bayanan aiki da bayanin saiti ga masu kula."
 
-#: app/templates/project_details.html:194
+#: app/templates/project_details.html:193
 msgid "Project ID"
 msgstr "ID na aiki"
 
-#: app/templates/project_details.html:205
+#: app/templates/project_details.html:204
 msgid "Created"
 msgstr "An ƙirƙira"
 
-#: app/templates/project_details.html:212
+#: app/templates/project_details.html:211
 msgid "Last Updated"
 msgstr "Sabuntawa ta ƙarshe"
 
-#: app/templates/project_details.html:223
+#: app/templates/project_details.html:222
 msgid "Hashtags"
 msgstr "Hashtag"
 
-#: app/templates/project_details.html:235
+#: app/templates/project_details.html:234
 msgid "External Project"
 msgstr "Aiki na waje"
 
-#: app/templates/project_details.html:237
+#: app/templates/project_details.html:236
 msgid "Instance:"
 msgstr "Instans:"
 
-#: app/templates/project_details.html:239
+#: app/templates/project_details.html:238
 msgid "Project ID:"
 msgstr "ID na aiki:"
 
-#: app/templates/project_details.html:249
-#: app/templates/project_details.html:257
+#: app/templates/project_details.html:248
+#: app/templates/project_details.html:256
 msgid "View Project in ODK Central →"
 msgstr "Duba aiki a ODK Central →"
 
-#: app/templates/project_details.html:264
+#: app/templates/project_details.html:263
 msgid "Manage QFieldCloud Project →"
 msgstr "Gudanar da aikin QFieldCloud →"
 
-#: app/templates/project_details.html:272
+#: app/templates/project_details.html:271
 msgid "View Project Externally →"
 msgstr "Duba aiki daga waje →"
 
-#: app/templates/project_details.html:288
+#: app/templates/project_details.html:287
 msgid "Delete this project in downstream and Field-TM? This cannot be undone."
 msgstr "A share wannan aiki a downstream da Field-TM? Ba za a iya janye wannan ba."
 
-#: app/templates/project_details.html:291
+#: app/templates/project_details.html:290
 msgid "Delete Project"
 msgstr "Share aiki"
 
-#: app/templates/project_details.html:302
+#: app/templates/project_details.html:301
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view\n"
@@ -2047,11 +2086,11 @@ msgstr "An sami kuskuren da ba a zata ba."
 msgid "Try Again"
 msgstr "Sake gwadawa"
 
-#: app/templates/partials/new_project/creating_fragment.html:23
+#: app/templates/partials/new_project/creating_fragment.html:24
 msgid "Setting up your project..."
 msgstr "Ana shirya aikinku..."
 
-#: app/templates/partials/new_project/creating_fragment.html:25
+#: app/templates/partials/new_project/creating_fragment.html:26
 msgid ""
 "Downloading map data, splitting tasks, and preparing the QField project. "
 "This can take a\n"
@@ -2098,6 +2137,14 @@ msgstr "Babu GeoJSON da aka dawo daga tantancewa"
 msgid "You must draw or upload a project area on the map before submitting."
 msgstr "Dole ne ka zana ko ka ɗora Area of Interest (AOI) a taswira kafin miƙawa."
 
+#: app/templates/partials/new_project/map_script.html:12
+msgid "Enter a Tasking Manager project ID first."
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:13
+msgid "Could not load AOI from Tasking Manager."
+msgstr ""
+
 #: app/templates/partials/new_project/map_section.html:3
 msgid "Project Area"
 msgstr "Yankin aiki"
@@ -2121,24 +2168,49 @@ msgstr "Goge"
 msgid "More options"
 msgstr "Zaɓuɓɓukan fom:"
 
-#: app/templates/partials/new_project/map_section.html:39
-msgid "Upload your own map file (GeoJSON)"
-msgstr "Ɗora GeoJSON na musamman"
+#: app/templates/partials/new_project/map_section.html:38
+msgid "Upload a GeoJSON file"
+msgstr ""
 
-#: app/templates/partials/new_project/map_section.html:43
+#: app/templates/partials/new_project/map_section.html:40
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
-"        drawing."
+"          drawing."
 msgstr ""
-"Idan kana da fayil ɗin taswira mai iyakar yankinka, ɗora shi nan maimakon"
-" zana shi."
 
 #: app/templates/partials/new_project/map_section.html:50
+msgid "Upload your own map file (GeoJSON)"
+msgstr "Ɗora GeoJSON na musamman"
+
+#: app/templates/partials/new_project/map_section.html:55
+#: app/templates/partials/new_project/map_section.html:56
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+msgid "or"
+msgstr "ko"
+
+#: app/templates/partials/new_project/map_section.html:60
+msgid "Load from a HOT Tasking Manager project"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:62
+msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:71
+msgid "Tasking Manager project ID"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:75
+msgid "Load AOI"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:84
 msgid "Combine multiple shapes into one"
 msgstr "Haɗa siffofi da yawa su zama ɗaya"
 
-#: app/templates/partials/new_project/map_section.html:55
+#: app/templates/partials/new_project/map_section.html:89
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2320,6 +2392,7 @@ msgstr "polylines na layi"
 msgid "points"
 msgstr "maki"
 
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
 #: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
 msgstr "siffofi"
@@ -2371,7 +2444,7 @@ msgstr "Raba ta murabba'i"
 msgid "Split by buildings"
 msgstr "Raba ta gine-gine"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/setup_steps/step4_split.html:179
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split area"
 msgstr "Sake raba"
@@ -2597,9 +2670,17 @@ msgstr "Yi amfani da wannan hoton"
 msgid "No imagery items were found for this AOI."
 msgstr "Ba a sami wasu abubuwan hoto na wannan AOI ba."
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:22
 msgid "Accept Data Extract"
 msgstr "Karɓi cire bayanai"
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:30
+msgid "Discard the downloaded data extract?"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:33
+msgid "Discard"
+msgstr ""
 
 #: app/templates/partials/project_details/fragments/finalize_error.html:7
 msgid "View technical details"
@@ -2652,6 +2733,17 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "Karɓi zaɓin ayyuka"
 
+#: app/templates/partials/project_details/fragments/split_running.html:10
+msgid "Splitting the AOI into tasks..."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/split_running.html:12
+msgid ""
+"Large areas can take several minutes. This page will update automatically"
+" when the preview\n"
+"    is ready - feel free to leave the tab open."
+msgstr ""
+
 #: app/templates/partials/project_details/setup_steps/step2_form.html:4
 msgid "Survey form ready"
 msgstr "Fom ɗin bincike ya shirya"
@@ -2676,11 +2768,6 @@ msgstr "Fom ɗin bincike"
 #: app/templates/partials/project_details/setup_steps/step2_form.html:28
 msgid "Loading survey types..."
 msgstr "Ana loda nau'ikan bincike..."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
-msgid "or"
-msgstr "ko"
 
 #: app/templates/partials/project_details/setup_steps/step2_form.html:36
 msgid "upload your own survey file (.xls / .xlsx)"
@@ -2851,15 +2938,15 @@ msgstr "Polilayi"
 msgid "Point"
 msgstr "Batu"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:116
-msgid "Use centroids"
-msgstr "Yi amfani da centroids"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:117
+msgid "Use Centroids (For OSM Data Download)"
+msgstr "Yi amfani da centroids (Don zazzage bayanan OSM)"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+#: app/templates/partials/project_details/setup_steps/step3_data.html:120
 msgid "Convert polygons to single points."
 msgstr "Mayar da polygons zuwa maki guda-guda."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:140
+#: app/templates/partials/project_details/setup_steps/step3_data.html:142
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "Ana samar da cire bayanan OSM... Wannan na iya ɗaukar ɗan lokaci."
 
@@ -2921,47 +3008,63 @@ msgstr "Haɗa layin dogo"
 msgid "Include aeroways"
 msgstr "Haɗa hanyoyin jirgi"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:109
+#: app/templates/partials/project_details/setup_steps/step4_split.html:115
 msgid "How to split"
 msgstr "Yadda za a raba"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+#: app/templates/partials/project_details/setup_steps/step4_split.html:117
 msgid "Choose a method..."
 msgstr "Zaɓi hanya..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:112
+#: app/templates/partials/project_details/setup_steps/step4_split.html:118
 msgid "By number of buildings (faster)"
 msgstr "Ta yawan gine-gine (mai sauri)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:114
+#: app/templates/partials/project_details/setup_steps/step4_split.html:120
+msgid ""
+"By number of buildings (cleaner shapes) - unavailable\n"
+"            for large areas"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 msgid "By number of buildings (cleaner shapes)"
 msgstr "Ta yawan gine-gine (siffofi masu tsafta)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:116
+#: app/templates/partials/project_details/setup_steps/step4_split.html:124
 msgid "By a regular grid"
 msgstr "Ta grid na yau da kullum"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+#: app/templates/partials/project_details/setup_steps/step4_split.html:125
 msgid "Into a fixed number of tasks"
 msgstr "Raba da takamaiman adadin ayyuka (zuwa nan ba da jimawa ba)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:122
+#: app/templates/partials/project_details/setup_steps/step4_split.html:129
+msgid "Cleaner shapes is disabled for this area."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+msgid ""
+"It becomes geometrically unstable above ~5,000 features. Use the\n"
+"          faster option instead."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:137
 msgid "Buildings per task"
 msgstr "Matsakaicin gine-gine a kowane aiki:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:133
+#: app/templates/partials/project_details/setup_steps/step4_split.html:148
 msgid "Number of tasks"
 msgstr "Yawan ayyuka:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:145
+#: app/templates/partials/project_details/setup_steps/step4_split.html:160
 msgid "Grid square size (metres)"
 msgstr "Girman murabba'in grid (mita)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/setup_steps/step4_split.html:179
 msgid "Split Again"
 msgstr "Sake raba"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:199
+#: app/templates/partials/project_details/setup_steps/step4_split.html:213
 msgid "Splitting area into tasks... This may take a moment."
 msgstr "Ana raba AOI zuwa ayyuka... Wannan na iya ɗaukar ɗan lokaci."
 
@@ -3045,3 +3148,4 @@ msgstr "Na zaɓi - bar shi babu komai don ƙirƙira ƙarƙashin sunan mai amfani
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "Ajiye kuma ci gaba"
+

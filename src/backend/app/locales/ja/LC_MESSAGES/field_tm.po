@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-06-01 17:10+0100\n"
+"POT-Creation-Date: 2026-06-06 03:42+0100\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ja\n"
@@ -18,19 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:144
+#: app/main.py:146
 msgid "Validation failed"
 msgstr "検証に失敗しました"
 
-#: app/main.py:168
+#: app/main.py:170
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "予期しないエラーが発生しました。管理者に連絡してください。"
 
-#: app/main.py:313
+#: app/main.py:315
 msgid "Could not connect to database"
 msgstr "データベースに接続できませんでした"
 
-#: app/auth/auth_deps.py:73
+#: app/auth/auth_deps.py:79
 msgid "Authenticated user is missing a valid identifier."
 msgstr "認証されたユーザーに有効な識別子がありません。"
 
@@ -263,7 +263,7 @@ msgstr "プロジェクト (%(project_id)s) が見つかりません。"
 msgid "Only the project manager can delete this project."
 msgstr "このプロジェクトを削除できるのはプロジェクト管理者のみです。"
 
-#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:300
+#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:299
 msgid "Project not found."
 msgstr "プロジェクトが見つかりません。"
 
@@ -432,19 +432,20 @@ msgstr ""
 "プロジェクト範囲は有効な JSON である必要があります（GeoJSON Polygon、MultiPolygon、Feature、または "
 "FeatureCollection）。"
 
-#: app/htmx/project_create/project_create_simple_flow.py:60
+#: app/htmx/project_create/project_create_simple_flow.py:87
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
 msgstr "このエリアには既存の OSM 建物が見つかりませんでした。新規にマッピングを続行してください。"
 
-#: app/htmx/project_create/project_create_simple_flow.py:157
+#: app/htmx/project_create/project_create_simple_flow.py:185
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr "簡易プロジェクト作成用の既定の OSM Buildings フォームを読み込めませんでした。"
 
-#: app/htmx/project_create/project_create_simple_flow.py:270
+#: app/htmx/project_create/project_create_simple_flow.py:325
 #: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:210
+#: app/htmx/project_create/project_create_submit_routes.py:214
+#: app/htmx/setup_steps/setup_step_split_background.py:69
 msgid "An unexpected error occurred. Please try again."
 msgstr "予期しないエラーが発生しました。もう一度お試しください。"
 
@@ -468,7 +469,7 @@ msgstr "このユーザーは存在しません。先に作成してください
 msgid "This user is already a collaborator on this project."
 msgstr "このユーザーはすでにこのプロジェクトの共同作業者です。"
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1393
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1397
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "共同作業者の追加に失敗しました: %(exc)s"
@@ -518,7 +519,7 @@ msgid "Admin"
 msgstr "管理者"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:10
-#: app/templates/project_details.html:200
+#: app/templates/project_details.html:199
 msgid "Manager"
 msgstr "マネージャー"
 
@@ -579,7 +580,7 @@ msgid "Visibility"
 msgstr "公開設定"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/project_details.html:186
+#: app/templates/project_details.html:185
 msgid "Description"
 msgstr "説明"
 
@@ -644,17 +645,17 @@ msgstr "閉じる"
 msgid "Collaborators"
 msgstr "共同作業者"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:66
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:150
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:73
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:164
 msgid "Data Extract"
 msgstr "データ抽出"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:78
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:85
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "OSM データのダウンロードに成功しました。%(feature_count)s 件の要素が見つかりました。"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:81
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:88
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -664,21 +665,21 @@ msgstr ""
 "地図上で %(feature_count)s "
 "件の要素をプレビューしています。以下のデータを確認してください。問題なければ「データ抽出を承認」をクリックして保存してください。そうでない場合は、別のパラメータで再度ダウンロードしてください。"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:111
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:122
 #: app/templates/partials/project_details/style_and_scripts.html:26
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "無効なファイル形式です。.geojson または .json ファイルをアップロードしてください。"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:134
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:145
 msgid "No valid geometries found in GeoJSON."
 msgstr "GeoJSON に有効なジオメトリが見つかりません。"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:162
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:176
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ GeoJSON のアップロードに成功しました。%(feature_count)s 件の要素が見つかりました。"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:165
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:179
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -688,56 +689,58 @@ msgstr ""
 "地図上で %(feature_count)s "
 "件の要素をプレビューしています。以下のデータを確認してください。問題なければ「データ抽出を承認」をクリックして保存してください。そうでない場合は、別のファイルをアップロードしてください。"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:195
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:317
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:208
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:330
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr "GeoJSON データが見つかりません。先に OSM データをダウンロードするか GeoJSON ファイルをアップロードしてください。"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:216
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:229
 #: app/htmx/setup_steps/setup_step_map_layers.py:27
 msgid "Project AOI"
 msgstr "プロジェクト AOI"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:227
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:240
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "データ抽出 (%(feature_count)s 件の要素)"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:244
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:257
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
 "continue to the next step."
 msgstr "地図上で %(feature_count)s 件のデータ要素をプレビューしています。データを確認してから次のステップに進んでください。"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:294
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
 msgstr "✓ 新規データ収集モードが選択されました。タスク分割はスキップされ、そのまま続行できます。"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:349
 msgid ""
 "✓ Data extract successfully saved! You can now proceed to Step 4 (split "
 "tasks)."
 msgstr "✓ データ抽出が正常に保存されました。ステップ4（タスク分割）に進めます。"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:374
-msgid "No data extract provided."
-msgstr "データ抽出が指定されていません。"
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:397
+msgid ""
+"No data extract is staged. Please download OSM data or upload a GeoJSON "
+"file first."
+msgstr ""
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:381
-msgid "Invalid data extract format."
-msgstr "無効なデータ抽出形式です。"
-
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:398
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:412
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
 "complete."
 msgstr "✓ データ抽出を承認しました。%(feature_count)s 件のフィーチャを保存しました。ステップ 3 が完了しました。"
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:456
+msgid "Data extract discarded. Choose a data source above to try again."
+msgstr ""
 
 #: app/htmx/setup_steps/setup_step_extract_helpers.py:42
 msgid "Invalid GeoJSON data in request. Please try uploading again."
@@ -810,13 +813,13 @@ msgid ""
 "administrator or support team."
 msgstr "プロジェクトの最終確定に失敗しました。設定を確認して再試行してください。問題が続く場合は、以下の技術的な詳細をインスタンス管理者またはサポートチームに送ってください。"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:99
+#: app/htmx/setup_steps/setup_step_split_routes.py:110
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr "データ抽出が見つかりません。先に OSM データをダウンロードするか GeoJSON ファイルをアップロードしてください。"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:130
+#: app/htmx/setup_steps/setup_step_split_routes.py:141
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -825,64 +828,96 @@ msgstr ""
 "%(data_feature_count)s 件のデータ要素を含む AOI 全体 (分割なし) をプレビューしています。AOI 全体が 1 "
 "つのタスクとして使用されます。"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:137
+#: app/htmx/setup_steps/setup_step_split_routes.py:148
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
 " features together."
 msgstr "%(task_count)s 個のタスク境界と %(data_feature_count)s 件のデータ要素をあわせてプレビューしています。"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:190
+#: app/htmx/setup_steps/setup_step_split_routes.py:201
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "プロジェクトの外形が見つかりません。タスク分割をスキップできません。"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:215
+#: app/htmx/setup_steps/setup_step_split_routes.py:226
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
 msgstr "✓ タスク分割をスキップしました。AOI 全体が 1 つのタスクとして使用されます。ステップ 5 に進めます。"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:270
+#: app/htmx/setup_steps/setup_step_split_routes.py:284
 msgid "Please select a splitting option."
 msgstr "分割オプションを選択してください。"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:294
+#: app/htmx/setup_steps/setup_step_split_routes.py:335
+msgid ""
+"Cleaner shapes is unavailable for this area (too many features). Please "
+"choose a different option."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_split_routes.py:388
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ このプロジェクト設定ではタスク分割は不要です。"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:344
+#: app/htmx/setup_steps/setup_step_split_routes.py:547
 msgid "No task areas data provided."
 msgstr "タスク領域データが指定されていません。"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:348
+#: app/htmx/setup_steps/setup_step_split_routes.py:551
 msgid "Invalid task areas data format."
 msgstr "無効なタスク領域データ形式です。"
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:371
+#: app/htmx/setup_steps/setup_step_split_routes.py:589
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ 分割タスクを正常に保存しました"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:47
+#: app/htmx/setup_steps/setup_step_validate_routes.py:56
+msgid "Could not reach Tasking Manager. Please try again later."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:61
+#, python-format
+msgid "Tasking Manager project %(id)s was not found."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:66
+#, python-format
+msgid "Tasking Manager returned an error (HTTP %(status)s)."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:79
+msgid "Tasking Manager returned an invalid response."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:89
+msgid "Tasking Manager project AOI did not contain any polygon geometries."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:113
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
 "Please reduce your project area."
 msgstr "面積は %(area_km2)s km² で、%(area_limit)s km² の上限を超えています。プロジェクト範囲を小さくしてください。"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:52
+#: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
 "longer to process."
 msgstr "面積は %(area_km2)s km² です。大きな範囲 (>%(area_warn)s km²) は処理に時間がかかる場合があります。"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:77
+#: app/htmx/setup_steps/setup_step_validate_routes.py:143
 msgid "GeoJSON is required"
 msgstr "GeoJSON は必須です"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:87
+#: app/htmx/setup_steps/setup_step_validate_routes.py:153
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "ポリゴンのジオメトリが見つかりません。プロジェクト領域はポリゴンである必要があります。"
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:196
+msgid "Tasking Manager project ID must be a positive integer."
+msgstr ""
 
 #: app/projects/project_crud.py:136
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
@@ -927,48 +962,48 @@ msgstr "名称未設定のエリア"
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "エリア {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:408
+#: app/projects/project_services.py:412
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:166
+#: app/qfield/qfield_crud.py:167
 msgid "Project outline is missing or has no geometry."
 msgstr "プロジェクトのアウトラインが欠落しているか、ジオメトリがありません。"
 
-#: app/qfield/qfield_crud.py:172
+#: app/qfield/qfield_crud.py:173
 msgid "Project outline geometry has no coordinates."
 msgstr "プロジェクトのアウトライン ジオメトリには座標がありません。"
 
-#: app/qfield/qfield_crud.py:476
+#: app/qfield/qfield_crud.py:477
 msgid "Project outline is required for QField project creation."
 msgstr "✓ このプロジェクト設定ではタスク分割は不要です。"
 
-#: app/qfield/qfield_crud.py:481
+#: app/qfield/qfield_crud.py:482
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm が必要です。"
 
-#: app/qfield/qfield_crud.py:498
+#: app/qfield/qfield_crud.py:499
 msgid "Failed to modify XLSForm for QField."
 msgstr "QField の XLSForm を変更できませんでした。"
 
-#: app/qfield/qfield_crud.py:547
+#: app/qfield/qfield_crud.py:548
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS ラッパーは完了しましたが、出力ファイルは書き込まれませんでした。"
 
-#: app/qfield/qfield_crud.py:559
+#: app/qfield/qfield_crud.py:562
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS ラッパーは完了しましたが、出力に .qgz ファイルがありません。"
 
-#: app/qfield/qfield_crud.py:590
+#: app/qfield/qfield_crud.py:592
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField プロジェクト ID がありません。ベースマップを添付できません。"
 
-#: app/qfield/qfield_crud.py:627
+#: app/qfield/qfield_crud.py:629
 msgid "Basemap attach completed but produced no project files."
 msgstr "ベースマップがQFieldプロジェクトに添付されました。"
 
-#: app/qfield/qfield_crud.py:813
+#: app/qfield/qfield_crud.py:817
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -977,94 +1012,94 @@ msgstr ""
 "QFieldCloud は %(attempts)d 回試行してもプロジェクトファイルの処理を完了しませんでした（最後のステータス: "
 "%(status)s）。"
 
-#: app/qfield/qfield_crud.py:871 app/qfield/qfield_crud.py:885
+#: app/qfield/qfield_crud.py:875 app/qfield/qfield_crud.py:889
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS プロジェクトの生成に失敗しました: %(error)s"
 
-#: app/qfield/qfield_crud.py:878
+#: app/qfield/qfield_crud.py:882
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS ラッパーが無効な JSON を返しました。"
 
-#: app/qfield/qfield_crud.py:902
+#: app/qfield/qfield_crud.py:906
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "アップロード用のベースマップ MBTiles のダウンロードに失敗しました (HTTP %(status)s)。"
 
-#: app/qfield/qfield_crud.py:917
+#: app/qfield/qfield_crud.py:921
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "QR コードをダウンロード"
 
-#: app/qfield/qfield_crud.py:1044
+#: app/qfield/qfield_crud.py:1048
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "QFieldCloud へのファイルのアップロードに失敗しました: %(error)s"
 
-#: app/qfield/qfield_crud.py:1218 app/qfield/qfield_crud.py:1380
+#: app/qfield/qfield_crud.py:1222 app/qfield/qfield_crud.py:1384
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "ユーザー '%(username)s' は QFieldCloud に存在しません。"
 
-#: app/qfield/qfield_crud.py:1338
+#: app/qfield/qfield_crud.py:1342
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "プロジェクト (%(project_id)s) が見つかりません。"
 
-#: app/qfield/qfield_crud.py:1362
+#: app/qfield/qfield_crud.py:1366
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
 " to the organization: %(error)s"
 msgstr "プロジェクトは組織「%(owner)s」に属しています。 「%(username)s」を組織に追加できませんでした: %(error)s"
 
-#: app/qfield/qfield_crud.py:1387
+#: app/qfield/qfield_crud.py:1391
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "ユーザー '%(username)s' はすでにこのプロジェクトの共同作業者です。"
 
-#: app/qfield/qfield_crud.py:1428
+#: app/qfield/qfield_crud.py:1432
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ 認証情報は有効です！"
 
-#: app/qfield/qfield_crud.py:1497
+#: app/qfield/qfield_crud.py:1501
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "このプロジェクトは QFieldCloud プロジェクトにリンクされていません。"
 
-#: app/qfield/qfield_crud.py:1504
+#: app/qfield/qfield_crud.py:1508
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "QFIELDCLOUD_QGIS_URL が構成されていません。"
 
-#: app/qfield/qfield_crud.py:1534
+#: app/qfield/qfield_crud.py:1538
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr "QFieldCloud パッケージ内に GeoPackage ファイルが見つかりませんでした。"
 
-#: app/qfield/qfield_crud.py:1556
+#: app/qfield/qfield_crud.py:1560
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
 msgstr "QFieldCloud パッケージに調査データが見つかりません。マッパーはまだ応答を送信していない可能性があります。"
 
-#: app/qfield/qfield_crud.py:1579
+#: app/qfield/qfield_crud.py:1583
 msgid "QFieldCloud did not return a package job id."
 msgstr "QFieldCloud はパッケージ ジョブ ID を返しませんでした。"
 
-#: app/qfield/qfield_crud.py:1596
+#: app/qfield/qfield_crud.py:1600
 msgid "QFieldCloud failed to package the project."
 msgstr "QFieldCloud はプロジェクトをパッケージ化できませんでした。"
 
-#: app/qfield/qfield_crud.py:1602
+#: app/qfield/qfield_crud.py:1606
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
 "%(status)s)."
 msgstr "QFieldCloud がプロジェクトをパッケージ化するのを待機中にタイムアウトしました (最終ステータス: %(status)s)。"
 
-#: app/qfield/qfield_crud.py:1626
+#: app/qfield/qfield_crud.py:1630
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "GeoPackage の変換に失敗しました: %(error)s"
 
-#: app/qfield/qfield_crud.py:1633
+#: app/qfield/qfield_crud.py:1637
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "QGIS ラッパーが /export に対して無効な JSON を返しました。"
 
@@ -1701,11 +1736,11 @@ msgstr "作成中..."
 msgid "Something went wrong. Please try again."
 msgstr "問題が発生しました。もう一度お試しください。"
 
-#: app/templates/new_project_custom.html:311
+#: app/templates/new_project_custom.html:334
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "この名前のプロジェクトはすでに存在します。別の名前を選択してください。"
 
-#: app/templates/new_project_custom.html:395
+#: app/templates/new_project_custom.html:418
 msgid "Description is required."
 msgstr "説明は必須です。"
 
@@ -1752,97 +1787,97 @@ msgid "Creating Project"
 msgstr "プロジェクトを作成中"
 
 #: app/templates/partials/new_project/creating_fragment.html:11
-#: app/templates/project_details.html:6 app/templates/project_details.html:294
-#: app/templates/project_details.html:305
+#: app/templates/project_details.html:6 app/templates/project_details.html:293
+#: app/templates/project_details.html:304
 msgid "Back to Projects"
 msgstr "プロジェクト一覧に戻る"
 
-#: app/templates/project_details.html:41
+#: app/templates/project_details.html:45
 msgid ""
 "Trigger a fresh QFieldCloud package and download the project data as a "
 "single GeoJSON file."
 msgstr "新しい QFieldCloud パッケージをトリガーし、プロジェクト データを単一の GeoJSON ファイルとしてダウンロードします。"
 
-#: app/templates/project_details.html:44
+#: app/templates/project_details.html:48
 msgid "Export Data"
 msgstr "データのエクスポート"
 
-#: app/templates/project_details.html:87 app/templates/project_details.html:95
+#: app/templates/project_details.html:85 app/templates/project_details.html:93
 msgid ""
 "Packaging project on QFieldCloud - this may take a minute, please be "
 "patient..."
 msgstr "QFieldCloud でプロジェクトをパッケージ化しています - これには 1 分ほどかかる場合があります。しばらくお待ちください..."
 
-#: app/templates/project_details.html:96
+#: app/templates/project_details.html:94
 msgid "✓ Download started."
 msgstr "✓ ダウンロードが開始されました。"
 
-#: app/templates/project_details.html:97
+#: app/templates/project_details.html:95
 msgid "Export failed:"
 msgstr "エクスポートに失敗しました:"
 
-#: app/templates/project_details.html:98
+#: app/templates/project_details.html:96
 msgid "Network error while exporting. Please try again."
 msgstr "エクスポート中にネットワークエラーが発生しました。もう一度試してください。"
 
-#: app/templates/project_details.html:174
+#: app/templates/project_details.html:173
 msgid "Project Metadata"
 msgstr "プロジェクトのメタデータ"
 
-#: app/templates/project_details.html:176
+#: app/templates/project_details.html:175
 msgid "Project metadata and setup information for managers."
 msgstr "管理者向けのプロジェクトメタデータと設定情報です。"
 
-#: app/templates/project_details.html:194
+#: app/templates/project_details.html:193
 msgid "Project ID"
 msgstr "プロジェクト ID"
 
-#: app/templates/project_details.html:205
+#: app/templates/project_details.html:204
 msgid "Created"
 msgstr "作成日"
 
-#: app/templates/project_details.html:212
+#: app/templates/project_details.html:211
 msgid "Last Updated"
 msgstr "最終更新"
 
-#: app/templates/project_details.html:223
+#: app/templates/project_details.html:222
 msgid "Hashtags"
 msgstr "ハッシュタグ"
 
-#: app/templates/project_details.html:235
+#: app/templates/project_details.html:234
 msgid "External Project"
 msgstr "外部プロジェクト"
 
-#: app/templates/project_details.html:237
+#: app/templates/project_details.html:236
 msgid "Instance:"
 msgstr "インスタンス:"
 
-#: app/templates/project_details.html:239
+#: app/templates/project_details.html:238
 msgid "Project ID:"
 msgstr "プロジェクト ID:"
 
-#: app/templates/project_details.html:249
-#: app/templates/project_details.html:257
+#: app/templates/project_details.html:248
+#: app/templates/project_details.html:256
 msgid "View Project in ODK Central →"
 msgstr "ODK Central でプロジェクトを表示 →"
 
-#: app/templates/project_details.html:264
+#: app/templates/project_details.html:263
 msgid "Manage QFieldCloud Project →"
 msgstr "QFieldCloud プロジェクトを管理 →"
 
-#: app/templates/project_details.html:272
+#: app/templates/project_details.html:271
 msgid "View Project Externally →"
 msgstr "外部でプロジェクトを表示 →"
 
-#: app/templates/project_details.html:288
+#: app/templates/project_details.html:287
 msgid "Delete this project in downstream and Field-TM? This cannot be undone."
 msgstr "下流システムと Field-TM の両方でこのプロジェクトを削除しますか？この操作は元に戻せません。"
 
-#: app/templates/project_details.html:291
+#: app/templates/project_details.html:290
 msgid "Delete Project"
 msgstr "プロジェクトを削除"
 
-#: app/templates/project_details.html:302
+#: app/templates/project_details.html:301
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view\n"
@@ -1923,11 +1958,11 @@ msgstr "予期しないエラーが発生しました。"
 msgid "Try Again"
 msgstr "もう一度試す"
 
-#: app/templates/partials/new_project/creating_fragment.html:23
+#: app/templates/partials/new_project/creating_fragment.html:24
 msgid "Setting up your project..."
 msgstr "プロジェクトを設定しています..."
 
-#: app/templates/partials/new_project/creating_fragment.html:25
+#: app/templates/partials/new_project/creating_fragment.html:26
 msgid ""
 "Downloading map data, splitting tasks, and preparing the QField project. "
 "This can take a\n"
@@ -1972,6 +2007,14 @@ msgstr "検証から GeoJSON が返されませんでした"
 msgid "You must draw or upload a project area on the map before submitting."
 msgstr "送信前に地図上で関心領域 (AOI) を描画するかアップロードする必要があります。"
 
+#: app/templates/partials/new_project/map_script.html:12
+msgid "Enter a Tasking Manager project ID first."
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:13
+msgid "Could not load AOI from Tasking Manager."
+msgstr ""
+
 #: app/templates/partials/new_project/map_section.html:3
 msgid "Project Area"
 msgstr "プロジェクト領域"
@@ -1995,22 +2038,49 @@ msgstr "クリア"
 msgid "More options"
 msgstr "フォームオプション:"
 
-#: app/templates/partials/new_project/map_section.html:39
-msgid "Upload your own map file (GeoJSON)"
-msgstr "カスタム GeoJSON をアップロード"
+#: app/templates/partials/new_project/map_section.html:38
+msgid "Upload a GeoJSON file"
+msgstr ""
 
-#: app/templates/partials/new_project/map_section.html:43
+#: app/templates/partials/new_project/map_section.html:40
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
-"        drawing."
-msgstr "範囲境界を含む地図ファイルが既にある場合は、描画する代わりにここへアップロードしてください。"
+"          drawing."
+msgstr ""
 
 #: app/templates/partials/new_project/map_section.html:50
+msgid "Upload your own map file (GeoJSON)"
+msgstr "カスタム GeoJSON をアップロード"
+
+#: app/templates/partials/new_project/map_section.html:55
+#: app/templates/partials/new_project/map_section.html:56
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+msgid "or"
+msgstr "または"
+
+#: app/templates/partials/new_project/map_section.html:60
+msgid "Load from a HOT Tasking Manager project"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:62
+msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:71
+msgid "Tasking Manager project ID"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:75
+msgid "Load AOI"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:84
 msgid "Combine multiple shapes into one"
 msgstr "複数の形状を 1 つに結合"
 
-#: app/templates/partials/new_project/map_section.html:55
+#: app/templates/partials/new_project/map_section.html:89
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2181,6 +2251,7 @@ msgstr "ポリライン"
 msgid "points"
 msgstr "ポイント"
 
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
 #: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
 msgstr "要素"
@@ -2228,7 +2299,7 @@ msgstr "正方形で分割"
 msgid "Split by buildings"
 msgstr "建物単位で分割"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/setup_steps/step4_split.html:179
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split area"
 msgstr "再分割"
@@ -2450,9 +2521,17 @@ msgstr "この画像を使用"
 msgid "No imagery items were found for this AOI."
 msgstr "このAOIの画像項目は見つかりませんでした。"
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:22
 msgid "Accept Data Extract"
 msgstr "データ抽出を承認"
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:30
+msgid "Discard the downloaded data extract?"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:33
+msgid "Discard"
+msgstr ""
 
 #: app/templates/partials/project_details/fragments/finalize_error.html:7
 msgid "View technical details"
@@ -2503,6 +2582,17 @@ msgstr "管理者アカウントを自動作成できませんでした。QField
 msgid "Accept Task Choices"
 msgstr "タスク選択を承認"
 
+#: app/templates/partials/project_details/fragments/split_running.html:10
+msgid "Splitting the AOI into tasks..."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/split_running.html:12
+msgid ""
+"Large areas can take several minutes. This page will update automatically"
+" when the preview\n"
+"    is ready - feel free to leave the tab open."
+msgstr ""
+
 #: app/templates/partials/project_details/setup_steps/step2_form.html:4
 msgid "Survey form ready"
 msgstr "調査フォームの準備完了"
@@ -2525,11 +2615,6 @@ msgstr "調査フォーム"
 #: app/templates/partials/project_details/setup_steps/step2_form.html:28
 msgid "Loading survey types..."
 msgstr "調査タイプを読み込み中..."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
-msgid "or"
-msgstr "または"
 
 #: app/templates/partials/project_details/setup_steps/step2_form.html:36
 msgid "upload your own survey file (.xls / .xlsx)"
@@ -2692,15 +2777,15 @@ msgstr "ポリライン"
 msgid "Point"
 msgstr "ポイント"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:116
-msgid "Use centroids"
-msgstr "重心を使用"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:117
+msgid "Use Centroids (For OSM Data Download)"
+msgstr "重心を使用 (OSMデータダウンロード用)"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+#: app/templates/partials/project_details/setup_steps/step3_data.html:120
 msgid "Convert polygons to single points."
 msgstr "ポリゴンを単一ポイントに変換します。"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:140
+#: app/templates/partials/project_details/setup_steps/step3_data.html:142
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "OSM データ抽出を生成しています... 少し時間がかかる場合があります。"
 
@@ -2759,47 +2844,63 @@ msgstr "鉄道を含める"
 msgid "Include aeroways"
 msgstr "航空路を含める"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:109
+#: app/templates/partials/project_details/setup_steps/step4_split.html:115
 msgid "How to split"
 msgstr "分割方法"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+#: app/templates/partials/project_details/setup_steps/step4_split.html:117
 msgid "Choose a method..."
 msgstr "方法を選択..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:112
+#: app/templates/partials/project_details/setup_steps/step4_split.html:118
 msgid "By number of buildings (faster)"
 msgstr "建物数別（高速）"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:114
+#: app/templates/partials/project_details/setup_steps/step4_split.html:120
+msgid ""
+"By number of buildings (cleaner shapes) - unavailable\n"
+"            for large areas"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 msgid "By number of buildings (cleaner shapes)"
 msgstr "建物数別（形状がきれい）"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:116
+#: app/templates/partials/project_details/setup_steps/step4_split.html:124
 msgid "By a regular grid"
 msgstr "通常グリッド別"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+#: app/templates/partials/project_details/setup_steps/step4_split.html:125
 msgid "Into a fixed number of tasks"
 msgstr "指定したタスク数で分割 (近日対応)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:122
+#: app/templates/partials/project_details/setup_steps/step4_split.html:129
+msgid "Cleaner shapes is disabled for this area."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+msgid ""
+"It becomes geometrically unstable above ~5,000 features. Use the\n"
+"          faster option instead."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:137
 msgid "Buildings per task"
 msgstr "タスクあたり平均建物数:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:133
+#: app/templates/partials/project_details/setup_steps/step4_split.html:148
 msgid "Number of tasks"
 msgstr "タスク数:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:145
+#: app/templates/partials/project_details/setup_steps/step4_split.html:160
 msgid "Grid square size (metres)"
 msgstr "グリッド正方形のサイズ（メートル）"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/setup_steps/step4_split.html:179
 msgid "Split Again"
 msgstr "再分割"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:199
+#: app/templates/partials/project_details/setup_steps/step4_split.html:213
 msgid "Splitting area into tasks... This may take a moment."
 msgstr "AOI をタスクへ分割中... 少し時間がかかる場合があります。"
 
@@ -2881,3 +2982,4 @@ msgstr "任意 - 空欄のままにするとユーザー名の下に作成され
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "保存して続行"
+

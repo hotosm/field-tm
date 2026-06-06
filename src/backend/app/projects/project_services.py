@@ -632,11 +632,15 @@ def _configure_extract_sources(
 ) -> tuple[dict, str]:
     """Apply the source-table selection for the requested geometry mode."""
     geom_type_lower = geom_type.lower()
+    # NOTE polygon/polyline + centroid still drive ST_Centroid in raw-data-api;
+    # the matching from entries keep the config self-consistent for the request.
     data_config = {
         ("polygon", False): ["ways_poly"],
+        ("polygon", True): ["ways_poly"],
         ("point", True): ["ways_poly", "nodes"],
         ("point", False): ["nodes"],
         ("polyline", False): ["ways_line"],
+        ("polyline", True): ["ways_line"],
     }
     config_data["from"] = data_config.get((geom_type_lower, centroid))
     if geom_type_lower == "polyline":

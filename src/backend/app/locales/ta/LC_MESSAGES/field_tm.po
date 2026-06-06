@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-06-01 17:10+0100\n"
+"POT-Creation-Date: 2026-06-06 03:42+0100\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: ta\n"
@@ -18,19 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:144
+#: app/main.py:146
 msgid "Validation failed"
 msgstr "சரிபார்ப்பு தோல்வியடைந்தது"
 
-#: app/main.py:168
+#: app/main.py:170
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "எதிர்பாராத பிழை ஏற்பட்டது. தயவுசெய்து நிர்வாகியை தொடர்பு கொள்ளவும்."
 
-#: app/main.py:313
+#: app/main.py:315
 msgid "Could not connect to database"
 msgstr "தரவுத்தளத்துடன் இணைக்க முடியவில்லை"
 
-#: app/auth/auth_deps.py:73
+#: app/auth/auth_deps.py:79
 msgid "Authenticated user is missing a valid identifier."
 msgstr "அங்கீகரிக்கப்பட்ட பயனர் சரியான அடையாளங்காட்டியைக் காணவில்லை."
 
@@ -272,7 +272,7 @@ msgstr "திட்டம் (%(project_id)s) கிடைக்கவில்
 msgid "Only the project manager can delete this project."
 msgstr "இந்த திட்டத்தை திட்ட மேலாளர் மட்டுமே நீக்க முடியும்."
 
-#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:300
+#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:299
 msgid "Project not found."
 msgstr "திட்டம் கிடைக்கவில்லை."
 
@@ -462,7 +462,7 @@ msgstr ""
 "திட்டப் பகுதி செல்லுபடியான JSON ஆக இருக்க வேண்டும் (GeoJSON Polygon, "
 "MultiPolygon, Feature அல்லது FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:60
+#: app/htmx/project_create/project_create_simple_flow.py:87
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -470,15 +470,16 @@ msgstr ""
 "இந்த பகுதியில் ஏற்கனவே உள்ள OSM கட்டிடங்கள் எதுவும் காணப்படவில்லை. "
 "புதிதாக வரைபடமிடலைத் தொடரவும்."
 
-#: app/htmx/project_create/project_create_simple_flow.py:157
+#: app/htmx/project_create/project_create_simple_flow.py:185
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 "எளிய திட்ட உருவாக்கத்திற்கான இயல்புநிலை OSM Buildings படிவத்தை ஏற்ற "
 "முடியவில்லை."
 
-#: app/htmx/project_create/project_create_simple_flow.py:270
+#: app/htmx/project_create/project_create_simple_flow.py:325
 #: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:210
+#: app/htmx/project_create/project_create_submit_routes.py:214
+#: app/htmx/setup_steps/setup_step_split_background.py:69
 msgid "An unexpected error occurred. Please try again."
 msgstr "எதிர்பாராத பிழை ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்."
 
@@ -504,7 +505,7 @@ msgstr "இந்த பயனர் இல்லை. தயவுசெய்�
 msgid "This user is already a collaborator on this project."
 msgstr "இந்த பயனர் ஏற்கனவே இந்த திட்டத்தில் இணை பணியாளராக உள்ளார்."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1393
+#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1397
 #, python-format
 msgid "Failed to add collaborator: %(exc)s"
 msgstr "இணை பணியாளரை சேர்க்க முடியவில்லை: %(exc)s"
@@ -554,7 +555,7 @@ msgid "Admin"
 msgstr "நிர்வாகி"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:10
-#: app/templates/project_details.html:200
+#: app/templates/project_details.html:199
 msgid "Manager"
 msgstr "மேலாளர்"
 
@@ -615,7 +616,7 @@ msgid "Visibility"
 msgstr "காண்திறன்"
 
 #: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/project_details.html:186
+#: app/templates/project_details.html:185
 msgid "Description"
 msgstr "விளக்கம்"
 
@@ -680,19 +681,19 @@ msgstr "மூடு"
 msgid "Collaborators"
 msgstr "இணை பணியாளர்கள்"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:66
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:150
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:73
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:164
 msgid "Data Extract"
 msgstr "தரவு எடுப்பு"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:78
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:85
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr ""
 "OSM தரவு வெற்றிகரமாக பதிவிறக்கப்பட்டது! %(feature_count)s அம்சங்கள் "
 "கண்டுபிடிக்கப்பட்டன."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:81
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:88
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -704,23 +705,23 @@ msgstr ""
 "Extract\" ஐச் சொடுக்கவும். இல்லையெனில் வேறு அளவுருக்களுடன் மீண்டும் "
 "பதிவிறக்க முயற்சிக்கவும்."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:111
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:122
 #: app/templates/partials/project_details/style_and_scripts.html:26
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "தவறான கோப்பு வகை. தயவுசெய்து .geojson அல்லது .json கோப்பை பதிவேற்றவும்."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:134
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:145
 msgid "No valid geometries found in GeoJSON."
 msgstr "GeoJSON-ல் செல்லுபடியான உருவ வடிவங்கள் எதுவும் கிடைக்கவில்லை."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:162
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:176
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr ""
 "✓ GeoJSON வெற்றிகரமாக பதிவேற்றப்பட்டது! %(feature_count)s அம்சங்கள் "
 "கண்டுபிடிக்கப்பட்டன."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:165
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:179
 #, python-format
 msgid ""
 "Previewing %(feature_count)s features on map. Review the data below. If "
@@ -732,8 +733,8 @@ msgstr ""
 "Extract\" ஐச் சொடுக்கவும். இல்லையெனில் வேறு கோப்பை பதிவேற்ற "
 "முயற்சிக்கவும்."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:195
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:317
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:208
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:330
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -741,17 +742,17 @@ msgstr ""
 "GeoJSON தரவு எதுவும் கிடைக்கவில்லை. தயவுசெய்து முதலில் OSM தரவை "
 "பதிவிறக்கவும் அல்லது GeoJSON கோப்பை பதிவேற்றவும்."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:216
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:229
 #: app/htmx/setup_steps/setup_step_map_layers.py:27
 msgid "Project AOI"
 msgstr "திட்ட AOI"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:227
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:240
 #, python-format
 msgid "Data Extract (%(feature_count)s features)"
 msgstr "தரவு எடுப்பு (%(feature_count)s அம்சங்கள்)"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:244
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:257
 #, python-format
 msgid ""
 "Previewing %(feature_count)s data features on map. Review the data, then "
@@ -760,7 +761,7 @@ msgstr ""
 "%(feature_count)s தரவு அம்சங்கள் வரைபடத்தில் முன்பார்வையாக "
 "காட்டப்படுகின்றன. தரவைப் பார்த்து அடுத்த படிக்குச் செல்லவும்."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:294
 msgid ""
 "✓ Collect-new-data mode selected. Task splitting is skipped and you can "
 "continue."
@@ -768,7 +769,7 @@ msgstr ""
 "✓ புதிய தரவு சேகரிப்பு முறை தேர்ந்தெடுக்கப்பட்டது. பணி பிரிப்பு "
 "தவிர்க்கப்படுகிறது; நீங்கள் தொடரலாம்."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:349
 msgid ""
 "✓ Data extract successfully saved! You can now proceed to Step 4 (split "
 "tasks)."
@@ -776,15 +777,13 @@ msgstr ""
 "✓ தரவு எடுப்பு வெற்றிகரமாக சேமிக்கப்பட்டது! இப்போது நீங்கள் படி 4-க்கு "
 "(பணிகளைப் பிரித்தல்) செல்லலாம்."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:374
-msgid "No data extract provided."
-msgstr "தரவு எடுப்பு வழங்கப்படவில்லை."
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:397
+msgid ""
+"No data extract is staged. Please download OSM data or upload a GeoJSON "
+"file first."
+msgstr ""
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:381
-msgid "Invalid data extract format."
-msgstr "தவறான தரவு எடுப்பு வடிவம்."
-
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:398
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:412
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
@@ -792,6 +791,10 @@ msgid ""
 msgstr ""
 "✓ தரவு எடுப்பு ஏற்கப்பட்டது! %(feature_count)s அம்சங்கள் சேமிக்கப்பட்டன. "
 "படி 3 இப்போது முடிந்தது."
+
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:456
+msgid "Data extract discarded. Choose a data source above to try again."
+msgstr ""
 
 #: app/htmx/setup_steps/setup_step_extract_helpers.py:42
 msgid "Invalid GeoJSON data in request. Please try uploading again."
@@ -879,7 +882,7 @@ msgstr ""
 "தொழில்நுட்ப விவரங்களை உங்கள் instance நிர்வாகி அல்லது ஆதரவு அணிக்கு "
 "அனுப்பவும்."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:99
+#: app/htmx/setup_steps/setup_step_split_routes.py:110
 msgid ""
 "No data extract found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -887,7 +890,7 @@ msgstr ""
 "தரவு எடுப்பு எதுவும் கிடைக்கவில்லை. தயவுசெய்து முதலில் OSM தரவை "
 "பதிவிறக்கவும் அல்லது GeoJSON கோப்பை பதிவேற்றவும்."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:130
+#: app/htmx/setup_steps/setup_step_split_routes.py:141
 #, python-format
 msgid ""
 "Previewing whole AOI (no splitting) with %(data_feature_count)s data "
@@ -896,7 +899,7 @@ msgstr ""
 "%(data_feature_count)s தரவு அம்சங்களுடன் முழு AOI (பிரிப்பு இன்றி) "
 "முன்பார்வையில் காட்டப்படுகிறது. முழு AOI ஒரு பணியாக பயன்படுத்தப்படும்."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:137
+#: app/htmx/setup_steps/setup_step_split_routes.py:148
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries and %(data_feature_count)s data"
@@ -905,11 +908,11 @@ msgstr ""
 "%(task_count)s பணி எல்லைகளும் %(data_feature_count)s தரவு அம்சங்களும் "
 "ஒன்றாக முன்பார்வையில் காட்டப்படுகின்றன."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:190
+#: app/htmx/setup_steps/setup_step_split_routes.py:201
 msgid "Project outline not found. Cannot skip task splitting."
 msgstr "திட்ட வரம்பு கிடைக்கவில்லை. பணி பிரிப்பைத் தவிர்க்க முடியாது."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:215
+#: app/htmx/setup_steps/setup_step_split_routes.py:226
 msgid ""
 "✓ Task splitting skipped. The whole AOI will be used as a single task. "
 "You can proceed to Step 5."
@@ -917,27 +920,55 @@ msgstr ""
 "✓ பணி பிரிப்பு தவிர்க்கப்பட்டது. முழு AOI ஒரு பணியாக பயன்படுத்தப்படும். "
 "நீங்கள் படி 5-க்கு செல்லலாம்."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:270
+#: app/htmx/setup_steps/setup_step_split_routes.py:284
 msgid "Please select a splitting option."
 msgstr "தயவுசெய்து ஒரு பிரிப்பு விருப்பத்தைத் தேர்ந்தெடுக்கவும்."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:294
+#: app/htmx/setup_steps/setup_step_split_routes.py:335
+msgid ""
+"Cleaner shapes is unavailable for this area (too many features). Please "
+"choose a different option."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_split_routes.py:388
 msgid "✓ Task splitting is not required for this project setup."
 msgstr "✓ இந்த திட்ட அமைப்பிற்கு பணி பிரிப்பு தேவையில்லை."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:344
+#: app/htmx/setup_steps/setup_step_split_routes.py:547
 msgid "No task areas data provided."
 msgstr "பணி பகுதிகளுக்கான தரவு வழங்கப்படவில்லை."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:348
+#: app/htmx/setup_steps/setup_step_split_routes.py:551
 msgid "Invalid task areas data format."
 msgstr "பணி பகுதி தரவு வடிவம் தவறானது."
 
-#: app/htmx/setup_steps/setup_step_split_routes.py:371
+#: app/htmx/setup_steps/setup_step_split_routes.py:589
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ பிரிக்கப்பட்ட பணிகள் வெற்றிகரமாகச் சேமிக்கப்பட்டன"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:47
+#: app/htmx/setup_steps/setup_step_validate_routes.py:56
+msgid "Could not reach Tasking Manager. Please try again later."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:61
+#, python-format
+msgid "Tasking Manager project %(id)s was not found."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:66
+#, python-format
+msgid "Tasking Manager returned an error (HTTP %(status)s)."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:79
+msgid "Tasking Manager returned an invalid response."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:89
+msgid "Tasking Manager project AOI did not contain any polygon geometries."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:113
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -946,7 +977,7 @@ msgstr ""
 "பரப்பு %(area_km2)s km² ஆகும்; இது %(area_limit)s km² வரம்பை மீறுகிறது. "
 "உங்கள் திட்டப் பரப்பை குறைக்கவும்."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:52
+#: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -955,13 +986,17 @@ msgstr ""
 "பரப்பு %(area_km2)s km² ஆகும். பெரிய பகுதிகள் (>%(area_warn)s km²) "
 "செயலாக்க அதிக நேரம் எடுக்கலாம்."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:77
+#: app/htmx/setup_steps/setup_step_validate_routes.py:143
 msgid "GeoJSON is required"
 msgstr "GeoJSON அவசியம்"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:87
+#: app/htmx/setup_steps/setup_step_validate_routes.py:153
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "எந்த புற்களவும் கிடைக்கவில்லை. திட்ட பகுதி ஒரு புற்கோணமாக இருக்க வேண்டும்."
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:196
+msgid "Tasking Manager project ID must be a positive integer."
+msgstr ""
 
 #: app/projects/project_crud.py:136
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
@@ -1011,48 +1046,48 @@ msgstr "பெயரில்லா பகுதி"
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "பகுதி {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:408
+#: app/projects/project_services.py:412
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:166
+#: app/qfield/qfield_crud.py:167
 msgid "Project outline is missing or has no geometry."
 msgstr "திட்ட அவுட்லைன் காணவில்லை அல்லது வடிவியல் இல்லை."
 
-#: app/qfield/qfield_crud.py:172
+#: app/qfield/qfield_crud.py:173
 msgid "Project outline geometry has no coordinates."
 msgstr "திட்ட அவுட்லைன் வடிவவியலுக்கு ஆயங்கள் இல்லை."
 
-#: app/qfield/qfield_crud.py:476
+#: app/qfield/qfield_crud.py:477
 msgid "Project outline is required for QField project creation."
 msgstr "✓ இந்த திட்ட அமைப்பிற்கு பணி பிரிப்பு தேவையில்லை."
 
-#: app/qfield/qfield_crud.py:481
+#: app/qfield/qfield_crud.py:482
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm தேவை."
 
-#: app/qfield/qfield_crud.py:498
+#: app/qfield/qfield_crud.py:499
 msgid "Failed to modify XLSForm for QField."
 msgstr "QFieldக்கான XLSForm ஐ மாற்ற முடியவில்லை."
 
-#: app/qfield/qfield_crud.py:547
+#: app/qfield/qfield_crud.py:548
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS ரேப்பர் முடிந்தது ஆனால் எந்த வெளியீட்டு கோப்புகளையும் எழுதவில்லை."
 
-#: app/qfield/qfield_crud.py:559
+#: app/qfield/qfield_crud.py:562
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS ரேப்பர் முடிந்தது ஆனால் வெளியீட்டில் .qgz கோப்பு இல்லை."
 
-#: app/qfield/qfield_crud.py:590
+#: app/qfield/qfield_crud.py:592
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField திட்ட ஐடி காணவில்லை; அடிப்படை வரைபடத்தை இணைக்க முடியாது."
 
-#: app/qfield/qfield_crud.py:627
+#: app/qfield/qfield_crud.py:629
 msgid "Basemap attach completed but produced no project files."
 msgstr "அடிப்படை வரைபடம் QField திட்டத்துடன் இணைக்கப்பட்டுள்ளது."
 
-#: app/qfield/qfield_crud.py:813
+#: app/qfield/qfield_crud.py:817
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -1061,42 +1096,42 @@ msgstr ""
 "%(attempts)d முயற்சிகளுக்குப் பிறகும் QFieldCloud திட்டக் கோப்பை "
 "செயலாக்கி முடிக்கவில்லை (கடைசி நிலை: %(status)s)."
 
-#: app/qfield/qfield_crud.py:871 app/qfield/qfield_crud.py:885
+#: app/qfield/qfield_crud.py:875 app/qfield/qfield_crud.py:889
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS திட்ட உருவாக்கம் தோல்வியடைந்தது: %(error)s"
 
-#: app/qfield/qfield_crud.py:878
+#: app/qfield/qfield_crud.py:882
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS ரேப்பர் தவறான JSON திரும்பியது."
 
-#: app/qfield/qfield_crud.py:902
+#: app/qfield/qfield_crud.py:906
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr ""
 "பதிவேற்றத்திற்கான அடிப்படை வரைபட MBTiles ஐ பதிவிறக்கம் செய்ய முடியவில்லை "
 "(HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:917
+#: app/qfield/qfield_crud.py:921
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "QR குறியீட்டை பதிவிறக்கவும்"
 
-#: app/qfield/qfield_crud.py:1044
+#: app/qfield/qfield_crud.py:1048
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "கோப்புகளை QFieldCloud இல் பதிவேற்ற முடியவில்லை: %(error)s"
 
-#: app/qfield/qfield_crud.py:1218 app/qfield/qfield_crud.py:1380
+#: app/qfield/qfield_crud.py:1222 app/qfield/qfield_crud.py:1384
 #, python-format
 msgid "User '%(username)s' does not exist on QFieldCloud."
 msgstr "பயனர் '%(username)s' QFieldCloud இல் இல்லை."
 
-#: app/qfield/qfield_crud.py:1338
+#: app/qfield/qfield_crud.py:1342
 #, python-format
 msgid "QFieldCloud project '%(project_id)s' not found."
 msgstr "திட்டம் (%(project_id)s) கிடைக்கவில்லை."
 
-#: app/qfield/qfield_crud.py:1362
+#: app/qfield/qfield_crud.py:1366
 #, python-format
 msgid ""
 "Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
@@ -1105,42 +1140,44 @@ msgstr ""
 "திட்டம் '%(owner)s' நிறுவனத்தைச் சேர்ந்தது. நிறுவனத்தில் '%(username)s' "
 "ஐச் சேர்க்க முடியவில்லை: %(error)s"
 
-#: app/qfield/qfield_crud.py:1387
+#: app/qfield/qfield_crud.py:1391
 #, python-format
 msgid "User '%(username)s' is already a collaborator on this project."
 msgstr "பயனர் '%(username)s' ஏற்கனவே இந்த திட்டத்தில் இணை பணியாளராக உள்ளார்."
 
-#: app/qfield/qfield_crud.py:1428
+#: app/qfield/qfield_crud.py:1432
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ சான்றுகள் செல்லுபடியாகும்!"
 
-#: app/qfield/qfield_crud.py:1497
+#: app/qfield/qfield_crud.py:1501
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "இந்தத் திட்டம் QFieldCloud திட்டத்துடன் இணைக்கப்படவில்லை."
 
-#: app/qfield/qfield_crud.py:1504
+#: app/qfield/qfield_crud.py:1508
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "QFIELDCLOUD_QGIS_URL உள்ளமைக்கப்படவில்லை."
 
-#: app/qfield/qfield_crud.py:1534
+#: app/qfield/qfield_crud.py:1538
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr "QFieldCloud தொகுப்பில் GeoPackage கோப்புகள் எதுவும் காணப்படவில்லை."
 
-#: app/qfield/qfield_crud.py:1556
+#: app/qfield/qfield_crud.py:1560
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
-msgstr "QFieldCloud தொகுப்பில் கணக்கெடுப்புத் தரவு எதுவும் இல்லை. வரைபட வல்லுநர்கள் இதுவரை எந்தப் பதிலையும் சமர்ப்பிக்காமல் இருக்கலாம்."
+msgstr ""
+"QFieldCloud தொகுப்பில் கணக்கெடுப்புத் தரவு எதுவும் இல்லை. வரைபட "
+"வல்லுநர்கள் இதுவரை எந்தப் பதிலையும் சமர்ப்பிக்காமல் இருக்கலாம்."
 
-#: app/qfield/qfield_crud.py:1579
+#: app/qfield/qfield_crud.py:1583
 msgid "QFieldCloud did not return a package job id."
 msgstr "QFieldCloud ஒரு தொகுப்பு வேலை ஐடியை வழங்கவில்லை."
 
-#: app/qfield/qfield_crud.py:1596
+#: app/qfield/qfield_crud.py:1600
 msgid "QFieldCloud failed to package the project."
 msgstr "QFieldCloud திட்டத்தைத் தொகுக்கத் தவறிவிட்டது."
 
-#: app/qfield/qfield_crud.py:1602
+#: app/qfield/qfield_crud.py:1606
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
@@ -1149,12 +1186,12 @@ msgstr ""
 "QFieldCloud திட்டத்தைத் தொகுக்கக் காத்திருக்கும் நேரம் முடிந்தது (கடைசி "
 "நிலை: %(status)s)."
 
-#: app/qfield/qfield_crud.py:1626
+#: app/qfield/qfield_crud.py:1630
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "GeoPackage மாற்றம் தோல்வியடைந்தது: %(error)s"
 
-#: app/qfield/qfield_crud.py:1633
+#: app/qfield/qfield_crud.py:1637
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "QGIS ரேப்பர் / ஏற்றுமதிக்கு தவறான JSON திரும்பியது."
 
@@ -1859,13 +1896,13 @@ msgstr "உருவாக்கப்படுகிறது..."
 msgid "Something went wrong. Please try again."
 msgstr "ஏதோ தவறு ஏற்பட்டது. தயவுசெய்து மீண்டும் முயற்சிக்கவும்."
 
-#: app/templates/new_project_custom.html:311
+#: app/templates/new_project_custom.html:334
 msgid "A project with this name already exists. Please choose a different name."
 msgstr ""
 "இந்த பெயருடன் ஒரு திட்டம் ஏற்கனவே உள்ளது. தயவுசெய்து வேறு பெயரைத் "
 "தேர்ந்தெடுக்கவும்."
 
-#: app/templates/new_project_custom.html:395
+#: app/templates/new_project_custom.html:418
 msgid "Description is required."
 msgstr "விளக்கம் அவசியம்."
 
@@ -1918,12 +1955,12 @@ msgid "Creating Project"
 msgstr "திட்டம் உருவாக்கப்படுகிறது"
 
 #: app/templates/partials/new_project/creating_fragment.html:11
-#: app/templates/project_details.html:6 app/templates/project_details.html:294
-#: app/templates/project_details.html:305
+#: app/templates/project_details.html:6 app/templates/project_details.html:293
+#: app/templates/project_details.html:304
 msgid "Back to Projects"
 msgstr "திட்டங்களுக்கு திரும்பு"
 
-#: app/templates/project_details.html:41
+#: app/templates/project_details.html:45
 msgid ""
 "Trigger a fresh QFieldCloud package and download the project data as a "
 "single GeoJSON file."
@@ -1931,88 +1968,90 @@ msgstr ""
 "புதிய QFieldCloud தொகுப்பைத் தூண்டி, திட்டத் தரவை ஒரு GeoJSON கோப்பாகப் "
 "பதிவிறக்கவும்."
 
-#: app/templates/project_details.html:44
+#: app/templates/project_details.html:48
 msgid "Export Data"
 msgstr "தரவு ஏற்றுமதி"
 
-#: app/templates/project_details.html:87 app/templates/project_details.html:95
+#: app/templates/project_details.html:85 app/templates/project_details.html:93
 msgid ""
 "Packaging project on QFieldCloud - this may take a minute, please be "
 "patient..."
-msgstr "QFieldCloud இல் பேக்கேஜிங் திட்டம் - இதற்கு ஒரு நிமிடம் ஆகலாம், தயவுசெய்து பொறுமையாக இருங்கள்..."
+msgstr ""
+"QFieldCloud இல் பேக்கேஜிங் திட்டம் - இதற்கு ஒரு நிமிடம் ஆகலாம், "
+"தயவுசெய்து பொறுமையாக இருங்கள்..."
 
-#: app/templates/project_details.html:96
+#: app/templates/project_details.html:94
 msgid "✓ Download started."
 msgstr "✓ பதிவிறக்கம் தொடங்கியது."
 
-#: app/templates/project_details.html:97
+#: app/templates/project_details.html:95
 msgid "Export failed:"
 msgstr "ஏற்றுமதி தோல்வி:"
 
-#: app/templates/project_details.html:98
+#: app/templates/project_details.html:96
 msgid "Network error while exporting. Please try again."
 msgstr "ஏற்றுமதி செய்யும் போது நெட்வொர்க் பிழை. மீண்டும் முயற்சிக்கவும்."
 
-#: app/templates/project_details.html:174
+#: app/templates/project_details.html:173
 msgid "Project Metadata"
 msgstr "திட்ட மெட்டாடேட்டா"
 
-#: app/templates/project_details.html:176
+#: app/templates/project_details.html:175
 msgid "Project metadata and setup information for managers."
 msgstr "மேலாளர்களுக்கான திட்ட மெட்டாடேட்டா மற்றும் அமைப்பு தகவல்."
 
-#: app/templates/project_details.html:194
+#: app/templates/project_details.html:193
 msgid "Project ID"
 msgstr "திட்ட அடையாளம்"
 
-#: app/templates/project_details.html:205
+#: app/templates/project_details.html:204
 msgid "Created"
 msgstr "உருவாக்கப்பட்டது"
 
-#: app/templates/project_details.html:212
+#: app/templates/project_details.html:211
 msgid "Last Updated"
 msgstr "கடைசியாக புதுப்பிக்கப்பட்டது"
 
-#: app/templates/project_details.html:223
+#: app/templates/project_details.html:222
 msgid "Hashtags"
 msgstr "ஹாஷ்டேக்குகள்"
 
-#: app/templates/project_details.html:235
+#: app/templates/project_details.html:234
 msgid "External Project"
 msgstr "வெளிப்புற திட்டம்"
 
-#: app/templates/project_details.html:237
+#: app/templates/project_details.html:236
 msgid "Instance:"
 msgstr "இன்ஸ்டன்ஸ்:"
 
-#: app/templates/project_details.html:239
+#: app/templates/project_details.html:238
 msgid "Project ID:"
 msgstr "திட்ட அடையாளம்:"
 
-#: app/templates/project_details.html:249
-#: app/templates/project_details.html:257
+#: app/templates/project_details.html:248
+#: app/templates/project_details.html:256
 msgid "View Project in ODK Central →"
 msgstr "ODK Central இல் திட்டத்தைப் பார்க்கவும் →"
 
-#: app/templates/project_details.html:264
+#: app/templates/project_details.html:263
 msgid "Manage QFieldCloud Project →"
 msgstr "QFieldCloud திட்டத்தை நிர்வகிக்கவும் →"
 
-#: app/templates/project_details.html:272
+#: app/templates/project_details.html:271
 msgid "View Project Externally →"
 msgstr "திட்டத்தை வெளியே இருந்து பார்க்கவும் →"
 
-#: app/templates/project_details.html:288
+#: app/templates/project_details.html:287
 msgid "Delete this project in downstream and Field-TM? This cannot be undone."
 msgstr ""
 "இந்த திட்டத்தை downstream மற்றும் Field-TM இல் நீக்கவா? இதை மீளச் செய்ய "
 "முடியாது."
 
-#: app/templates/project_details.html:291
+#: app/templates/project_details.html:290
 msgid "Delete Project"
 msgstr "திட்டத்தை நீக்கு"
 
-#: app/templates/project_details.html:302
+#: app/templates/project_details.html:301
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view\n"
@@ -2095,11 +2134,11 @@ msgstr "எதிர்பாராத பிழை ஏற்பட்டது.
 msgid "Try Again"
 msgstr "மீண்டும் முயற்சிக்கவும்"
 
-#: app/templates/partials/new_project/creating_fragment.html:23
+#: app/templates/partials/new_project/creating_fragment.html:24
 msgid "Setting up your project..."
 msgstr "உங்கள் திட்டம் அமைக்கப்படுகிறது..."
 
-#: app/templates/partials/new_project/creating_fragment.html:25
+#: app/templates/partials/new_project/creating_fragment.html:26
 msgid ""
 "Downloading map data, splitting tasks, and preparing the QField project. "
 "This can take a\n"
@@ -2148,6 +2187,14 @@ msgstr ""
 "சமர்ப்பிப்பதற்கு முன் வரைபடத்தில் ஒரு ஆர்வப் பகுதியை (AOI) வரையவோ அல்லது "
 "பதிவேற்றவோ வேண்டும்."
 
+#: app/templates/partials/new_project/map_script.html:12
+msgid "Enter a Tasking Manager project ID first."
+msgstr ""
+
+#: app/templates/partials/new_project/map_script.html:13
+msgid "Could not load AOI from Tasking Manager."
+msgstr ""
+
 #: app/templates/partials/new_project/map_section.html:3
 msgid "Project Area"
 msgstr "திட்ட பகுதி"
@@ -2171,24 +2218,49 @@ msgstr "அழி"
 msgid "More options"
 msgstr "படிவ விருப்பங்கள்:"
 
-#: app/templates/partials/new_project/map_section.html:39
-msgid "Upload your own map file (GeoJSON)"
-msgstr "தனிப்பயன் GeoJSON பதிவேற்று"
+#: app/templates/partials/new_project/map_section.html:38
+msgid "Upload a GeoJSON file"
+msgstr ""
 
-#: app/templates/partials/new_project/map_section.html:43
+#: app/templates/partials/new_project/map_section.html:40
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
-"        drawing."
+"          drawing."
 msgstr ""
-"உங்கள் பகுதி எல்லையுடன் கூடிய வரைபடக் கோப்பு ஏற்கனவே இருந்தால், "
-"வரைவதற்குப் பதிலாக அதை இங்கே பதிவேற்றவும்."
 
 #: app/templates/partials/new_project/map_section.html:50
+msgid "Upload your own map file (GeoJSON)"
+msgstr "தனிப்பயன் GeoJSON பதிவேற்று"
+
+#: app/templates/partials/new_project/map_section.html:55
+#: app/templates/partials/new_project/map_section.html:56
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+msgid "or"
+msgstr "அல்லது"
+
+#: app/templates/partials/new_project/map_section.html:60
+msgid "Load from a HOT Tasking Manager project"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:62
+msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:71
+msgid "Tasking Manager project ID"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:75
+msgid "Load AOI"
+msgstr ""
+
+#: app/templates/partials/new_project/map_section.html:84
 msgid "Combine multiple shapes into one"
 msgstr "பல வடிவங்களை ஒன்றாக இணைக்கவும்"
 
-#: app/templates/partials/new_project/map_section.html:55
+#: app/templates/partials/new_project/map_section.html:89
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2373,6 +2445,7 @@ msgstr "பாலிலைன்கள்"
 msgid "points"
 msgstr "புள்ளிகள்"
 
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
 #: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
 msgstr "அம்சங்கள்"
@@ -2425,7 +2498,7 @@ msgstr "சதுரப்படி பிரி"
 msgid "Split by buildings"
 msgstr "கட்டிடங்களின்படி பிரி"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/setup_steps/step4_split.html:179
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split area"
 msgstr "மீண்டும் பிரி"
@@ -2657,9 +2730,17 @@ msgstr "இந்த படத்தைப் பயன்படுத்தவ�
 msgid "No imagery items were found for this AOI."
 msgstr "இந்த AOI-க்கு எந்தப் பட உருப்படிகளும் கிடைக்கவில்லை."
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:24
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:22
 msgid "Accept Data Extract"
 msgstr "தரவு எடுப்பை ஏற்கவும்"
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:30
+msgid "Discard the downloaded data extract?"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:33
+msgid "Discard"
+msgstr ""
 
 #: app/templates/partials/project_details/fragments/finalize_error.html:7
 msgid "View technical details"
@@ -2712,6 +2793,17 @@ msgstr ""
 msgid "Accept Task Choices"
 msgstr "பணி தேர்வுகளை ஏற்கவும்"
 
+#: app/templates/partials/project_details/fragments/split_running.html:10
+msgid "Splitting the AOI into tasks..."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/split_running.html:12
+msgid ""
+"Large areas can take several minutes. This page will update automatically"
+" when the preview\n"
+"    is ready - feel free to leave the tab open."
+msgstr ""
+
 #: app/templates/partials/project_details/setup_steps/step2_form.html:4
 msgid "Survey form ready"
 msgstr "கணக்கெடுப்பு படிவம் தயார்"
@@ -2737,11 +2829,6 @@ msgstr "கணக்கெடுப்பு படிவம்"
 #: app/templates/partials/project_details/setup_steps/step2_form.html:28
 msgid "Loading survey types..."
 msgstr "கணக்கெடுப்பு வகைகள் ஏற்றப்படுகின்றன..."
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
-msgid "or"
-msgstr "அல்லது"
 
 #: app/templates/partials/project_details/setup_steps/step2_form.html:36
 msgid "upload your own survey file (.xls / .xlsx)"
@@ -2912,15 +2999,15 @@ msgstr "பாலியிலைன்"
 msgid "Point"
 msgstr "புள்ளி"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:116
-msgid "Use centroids"
-msgstr "மையப் புள்ளிகளைப் பயன்படுத்து"
+#: app/templates/partials/project_details/setup_steps/step3_data.html:117
+msgid "Use Centroids (For OSM Data Download)"
+msgstr "மையப் புள்ளிகளைப் பயன்படுத்து (OSM தரவைப் பதிவிறக்க)"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+#: app/templates/partials/project_details/setup_steps/step3_data.html:120
 msgid "Convert polygons to single points."
 msgstr "பல்கோணங்களை தனி புள்ளிகளாக மாற்றவும்."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:140
+#: app/templates/partials/project_details/setup_steps/step3_data.html:142
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "OSM தரவு எடுப்பு உருவாக்கப்படுகிறது... இது சிறிது நேரம் எடுக்கலாம்."
 
@@ -2983,47 +3070,63 @@ msgstr "ரயில்பாதைகளைச் சேர்க்கவு�
 msgid "Include aeroways"
 msgstr "விமானப் பாதைகளைச் சேர்க்கவும்"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:109
+#: app/templates/partials/project_details/setup_steps/step4_split.html:115
 msgid "How to split"
 msgstr "எப்படி பிரிப்பது"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:111
+#: app/templates/partials/project_details/setup_steps/step4_split.html:117
 msgid "Choose a method..."
 msgstr "முறையைத் தேர்ந்தெடுக்கவும்..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:112
+#: app/templates/partials/project_details/setup_steps/step4_split.html:118
 msgid "By number of buildings (faster)"
 msgstr "கட்டிட எண்ணிக்கையால் (வேகமானது)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:114
+#: app/templates/partials/project_details/setup_steps/step4_split.html:120
+msgid ""
+"By number of buildings (cleaner shapes) - unavailable\n"
+"            for large areas"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 msgid "By number of buildings (cleaner shapes)"
 msgstr "கட்டிட எண்ணிக்கையால் (சுத்தமான வடிவங்கள்)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:116
+#: app/templates/partials/project_details/setup_steps/step4_split.html:124
 msgid "By a regular grid"
 msgstr "வழக்கமான கட்டத்தால்"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+#: app/templates/partials/project_details/setup_steps/step4_split.html:125
 msgid "Into a fixed number of tasks"
 msgstr "குறிப்பிட்ட பணிகளின் எண்ணிக்கைப்படி பிரி (விரைவில்)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:122
+#: app/templates/partials/project_details/setup_steps/step4_split.html:129
+msgid "Cleaner shapes is disabled for this area."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+msgid ""
+"It becomes geometrically unstable above ~5,000 features. Use the\n"
+"          faster option instead."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:137
 msgid "Buildings per task"
 msgstr "ஒரு பணிக்கு சராசரி கட்டிடங்கள்:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:133
+#: app/templates/partials/project_details/setup_steps/step4_split.html:148
 msgid "Number of tasks"
 msgstr "பணிகளின் எண்ணிக்கை:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:145
+#: app/templates/partials/project_details/setup_steps/step4_split.html:160
 msgid "Grid square size (metres)"
 msgstr "கட்ட சதுர அளவு (மீட்டர்)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:164
+#: app/templates/partials/project_details/setup_steps/step4_split.html:179
 msgid "Split Again"
 msgstr "மீண்டும் பிரி"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:199
+#: app/templates/partials/project_details/setup_steps/step4_split.html:213
 msgid "Splitting area into tasks... This may take a moment."
 msgstr "AOI பணிகளாகப் பிரிக்கப்படுகிறது... இது சிறிது நேரம் எடுக்கலாம்."
 
@@ -3107,3 +3210,4 @@ msgstr "விருப்பம் - உங்கள் பயனர்பெ�
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:183
 msgid "Save & Continue"
 msgstr "சேமித்து தொடரவும்"
+

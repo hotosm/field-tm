@@ -488,6 +488,132 @@ async def test_download_osm_data_maps_extract_generation_failure(monkeypatch):
         )
 
 
+async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
+    """Checking 'Use centroids' should pass centroid=True downstream."""
+    downloaded_geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "geometry": {"type": "Point", "coordinates": [85.305, 27.705]},
+                "properties": {"osm_id": 1},
+            }
+        ],
+    }
+
+    async def fake_get_project_by_id(_db, _project_id):
+        return Mock(
+            id=1,
+            outline={
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [85.30, 27.71],
+                        [85.30, 27.70],
+                        [85.31, 27.70],
+                        [85.31, 27.71],
+                        [85.30, 27.71],
+                    ]
+                ],
+            },
+        )
+
+    captured: dict = {}
+
+    async def fake_generate_data_extract(
+        project_id, aoi, geom_type, config_data, centroid, use_st_within
+    ):
+        captured["geom_type"] = geom_type
+        captured["centroid"] = centroid
+        captured["config_from"] = config_data.get("from")
+        return Mock(data={"download_url": "https://example.test/extract.geojson"})
+
+    class FakeResponse:
+        ok = True
+
+        async def text(self):
+            return json.dumps(downloaded_geojson)
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+    class FakeSession:
+        def __init__(self, **_kwargs):
+            pass
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb):
+            return False
+
+        def get(self, _url):
+            return FakeResponse()
+
+    def fake_parse_aoi(_db_url, input_geojson, merge=True):
+        return input_geojson
+
+    def fake_featcol_keep_single_geom_type(featcol):
+        return featcol
+
+    async def fake_check_crs(_featcol):
+        return None
+
+    monkeypatch.setattr(
+        project_services.project_deps,
+        "get_project_by_id",
+        fake_get_project_by_id,
+    )
+    monkeypatch.setattr(
+        project_services.project_crud,
+        "generate_data_extract",
+        fake_generate_data_extract,
+    )
+    monkeypatch.setattr(project_services.aiohttp, "ClientSession", FakeSession)
+    monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
+    monkeypatch.setattr(
+        project_services,
+        "featcol_keep_single_geom_type",
+        fake_featcol_keep_single_geom_type,
+    )
+    monkeypatch.setattr(project_services, "check_crs", fake_check_crs)
+
+    result = await project_services.download_osm_data(
+        db=Mock(),
+        project_id=1,
+        osm_category="buildings",
+        geom_type="POLYGON",
+        centroid=True,
+    )
+
+    assert captured["centroid"] is True
+    assert captured["geom_type"] == "polygon"
+    # POLYGON + centroid must resolve to ways_poly, not None
+    assert captured["config_from"] == ["ways_poly"]
+    assert result["features"][0]["geometry"]["type"] == "Point"
+
+
+def test_configure_extract_sources_polygon_centroid_maps_to_ways_poly():
+    """Polygon + centroid should select ways_poly so the config isn't malformed."""
+    config, geom_type = project_services._configure_extract_sources(
+        {}, "POLYGON", centroid=True
+    )
+    assert config["from"] == ["ways_poly"]
+    assert geom_type == "polygon"
+
+
+def test_configure_extract_sources_polyline_centroid_maps_to_ways_line():
+    """Polyline + centroid should select ways_line and lowercase to 'line'."""
+    config, geom_type = project_services._configure_extract_sources(
+        {}, "POLYLINE", centroid=True
+    )
+    assert config["from"] == ["ways_line"]
+    assert geom_type == "line"
+
+
 @pytest.mark.parametrize(
     "algorithm",
     ["AVG_BUILDING_VORONOI", "AVG_BUILDING_SKELETON"],
