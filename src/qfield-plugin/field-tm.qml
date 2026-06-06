@@ -27,6 +27,7 @@ Item {
 
   property bool outdated: false
   property bool reader: false
+  property bool singleTaskMode: false
 
   property string currentUser: ""
   property var currentTask: undefined
@@ -199,7 +200,7 @@ Item {
           Layout.preferredHeight: 36
           Layout.leftMargin: 8
           Layout.alignment: Qt.AlignVCenter
-          visible: fieldTM.currentTask !== undefined
+          visible: fieldTM.currentTask !== undefined && !fieldTM.singleTaskMode
 
           onClicked: {
             if (fieldTM.currentTask !== undefined) {
@@ -252,7 +253,9 @@ Item {
                 rewardEmitter.reward();
               }
 
-              fieldTM.currentTask = undefined;
+              if (!fieldTM.singleTaskMode) {
+                fieldTM.currentTask = undefined;
+              }
             }
           }
         }
@@ -451,7 +454,9 @@ Item {
           mainWindow.displayToast(qsTranslate("FieldTM", "Completed task #%1").arg(fieldTM.currentTask.attribute("task_id")));
           rewardEmitter.reward();
 
-          fieldTM.currentTask = undefined;
+          if (!fieldTM.singleTaskMode) {
+            fieldTM.currentTask = undefined;
+          }
         }
       }
     }
@@ -526,13 +531,31 @@ Item {
     fieldTM.currentUser = projectInfo.cloudUserInformation.username;
     fieldTM.reader = cloudProjectsModel.currentProject && cloudProjectsModel.currentProject.userRole === "reader";
 
-    let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, `"status" = 'in_progress' and "assigned_to" = '${fieldTM.currentUser}'`);
-    if (it.hasNext()) {
-      fieldTM.currentTask = it.next();
+    // Single-task projects skip the locking UX: auto-claim the lone task so taps
+    // land directly on the survey layer.
+    let allTasksIt = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, "1=1");
+    let firstTask = allTasksIt.hasNext() ? allTasksIt.next() : null;
+    let hasSecondTask = allTasksIt.hasNext();
+    delete allTasksIt;
+    fieldTM.singleTaskMode = firstTask !== null && !hasSecondTask;
+
+    if (fieldTM.singleTaskMode) {
+      fieldTM.currentTask = firstTask;
+      if (!fieldTM.reader && fieldTM.currentTask.attribute("assigned_to") == "") {
+        fieldTM.tasksLayer.startEditing();
+        fieldTM.tasksLayer.changeAttributeValue(fieldTM.currentTask.id, fieldTM.tasksLayer.fields.indexOf("assigned_to"), fieldTM.currentUser);
+        fieldTM.tasksLayer.commitChanges();
+        pushToCloud();
+      }
     } else {
-      fieldTM.currentTask = undefined;
+      let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, `"status" = 'in_progress' and "assigned_to" = '${fieldTM.currentUser}'`);
+      if (it.hasNext()) {
+        fieldTM.currentTask = it.next();
+      } else {
+        fieldTM.currentTask = undefined;
+      }
+      delete it;
     }
-    delete it;
 
     const pointHandler = iface.findItemByObjectName("pointHandler");
     pointHandler.registerHandler("fieldTM", (point, type, interactionType) => {
