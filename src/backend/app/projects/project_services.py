@@ -54,6 +54,7 @@ from app.helpers.geometry_utils import (
     check_crs,
     featcol_keep_single_geom_type,
     geojson_area_km2,
+    merge_featcol_polygons_sync,
     polygon_to_centroid,
 )
 from app.i18n import _
@@ -426,6 +427,7 @@ def _derive_simple_project_metadata(
 def _build_simple_outline_payload(outline: dict) -> dict:
     """Normalize simplified-flow outlines to GeoJSON geometry for storage."""
     featcol = parse_aoi(settings.FTM_DB_URL, outline, merge=True)
+    featcol = merge_featcol_polygons_sync(settings.FTM_DB_URL, featcol)
     features = featcol.get("features", [])
     if not features:
         raise ValidationError(

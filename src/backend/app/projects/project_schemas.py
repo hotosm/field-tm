@@ -50,6 +50,7 @@ from app.db.enums import (
     XLSFormType,
 )
 from app.db.models import DbProject, slugify
+from app.helpers.geometry_utils import merge_featcol_polygons_sync
 from app.qfield.qfield_schemas import QFieldCloud
 
 
@@ -271,6 +272,9 @@ class StubProjectIn(BaseModel):
         )
 
         if merge:
+            merged_geojson = merge_featcol_polygons_sync(
+                settings.FTM_DB_URL, merged_geojson
+            )
             return merged_geojson.get("features")[0].get("geometry")
         else:
             geometries = [

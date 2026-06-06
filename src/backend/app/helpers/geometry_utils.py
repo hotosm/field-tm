@@ -24,7 +24,7 @@ from typing import Optional
 
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
-from psycopg import AsyncConnection
+from psycopg import AsyncConnection, Connection
 
 log = logging.getLogger(__name__)
 
@@ -61,6 +61,39 @@ async def geojson_area_km2(db: AsyncConnection, geojson_geom: dict) -> float:
         )
         row = await cur.fetchone()
     return float(row[0]) if row and row[0] is not None else 0.0
+
+
+def merge_featcol_polygons_sync(db_url: str, featcol: dict) -> dict:
+    """Union all polygon features in a FeatureCollection into a single feature.
+
+    FIXME: Workaround for geojson_aoi_parser<=0.3.5 where the `merge` flag is
+    unimplemented (commented as "Potential future polygon merging feature" in
+    geojson_aoi/_sync/postgis.py). Once merging is wired up upstream, drop this
+    helper and rely on parse_aoi(..., merge=True) again.
+    """
+    features = featcol.get("features", [])
+    if len(features) <= 1:
+        return featcol
+    geoms = [feat["geometry"] for feat in features if feat.get("geometry")]
+    if len(geoms) <= 1:
+        return featcol
+
+    with Connection.connect(db_url) as conn, conn.cursor() as cur:
+        cur.execute(
+            "SELECT ST_AsGeoJSON(ST_Union(ST_GeomFromGeoJSON(value::text)))::json "
+            "FROM jsonb_array_elements(%s::jsonb)",
+            (json.dumps(geoms),),
+        )
+        row = cur.fetchone()
+
+    merged_geom = row[0] if row else None
+    if not merged_geom:
+        return featcol
+
+    return {
+        "type": "FeatureCollection",
+        "features": [{"type": "Feature", "geometry": merged_geom, "properties": None}],
+    }
 
 
 async def polygon_to_centroid(

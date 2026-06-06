@@ -20,7 +20,12 @@ from psycopg import AsyncConnection
 from app.auth.auth_deps import login_required
 from app.config import settings
 from app.db.database import db_conn
-from app.helpers.geometry_utils import AREA_LIMIT_KM2, AREA_WARN_KM2, geojson_area_km2
+from app.helpers.geometry_utils import (
+    AREA_LIMIT_KM2,
+    AREA_WARN_KM2,
+    geojson_area_km2,
+    merge_featcol_polygons_sync,
+)
 from app.i18n import _
 
 from ..setup_steps.setup_step_responses import (
@@ -152,6 +157,11 @@ async def validate_geojson(
             return _json_error_response(
                 _("No polygon geometries found. Project area must be a polygon."),
                 422,
+            )
+
+        if merge_geometries:
+            merged_featcol = merge_featcol_polygons_sync(
+                settings.FTM_DB_URL, merged_featcol
             )
 
         result_geojson = (
