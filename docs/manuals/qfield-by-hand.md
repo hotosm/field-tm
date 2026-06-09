@@ -41,35 +41,47 @@ out:
   Open the project in the temporary directory to continue.
 - You can then add a boundary for the AOI and a basemap as you would
   in any normal QGIS project.
-
 ## 3. Configure The Project Further
 
-- You can configure the project in any way that you like, within the
+-You can configure the project in any way that you like, within the
   constraints of what you can do in QGIS (eg. styling, labels, etc).
   QField users will see those same styles when they use the app.
 - Basemaps such as satellite or drone imagery can be added as layers,
   into a 'mutually exclusive' basemap group if preferred.
+- If aerial or drone imagery cannot be uploaded to OpenAerialMap (OAM),
+  it can still be included in the project as an MBTiles layer.
+- To do this, first generate an `.mbtiles` package from the source
+  imagery using a suitable tool.
+- Add the generated MBTiles file to the QGIS project as a raster layer.
+- Verify that the imagery aligns correctly with the project CRS and
+  other project layers before saving the project.
 - Symbology can be updated to vary based on data type. For example,
   if a question asks the user to define the feature 'category', the
   symbol on the map can reflect the categories (with a legend).
 - You may wish to add additional layers to the project, e.g.:
-  - Task boundaries with mapper assignments.
+
+  -Task boundaries with mapper assignments.
   - Location of cell towers to get phone signal.
   - Contours to show terrain.
-  - Other georeferenced data, such as scanned in archive maps,
-    or drawn community maps.
-
+  - Other georeferenced data, such as scanned in archive maps, 
+  or drawn community maps. 
 ## 4. Syncing The Project To The Cloud
 
 - Install QField Sync in QGIS.
 - You need to register an account at
-  [https://app.qfield.cloud](https://app.qfield.cloud).
+  https://app.qfield.cloud.
 - QField Cloud is the bridge between QGIS and the users'
   interaction with the project.
 - Log in to QField via the QField Sync plugin in QGIS.
 - Click on the cloud icon and click create new project.
 - Choose 'Convert currently open project to a cloud project'.
 - Add a name, choose HOTOSM as the owner, then convert and upload.
+- If you have added private imagery as an MBTiles layer, it will be
+  packaged together with the QGIS project during synchronization.
+ Users who synchronize the project in QField will then be able to
+-  access the imagery offline as part of the project.
+- Note that large MBTiles files may increase upload, download, and
+  synchronization times.
 
 ## 5. Open In The QField App
 
