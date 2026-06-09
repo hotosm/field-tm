@@ -1,3 +1,6 @@
+-- Base schema files run against an empty database, so online migration
+-- lock-safety checks do not apply here.
+-- noqa: disable=PG01
 ALTER TABLE ONLY projects
 ADD CONSTRAINT fk_users FOREIGN KEY (created_by_sub)
 REFERENCES users (
@@ -13,3 +16,4 @@ ALTER TABLE ONLY user_roles
 ADD CONSTRAINT user_roles_user_sub_fkey FOREIGN KEY (
     user_sub
 ) REFERENCES users (sub);
+-- noqa: enable=PG01
