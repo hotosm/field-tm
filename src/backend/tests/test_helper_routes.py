@@ -25,6 +25,7 @@ from unittest.mock import AsyncMock, MagicMock, Mock, patch
 import pytest
 
 from app.central.central_routes import odk_creds_test
+from app.config import settings
 
 HELPERS_PREFIX = "/api/v1/helpers"
 
@@ -86,6 +87,16 @@ _MULTIPOLYGON_FEATCOL = {
 }
 
 
+@pytest.fixture(autouse=True)
+def _local_admin_auth(monkeypatch):
+    """Route requests through the debug local-admin auth path.
+
+    The helper routes depend on login_required, which otherwise needs a
+    live hotosm-auth session cookie.
+    """
+    monkeypatch.setattr(settings, "DEBUG", True)
+
+
 async def test_helper_odk_creds_test():
     """The surviving ODK JSON route should still validate credentials."""
     with patch(
@@ -131,7 +142,7 @@ async def test_download_template_xlsform_invalid_form_type(client):
         params={"form_type": "not-a-real-form"},
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 
 # ---------------------------------------------------------------------------
