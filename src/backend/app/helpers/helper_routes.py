@@ -22,6 +22,7 @@ import json
 import logging
 from io import BytesIO, StringIO
 from pathlib import Path
+from typing import Annotated
 from uuid import uuid4
 
 import requests
@@ -30,7 +31,9 @@ from litestar import Request, Response, Router, get, post
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
 from litestar.di import Provide
+from litestar.enums import RequestEncodingType
 from litestar.exceptions import HTTPException
+from litestar.params import Body, Parameter
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.xlsforms import xlsforms_path
 
@@ -87,11 +90,11 @@ async def download_template(
     dependencies={"current_user": Provide(login_required)},
 )
 async def convert_geojson_to_odk_csv_wrapper(
-    geojson: UploadFile,
+    data: Annotated[UploadFile, Body(media_type=RequestEncodingType.MULTI_PART)],
     current_user: object,
 ) -> Response[bytes]:
     """Convert GeoJSON upload media to ODK CSV upload media."""
-    filename = Path(geojson.filename)
+    filename = Path(data.filename)
     file_ext = filename.suffix.lower()
 
     allowed_extensions = [".json", ".geojson"]
@@ -101,7 +104,7 @@ async def convert_geojson_to_odk_csv_wrapper(
             detail=_("Provide a valid .json or .geojson file"),
         )
 
-    contents = await geojson.read()
+    contents = await data.read()
     feature_csv = await convert_geojson_to_odk_csv(BytesIO(contents))
 
     headers = {"Content-Disposition": f"attachment; filename={filename.stem}.csv"}
@@ -119,18 +122,25 @@ async def convert_geojson_to_odk_csv_wrapper(
     },
 )
 async def create_entities_from_csv(
-    csv_file: UploadFile,
+    data: Annotated[UploadFile, Body(media_type=RequestEncodingType.MULTI_PART)],
     odk_project_id: int,
     entity_name: str,
     current_user: object,
-    odk_creds: ODKCentral,
+    external_project_instance_url: str | None = Parameter(default=None),
+    external_project_username: str | None = Parameter(default=None),
+    external_project_password: str | None = Parameter(default=None),
 ) -> dict:
     """Upload a CSV file to create new ODK Entities in a project.
 
     The Entity must already be defined on the server.
     The CSV fields must match the Entity fields.
     """
-    filename = Path(csv_file.filename)
+    odk_creds = ODKCentral(
+        external_project_instance_url=external_project_instance_url,
+        external_project_username=external_project_username,
+        external_project_password=external_project_password,
+    )
+    filename = Path(data.filename)
     file_ext = filename.suffix.lower()
 
     if file_ext != ".csv":
@@ -144,7 +154,7 @@ async def create_entities_from_csv(
         csv_reader = csv.DictReader(StringIO(csv_str))
         return [dict(row) for row in csv_reader]
 
-    parsed_data = parse_csv(await csv_file.read())
+    parsed_data = parse_csv(await data.read())
     entities_data_dict = {str(uuid4()): data for data in parsed_data}
 
     async with central_deps.get_odk_dataset(odk_creds) as odk_central:
@@ -175,7 +185,7 @@ async def convert_javarosa_geom_to_geojson(
     dependencies={"current_user": Provide(login_required)},
 )
 async def convert_odk_submission_json_to_geojson_wrapper(
-    json_file: UploadFile,
+    data: Annotated[UploadFile, Body(media_type=RequestEncodingType.MULTI_PART)],
     current_user: object,
 ) -> Response[bytes]:
     """Convert the ODK submission output JSON to GeoJSON.
@@ -183,7 +193,7 @@ async def convert_odk_submission_json_to_geojson_wrapper(
     The submission JSON be downloaded via ODK Central, or osm-fieldwork.
     The logic works with the standardised XForm form fields from osm-fieldwork.
     """
-    filename = Path(json_file.filename)
+    filename = Path(data.filename)
     file_ext = filename.suffix.lower()
 
     allowed_extensions = [".json"]
@@ -193,7 +203,7 @@ async def convert_odk_submission_json_to_geojson_wrapper(
             detail=_("Provide a valid .json file"),
         )
 
-    contents = await json_file.read()
+    contents = await data.read()
     submission_geojson = await convert_odk_submission_json_to_geojson(BytesIO(contents))
     submission_data = BytesIO(json.dumps(submission_geojson).encode("utf-8"))
 
@@ -241,11 +251,11 @@ async def get_raw_data_api_osm_token(
     dependencies={"current_user": Provide(login_required)},
 )
 async def flatten_multipolygons_to_polygons(
-    geojson: UploadFile,
+    data: Annotated[UploadFile, Body(media_type=RequestEncodingType.MULTI_PART)],
     current_user: object,
 ) -> Response[bytes]:
     """If any MultiPolygons are present, replace with multiple Polygons."""
-    featcol = parse_aoi(settings.FTM_DB_URL, await geojson.read())
+    featcol = parse_aoi(settings.FTM_DB_URL, await data.read())
     if not featcol:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
