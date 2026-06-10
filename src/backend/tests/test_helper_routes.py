@@ -155,7 +155,7 @@ async def test_convert_geojson_to_odk_csv_success(client):
     response = await client.post(
         f"{HELPERS_PREFIX}/convert-geojson-to-odk-csv",
         files={
-            "geojson": (
+            "data": (
                 "features.geojson",
                 json.dumps(_POLYGON_FEATCOL).encode("utf-8"),
                 "application/geo+json",
@@ -189,7 +189,7 @@ async def test_convert_geojson_to_odk_csv_invalid_extension(client):
     """A non-GeoJSON file extension should be rejected."""
     response = await client.post(
         f"{HELPERS_PREFIX}/convert-geojson-to-odk-csv",
-        files={"geojson": ("features.txt", b"not geojson", "text/plain")},
+        files={"data": ("features.txt", b"not geojson", "text/plain")},
     )
 
     assert response.status_code == 400
@@ -299,7 +299,7 @@ async def test_convert_odk_submission_json_to_geojson_success(client):
     response = await client.post(
         f"{HELPERS_PREFIX}/convert-odk-submission-json-to-geojson",
         files={
-            "json_file": (
+            "data": (
                 "submissions.json",
                 json.dumps(submission).encode("utf-8"),
                 "application/json",
@@ -325,7 +325,7 @@ async def test_convert_odk_submission_json_to_geojson_invalid_extension(client):
     """A non-JSON file extension should be rejected."""
     response = await client.post(
         f"{HELPERS_PREFIX}/convert-odk-submission-json-to-geojson",
-        files={"json_file": ("submissions.csv", b"a,b,c", "text/csv")},
+        files={"data": ("submissions.csv", b"a,b,c", "text/csv")},
     )
 
     assert response.status_code == 400
@@ -337,7 +337,7 @@ async def test_convert_odk_submission_json_to_geojson_empty(client):
     response = await client.post(
         f"{HELPERS_PREFIX}/convert-odk-submission-json-to-geojson",
         files={
-            "json_file": ("submissions.json", b"[]", "application/json"),
+            "data": ("submissions.json", b"[]", "application/json"),
         },
     )
 
@@ -393,7 +393,7 @@ async def test_multipolygons_to_polygons_success(client):
     response = await client.post(
         f"{HELPERS_PREFIX}/multipolygons-to-polygons",
         files={
-            "geojson": (
+            "data": (
                 "aoi.geojson",
                 json.dumps(_MULTIPOLYGON_FEATCOL).encode("utf-8"),
                 "application/geo+json",
