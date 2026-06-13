@@ -56,6 +56,7 @@ from app.helpers.geometry_utils import (
     geojson_area_km2,
     merge_featcol_polygons_sync,
     polygon_to_centroid,
+    stamp_missing_task_ids,
 )
 from app.i18n import _
 from app.projects import project_crud, project_deps, project_schemas
@@ -1142,6 +1143,9 @@ async def save_task_areas(
     # Validate CRS if not empty
     if tasks_geojson and tasks_geojson.get("features"):
         await check_crs(tasks_geojson)
+        # Stamp stable task ids before persisting, so export builders read
+        # task identity from storage instead of re-deriving it positionally
+        stamp_missing_task_ids(tasks_geojson)
 
     await DbProject.update(
         db,
@@ -1309,14 +1313,20 @@ async def _build_task_entities(project: DbProject) -> list[dict]:
         log.info(
             f"Uploading {len(task_areas.get('features', []))} task boundaries to ODK"
         )
-        for idx, feature in enumerate(task_areas.get("features", []), start=1):
+        # Stored task_id is authoritative (stamped by save_task_areas); stamp
+        # in memory only for legacy rows saved before ids were persisted,
+        # using the same helper as the QField builder so both export paths
+        # always agree on task identity
+        stamp_missing_task_ids(task_areas)
+        for feature in task_areas.get("features", []):
             if not feature.get("geometry"):
                 continue
+            task_id = feature["properties"]["task_id"]
             entity_dict = await central_crud.feature_geojson_to_entity_dict(
                 feature,
                 additional_features=True,
             )
-            task_entities.append(_task_entity_style(entity_dict, idx))
+            task_entities.append(_task_entity_style(entity_dict, task_id))
 
     if task_entities:
         return task_entities

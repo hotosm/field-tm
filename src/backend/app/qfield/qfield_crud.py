@@ -53,6 +53,7 @@ from qfieldcloud_sdk.sdk import (
 
 from app.config import decrypt_value, encrypt_value, settings
 from app.db.models import DbProject
+from app.helpers.geometry_utils import stamp_missing_task_ids
 from app.i18n import _
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_deps import qfield_client
@@ -310,11 +311,10 @@ def _build_tasks_geojson(project: DbProject) -> dict:
     """
     task_areas = project.task_areas_geojson
     if task_areas and isinstance(task_areas, dict) and task_areas.get("features"):
-        for idx, feature in enumerate(task_areas["features"], start=1):
-            props = feature.setdefault("properties", {})
-            if "task_id" not in props:
-                props["task_id"] = idx
-        return task_areas
+        # Stored ids are authoritative (stamped by save_task_areas); stamping
+        # here is in-memory only, covering legacy rows saved before ids were
+        # persisted. Such projects keep derivation-based ids until re-saved.
+        return stamp_missing_task_ids(task_areas)
 
     # Fallback: single task from outline
     geometry = _extract_geometry(project.outline)
