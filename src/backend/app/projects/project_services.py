@@ -24,6 +24,8 @@ exceptions (not HTTP exceptions), returning plain data structures.
 
 import json
 import logging
+import re
+import unicodedata
 from asyncio import TimeoutError as AsyncTimeoutError
 from asyncio import get_running_loop
 from dataclasses import dataclass
@@ -1162,6 +1164,162 @@ async def save_task_areas(
         f"(empty: {is_empty}, count: {task_count})"
     )
     return task_count
+
+
+# Charset matches ODK Central's dataset property name rules
+# (central_schemas.ALLOWED_PROPERTY_PATTERN), so group labels stay
+# sync-safe for the later ODK/QField assignment push PRs. Empty
+# string is allowed and means "ungrouped".
+ASSIGNED_GROUP_PATTERN = re.compile(r"^[a-zA-Z0-9_-]*$")
+ASSIGNED_GROUP_MAX_LENGTH = 100
+ASSIGNED_TO_MAX_LENGTH = 100
+
+
+def _clean_assigned_to(value: object) -> str:
+    """Stringify an assignee value and strip control/format characters."""
+    text = str(value) if value is not None else ""
+    return "".join(
+        char for char in text if unicodedata.category(char) not in ("Cc", "Cf")
+    )
+
+
+def _validate_assignment_entry(entry: object) -> dict:
+    """Validate one per-task assignment edit, returning cleaned values.
+
+    Raises:
+        ValidationError: If the entry shape or a value is invalid.
+    """
+    if not isinstance(entry, dict):
+        raise ValidationError(_("Invalid assignments data format."))
+
+    cleaned: dict[str, str] = {}
+    if "assigned_to" in entry:
+        assigned_to = _clean_assigned_to(entry["assigned_to"])
+        if len(assigned_to) > ASSIGNED_TO_MAX_LENGTH:
+            raise ValidationError(
+                _("Assignee must be %(max_length)s characters or fewer.")
+                % {"max_length": ASSIGNED_TO_MAX_LENGTH}
+            )
+        cleaned["assigned_to"] = assigned_to
+    if "assigned_group" in entry:
+        assigned_group = (
+            str(entry["assigned_group"]) if entry["assigned_group"] is not None else ""
+        )
+        if not ASSIGNED_GROUP_PATTERN.match(assigned_group):
+            raise ValidationError(
+                _(
+                    "Group labels may only contain letters, numbers, "
+                    "hyphens and underscores."
+                )
+            )
+        if len(assigned_group) > ASSIGNED_GROUP_MAX_LENGTH:
+            raise ValidationError(
+                _("Group labels must be %(max_length)s characters or fewer.")
+                % {"max_length": ASSIGNED_GROUP_MAX_LENGTH}
+            )
+        cleaned["assigned_group"] = assigned_group
+    return cleaned
+
+
+def count_assigned_tasks(task_areas: dict | None) -> int:
+    """Count stored task features carrying a non-empty assignment.
+
+    Used by the split/extract lifecycle guards to warn before actions
+    that overwrite or reset ``task_areas_geojson`` (and would silently
+    discard those assignments).
+    """
+    if not isinstance(task_areas, dict):
+        return 0
+    count = 0
+    for feature in task_areas.get("features") or []:
+        properties = feature.get("properties") or {}
+        if properties.get("assigned_to") or properties.get("assigned_group"):
+            count += 1
+    return count
+
+
+async def save_task_assignments(
+    db: AsyncConnection,
+    project_id: int,
+    assignments: dict,
+) -> int:
+    """Merge per-task assignment edits into stored task area properties.
+
+    Assignments are advisory metadata on each task feature; task ``status``
+    is owned by the field apps and is never written here.
+
+    Args:
+        db: Database connection.
+        project_id: The project ID.
+        assignments: Mapping of task id to a dict with optional
+            ``assigned_to`` / ``assigned_group`` string values.
+
+    Returns:
+        Number of task features updated.
+
+    Raises:
+        ValidationError: If the payload shape, a task id, or a value is invalid.
+    """
+    if not isinstance(assignments, dict):
+        raise ValidationError(_("Invalid assignments data format."))
+
+    # Row-lock the project so the read-merge-write below is atomic with
+    # respect to concurrent assignment saves and re-splits; without it a
+    # racing save could write a stale FeatureCollection back over edits
+    # committed in between. The lock is released by the commit below.
+    async with db.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT task_areas_geojson
+            FROM projects
+            WHERE id = %(project_id)s
+            FOR UPDATE
+            """,
+            {"project_id": project_id},
+        )
+        row = await cur.fetchone()
+    task_areas = row[0] if row else None
+    features = task_areas.get("features") if isinstance(task_areas, dict) else None
+    if not features:
+        raise ValidationError(
+            _("No task areas to assign. Split the project area into tasks first.")
+        )
+
+    # Stored task_id is authoritative (stamped by save_task_areas); stamp in
+    # memory for legacy rows saved before ids were persisted, mirroring
+    # _build_task_entities. The stamped ids then persist with this save.
+    stamp_missing_task_ids(task_areas)
+    properties_by_task_id = {
+        feature["properties"]["task_id"]: feature["properties"] for feature in features
+    }
+
+    updated_count = 0
+    for raw_task_id, entry in assignments.items():
+        try:
+            task_id = int(raw_task_id)
+        except (TypeError, ValueError) as err:
+            raise ValidationError(
+                _("Invalid task id: %(task_id)s") % {"task_id": raw_task_id}
+            ) from err
+        properties = properties_by_task_id.get(task_id)
+        if properties is None:
+            raise ValidationError(
+                _("Unknown task id: %(task_id)s") % {"task_id": task_id}
+            )
+        properties.update(_validate_assignment_entry(entry))
+        updated_count += 1
+
+    await DbProject.update(
+        db,
+        project_id,
+        project_schemas.ProjectUpdate(task_areas_geojson=task_areas),
+    )
+    await db.commit()
+
+    log.info(
+        f"Saved task assignments for project {project_id} (updated: {updated_count})"
+    )
+    return updated_count
 
 
 def _validate_odk_finalization_prereqs(

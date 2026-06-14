@@ -1,0 +1,144 @@
+<!-- Task assignment panel (project managers). Assignments are advisory
+     feature properties on the stored task areas; task status stays owned
+     by the field apps. The map/selection behaviour is progressive
+     enhancement - the summary table and save form work without JS. -->
+{% if not has_task_areas %}
+<wa-callout variant="info">
+  <span
+    >{{ _("This project has a single task covering the whole area. Split the area into tasks to
+    assign mappers to specific task areas.") }}</span
+  >
+</wa-callout>
+{% else %}
+<div id="assignment-panel-content">
+  <h3 class="ftm-step__title">{{ _("Task Assignments") }}</h3>
+  <p class="ftm-step-intro">
+    {{ _("Select tasks on the map, then apply an assignee and group label. Changes are saved when
+    you press Save assignments.") }}
+  </p>
+
+  <div id="assignment-map" style="height: 400px; margin-bottom: 15px"></div>
+
+  <div class="ftm-split-grid" style="margin-bottom: 10px">
+    <div>
+      <label for="assignment-assignee-input" class="ftm-split-label">{{ _("Assignee") }}</label>
+      <input
+        type="text"
+        id="assignment-assignee-input"
+        list="assignment-assignee-options"
+        maxlength="100"
+        class="ftm-split-input"
+        placeholder="{{ _('Mapper name (free text)') }}"
+      />
+      <!-- QFC collaborator suggestions for QField projects; ODK projects
+           get free text only. Free-text entry is always allowed. -->
+      <datalist id="assignment-assignee-options">
+        {% for name in assignee_suggestions %}
+        <option value="{{ name }}"></option>
+        {% endfor %}
+      </datalist>
+    </div>
+    <div>
+      <label for="assignment-group-input" class="ftm-split-label">{{ _("Group label") }}</label>
+      <input
+        type="text"
+        id="assignment-group-input"
+        pattern="[a-zA-Z0-9_-]*"
+        maxlength="100"
+        class="ftm-split-input"
+        placeholder="{{ _('e.g. NE') }}"
+      />
+    </div>
+  </div>
+  <div class="ftm-step__actions" style="margin-top: 0; margin-bottom: 8px">
+    <button id="assignment-apply-btn" type="button" class="wa-button wa-button--default">
+      {{ _("Apply to selected") }}
+    </button>
+    <button id="assignment-autogroup-btn" type="button" class="wa-button wa-button--default">
+      {{ _("Auto-group by quadrant") }}
+    </button>
+    <button id="assignment-unassign-btn" type="button" class="wa-button wa-button--default">
+      {{ _("Unassign selected") }}
+    </button>
+    <button id="assignment-clear-btn" type="button" class="wa-button wa-button--default">
+      {{ _("Clear selection") }}
+    </button>
+  </div>
+
+  <!-- Filled by the JS module: transient validation messages and the
+       restored-draft "N unsaved changes" banner. -->
+  <div id="assignment-messages" style="margin-bottom: 8px"></div>
+  <div id="assignment-draft-banner" style="margin-bottom: 8px"></div>
+
+  <!-- On 4xx/5xx the global htmx config would swap the error callout over
+       the summary table; suppress that (split_running.html pattern) and
+       surface the server-rendered error in the messages region instead. -->
+  <form
+    id="assignment-save-form"
+    hx-post="/projects/{{ project_id }}/assignments"
+    hx-target="#assignment-summary-region"
+    hx-swap="innerHTML"
+    hx-indicator="#assignment-save-indicator"
+    hx-on::before-swap="if (event.detail.xhr.status >= 400) { event.detail.shouldSwap = false; event.detail.isError = false; const region = document.getElementById('assignment-messages'); if (region) { region.innerHTML = event.detail.serverResponse; } }"
+  >
+    <input type="hidden" id="assignment-payload" name="assignments" value="{}" />
+    <button
+      type="submit"
+      class="wa-button wa-button--brand"
+      style="min-width: 180px; position: relative"
+    >
+      {{ _("Save assignments") }}
+      <span
+        id="assignment-save-indicator"
+        class="htmx-indicator"
+        style="display: none; margin-inline-start: 8px"
+      >
+        <svg
+          class="ftm-spinner"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M21 12a9 9 0 11-6.219-8.56" />
+        </svg>
+      </span>
+    </button>
+  </form>
+
+  <div id="assignment-summary-region">
+    {% include "partials/project_details/fragments/assignment_summary.html" %}
+  </div>
+
+  <script>
+    (function () {
+      const projectId = {{ project_id }};
+      const i18nStrings = {
+        unassigned: {{ _("Unassigned")|tojson }},
+        taskLabelFormat: {{ _("Task %(task_id)s")|tojson }},
+        groupLabelFormat: {{ _("Group: %(group)s")|tojson }},
+        assignedToFormat: {{ _("Assigned to: %(name)s")|tojson }},
+        applyToSelectedFormat: {{ _("Apply to selected (%(count)s)")|tojson }},
+        applyToSelected: {{ _("Apply to selected")|tojson }},
+        noSelection: {{ _("Select one or more tasks on the map first.")|tojson }},
+        nothingToApply: {{ _("Enter an assignee or group label to apply first.")|tojson }},
+        unsavedChangesFormat: {{ _("%(count)s unsaved changes")|tojson }},
+        discardChanges: {{ _("Discard changes")|tojson }},
+        invalidGroupLabel: {{ _("Group labels may only contain letters, numbers, hyphens and underscores.")|tojson }},
+        loadFailed: {{ _("Could not load task areas.")|tojson }},
+        selectAllTasks: {{ _("Select all tasks")|tojson }},
+        selectTaskFormat: {{ _("Select task %(task_id)s")|tojson }},
+        savedEvent: 'assignment:saved',
+      };
+      import('/static/js/task_assignment.js')
+        .then(({ initAssignmentPanel }) => {
+          initAssignmentPanel({ projectId, i18nStrings });
+        })
+        .catch(() => {
+          // The summary table and save form stay usable even if the
+          // optional map module fails to load.
+        });
+    })();
+  </script>
+</div>
+{% endif %}

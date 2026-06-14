@@ -1,0 +1,36 @@
+<!-- Server-rendered assignment summary, re-rendered by the save POST.
+     Values are user-supplied free text and rely on Jinja autoescaping. -->
+{% if saved_message %}
+<wa-callout variant="success">
+  <span>{{ saved_message }}</span>
+</wa-callout>
+{% endif %} {% if has_task_areas %}
+<table id="assignment-summary-table" style="width: 100%; margin-top: 10px; border-collapse: collapse">
+  <thead>
+    <tr style="text-align: start; border-bottom: 1px solid #ddd">
+      <th style="text-align: start; padding: 6px 8px">{{ _("Task") }}</th>
+      <th style="text-align: start; padding: 6px 8px">{{ _("Group") }}</th>
+      <th style="text-align: start; padding: 6px 8px">{{ _("Assignee") }}</th>
+      {% if has_building_counts %}
+      <th style="text-align: start; padding: 6px 8px">{{ _("Buildings") }}</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in summary_rows %}
+    <tr style="border-bottom: 1px solid #eee" data-task-id="{{ row.task_id }}">
+      <td style="padding: 6px 8px">{{ row.task_id }}</td>
+      <td style="padding: 6px 8px">{{ row.assigned_group }}</td>
+      <td style="padding: 6px 8px">
+        {% if row.assigned_to %}{{ row.assigned_to }}{% else %}
+        <span style="color: #666">{{ _("Unassigned") }}</span>
+        {% endif %}
+      </td>
+      {% if has_building_counts %}
+      <td style="padding: 6px 8px">{{ row.building_count if row.building_count is not none }}</td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
