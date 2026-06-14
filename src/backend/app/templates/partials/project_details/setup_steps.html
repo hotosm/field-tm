@@ -12,10 +12,11 @@ project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_
 overwrites/resets task_areas_geojson, so the destructive actions below confirm first when this is
 non-zero (assignment lifecycle guard). #} {% set assigned_ns = namespace(count=0) %} {% if
 has_task_areas and not is_no_splitting %} {% for feature in
-(project.task_areas_geojson.get('features') or []) %} {% set feature_props = feature.get('properties')
-or {} %} {% if feature_props.get('assigned_to') or feature_props.get('assigned_group') %} {% set
-assigned_ns.count = assigned_ns.count + 1 %} {% endif %} {% endfor %} {% endif %} {% set
-assigned_task_count = assigned_ns.count %} {% if status_value == 'PUBLISHED' %}
+(project.task_areas_geojson.get('features') or []) %} {% set feature_props =
+feature.get('properties') or {} %} {% if feature_props.get('assigned_to') or
+feature_props.get('assigned_group') %} {% set assigned_ns.count = assigned_ns.count + 1 %} {% endif
+%} {% endfor %} {% endif %} {% set assigned_task_count = assigned_ns.count %} {% if status_value ==
+'PUBLISHED' %}
 <!-- Project Published - Mapper-first access -->
 <div class="ftm-published-divider ftm-published-divider--top">
   <h2 class="ftm-published-header">{{ _("Ready for Mapping") }}</h2>
@@ -44,9 +45,7 @@ assigned_task_count = assigned_ns.count %} {% if status_value == 'PUBLISHED' %}
       <p style="color: #666">{{ _("Loading collaborator form...") }}</p>
     </div>
   </div>
-  {% endif %}
-
-  {% if show_assignment_panel %}
+  {% endif %} {% if show_assignment_panel %}
   <div
     id="assignment-panel"
     hx-get="/projects/{{ project.id }}/assignments-htmx"

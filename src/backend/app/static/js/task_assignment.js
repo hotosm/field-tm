@@ -390,7 +390,10 @@ export function initAssignmentPanel({ projectId, i18nStrings }) {
           if (taskId === undefined || taskId === null) return;
           layersByTaskId[String(taskId)] = layer;
           layer.on("click", function (event) {
-            toggleSelection(Number(taskId), Boolean(event.originalEvent && event.originalEvent.shiftKey));
+            toggleSelection(
+              Number(taskId),
+              Boolean(event.originalEvent && event.originalEvent.shiftKey),
+            );
           });
           // Content function so the label reflects draft edits when shown.
           layer.bindTooltip(

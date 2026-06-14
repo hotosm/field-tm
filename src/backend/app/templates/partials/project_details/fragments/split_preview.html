@@ -21,9 +21,14 @@
         hx-target="#split-status"
         hx-swap="innerHTML"
         hx-include="#accept-split-form"
-        {% if discard_assignment_count %}
+        {%
+        if
+        discard_assignment_count
+        %}
         hx-confirm="{{ _('Accepting this split discards %(count)s existing task assignment(s). Continue?') % {'count': discard_assignment_count} }}"
-        {% endif %}
+        {%
+        endif
+        %}
         class="wa-button wa-button--primary"
         style="min-width: 200px"
       >
