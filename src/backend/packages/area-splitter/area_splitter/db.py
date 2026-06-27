@@ -194,7 +194,7 @@ def aoi_to_postgis(conn: psycopg.Connection, geom: dict) -> None:
 
     sql_insert = """
         INSERT INTO project_aoi (geom)
-        VALUES (ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326))
+        VALUES (ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON(%s), 4326)))
         RETURNING id, geom;
     """
 
@@ -235,7 +235,7 @@ def insert_geoms_batch(
 
     query = (
         f"INSERT INTO {table_name} (geom, osm_id, tags) "
-        "VALUES (ST_SetSRID(ST_GeomFromGeoJSON(%(geom)s), 4326), %(osm_id)s, %(tags)s)"
+        "VALUES (ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON(%(geom)s), 4326)), %(osm_id)s, %(tags)s)"
     )
     prepared = [{**row, "tags": Json(row.get("tags"))} for row in rows]
     cur.executemany(query, prepared)

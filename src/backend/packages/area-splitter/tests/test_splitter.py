@@ -123,6 +123,7 @@ def test_insert_geoms_batch_uses_executemany_and_json_tags():
     assert len(cur.calls) == 1
     query, params = cur.calls[0]
     assert "INSERT INTO ways_poly" in query
+    assert "ST_MakeValid" in query
     assert len(params) == 2
     assert isinstance(params[0]["tags"], Json)
     assert params[0]["osm_id"] == 1
