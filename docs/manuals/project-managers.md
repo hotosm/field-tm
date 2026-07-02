@@ -112,14 +112,14 @@ Go to [field-tm](https://field.hotosm.org/) and click **New Project**.
 
 Field-TM offers two project creation paths:
 
-| | **Quick Setup — OSM Buildings** | **Custom Project** |
-|---|---|---|
-| **Best for** | Tagging existing buildings in OSM | Everything else |
-| **Field app** | QField (Android & iOS) | QField **or** ODK Collect |
-| **Survey form** | Pre-built building survey | Upload your own XLSForm |
-| **Map data** | Auto-fetched from OpenStreetMap | Upload, fetch from OSM, or start empty |
-| **Task splitting** | Automatic (~10 buildings per task) | Configurable |
-| **Setup time** | ~1 minute | ~5 minutes |
+|                    | **Quick Setup — OSM Buildings**    | **Custom Project**                     |
+| ------------------ | ---------------------------------- | -------------------------------------- |
+| **Best for**       | Tagging existing buildings in OSM  | Everything else                        |
+| **Field app**      | QField (Android & iOS)             | QField **or** ODK Collect              |
+| **Survey form**    | Pre-built building survey          | Upload your own XLSForm                |
+| **Map data**       | Auto-fetched from OpenStreetMap    | Upload, fetch from OSM, or start empty |
+| **Task splitting** | Automatic (~10 buildings per task) | Configurable                           |
+| **Setup time**     | ~1 minute                          | ~5 minutes                             |
 
 ---
 
@@ -192,7 +192,7 @@ Mapping can use **QField (Android & iOS)** or **ODK Collect (Android)**.
    - **ODK Collect** — Android only; submits directly to ODK Central.
 7. Click **Next**.
 
-  ![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
+![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
 
 ### Step 2 — Define the project area
 
@@ -205,7 +205,7 @@ Mapping can use **QField (Android & iOS)** or **ODK Collect (Android)**.
     Confirm the exact area before proceeding — the project boundary
     cannot be edited after the project is created.
 
-  ![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
+![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
 
 ### Step 3 — Upload the survey form
 
@@ -217,7 +217,7 @@ Mapping can use **QField (Android & iOS)** or **ODK Collect (Android)**.
 See [XLS Form Preparation](#xls-form-preparation) for guidance on
 preparing your form.
 
-  ![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
+![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
 
 ### Step 4 — Select map data
 
@@ -232,7 +232,7 @@ Choose what existing features (if any) mappers will survey:
 You can also upload a secondary supporting layer (e.g. administrative
 boundaries) that mappers can see but cannot edit.
 
-  ![image](https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89)
+![image](https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89)
 
 ### Step 5 — Configure task splitting
 
@@ -249,7 +249,7 @@ Choose how the AOI is divided into mapper tasks:
 Task splitting may take a few seconds to a few minutes depending on
 feature count and AOI size. Click **Submit** to create the project.
 
-  ![image](https://github.com/user-attachments/assets/7eeaf7ed-c13d-4444-aeeb-d71aed4fee8e)
+![image](https://github.com/user-attachments/assets/7eeaf7ed-c13d-4444-aeeb-d71aed4fee8e)
 
 ### After creation — QField projects
 
