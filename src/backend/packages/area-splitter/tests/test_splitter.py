@@ -502,7 +502,9 @@ def _extract_featcol(features):
     return {"type": "FeatureCollection", "features": features}
 
 
-def _assert_tasks_valid_and_bounded_by_aoi(aoi_geometry, features, overshoot_tolerance=0.02):
+def _assert_tasks_valid_and_bounded_by_aoi(
+    aoi_geometry, features, overshoot_tolerance=0.02
+):
     """Assert every task polygon is valid, non-overlapping, and stays within the AOI.
 
     The straight skeleton algorithm intentionally only builds task polygons
@@ -712,7 +714,9 @@ def test_split_by_sql_skeleton_concave_aoi():
         l_shape_aoi, DB_URL, num_buildings=50, osm_extract=extract
     ).get("features", [])
 
-    _assert_tasks_valid_and_bounded_by_aoi(l_shape_aoi["features"][0]["geometry"], features)
+    _assert_tasks_valid_and_bounded_by_aoi(
+        l_shape_aoi["features"][0]["geometry"], features
+    )
 
 
 def test_split_by_sql_skeleton_task_polygons_cover_aoi(aoi_json, extract_json):
@@ -726,7 +730,9 @@ def test_split_by_sql_skeleton_task_polygons_cover_aoi(aoi_json, extract_json):
         aoi_json, DB_URL, num_buildings=10, osm_extract=extract_json
     ).get("features", [])
 
-    _assert_tasks_valid_and_bounded_by_aoi(aoi_json["features"][0]["geometry"], features)
+    _assert_tasks_valid_and_bounded_by_aoi(
+        aoi_json["features"][0]["geometry"], features
+    )
 
 
 def test_cli_help(capsys):
