@@ -377,7 +377,7 @@ Item {
   function loadCompanionPlugins() {
     for (let i = 0; i < _companionPlugins.length; ++i) {
       const plugin = _companionPlugins[i];
-      // Upstream version already installed via the plugin manager — leave the user in control.
+      // Upstream version already installed via the plugin manager - leave the user in control.
       if (_isCompanionInstalled(plugin.uuid)) {
         continue;
       }
