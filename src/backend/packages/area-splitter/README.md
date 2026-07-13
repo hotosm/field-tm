@@ -50,27 +50,27 @@ pip install area-splitter
 > CREATE EXTENSION IF NOT EXISTS postgis_sfcgal WITH SCHEMA public;
 > ```
 
-## Splitting Types
+## Splitting Options
 
-### Split By Square
+Five algorithms are available via the `SplittingAlgorithm` enum:
 
-The default is to split the polygon into squares. The default
-dimension is 50 meters, but that is configurable. The outer square are
-clipped to the AOI boundary.
+- `NO_SPLITTING`: return the AOI as one task.
+- `DIVIDE_BY_SQUARE`: grid of squares clipped to the AOI (default
+  50m). No OSM data required.
+- `AVG_BUILDING_VORONOI` (v1): split along roads/rivers/etc, cluster
+  buildings, enclose with Voronoi. Kept for compatibility.
+- `AVG_BUILDING_SKELETON` (v2, default): same as v1 but uses
+  `CG_StraightSkeleton` for cleaner task edges. Needs SFCGAL.
+- `TOTAL_TASKS`: same SQL as v2, but sized by target task count
+  instead of buildings per task.
 
-### Split By Feature
+The three SQL-based algorithms share a six-step pipeline. See
+[docs/pipeline.md](docs/pipeline.md) for the full walkthrough, and
+[docs/algorithms/](docs/algorithms/) for what makes each one
+different.
 
-The split by feature uses highway data extracted from OpenStreetMap,
-and uses it to generate non square task boundaries. It can also be
-adjusted to use the number of buildings in a task to adjust it's
-size.
-
-![Split By Feature](https://github.com/hotosm/area-splitter/blob/main/docs/images/Screenshot%20from%202023-08-06%2018-26-34.png)
-
-### Custom SQL query
-
-It is also possible to supply a custom SQL query to generate the
-tasks.
+For a user-facing overview (which one to pick for a project), see
+the [Task Splitting manual](../../../docs/manuals/task-splitting.md).
 
 ## Usage In Code
 

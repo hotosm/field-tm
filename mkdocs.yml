@@ -77,8 +77,7 @@ nav:
       - Mapper Guide: manuals/mapping.md
       - Project Manager Guide: manuals/project-managers.md
       - Video Guides: manuals/videos.md
-      - FieldTM Roles: manuals/user-types-explained.md
-      - Workflow Diagrams: manuals/workflow-diagrams.md
+      - Task Splitting: manuals/task-splitting.md
       - XLSForm Design: manuals/xlsform-design.md
       - Visualising Data Externally: https://docs.getodk.org/tutorial-mapping-households
       - ODKCollect Offline Maps: https://docs.getodk.org/collect-offline-maps
