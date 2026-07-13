@@ -106,81 +106,171 @@ All project manager permissions are granted to the organisation manager.
 Project creation access is provided to users who have organisation admin or
 higher level of permission.
 
-Go to [field-tm] <https://field.hotosm.org/>
+Go to [field-tm](https://field.hotosm.org/) and click **New Project**.
 
-### 1. Create the project details
+### Choose Your Project Type
 
-- Login to field-tm first to see the option of creating the project.
+Field-TM offers two project creation paths:
 
-  ![image](https://github.com/user-attachments/assets/6bf8604b-d44c-4488-a8c6-5312fb75a975)
+|                    | **Quick Setup — OSM Buildings**    | **Custom Project**                     |
+| ------------------ | ---------------------------------- | -------------------------------------- |
+| **Best for**       | Tagging existing buildings in OSM  | Everything else                        |
+| **Field app**      | QField (Android & iOS)             | QField **or** ODK Collect              |
+| **Survey form**    | Pre-built building survey          | Upload your own XLSForm                |
+| **Map data**       | Auto-fetched from OpenStreetMap    | Upload, fetch from OSM, or start empty |
+| **Task splitting** | Automatic (~10 buildings per task) | Configurable                           |
+| **Setup time**     | ~1 minute                          | ~5 minutes                             |
 
-- Start by filling in the project basic information such as the name,
-  description,
-  hashtag, etc. This captures essential information about your project.
+---
 
-- If you want to use drone imagery or any other high resolution base imagery,
-  you can add the TMS layer from this step.
+## Quick Setup: Map OSM Buildings with QField
 
-- You can also choose whether you want to create public or private project
-  in Field-TM.
-- You can also choose the option whether you want mappers to use ODK collect
-  mobile application or webform during this step. By default, webform will be
-  used.
+This is the fastest way to start a building-tagging campaign.
+Everything is configured automatically — just draw your area.
 
-- Finally click Next to proceed.
+**Field mapping happens in QField on Android or iOS.**
 
-  ![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
+### Step 1 — Draw your area
 
-### 2. Create a project area
+1. Log in to Field-TM.
+2. Click **New Project** and select **"Add tags to OSM buildings"**.
+3. On the map, draw a freehand polygon around the area you want to map,
+   or upload a GeoJSON file.
+4. Click **Create Project**.
 
-- You can draw a freehand polygon on a map interface or you can upload
-  the AOI file.
-- Click on Upload file button to upload the AOI file. The file is only
-  supported by Geojson format. See [preparing map features](#preparing-map-features).
-- Review the displayed map that corresponds to your selected area and
-  click on "Next".
+Field-TM will then automatically:
 
-      !!! tip
+- Download building outlines from OpenStreetMap for your area.
+- Split the area into tasks of roughly 10 buildings each, using roads,
+  rivers, railways, and airstrips as natural task boundaries.
+- Package a basemap for offline use (where available).
+- Create a QField Cloud project with the pre-built building survey.
 
-            Confirm the exact area for the survey before creating the project,
-            as the project boundary cannot be edited once the project is created.
+Project creation runs in the background. You will be redirected to a
+status page and then to the project once it is ready.
 
-      ![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
+!!! tip
 
-### 3. Upload the survey (or use an existing one)
+    If no OSM buildings exist in the area yet, the project will still be
+    created — mappers can digitise new buildings directly in QField.
 
-- You may choose to upload a pre-Configured XLSForm or browse the forms.
-  [XLS Form Preparation](#xls-form-preparation)
-- Click the UploadXLSForm if you are uploading the file or download forms
-  by clicking Download form.
-- Finally click Next to proceed.
+### Step 2 — Share with mappers (QField)
 
-  ![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
+Once the project is ready:
 
-### 4. Select the geometry type you wish to map
+1. Go to the project page and copy the **QField project link** or
+   display the **QR code**.
+2. Mappers install **QField** on their Android or iOS device and log in
+   with their QField Cloud account (free to create at
+   [app.qfield.cloud](https://app.qfield.cloud)).
+3. They scan the QR code or open the shared link to download the project.
+4. Mapped data syncs to QField Cloud automatically or manually — the
+   project manager can review progress from the Field-TM dashboard.
 
-- Select an option under 'What type of geometry?'
-- If you want to upload your own, click in Upload custom mapdata or else
-  go with the default one of fetch data from OSM.
-- You can also go for 'no existing data' option, if you want to collect map
-  features as well in field.
-- You can also upload additional map feature to have multiple feature
-  selection supported.
+---
 
-  ![image](https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89)
+## Custom Project Setup (Advanced)
 
-### 5. Task splitting
+Use this path for anything other than tagging OSM buildings: roads,
+water points, vaccination campaigns, census mapping, infrastructure
+inspections, or any project where you need to bring your own form or
+map data.
 
-- Option 1: Split project into squares.
-- Option 2: Use the project area created as the task areas.
-  This could be a single task, or multiple task areas if uploaded.
-- Option 3: The task splitting algorithm which splits
-  the tasks with average number of features which is provided by project
-  creator.
-  - The task splitting may take few seconds to few minutes considering
-    the feature count and size of AOI. Click on "Submit" to create project.
+Mapping can use **QField (Android & iOS)** or **ODK Collect (Android)**.
 
-    ![image](https://github.com/user-attachments/assets/7eeaf7ed-c13d-4444-aeeb-d71aed4fee8e)
+### Step 1 — Create project details
+
+1. Log in to Field-TM.
+2. Click **New Project** and select **"Something else"**.
+3. Fill in the project basics: name, description, and hashtag.
+4. If you have drone imagery or other high-resolution basemap, add the
+   TMS URL here.
+5. Choose **Public** or **Private** visibility.
+6. Choose the field mapping app:
+   - **QField** — works on Android and iOS; supports offline basemaps
+     and syncs via QField Cloud.
+   - **ODK Collect** — Android only; submits directly to ODK Central.
+7. Click **Next**.
+
+![image](https://github.com/user-attachments/assets/c65c4ae2-d9be-4e45-ac71-a8b5653baba3)
+
+### Step 2 — Define the project area
+
+- Draw a freehand polygon on the map, or click **Upload file** to
+  upload a GeoJSON AOI.
+- Review the highlighted area on the map and click **Next**.
+
+!!! tip
+
+    Confirm the exact area before proceeding — the project boundary
+    cannot be edited after the project is created.
+
+![image](https://github.com/user-attachments/assets/64aeda34-c682-4fdc-8c2f-1fd83e29c61f)
+
+### Step 3 — Upload the survey form
+
+- Upload a pre-configured XLSForm, or browse the
+  [community XLSForm gallery](https://xlsforms.field.hotosm.org) to
+  download an existing one.
+- Click **Next** once a form is selected.
+
+See [XLS Form Preparation](#xls-form-preparation) for guidance on
+preparing your form.
+
+![image](https://github.com/user-attachments/assets/cdf1e050-42ec-4149-bf97-0d841bc5117f)
+
+### Step 4 — Select map data
+
+Choose what existing features (if any) mappers will survey:
+
+- **Fetch from OSM** — downloads buildings or healthcare features for
+  the AOI automatically.
+- **Upload custom map data** — upload your own GeoJSON file of features.
+- **No existing data** — mappers collect and digitise entirely new
+  features in the field.
+
+You can also upload a secondary supporting layer (e.g. administrative
+boundaries) that mappers can see but cannot edit.
+
+![image](https://github.com/user-attachments/assets/8df7c0fc-9a14-4d2d-bfdf-9fb8d9e92b89)
+
+### Step 5 — Configure task splitting
+
+Choose how the AOI is divided into mapper tasks:
+
+- **Split into squares** — uniform grid; good for areas with sparse
+  features.
+- **Use uploaded areas** — use the uploaded AOI boundaries directly as
+  task areas (one or many).
+- **Split by feature count** — algorithm splits based on a target number
+  of features per task; uses road/river lines as natural boundaries where
+  possible.
+
+Task splitting may take a few seconds to a few minutes depending on
+feature count and AOI size. Click **Submit** to create the project.
+
+![image](https://github.com/user-attachments/assets/7eeaf7ed-c13d-4444-aeeb-d71aed4fee8e)
+
+### After creation — QField projects
+
+If you selected **QField** as the field app:
+
+1. Go to the project page and copy the **QField project link** or
+   display the **QR code**.
+2. Mappers log in to QField with a QField Cloud account
+   ([app.qfield.cloud](https://app.qfield.cloud)) and scan the QR code
+   or open the shared link to download the project.
+3. Submissions sync back to QField Cloud; you can review them from the
+   Field-TM submissions page.
+
+### After creation — ODK Collect projects
+
+If you selected **ODK Collect** as the field app:
+
+1. Mappers install ODK Collect on Android.
+2. Share the project URL (`https://field.hotosm.org/project/{project_id}`)
+   or QR code so mappers can configure the app automatically.
+3. Submissions go to ODK Central and appear in the Field-TM dashboard.
 
 ### Project Creation Tips
 
