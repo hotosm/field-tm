@@ -194,7 +194,15 @@
         </div>
       </wa-dropdown>
       {% if auth_enabled %}
-      <wa-button slot="auth" variant="brand" id="login-btn">{{ _("Login") }}</wa-button>
+      <!-- Shared Hanko web component: renders the login button when logged out
+           (redirects to the central login page) and the user profile dropdown
+           with logout when logged in. Same pattern as the other HOT apps. -->
+      <hotosm-auth
+        slot="auth"
+        hanko-url="{{ hanko_public_url }}"
+        login-url="{{ login_url }}"
+        lang="{{ current_locale() }}"
+      ></hotosm-auth>
       {% endif %}
     </hot-header>
 
@@ -204,13 +212,7 @@
       domain="field.hotosm.org"
     ></hot-tracking>
 
-    {% if auth_enabled %}
-    <!-- Hidden session verifier: validates the Hanko session after redirect back
-         from the login page and emits hanko-login. -->
-    <div style="display: none">
-      <hotosm-auth hanko-url="{{ hanko_public_url }}"></hotosm-auth>
-    </div>
-    {% endif %} {% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 
     <script>
       // Strip ?lang= from the URL after the locale cookie middleware has set
@@ -232,15 +234,6 @@
       });
 
       {% if auth_enabled %}
-      const loginButton = document.getElementById("login-btn");
-      if (loginButton) {
-        loginButton.addEventListener("click", () => {
-          const returnTo = encodeURIComponent(window.location.href);
-          const separator = "{{ login_url }}".includes("?") ? "&" : "?";
-          window.location.href = `{{ login_url }}${separator}return_to=${returnTo}`;
-        });
-      }
-
       // Sync the authenticated user into the Field-TM database once per browser
       // session. hotosm-auth validates the session and emits 'hanko-login' on
       // every page load when a session is found; sessionStorage prevents us
