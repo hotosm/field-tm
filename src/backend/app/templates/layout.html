@@ -258,33 +258,39 @@
           }
 
           // 2. Adopt the language from the HOT login profile (issue #3038).
-          // One-way sync: login -> Field-TM. Applied once per session via
-          // ?lang=, which the locale middleware persists into ftm_locale. The
-          // guard is set up-front so the reload can never loop, and so a manual
-          // switcher choice later in the session is respected.
-          if (!sessionStorage.getItem("ftm_locale_synced")) {
-            sessionStorage.setItem("ftm_locale_synced", "1");
-            try {
-              const profileResp = await fetch("{{ hanko_public_url }}/api/profile/me", { credentials: "include" });
-              if (profileResp.ok) {
-                const profile = await profileResp.json();
-                const lang = (profile.language || "").toLowerCase();
-                if (lang && lang !== ftmLocale) {
+          // One-way: login -> Field-TM. We remember the last profile language
+          // we saw (localStorage) and only re-apply when it *changes*. This way
+          // a profile language change is reflected on the next reload, while a
+          // manual switcher choice is respected as long as the profile language
+          // stays the same. Applied via ?lang=, which the locale middleware
+          // persists into the ftm_locale cookie.
+          try {
+            const profileResp = await fetch("{{ hanko_public_url }}/api/profile/me", { credentials: "include" });
+            if (profileResp.ok) {
+              const profile = await profileResp.json();
+              const lang = (profile.language || "").toLowerCase();
+              const lastSeen = localStorage.getItem("ftm_profile_lang");
+              if (lang && lang !== lastSeen) {
+                // Profile language changed (or first login): remember it up
+                // front so the reload below can never loop, then apply it.
+                localStorage.setItem("ftm_profile_lang", lang);
+                if (lang !== ftmLocale) {
                   const url = new URL(window.location.href);
                   url.searchParams.set("lang", lang);
                   window.location.assign(url.toString());
                 }
               }
-            } catch (e) {
-              console.warn("Field-TM: failed to read login language:", e);
             }
+          } catch (e) {
+            console.warn("Field-TM: failed to read login language:", e);
           }
         });
 
-        // Clear the flags on logout so the next login re-syncs profile + locale.
+        // Clear the flags on logout so the next login re-syncs profile + locale
+        // (a different user may have a different language).
         hotosmAuth.addEventListener("hanko-logout", () => {
           sessionStorage.removeItem("ftm_profile_synced");
-          sessionStorage.removeItem("ftm_locale_synced");
+          localStorage.removeItem("ftm_profile_lang");
         });
       }
       {% endif %}
