@@ -408,7 +408,9 @@ def test_split_by_sql_total_tasks_passes_num_enumerators(
     assert isinstance(features, dict) and features.get("type") == "FeatureCollection"
 
 
-def test_split_by_sql_roads_requires_no_legacy_param(monkeypatch, aoi_json, extract_json):
+def test_split_by_sql_roads_requires_no_legacy_param(
+    monkeypatch, aoi_json, extract_json
+):
     """SPLIT_BY_ROADS has no required_params, so it needs neither num_buildings
     nor num_enumerators to resolve algorithm params successfully.
     """

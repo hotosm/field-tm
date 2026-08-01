@@ -83,7 +83,7 @@ Needs: AOI polygon, OSM extract with roads.
 ## Which one to pick
 
 | Situation                               | Use                      |
-| ---------------------------------------- | ------------------------ |
+| --------------------------------------- | ------------------------ |
 | Very small AOI, one mapper              | No Splitting             |
 | No OSM data, or a sparse area           | Split by Square          |
 | You know how many mappers you have      | Specific Number of Tasks |
