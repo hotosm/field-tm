@@ -14,10 +14,11 @@ class SplittingAlgorithm(StrEnum):
     AVG_BUILDING_VORONOI = "AVG_BUILDING_VORONOI"
     AVG_BUILDING_SKELETON = "AVG_BUILDING_SKELETON"
     TOTAL_TASKS = "TOTAL_TASKS"
+    SPLIT_BY_ROADS = "SPLIT_BY_ROADS"
 
     @property
     def sql_path(self) -> Path | None:
-        """Get SQL file path for building-based algorithms."""
+        """Get the algorithm-specific (step 4) SQL file for building-based algorithms."""
         if self in (
             SplittingAlgorithm.AVG_BUILDING_VORONOI,
             SplittingAlgorithm.AVG_BUILDING_SKELETON,
@@ -34,6 +35,25 @@ class SplittingAlgorithm(StrEnum):
         return None
 
     @property
+    def sql_files(self) -> list[Path] | None:
+        """Ordered SQL files to run for SQL-based splitting, or None if not SQL-based."""
+        if self.sql_path:
+            return [
+                algorithms_path / "common/1-linear-features.sql",
+                algorithms_path / "common/2-group-buildings.sql",
+                algorithms_path / "common/3-cluster-buildings.sql",
+                self.sql_path,
+                algorithms_path / "common/5-alignment.sql",
+                algorithms_path / "common/6-extract.sql",
+            ]
+        if self is SplittingAlgorithm.SPLIT_BY_ROADS:
+            return [
+                algorithms_path / "common/1-linear-features.sql",
+                algorithms_path / "split_by_roads.sql",
+            ]
+        return None
+
+    @property
     def label(self) -> str:
         """Human-readable name."""
         return {
@@ -44,6 +64,7 @@ class SplittingAlgorithm(StrEnum):
                 "Average Buildings v2 (Straight Skeleton)"
             ),
             SplittingAlgorithm.TOTAL_TASKS: "Split by Specific Number of Tasks",
+            SplittingAlgorithm.SPLIT_BY_ROADS: "Split by Roads",
         }[self]
 
     @property
@@ -55,4 +76,5 @@ class SplittingAlgorithm(StrEnum):
             SplittingAlgorithm.AVG_BUILDING_VORONOI: ["num_buildings"],
             SplittingAlgorithm.AVG_BUILDING_SKELETON: ["num_buildings"],
             SplittingAlgorithm.TOTAL_TASKS: ["num_enumerators"],
+            SplittingAlgorithm.SPLIT_BY_ROADS: [],
         }[self]

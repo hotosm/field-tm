@@ -86,7 +86,7 @@ export function initProjectSetupSplit({ i18nStrings }) {
     const splitBtnText = document.getElementById("split-btn-text");
 
     if (paramContainer) {
-      paramContainer.style.display = algorithm && algorithm !== "NO_SPLITTING" ? "block" : "none";
+      paramContainer.style.display = algorithm in algorithmActiveParam ? "block" : "none";
     }
 
     if (splitBtnText) {

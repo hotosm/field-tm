@@ -408,6 +408,70 @@ def test_split_by_sql_total_tasks_passes_num_enumerators(
     assert isinstance(features, dict) and features.get("type") == "FeatureCollection"
 
 
+def test_split_by_sql_roads_requires_no_legacy_param(monkeypatch, aoi_json, extract_json):
+    """SPLIT_BY_ROADS has no required_params, so it needs neither num_buildings
+    nor num_enumerators to resolve algorithm params successfully.
+    """
+    captured = {}
+
+    def fake_split_by_sql(
+        self,
+        db,
+        algorithm,
+        algorithm_params,
+        osm_extract,
+        **_kwargs,
+    ):
+        captured["algorithm"] = algorithm
+        captured["algorithm_params"] = algorithm_params
+        return {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": aoi_json["features"][0]["geometry"],
+                }
+            ],
+        }
+
+    monkeypatch.setattr(AreaSplitter, "splitBySQL", fake_split_by_sql)
+
+    features = split_by_sql(
+        aoi_json,
+        "postgresql://unused",
+        osm_extract=extract_json,
+        algorithm=SplittingAlgorithm.SPLIT_BY_ROADS,
+    )
+
+    assert captured["algorithm"] == SplittingAlgorithm.SPLIT_BY_ROADS
+    assert captured["algorithm_params"]["include_roads"] == "TRUE"
+    assert isinstance(features, dict) and features.get("type") == "FeatureCollection"
+
+
+def test_split_by_sql_roads_with_extract(aoi_json, extract_json):
+    """Splitting by roads should return polygons bounded by linear features."""
+    features = split_by_sql(
+        aoi_json,
+        DB_URL,
+        osm_extract=extract_json,
+        algorithm=SplittingAlgorithm.SPLIT_BY_ROADS,
+        algorithm_params={
+            "include_roads": "TRUE",
+            "include_rivers": "TRUE",
+            "include_railways": "TRUE",
+            "include_aeroways": "TRUE",
+        },
+    )
+    assert isinstance(features, dict) and features.get("type") == "FeatureCollection"
+    feature_list = features.get("features", [])
+    assert len(feature_list) >= 1
+    assert all(
+        feature.get("geometry", {}).get("type") in {"Polygon", "MultiPolygon"}
+        for feature in feature_list
+    )
+    assert all("building_count" in feature["properties"] for feature in feature_list)
+
+
 def test_split_by_sql_ftm_no_extract(aoi_json):
     """Test Field-TM splitting algorithm, with no data extract."""
     features = split_by_sql(
