@@ -16,6 +16,6 @@ jobs:
     steps:
       - run: echo hello
 #   publish_to_pypi:
-#     uses: hotosm/gh-workflows/.github/workflows/pypi_publish.yml@2.0.5
+#     uses: hotosm/gh-workflows/.github/workflows/pypi_publish.yml@4.1.0
 #     secrets:
 #       PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
