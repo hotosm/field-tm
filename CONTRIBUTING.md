@@ -110,13 +110,23 @@ pip install pre-commit
 pre-commit install
 ```
 
-### Commit Sign-Off Policy
+### How We Handle Contributions
 
-- In order to commit to this repository, please read and accept our
-  [commit sign-off policy](https://developercertificate.org)
-- This is simply to verify that you are the author of the commits you make.
-- If possible, please add to your commit footer the `Signed-off-by` info:
-  `Signed-off-by: John Doe <joe.doe@example.com>`
+Two small things, and neither one takes any rights away from you -
+**you always keep the copyright to the code you write:**
+
+1. **A one-time contribution agreement.** The first time you open a pull
+   request, a bot asks you to comment confirming you have read and agree to
+   these guidelines. This is **not** a copyright assignment or a re-licensing
+   CLA - it just confirms you've read this document, and helps keep out
+   automated bot / AI accounts, which we do not accept.
+2. **A sign-off on each commit (the DCO).** Add a `Signed-off-by` line to your
+   commits (`git commit -s`) to certify you wrote the code.
+
+For the full explanation, see the HOT contributor guide:
+
+- [How contributions are handled](https://docs.hotosm.org/become-a-contributor/#how-contributions-are-handled)
+- [Commit sign-off (DCO)](https://docs.hotosm.org/dev-guide/repo-management/git/#commit-sign-off-dco)
 
 ## Our Development Practices
 
