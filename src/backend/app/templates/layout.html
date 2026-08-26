@@ -74,22 +74,34 @@
     <!-- HOT UI theme, self-contained (fonts loaded separately above) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/style.css" />
 
-    <!-- HOT UI components: /+esm rewrites bare-module specifiers, so no import map needed -->
+    <!-- webawesome-all.js is a barrel of bare `@awesome.me/webawesome/...` imports, so the
+         browser needs this map to resolve them. dist-cdn is the pre-bundled build; the pin
+         must match the @awesome.me/webawesome version @hotosm/ui 1.0.0 was built against. -->
+    <script type="importmap">
+      {
+        "imports": {
+          "@awesome.me/webawesome/dist/components/": "https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.11.0/dist-cdn/components/"
+        }
+      }
+    </script>
+
+    <!-- HOT UI components: raw dist files, NOT jsDelivr's /+esm (it duplicates wa-*
+         registrations and most elements never register). -->
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/webawesome-all.js/+esm"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/webawesome-all.js"
     />
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/hotosm-ui.js/+esm"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/hotosm-ui.js"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/webawesome-all.js/+esm"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/webawesome-all.js"
     ></script>
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/hotosm-ui.js/+esm"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/hotosm-ui.js"
     ></script>
     {% if auth_enabled %}
     <link
