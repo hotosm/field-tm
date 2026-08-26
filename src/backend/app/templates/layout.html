@@ -71,62 +71,25 @@
       }
     </style>
 
-    <!-- WebAwesome CSS - loaded from CDN so the browser caches it across all HOT tools -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.2.1/dist/styles/native.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.2.1/dist/styles/utilities.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.2.1/dist/styles/themes/default.css"
-    />
+    <!-- HOT UI theme, self-contained (fonts loaded separately above) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/style.css" />
 
-    <!-- Import map: lets the browser resolve WebAwesome bare-module specifiers used -->
-    <!-- inside hotosm-ui.js so WA components load correctly (incl. inside Shadow DOM). -->
-    <script type="importmap">
-      {
-        "imports": {
-          "@awesome.me/webawesome/dist/components/": "https://cdn.jsdelivr.net/npm/@awesome.me/webawesome@3.2.1/dist-cdn/components/"
-        }
-      }
-    </script>
-    <script type="module">
-      import "@awesome.me/webawesome/dist/components/badge/badge.js";
-      import "@awesome.me/webawesome/dist/components/button/button.js";
-      import "@awesome.me/webawesome/dist/components/callout/callout.js";
-      import "@awesome.me/webawesome/dist/components/card/card.js";
-      import "@awesome.me/webawesome/dist/components/dropdown/dropdown.js";
-      import "@awesome.me/webawesome/dist/components/dialog/dialog.js";
-      import "@awesome.me/webawesome/dist/components/icon/icon.js";
-      import "@awesome.me/webawesome/dist/components/input/input.js";
-      import "@awesome.me/webawesome/dist/components/option/option.js";
-      import "@awesome.me/webawesome/dist/components/popover/popover.js";
-      import "@awesome.me/webawesome/dist/components/radio/radio.js";
-      import "@awesome.me/webawesome/dist/components/radio-group/radio-group.js";
-      import "@awesome.me/webawesome/dist/components/select/select.js";
-      import "@awesome.me/webawesome/dist/components/spinner/spinner.js";
-      import "@awesome.me/webawesome/dist/components/tag/tag.js";
-      import "@awesome.me/webawesome/dist/components/textarea/textarea.js";
-    </script>
-
-    <!-- HOT UI theme + components -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.1/dist/style-core.css"
-    />
-    <!-- modulepreload: browser fetches, parses, and compiles the module eagerly  -->
-    <!-- so custom elements are defined as soon as possible after the page loads. -->
+    <!-- HOT UI components: /+esm rewrites bare-module specifiers, so no import map needed -->
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.1/dist/hotosm-ui.js"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/webawesome-all.js/+esm"
+    />
+    <link
+      rel="modulepreload"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/hotosm-ui.js/+esm"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@0.10.1/dist/hotosm-ui.js"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/webawesome-all.js/+esm"
+    ></script>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@1.0.0/dist/hotosm-ui.js/+esm"
     ></script>
     {% if auth_enabled %}
     <link
