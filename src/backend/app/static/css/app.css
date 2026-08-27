@@ -12,7 +12,6 @@
 
 /* --- Body typography -------------------------------------- */
 body {
-  font-family: var(--hot-font-sans, Archivo, -apple-system, Roboto, Helvetica, Arial, sans-serif);
   color: var(--hot-color-neutral-900, #404248);
 }
 
@@ -70,7 +69,6 @@ body {
 .ftm-page-title {
   margin: 0;
   font-size: var(--hot-font-size-x-large);
-  font-family: var(--hot-font-sans-variant-condensed);
   color: var(--ftm-text);
 }
 
@@ -336,7 +334,6 @@ body {
 
 .ftm-section-title {
   color: var(--ftm-brand);
-  font-family: var(--hot-font-sans-variant-condensed);
   margin-bottom: 10px;
 }
 
@@ -361,7 +358,6 @@ body {
   margin: 0 0 8px;
   color: var(--ftm-text);
   font-size: var(--hot-font-size-large);
-  font-family: var(--hot-font-sans-variant-condensed);
 }
 
 .ftm-manager-section__subtitle {
@@ -661,7 +657,6 @@ body {
 /* --- Setup steps ------------------------------------------ */
 .ftm-setup-header {
   color: var(--ftm-brand);
-  font-family: var(--hot-font-sans-variant-condensed);
   margin-bottom: 20px;
   font-size: var(--hot-font-size-x-large);
 }
@@ -693,7 +688,6 @@ body {
   color: var(--ftm-text);
   margin: 0;
   font-size: var(--hot-font-size-large);
-  font-family: var(--hot-font-sans-variant-condensed);
 }
 
 .ftm-step__check {
@@ -892,7 +886,6 @@ body {
 /* --- Published project ------------------------------------ */
 .ftm-published-header {
   color: var(--ftm-color-success);
-  font-family: var(--hot-font-sans-variant-condensed);
   margin-bottom: 10px;
   font-size: var(--hot-font-size-x-large);
 }
@@ -971,7 +964,6 @@ body {
   color: var(--ftm-text);
   margin: 0 0 12px;
   font-size: var(--hot-font-size-large);
-  font-family: var(--hot-font-sans-variant-condensed);
 }
 
 .ftm-qr-panel__description {
@@ -1027,7 +1019,6 @@ body {
   margin: 0 0 10px;
   color: var(--ftm-text);
   font-size: var(--hot-font-size-large);
-  font-family: var(--hot-font-sans-variant-condensed);
 }
 
 .ftm-qfc-collab__steps {
@@ -1471,7 +1462,6 @@ body {
 .ftm-chooser-card__title {
   margin: 0;
   font-size: var(--hot-font-size-large);
-  font-family: var(--hot-font-sans-variant-condensed);
   color: var(--ftm-text);
   line-height: 1.2;
 }
@@ -1554,7 +1544,6 @@ body {
 .ftm-custom-section__title {
   margin: 0 0 4px;
   font-size: var(--hot-font-size-medium);
-  font-family: var(--hot-font-sans-variant-condensed);
   color: var(--ftm-text);
 }
 
