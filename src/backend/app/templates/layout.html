@@ -64,7 +64,7 @@
     </style>
 
     <!-- HOT UI theme, self-contained (fonts loaded separately above) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.0.0/dist/style.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.1.0/dist/style.css" />
 
     <!-- webawesome-all.js is a barrel of bare `@awesome.me/webawesome/...` imports, so the
          browser needs this map to resolve them. dist-cdn is the pre-bundled build; the pin
@@ -81,19 +81,19 @@
          registrations and most elements never register). -->
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.0.0/dist/webawesome-all.js"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.1.0/dist/webawesome-all.js"
     />
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.0.0/dist/hotosm-ui.js"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.1.0/dist/hotosm-ui.js"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.0.0/dist/webawesome-all.js"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.1.0/dist/webawesome-all.js"
     ></script>
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.0.0/dist/hotosm-ui.js"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.1.0/dist/hotosm-ui.js"
     ></script>
     {% if auth_enabled %}
     <link
@@ -138,7 +138,7 @@
   <body>
     <hot-announcement src="https://d33erh71igmru9.cloudfront.net/field-tm.json"></hot-announcement>
 
-    <hot-header id="app-header" title="FieldTM" size="medium">
+    <hot-header id="app-header" title="FieldTM" size="m">
       <wa-dropdown slot="lang">
         <wa-button slot="trigger" variant="text" class="ftm-header-lang-trigger">
           {{ locale_labels.get(current_locale(), current_locale().upper()) }}

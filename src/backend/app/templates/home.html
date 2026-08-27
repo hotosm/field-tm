@@ -22,7 +22,7 @@
             <wa-select
               id="projects-status-filter"
               name="status"
-              size="small"
+              size="s"
               value="{{ selected_status or '' }}"
             >
               {% for val, label in status_options %}
@@ -39,7 +39,7 @@
           <wa-select
             id="projects-sort-filter"
             name="sort"
-            size="small"
+            size="s"
             value="{{ selected_sort or 'newest' }}"
           >
             {% for val, label in sort_options %}
@@ -54,7 +54,7 @@
             id="projects-search"
             type="search"
             name="search"
-            size="small"
+            size="s"
             placeholder='{{ _("Search projects…") }}'
             value="{{ search_query or '' }}"
             with-clear
