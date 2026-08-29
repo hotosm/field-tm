@@ -27,6 +27,7 @@ import pytest
 from app.qfield import qfield_crud
 from app.qfield.qfield_crud import (
     _build_qfc_service_account_email,
+    _build_tasks_geojson,
     _create_qfc_user,
     _is_org_owned_project,
     _resolve_backend_qfc_url,
@@ -92,6 +93,75 @@ def test_clean_tags_for_qgis_stringifies_nested_properties():
         "building": "yes",
         "levels": "2",
     }
+
+
+def test_build_tasks_geojson_keeps_stored_ids_and_stamps_legacy_rows():
+    """Stored task ids win; legacy unstamped features get non-colliding ids."""
+    project = SimpleNamespace(
+        task_areas_geojson={
+            "type": "FeatureCollection",
+            "features": [
+                {"type": "Feature", "geometry": None, "properties": {}},
+                {"type": "Feature", "geometry": None, "properties": {"task_id": 1}},
+                {"type": "Feature", "geometry": None, "properties": {"task_id": 4}},
+                {"type": "Feature", "geometry": None, "properties": {}},
+            ],
+        },
+        outline=None,
+    )
+
+    tasks_geojson = _build_tasks_geojson(project)
+
+    stored_ids = [
+        feature["properties"]["task_id"] for feature in tasks_geojson["features"]
+    ]
+    assert stored_ids == [2, 1, 4, 3]
+
+
+def test_build_tasks_geojson_restamps_duplicate_and_invalid_ids():
+    """Duplicate or malformed stored ids must come out as unique integers."""
+    project = SimpleNamespace(
+        task_areas_geojson={
+            "type": "FeatureCollection",
+            "features": [
+                {"type": "Feature", "geometry": None, "properties": {"task_id": 1}},
+                {"type": "Feature", "geometry": None, "properties": {"task_id": 1}},
+                {"type": "Feature", "geometry": None, "properties": {"task_id": "2"}},
+                {"type": "Feature", "geometry": None, "properties": {"task_id": "abc"}},
+            ],
+        },
+        outline=None,
+    )
+
+    tasks_geojson = _build_tasks_geojson(project)
+
+    stored_ids = [
+        feature["properties"]["task_id"] for feature in tasks_geojson["features"]
+    ]
+    assert stored_ids == [1, 3, 2, 4]
+    assert all(isinstance(task_id, int) for task_id in stored_ids)
+
+
+def test_build_tasks_geojson_falls_back_to_single_outline_task():
+    """No stored task areas should yield a single outline task with id 1."""
+    project = SimpleNamespace(
+        task_areas_geojson={},
+        outline={"type": "Point", "coordinates": [85.3, 27.7]},
+    )
+
+    tasks_geojson = _build_tasks_geojson(project)
+
+    assert len(tasks_geojson["features"]) == 1
+    assert tasks_geojson["features"][0]["properties"]["task_id"] == 1
+
+
+def test_build_tasks_geojson_returns_empty_collection_without_outline():
+    """No task areas and no outline should produce an empty FeatureCollection."""
+    project = SimpleNamespace(task_areas_geojson=None, outline=None)
+
+    tasks_geojson = _build_tasks_geojson(project)
+
+    assert tasks_geojson == {"type": "FeatureCollection", "features": []}
 
 
 def test_resolve_qfield_project_url_prefers_absolute_api_url():

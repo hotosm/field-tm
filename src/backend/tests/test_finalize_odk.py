@@ -6,6 +6,7 @@ delivery work correctly through the whole chain.
 """
 
 from contextlib import asynccontextmanager
+from copy import deepcopy
 from dataclasses import dataclass
 from io import BytesIO
 from types import SimpleNamespace
@@ -22,9 +23,12 @@ from app.projects.project_services import (
     ServiceError,
     ValidationError,
     _build_feature_dataset_payload,
+    _build_task_entities,
     derive_simple_project_metadata,
     finalize_odk_project,
+    save_task_areas,
 )
+from app.qfield.qfield_crud import _build_tasks_geojson
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -76,6 +80,15 @@ SAMPLE_DATA_EXTRACT = {
 
 DUMMY_XLSFORM = b"dummy xlsform bytes"
 _UNSET = object()
+
+
+def _task_feature(properties: Optional[dict] = None) -> dict:
+    """Build a task-area Feature with the sample polygon geometry."""
+    return {
+        "type": "Feature",
+        "geometry": SAMPLE_OUTLINE["features"][0]["geometry"],
+        "properties": properties if properties is not None else {},
+    }
 
 
 @dataclass
@@ -800,6 +813,195 @@ async def test_build_feature_dataset_payload_allows_empty_data_extract_features(
 
     assert entity_properties == []
     assert entities_list == []
+
+
+# ---------------------------------------------------------------------------
+# Tests: stable task_id stamping and task entity building
+# ---------------------------------------------------------------------------
+
+
+async def test_save_task_areas_stamps_missing_task_ids(stub_project, db):
+    """Saving task areas should stamp sequential ids onto unstamped features."""
+    tasks_geojson = {
+        "type": "FeatureCollection",
+        "features": [_task_feature(), _task_feature(), _task_feature()],
+    }
+
+    task_count = await save_task_areas(db, stub_project.id, tasks_geojson)
+
+    assert task_count == 3
+    updated_project = await DbProject.one(db, stub_project.id)
+    stored_ids = [
+        feature["properties"]["task_id"]
+        for feature in updated_project.task_areas_geojson["features"]
+    ]
+    assert stored_ids == [1, 2, 3]
+
+
+async def test_save_task_areas_preserves_existing_ids_and_avoids_collisions(
+    stub_project, db
+):
+    """Existing task ids must stay untouched; stamped ids skip used values."""
+    tasks_geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            _task_feature(properties={"task_id": 2}),
+            _task_feature(),
+            _task_feature(properties={"task_id": 1}),
+            _task_feature(),
+        ],
+    }
+
+    await save_task_areas(db, stub_project.id, tasks_geojson)
+
+    updated_project = await DbProject.one(db, stub_project.id)
+    stored_ids = [
+        feature["properties"]["task_id"]
+        for feature in updated_project.task_areas_geojson["features"]
+    ]
+    assert stored_ids == [2, 3, 1, 4]
+
+
+async def test_save_task_areas_restamps_duplicate_and_invalid_ids(stub_project, db):
+    """Duplicate, malformed, or digit-string ids must persist as unique ints."""
+    tasks_geojson = {
+        "type": "FeatureCollection",
+        "features": [
+            _task_feature(properties={"task_id": 2}),
+            _task_feature(properties={"task_id": 2}),
+            _task_feature(properties={"task_id": "3"}),
+            _task_feature(properties={"task_id": "abc"}),
+            _task_feature(properties={"task_id": 0}),
+        ],
+    }
+
+    await save_task_areas(db, stub_project.id, tasks_geojson)
+
+    updated_project = await DbProject.one(db, stub_project.id)
+    stored_ids = [
+        feature["properties"]["task_id"]
+        for feature in updated_project.task_areas_geojson["features"]
+    ]
+    assert stored_ids == [2, 1, 3, 4, 5]
+    assert all(isinstance(task_id, int) for task_id in stored_ids)
+
+
+async def test_save_task_areas_rejects_invalid_data_format(stub_project, db):
+    """Non-dict task areas payloads should be rejected before persisting."""
+    with pytest.raises(ValidationError, match="Invalid task areas data format"):
+        await save_task_areas(db, stub_project.id, ["not", "a", "dict"])
+
+
+@pytest.mark.asyncio
+async def test_build_task_entities_uses_stored_task_ids():
+    """Entity labels and data must come from stored task_id, not position."""
+    project = FakeProject(
+        task_areas_geojson={
+            "type": "FeatureCollection",
+            "features": [
+                _task_feature(properties={"task_id": 7}),
+                _task_feature(properties={"task_id": 3}),
+            ],
+        }
+    )
+
+    async def fake_feature_geojson_to_entity_dict(feature, **kwargs):
+        return {"label": "", "data": {"geometry": "geom"}}
+
+    with patch(
+        "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+        side_effect=fake_feature_geojson_to_entity_dict,
+    ):
+        task_entities = await _build_task_entities(project)
+
+    assert [entity["label"] for entity in task_entities] == ["Task 7", "Task 3"]
+    assert [entity["data"]["task_id"] for entity in task_entities] == ["7", "3"]
+
+
+@pytest.mark.asyncio
+async def test_build_task_entities_stamps_legacy_rows_in_memory():
+    """Features saved before id stamping get in-memory ids matching position."""
+    project = FakeProject(
+        task_areas_geojson={
+            "type": "FeatureCollection",
+            "features": [_task_feature(), _task_feature()],
+        }
+    )
+
+    async def fake_feature_geojson_to_entity_dict(feature, **kwargs):
+        return {"label": "", "data": {"geometry": "geom"}}
+
+    with patch(
+        "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+        side_effect=fake_feature_geojson_to_entity_dict,
+    ):
+        task_entities = await _build_task_entities(project)
+
+    assert [entity["label"] for entity in task_entities] == ["Task 1", "Task 2"]
+    assert [entity["data"]["task_id"] for entity in task_entities] == ["1", "2"]
+
+
+@pytest.mark.asyncio
+async def test_build_task_entities_agrees_with_qfield_builder_on_mixed_ids():
+    """Both export builders must derive identical ids from the same fixture."""
+    featcol = {
+        "type": "FeatureCollection",
+        "features": [
+            _task_feature(),
+            _task_feature(properties={"task_id": 1}),
+            _task_feature(properties={"task_id": 4}),
+            _task_feature(),
+        ],
+    }
+
+    qfield_project = SimpleNamespace(task_areas_geojson=deepcopy(featcol), outline=None)
+    qfield_ids = [
+        feature["properties"]["task_id"]
+        for feature in _build_tasks_geojson(qfield_project)["features"]
+    ]
+
+    odk_project = FakeProject(task_areas_geojson=deepcopy(featcol))
+
+    async def fake_feature_geojson_to_entity_dict(feature, **kwargs):
+        return {"label": "", "data": {"geometry": "geom"}}
+
+    with patch(
+        "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+        side_effect=fake_feature_geojson_to_entity_dict,
+    ):
+        task_entities = await _build_task_entities(odk_project)
+    odk_ids = [int(entity["data"]["task_id"]) for entity in task_entities]
+
+    assert qfield_ids == [2, 1, 4, 3]
+    assert odk_ids == qfield_ids
+
+
+@pytest.mark.asyncio
+async def test_build_task_entities_outline_fallback_stays_task_one():
+    """The single-task outline fallback must keep its canonical task id 1."""
+    project = FakeProject(task_areas_geojson=None)
+
+    async def fake_feature_geojson_to_entity_dict(feature, **kwargs):
+        return {"label": "", "data": {"geometry": "geom"}}
+
+    with patch(
+        "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+        side_effect=fake_feature_geojson_to_entity_dict,
+    ):
+        task_entities = await _build_task_entities(project)
+
+    assert len(task_entities) == 1
+    assert task_entities[0]["label"] == "Task 1"
+    assert task_entities[0]["data"]["task_id"] == "1"
+
+
+@pytest.mark.asyncio
+async def test_build_task_entities_requires_outline_when_no_task_areas():
+    """Missing both task areas and outline should fail with a clear error."""
+    project = FakeProject(task_areas_geojson=None, outline_geojson=None)
+
+    with pytest.raises(ValidationError, match="Project outline is missing"):
+        await _build_task_entities(project)
 
 
 @pytest.mark.asyncio

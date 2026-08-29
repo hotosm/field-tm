@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-06-06 03:42+0100\n"
+"POT-Creation-Date: 2026-06-12 21:52-0400\n"
 "PO-Revision-Date: 2026-03-18 17:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ja\n"
@@ -159,31 +159,31 @@ msgstr "%(action)s はアップストリーム接続エラーにより失敗し�
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "タイルパック API が HTTP %(status_code)s を返しました。"
 
-#: app/helpers/helper_routes.py:78
+#: app/helpers/helper_routes.py:81
 msgid "Failed to convert YAML form to XLSForm."
 msgstr "YAML フォームから XLSForm への変換に失敗しました。"
 
-#: app/helpers/helper_routes.py:101
+#: app/helpers/helper_routes.py:104
 msgid "Provide a valid .json or .geojson file"
 msgstr "有効な .xls または .xlsx ファイルを指定してください"
 
-#: app/helpers/helper_routes.py:139
+#: app/helpers/helper_routes.py:149
 msgid "Provide a valid .csv"
 msgstr "有効な .xls または .xlsx ファイルを指定してください"
 
-#: app/helpers/helper_routes.py:193
+#: app/helpers/helper_routes.py:203
 msgid "Provide a valid .json file"
 msgstr "有効な .xls または .xlsx ファイルを指定してください"
 
-#: app/helpers/helper_routes.py:228
+#: app/helpers/helper_routes.py:238
 msgid "Could not login to raw-data-api"
 msgstr "raw-data-api にログインできませんでした"
 
-#: app/helpers/helper_routes.py:252
+#: app/helpers/helper_routes.py:262
 msgid "No geometries present"
 msgstr "ジオメトリが存在しません"
 
-#: app/helpers/helper_routes.py:269
+#: app/helpers/helper_routes.py:279
 msgid "Your geojson file is invalid."
 msgstr "geojson ファイルが無効です。"
 
@@ -254,50 +254,50 @@ msgstr "マッピングサーバーへの接続時に認証に失敗しました
 msgid "An unexpected error occurred while generating the QR code."
 msgstr "QR コードの生成中に予期しないエラーが発生しました。"
 
-#: app/htmx/project_detail_routes.py:298
+#: app/htmx/project_detail_routes.py:325
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "プロジェクト (%(project_id)s) が見つかりません。"
 
-#: app/htmx/project_detail_routes.py:305
+#: app/htmx/project_detail_routes.py:332
 msgid "Only the project manager can delete this project."
 msgstr "このプロジェクトを削除できるのはプロジェクト管理者のみです。"
 
-#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:299
+#: app/htmx/project_detail_routes.py:370 app/templates/project_details.html:299
 msgid "Project not found."
 msgstr "プロジェクトが見つかりません。"
 
-#: app/htmx/project_detail_routes.py:379
+#: app/htmx/project_detail_routes.py:406
 #: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "エラー: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:413
+#: app/htmx/project_detail_routes.py:440
 #, python-format
 msgid "Added the following user(s) as project editors: %(names)s."
 msgstr "次のユーザーをプロジェクト編集者として追加しました: %(names)s。"
 
-#: app/htmx/project_detail_routes.py:417
+#: app/htmx/project_detail_routes.py:444
 #, python-format
 msgid "Could not add '%(username)s': %(reason)s"
 msgstr "「%(username)s」を追加できませんでした: %(reason)s"
 
-#: app/htmx/project_detail_routes.py:423
+#: app/htmx/project_detail_routes.py:450
 msgid "Add more collaborators"
 msgstr "コラボレーターをさらに追加する"
 
-#: app/htmx/project_detail_routes.py:436
+#: app/htmx/project_detail_routes.py:463
 msgid "Invite QFieldCloud collaborators"
 msgstr "QFieldCloud のコラボレーターを招待する"
 
-#: app/htmx/project_detail_routes.py:439
+#: app/htmx/project_detail_routes.py:466
 msgid ""
 "Mappers must have an account on QFieldCloud before you can give them "
 "access to this project."
 msgstr "マッパーにこのプロジェクトへのアクセスを許可するには、マッパーに QFieldCloud のアカウントが必要です。"
 
-#: app/htmx/project_detail_routes.py:445
+#: app/htmx/project_detail_routes.py:472
 msgid ""
 "Have each mapper create a free account at <a "
 "href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
@@ -307,7 +307,7 @@ msgstr ""
 "rel=\"noopener\" class=\"ftm-link--brand\">app.qfield.cloud</a> "
 "で無料アカウントを作成してもらいます。"
 
-#: app/htmx/project_detail_routes.py:451
+#: app/htmx/project_detail_routes.py:478
 msgid ""
 "Enter their QFieldCloud usernames below (comma-separated for multiple "
 "users) and click submit. They will be added as editors and can log in to "
@@ -317,23 +317,23 @@ msgstr ""
 "(複数ユーザーの場合はカンマ区切り)、「送信」をクリックします。これらは編集者として追加され、QField "
 "にログインしてマッピングを開始できます。"
 
-#: app/htmx/project_detail_routes.py:457
+#: app/htmx/project_detail_routes.py:484
 msgid "e.g. alice, bob, charlie"
 msgstr "例えばアリス、ボブ、チャーリー"
 
-#: app/htmx/project_detail_routes.py:458
+#: app/htmx/project_detail_routes.py:485
 msgid "Add collaborators"
 msgstr "コラボレーターを追加する"
 
-#: app/htmx/project_detail_routes.py:550
+#: app/htmx/project_detail_routes.py:577
 msgid "Enter at least one QFieldCloud username."
 msgstr "少なくとも 1 つの QFieldCloud ユーザー名を入力します。"
 
-#: app/htmx/project_detail_routes.py:560
+#: app/htmx/project_detail_routes.py:587
 msgid "QFieldCloud project ID not found for this project."
 msgstr "このプロジェクトの QFieldCloud プロジェクト ID が見つかりません。"
 
-#: app/htmx/project_detail_routes.py:566
+#: app/htmx/project_detail_routes.py:593
 msgid ""
 "This project was created on a custom QFieldCloud instance. Use the "
 "QFieldCloud Admin tab to manage collaborators."
@@ -341,18 +341,42 @@ msgstr ""
 "このプロジェクトはカスタム QFieldCloud インスタンス上に作成されました。 [QFieldCloud Admin] "
 "タブを使用してコラボレーターを管理します。"
 
-#: app/htmx/project_detail_routes.py:632
+#: app/htmx/project_detail_routes.py:659
 msgid "GeoJSON export is only available for QField projects."
 msgstr "GeoJSON エクスポートは、QField プロジェクトでのみ使用できます。"
 
-#: app/htmx/project_detail_routes.py:637
+#: app/htmx/project_detail_routes.py:664
 msgid "This project is not yet linked to a QFieldCloud project."
 msgstr "このプロジェクトはまだ QFieldCloud プロジェクトにリンクされていません。"
 
-#: app/htmx/project_detail_routes.py:648
+#: app/htmx/project_detail_routes.py:675
 #, python-format
 msgid "Failed to export GeoJSON: %(error)s"
 msgstr "GeoJSON のエクスポートに失敗しました: %(error)s"
+
+#: app/htmx/assignment/assignment_routes.py:223
+#: app/htmx/basemap/basemap_fragments.py:17
+#: app/htmx/setup_steps/setup_step_responses.py:90
+msgid "Project not found or access denied."
+msgstr "プロジェクトが見つからないか、アクセスが拒否されました。"
+
+#: app/htmx/assignment/assignment_routes.py:230
+#: app/projects/project_services.py:1285
+msgid "No task areas to assign. Split the project area into tasks first."
+msgstr ""
+
+#: app/htmx/assignment/assignment_routes.py:275
+msgid "No assignments data provided."
+msgstr ""
+
+#: app/htmx/assignment/assignment_routes.py:282
+#: app/projects/project_services.py:1193 app/projects/project_services.py:1264
+msgid "Invalid assignments data format."
+msgstr ""
+
+#: app/htmx/assignment/assignment_routes.py:302
+msgid "✓ Assignments saved"
+msgstr ""
 
 #: app/htmx/basemap/basemap_attach_flow.py:69
 msgid ""
@@ -390,11 +414,6 @@ msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
 "%(config)s."
 msgstr "このデプロイではQFieldベースマップ添付が設定されていません。%(config)s が不足しています。"
-
-#: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:90
-msgid "Project not found or access denied."
-msgstr "プロジェクトが見つからないか、アクセスが拒否されました。"
 
 #: app/htmx/basemap/basemap_fragments.py:105
 msgid "Basemap attached to QField project successfully."
@@ -697,7 +716,7 @@ msgid ""
 msgstr "GeoJSON データが見つかりません。先に OSM データをダウンロードするか GeoJSON ファイルをアップロードしてください。"
 
 #: app/htmx/setup_steps/setup_step_extract_handlers.py:229
-#: app/htmx/setup_steps/setup_step_map_layers.py:27
+#: app/htmx/setup_steps/setup_step_map_layers.py:28
 msgid "Project AOI"
 msgstr "プロジェクト AOI"
 
@@ -760,38 +779,38 @@ msgid ""
 "to use server defaults."
 msgstr "ODK の URL、ユーザー名、パスワード (3 つすべて) を指定するか、サーバー既定値を使うためにすべて空欄のままにしてください。"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:39
+#: app/htmx/setup_steps/setup_step_map_layers.py:40
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "データ抽出 (%(data_feature_count)s 件の要素)"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:52
+#: app/htmx/setup_steps/setup_step_map_layers.py:53
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "タスク境界 (%(task_count)s 件のタスク)"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:61
+#: app/htmx/setup_steps/setup_step_map_layers.py:62
 msgid "Task ID"
 msgstr "タスクID"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:62
+#: app/htmx/setup_steps/setup_step_map_layers.py:63
 msgid "Building Count"
 msgstr "建物数"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:81
+#: app/htmx/setup_steps/setup_step_map_layers.py:82
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
 msgstr "タスク境界が見つかりません。まず上の「AOI を分割」ボタンを使ってプロジェクトをタスクに分割してください。"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:132
+#: app/htmx/setup_steps/setup_step_map_layers.py:133
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
 "%(algorithm)s."
 msgstr "✓ AOI の分割に成功しました。%(algorithm)s を使って %(task_count)s 個のタスク領域を生成しました。"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:139
+#: app/htmx/setup_steps/setup_step_map_layers.py:140
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -871,107 +890,132 @@ msgstr "無効なタスク領域データ形式です。"
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ 分割タスクを正常に保存しました"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:56
-msgid "Could not reach Tasking Manager. Please try again later."
-msgstr ""
-
 #: app/htmx/setup_steps/setup_step_validate_routes.py:61
-#, python-format
-msgid "Tasking Manager project %(id)s was not found."
+msgid "Could not reach Tasking Manager. Please try again later."
 msgstr ""
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:66
 #, python-format
+msgid "Tasking Manager project %(id)s was not found."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:71
+#, python-format
 msgid "Tasking Manager returned an error (HTTP %(status)s)."
 msgstr ""
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:79
+#: app/htmx/setup_steps/setup_step_validate_routes.py:84
 msgid "Tasking Manager returned an invalid response."
 msgstr ""
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:89
+#: app/htmx/setup_steps/setup_step_validate_routes.py:94
 msgid "Tasking Manager project AOI did not contain any polygon geometries."
 msgstr ""
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:113
+#: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
 "Please reduce your project area."
 msgstr "面積は %(area_km2)s km² で、%(area_limit)s km² の上限を超えています。プロジェクト範囲を小さくしてください。"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:118
+#: app/htmx/setup_steps/setup_step_validate_routes.py:123
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
 "longer to process."
 msgstr "面積は %(area_km2)s km² です。大きな範囲 (>%(area_warn)s km²) は処理に時間がかかる場合があります。"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:143
+#: app/htmx/setup_steps/setup_step_validate_routes.py:148
 msgid "GeoJSON is required"
 msgstr "GeoJSON は必須です"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:153
+#: app/htmx/setup_steps/setup_step_validate_routes.py:158
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "ポリゴンのジオメトリが見つかりません。プロジェクト領域はポリゴンである必要があります。"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:196
+#: app/htmx/setup_steps/setup_step_validate_routes.py:206
 msgid "Tasking Manager project ID must be a positive integer."
 msgstr ""
 
-#: app/projects/project_crud.py:136
+#: app/projects/project_crud.py:138
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
 msgstr "選択した領域が大きすぎます。 200 km² より小さいエリアを選択してください。"
 
-#: app/projects/project_crud.py:147
+#: app/projects/project_crud.py:149
 msgid "Failed to generate data extract from the raw data API."
 msgstr "生データ API からのデータ抽出の生成に失敗しました。"
 
-#: app/projects/project_crud.py:901
+#: app/projects/project_crud.py:903
 msgid "QField project ID not found."
 msgstr "プロジェクトが見つかりません。"
 
-#: app/projects/project_crud.py:934
+#: app/projects/project_crud.py:936
 msgid "Project name not found."
 msgstr "プロジェクトが見つかりません。"
 
-#: app/projects/project_crud.py:941
+#: app/projects/project_crud.py:943
 msgid "ODK project ID not found."
 msgstr "プロジェクトが見つかりません。"
 
-#: app/projects/project_crud.py:950
+#: app/projects/project_crud.py:952
 msgid "Appuser token not found."
 msgstr "プロジェクトが見つかりません。"
 
-#: app/projects/project_crud.py:967
+#: app/projects/project_crud.py:969
 msgid "Failed to generate QR code."
 msgstr "テンプレートフォームの読み込みに失敗しました。"
 
-#: app/projects/project_services.py:75
+#: app/projects/project_services.py:79
 msgid ""
 "This project was created with a simplified workflow in FieldTM and is "
 "made to collect building data to enhance OpenStreetMap."
 msgstr "このプロジェクトは FieldTM の簡易ワークフローで作成され、OpenStreetMap を改善するための建物データ収集用に作られています。"
 
-#: app/projects/project_services.py:82
+#: app/projects/project_services.py:86
 msgid "Unnamed Area"
 msgstr "名称未設定のエリア"
 
-#: app/projects/project_services.py:95
+#: app/projects/project_services.py:99
 #, python-brace-format
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "エリア {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:412
+#: app/projects/project_services.py:416
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:167
+#: app/projects/project_services.py:1200
+#, python-format
+msgid "Assignee must be %(max_length)s characters or fewer."
+msgstr ""
+
+#: app/projects/project_services.py:1211
+#: app/templates/partials/project_details/fragments/assignment_panel.html:127
+msgid "Group labels may only contain letters, numbers, hyphens and underscores."
+msgstr ""
+
+#: app/projects/project_services.py:1217
+#, python-format
+msgid "Group labels must be %(max_length)s characters or fewer."
+msgstr ""
+
+#: app/projects/project_services.py:1302
+#, python-format
+msgid "Invalid task id: %(task_id)s"
+msgstr ""
+
+#: app/projects/project_services.py:1307
+#, python-format
+msgid "Unknown task id: %(task_id)s"
+msgstr ""
+
+#: app/qfield/qfield_crud.py:168
 msgid "Project outline is missing or has no geometry."
 msgstr "プロジェクトのアウトラインが欠落しているか、ジオメトリがありません。"
 
-#: app/qfield/qfield_crud.py:173
+#: app/qfield/qfield_crud.py:174
 msgid "Project outline geometry has no coordinates."
 msgstr "プロジェクトのアウトライン ジオメトリには座標がありません。"
 
@@ -2033,8 +2077,8 @@ msgstr "クリア"
 
 #: app/templates/partials/new_project/map_section.html:32
 #: app/templates/partials/project_details/setup_steps/step2_form.html:89
-#: app/templates/partials/project_details/setup_steps/step3_data.html:72
-#: app/templates/partials/project_details/setup_steps/step4_split.html:36
+#: app/templates/partials/project_details/setup_steps/step3_data.html:79
+#: app/templates/partials/project_details/setup_steps/step4_split.html:39
 msgid "More options"
 msgstr "フォームオプション:"
 
@@ -2056,7 +2100,7 @@ msgstr "カスタム GeoJSON をアップロード"
 #: app/templates/partials/new_project/map_section.html:55
 #: app/templates/partials/new_project/map_section.html:56
 #: app/templates/partials/project_details/setup_steps/step2_form.html:34
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+#: app/templates/partials/project_details/setup_steps/step3_data.html:66
 msgid "or"
 msgstr "または"
 
@@ -2134,7 +2178,7 @@ msgid "Project Location"
 msgstr "プロジェクト場所"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-#: app/templates/partials/project_details/setup_steps.html:65
+#: app/templates/partials/project_details/setup_steps.html:83
 msgid "Survey Form"
 msgstr "調査フォーム"
 
@@ -2167,39 +2211,39 @@ msgstr ""
 "画像や動画などの追加メディアファイルをこのプロジェクトにアップロードする必要がある場合は、ODK Central "
 "にログインしてフォーム設定からアップロードしてください。"
 
-#: app/templates/partials/project_details/setup_steps.html:14
+#: app/templates/partials/project_details/setup_steps.html:21
 msgid "Ready for Mapping"
 msgstr "マッピング準備完了"
 
-#: app/templates/partials/project_details/setup_steps.html:25
+#: app/templates/partials/project_details/setup_steps.html:32
 msgid "Loading QR code..."
 msgstr "QR コードを読み込み中..."
 
-#: app/templates/partials/project_details/setup_steps.html:37
+#: app/templates/partials/project_details/setup_steps.html:44
 msgid "Loading collaborator form..."
 msgstr "共同作業者フォームを読み込んでいます..."
 
-#: app/templates/partials/project_details/setup_steps.html:44
+#: app/templates/partials/project_details/setup_steps.html:62
 msgid "Project Setup"
 msgstr "プロジェクト設定"
 
-#: app/templates/partials/project_details/setup_steps.html:56
+#: app/templates/partials/project_details/setup_steps.html:74
 msgid "Project setup progress"
 msgstr "プロジェクト設定"
 
-#: app/templates/partials/project_details/setup_steps.html:59
+#: app/templates/partials/project_details/setup_steps.html:77
 msgid "Project Details"
 msgstr "プロジェクト AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:71
+#: app/templates/partials/project_details/setup_steps.html:89
 msgid "Get Data"
 msgstr "ステップ 3: データ取得"
 
-#: app/templates/partials/project_details/setup_steps.html:77
+#: app/templates/partials/project_details/setup_steps.html:95
 msgid "Split Tasks"
 msgstr "AOI を分割"
 
-#: app/templates/partials/project_details/setup_steps.html:81
+#: app/templates/partials/project_details/setup_steps.html:99
 msgid "Finalise"
 msgstr "プロジェクトを確定"
 
@@ -2251,7 +2295,7 @@ msgstr "ポリライン"
 msgid "points"
 msgstr "ポイント"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+#: app/templates/partials/project_details/setup_steps/step4_split.html:136
 #: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
 msgstr "要素"
@@ -2282,7 +2326,7 @@ msgstr "推奨ソースを更新しました (%(geom_label)s)。地図上のデ�
 msgid "Downloading..."
 msgstr "ダウンロード中..."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:27
+#: app/templates/partials/project_details/setup_steps/step3_data.html:31
 #: app/templates/partials/project_details/style_and_scripts.html:25
 msgid "Use OSM data"
 msgstr "OSM データをダウンロード"
@@ -2299,7 +2343,7 @@ msgstr "正方形で分割"
 msgid "Split by buildings"
 msgstr "建物単位で分割"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:179
+#: app/templates/partials/project_details/setup_steps/step4_split.html:185
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split area"
 msgstr "再分割"
@@ -2391,6 +2435,129 @@ msgstr "%(project_type)s にプロジェクトを作成中... 少し時間がか
 #: app/templates/partials/project_details/style_and_scripts.html:50
 msgid "Error:"
 msgstr "エラー:"
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:8
+msgid ""
+"This project has a single task covering the whole area. Split the area "
+"into tasks to\n"
+"    assign mappers to specific task areas."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:14
+msgid "Task Assignments"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:16
+msgid ""
+"Select tasks on the map, then apply an assignee and group label. Changes "
+"are saved when\n"
+"    you press Save assignments."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:24
+#: app/templates/partials/project_details/fragments/assignment_summary.html:13
+msgid "Assignee"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:31
+msgid "Mapper name (free text)"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:42
+msgid "Group label"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:49
+msgid "e.g. NE"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:55
+#: app/templates/partials/project_details/fragments/assignment_panel.html:122
+msgid "Apply to selected"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:58
+msgid "Auto-group by quadrant"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:61
+msgid "Unassign selected"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:64
+msgid "Clear selection"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:90
+msgid "Save assignments"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:117
+#: app/templates/partials/project_details/fragments/assignment_summary.html:26
+msgid "Unassigned"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:118
+#, python-format
+msgid "Task %(task_id)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:119
+#, python-format
+msgid "Group: %(group)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:120
+#, python-format
+msgid "Assigned to: %(name)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:121
+#, python-format
+msgid "Apply to selected (%(count)s)"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:123
+msgid "Select one or more tasks on the map first."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:124
+msgid "Enter an assignee or group label to apply first."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:125
+#, python-format
+msgid "%(count)s unsaved changes"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:126
+msgid "Discard changes"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:128
+msgid "Could not load task areas."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:129
+msgid "Select all tasks"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:130
+#, python-format
+msgid "Select task %(task_id)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_summary.html:11
+msgid "Task"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_summary.html:12
+msgid "Group"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_summary.html:15
+msgid "Buildings"
+msgstr ""
 
 #: app/templates/partials/project_details/fragments/basemap_progress.html:5
 msgid ""
@@ -2578,7 +2745,14 @@ msgid ""
 "      manage the project."
 msgstr "管理者アカウントを自動作成できませんでした。QFieldCloud に管理者としてログインしてプロジェクトを管理してください。"
 
-#: app/templates/partials/project_details/fragments/split_preview.html:27
+#: app/templates/partials/project_details/fragments/split_preview.html:25
+#, python-format
+msgid ""
+"Accepting this split discards %(count)s existing task assignment(s). "
+"Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/split_preview.html:30
 msgid "Accept Task Choices"
 msgstr "タスク選択を承認"
 
@@ -2697,95 +2871,104 @@ msgid ""
 "    map so mappers can collect everything from scratch."
 msgstr "プロジェクト範囲の既存フィーチャを OpenStreetMap から取得するか、空の地図から始めてマッパーがすべてを一から収集できるようにします。"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:53
+#: app/templates/partials/project_details/setup_steps/step3_data.html:26
+#: app/templates/partials/project_details/setup_steps/step3_data.html:55
+#: app/templates/partials/project_details/setup_steps/step3_data.html:163
+#, python-format
+msgid ""
+"Replacing the data extract discards %(count)s existing task "
+"assignment(s). Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:60
 msgid "Start with empty map"
 msgstr "空の地図から始める"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:61
+#: app/templates/partials/project_details/setup_steps/step3_data.html:68
 msgid "upload your own map file (GeoJSON)"
 msgstr "カスタム GeoJSON をアップロード"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:79
+#: app/templates/partials/project_details/setup_steps/step3_data.html:86
 msgid "Override the default OSM source for this project."
 msgstr "このプロジェクト向けの推奨デフォルト設定が有効です。"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+#: app/templates/partials/project_details/setup_steps/step3_data.html:92
 msgid "What to download"
 msgstr "ダウンロードするもの"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:88
+#: app/templates/partials/project_details/setup_steps/step3_data.html:95
 msgid "OSM Buildings"
 msgstr "OSM 建物"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:96
 msgid "OSM Highways"
 msgstr "OSM 道路"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:90
+#: app/templates/partials/project_details/setup_steps/step3_data.html:97
 msgid "OSM Healthcare"
 msgstr "OSM 医療"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:91
+#: app/templates/partials/project_details/setup_steps/step3_data.html:98
 msgid "OSM Toilets"
 msgstr "OSM トイレ"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:92
+#: app/templates/partials/project_details/setup_steps/step3_data.html:99
 msgid "OSM Religious"
 msgstr "OSM 宗教施設"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:93
+#: app/templates/partials/project_details/setup_steps/step3_data.html:100
 msgid "OSM Landuse"
 msgstr "OSM 土地利用"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:94
+#: app/templates/partials/project_details/setup_steps/step3_data.html:101
 msgid "OSM Waterways"
 msgstr "OSM 水路"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:95
+#: app/templates/partials/project_details/setup_steps/step3_data.html:102
 msgid "OSM Water Points"
 msgstr "OSM 給水地点"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:96
+#: app/templates/partials/project_details/setup_steps/step3_data.html:103
 msgid "OSM Waste Disposal"
 msgstr "OSM 廃棄物処理"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:97
+#: app/templates/partials/project_details/setup_steps/step3_data.html:104
 msgid "OSM Education"
 msgstr "OSM 教育"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:98
+#: app/templates/partials/project_details/setup_steps/step3_data.html:105
 msgid "OSM Cemeteries"
 msgstr "OSM 墓地"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:99
+#: app/templates/partials/project_details/setup_steps/step3_data.html:106
 msgid "OSM Amenities"
 msgstr "OSM 施設"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+#: app/templates/partials/project_details/setup_steps/step3_data.html:111
 msgid "Feature shape"
 msgstr "要素"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:107
+#: app/templates/partials/project_details/setup_steps/step3_data.html:114
 msgid "Polygon (area)"
 msgstr "ポリゴン"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:108
+#: app/templates/partials/project_details/setup_steps/step3_data.html:115
 msgid "Line"
 msgstr "ポリライン"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:109
+#: app/templates/partials/project_details/setup_steps/step3_data.html:116
 msgid "Point"
 msgstr "ポイント"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:117
+#: app/templates/partials/project_details/setup_steps/step3_data.html:124
 msgid "Use Centroids (For OSM Data Download)"
 msgstr "重心を使用 (OSMデータダウンロード用)"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:120
+#: app/templates/partials/project_details/setup_steps/step3_data.html:127
 msgid "Convert polygons to single points."
 msgstr "ポリゴンを単一ポイントに変換します。"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:142
+#: app/templates/partials/project_details/setup_steps/step3_data.html:149
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "OSM データ抽出を生成しています... 少し時間がかかる場合があります。"
 
@@ -2817,90 +3000,100 @@ msgstr ""
 "複数のマッパーが並行して作業できるよう、範囲を小さなタスクに分割します。下で分割方法を選び、結果をプレビューして承認します。スキップすると全範囲を"
 " 1 つのタスクとして使います。"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:29
+#: app/templates/partials/project_details/setup_steps/step4_split.html:27
+#, python-format
+msgid "This will discard %(count)s existing task assignment(s). Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:32
 msgid "Skip splitting"
 msgstr "分割中..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:50
+#: app/templates/partials/project_details/setup_steps/step4_split.html:49
+#, python-format
+msgid "Re-splitting discards %(count)s existing task assignment(s). Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:56
 msgid ""
 "When splitting by building count, these linear features are used as "
 "natural task\n"
 "          boundaries."
 msgstr "建物数で分割する場合、これらの線形フィーチャはタスクの自然な境界として使用されます。"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:75
+#: app/templates/partials/project_details/setup_steps/step4_split.html:81
 msgid "Include roads"
 msgstr "道路を含める"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:84
+#: app/templates/partials/project_details/setup_steps/step4_split.html:90
 msgid "Include rivers"
 msgstr "河川を含める"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:93
+#: app/templates/partials/project_details/setup_steps/step4_split.html:99
 msgid "Include railways"
 msgstr "鉄道を含める"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:102
+#: app/templates/partials/project_details/setup_steps/step4_split.html:108
 msgid "Include aeroways"
 msgstr "航空路を含める"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:115
+#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 msgid "How to split"
 msgstr "分割方法"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+#: app/templates/partials/project_details/setup_steps/step4_split.html:123
 msgid "Choose a method..."
 msgstr "方法を選択..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:118
+#: app/templates/partials/project_details/setup_steps/step4_split.html:124
 msgid "By number of buildings (faster)"
 msgstr "建物数別（高速）"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:120
+#: app/templates/partials/project_details/setup_steps/step4_split.html:126
 msgid ""
 "By number of buildings (cleaner shapes) - unavailable\n"
 "            for large areas"
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:121
+#: app/templates/partials/project_details/setup_steps/step4_split.html:127
 msgid "By number of buildings (cleaner shapes)"
 msgstr "建物数別（形状がきれい）"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:124
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
 msgid "By a regular grid"
 msgstr "通常グリッド別"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:125
+#: app/templates/partials/project_details/setup_steps/step4_split.html:131
 msgid "Into a fixed number of tasks"
 msgstr "指定したタスク数で分割 (近日対応)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:129
+#: app/templates/partials/project_details/setup_steps/step4_split.html:135
 msgid "Cleaner shapes is disabled for this area."
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+#: app/templates/partials/project_details/setup_steps/step4_split.html:136
 msgid ""
 "It becomes geometrically unstable above ~5,000 features. Use the\n"
 "          faster option instead."
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:137
+#: app/templates/partials/project_details/setup_steps/step4_split.html:143
 msgid "Buildings per task"
 msgstr "タスクあたり平均建物数:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:148
+#: app/templates/partials/project_details/setup_steps/step4_split.html:154
 msgid "Number of tasks"
 msgstr "タスク数:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:160
+#: app/templates/partials/project_details/setup_steps/step4_split.html:166
 msgid "Grid square size (metres)"
 msgstr "グリッド正方形のサイズ（メートル）"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:179
+#: app/templates/partials/project_details/setup_steps/step4_split.html:185
 msgid "Split Again"
 msgstr "再分割"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:213
+#: app/templates/partials/project_details/setup_steps/step4_split.html:219
 msgid "Splitting area into tasks... This may take a moment."
 msgstr "AOI をタスクへ分割中... 少し時間がかかる場合があります。"
 
