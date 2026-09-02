@@ -31,7 +31,7 @@ dependencies = [
     "pydantic-settings==2.6.0",
     "geojson-pydantic==1.1.2",
     "python-multipart==0.0.30",
-    "psycopg[c,pool]==3.3.3",
+    "psycopg[c,pool]==3.3.5",
     "cryptography==46.0.7",
     "pyxform==4.0.0",
     "pyodk==1.2.1",
