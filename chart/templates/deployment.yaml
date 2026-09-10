@@ -137,6 +137,10 @@ spec:
             - name: QFIELDCLOUD_QGIS_URL
               value: "http://{{ include "field-tm.fullname" . }}-qgis:8080"
             {{- end }}
+            {{- if .Values.auth.bundled.enabled }}
+            - name: HANKO_API_URL
+              value: "http://{{ include "field-tm.hankoServiceName" . }}:8000"
+            {{- end }}
             {{- range $key, $val := .Values.env }}
             - name: {{ $key }}
               value: {{ $val | quote }}
