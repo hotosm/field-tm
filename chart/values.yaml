@@ -119,7 +119,9 @@ auth:
       googleClientId: ""
     resources: {}
     db:
-      # Default is to use an external database; enable for in-cluster PostGIS.
+      # Default is an in-cluster PostGIS database, dedicated to Hanko (kept
+      # separate from the main `db` block). Set to false and provide `host`
+      # below to point at an external database instead.
       enabled: true
       image:
         repository: ghcr.io/hotosm/postgis
