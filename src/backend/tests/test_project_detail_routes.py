@@ -100,7 +100,8 @@ async def test_project_details_renders_location_and_manager_metadata(
     assert response.status_code == 200
     assert "📍 Nairobi, Kenya" in response.text
     assert "Location</h4>" not in response.text
-    assert f'hx-delete="/projects/{project.id}"' in response.text
+    # Delete button is temporarily hidden pending proper access control
+    assert f'hx-delete="/projects/{project.id}"' not in response.text
 
 
 def test_can_delete_project_allows_creator():

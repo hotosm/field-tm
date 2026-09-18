@@ -280,7 +280,9 @@
     </div>
 
     <div slot="footer" class="ftm-flex-end">
-      {% if can_delete_project %}
+      {# Delete button temporarily disabled until project-level access control is in place via the
+      HOT login system. The DELETE /projects/{id} route and `can_delete_project` context are kept so
+      this can be restored. {% if can_delete_project %}
       <wa-button
         variant="brand"
         hx-delete="/projects/{{ project.id }}"
@@ -289,7 +291,7 @@
       >
         {{ _("Delete Project") }}
       </wa-button>
-      {% endif %}
+      {% endif %} #}
       <wa-button href="/projects" variant="default">{{ _("Back to Projects") }}</wa-button>
     </div>
   </wa-card>

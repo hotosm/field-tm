@@ -171,3 +171,8 @@ repos:
             --ignore,
             src/backend/packages/area-splitter/CHANGELOG.md,
           ]
+
+  - repo: https://github.com/betterleaks/betterleaks
+    rev: v1.8.1
+    hooks:
+      - id: betterleaks
