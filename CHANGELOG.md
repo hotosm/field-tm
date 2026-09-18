@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026.4.4 (2026-09-18)
+
+### Fix
+
+- temp remove delete button from projects
+- **frontend**: final fix for usage of hotosm/ui and needing configmaps
+- **splitter**: handle polygons with connected rings (#3106)
+- **backend**: repair multipart upload binding on helper routes + add route tests (#2232) (#3096)
+
+### Refactor
+
+- **frontend**: remove webfonts in favour of system-sans, align with hotosm/ui
+- update hotosm/ui usage to align with other apps, load all components
+
 ## 2026.4.3 (2026-06-06)
 
 ### Fix
