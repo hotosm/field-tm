@@ -30,6 +30,22 @@ body {
   --ftm-radius-sm: var(--hot-border-radius-medium, 0.25rem);
 }
 
+/* --- Auth: login button (hotosm-auth web component) ------- */
+/* Theme the logged-out login button to match the previous brand
+   button. Custom properties pierce the component's shadow DOM.
+   Uses the HOT brand red as a literal value: nesting var(--ftm-brand)
+   -> var(--hot-color-primary-600) resolves inconsistently once inherited
+   into the component's shadow DOM (it fell back to gray-600), so we set
+   the colour directly. Only affects the login button; the profile
+   dropdown keeps its own defaults. */
+hotosm-auth {
+  --login-btn-bg-color: #d73f3f;
+  --login-btn-hover-bg-color: #b93636;
+  --login-btn-text-color: #ffffff;
+  --login-btn-border-radius: 0.25rem;
+  --login-btn-padding: 0.5rem 1rem;
+}
+
 /* --- Page layouts ----------------------------------------- */
 .ftm-page {
   padding: 24px;
