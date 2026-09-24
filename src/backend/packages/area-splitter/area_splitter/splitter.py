@@ -155,10 +155,10 @@ def _require_split_output(
 
 
 def _validate_algorithm_selection(algorithm: SplittingAlgorithm) -> None:
-    """Ensure the selected splitting algorithm has a SQL path."""
-    if algorithm.sql_path:
+    """Ensure the selected splitting algorithm has SQL files defined."""
+    if algorithm.sql_files:
         return
-    err = f"SplittingAlgorithm {algorithm} must have an sql_path defined."
+    err = f"SplittingAlgorithm {algorithm} must have sql_files defined."
     log.error(err)
     raise ValueError(err)
 
@@ -183,7 +183,7 @@ def _resolve_algorithm_params(
             params["num_buildings"] = num_buildings
         elif num_enumerators:
             params["num_enumerators"] = num_enumerators
-        else:
+        elif algorithm.required_params:
             err = (
                 f"Algorithm {algorithm.value} requires the following parameters: "
                 f"{', '.join(algorithm.required_params)}. "
@@ -604,8 +604,8 @@ class AreaSplitter:
             )
             log.error(msg)
             raise ValueError(msg)
-        if not algorithm.sql_path:
-            msg = f"Algorithm {algorithm} does not have an SQL file path"
+        if not algorithm.sql_files:
+            msg = f"Algorithm {algorithm} does not have SQL files defined"
             log.error(msg)
             raise ValueError(msg)
         missing_params = [
@@ -666,14 +666,7 @@ class AreaSplitter:
         params: dict,
     ) -> list:
         """Execute the ordered SQL algorithm files and return feature rows."""
-        sql_files = [
-            "common/1-linear-features.sql",
-            "common/2-group-buildings.sql",
-            "common/3-cluster-buildings.sql",
-            algorithm.sql_path,
-            "common/5-alignment.sql",
-            "common/6-extract.sql",
-        ]
+        sql_files = algorithm.sql_files
         log.info(f"Running task splitting algorithm parts in order: {sql_files}")
         for sql_file in sql_files:
             sql_file_path = (

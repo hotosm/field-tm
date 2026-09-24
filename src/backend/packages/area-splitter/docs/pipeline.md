@@ -108,6 +108,14 @@ features.
 
 Returns the final task polygons as a GeoJSON FeatureCollection.
 
+## Split by roads
+
+`SPLIT_BY_ROADS` only runs step 1, then its own extract query
+(`split_by_roads.sql`) instead of steps 2-6. It returns the
+road-bounded polygons from step 1 (`polygonsnocount`) directly, with
+no building clustering or edge alignment. See
+[docs/algorithms/roads.md](algorithms/roads.md).
+
 ## Non-SQL algorithms
 
 `NO_SPLITTING` and `DIVIDE_BY_SQUARE` do not use the pipeline above.

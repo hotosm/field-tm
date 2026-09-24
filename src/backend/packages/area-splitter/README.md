@@ -52,7 +52,7 @@ pip install area-splitter
 
 ## Splitting Options
 
-Five algorithms are available via the `SplittingAlgorithm` enum:
+Six algorithms are available via the `SplittingAlgorithm` enum:
 
 - `NO_SPLITTING`: return the AOI as one task.
 - `DIVIDE_BY_SQUARE`: grid of squares clipped to the AOI (default
@@ -63,6 +63,9 @@ Five algorithms are available via the `SplittingAlgorithm` enum:
   `CG_StraightSkeleton` for cleaner task edges. Needs SFCGAL.
 - `TOTAL_TASKS`: same SQL as v2, but sized by target task count
   instead of buildings per task.
+- `SPLIT_BY_ROADS`: task boundaries are exactly the polygons enclosed
+  by roads/rivers/etc, no building clustering. See
+  [docs/algorithms/roads.md](docs/algorithms/roads.md).
 
 The three SQL-based algorithms share a six-step pipeline. See
 [docs/pipeline.md](docs/pipeline.md) for the full walkthrough, and

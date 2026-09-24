@@ -951,7 +951,7 @@ def _validate_split_extract(parsed_extract) -> None:
         )
 
 
-async def _split_with_building_algorithm(  # noqa: PLR0913
+async def _split_with_sql_algorithm(  # noqa: PLR0913
     aoi_featcol: dict,
     parsed_extract: dict,
     algorithm_enum: SplittingAlgorithm,
@@ -962,7 +962,7 @@ async def _split_with_building_algorithm(  # noqa: PLR0913
     include_aeroways: bool,
     statement_timeout_ms: Optional[int] = None,
 ) -> dict:
-    """Run one of the SQL-backed building-based split algorithms."""
+    """Run one of the SQL-backed split algorithms (building-based or roads-only)."""
     _validate_split_extract(parsed_extract)
     algorithm_params = {
         **algorithm_params,
@@ -1078,7 +1078,7 @@ async def split_aoi(
         SplittingAlgorithm.AVG_BUILDING_VORONOI,
         SplittingAlgorithm.AVG_BUILDING_SKELETON,
     ):
-        features = await _split_with_building_algorithm(
+        features = await _split_with_sql_algorithm(
             aoi_featcol,
             parsed_extract,
             algorithm_enum,
@@ -1096,11 +1096,22 @@ async def split_aoi(
             options.dimension_meters,
         )
     elif algorithm_enum == SplittingAlgorithm.TOTAL_TASKS:
-        features = await _split_with_building_algorithm(
+        features = await _split_with_sql_algorithm(
             aoi_featcol,
             parsed_extract,
             algorithm_enum,
             {"num_enumerators": options.no_of_tasks},
+            options.include_roads,
+            options.include_rivers,
+            options.include_railways,
+            options.include_aeroways,
+        )
+    elif algorithm_enum == SplittingAlgorithm.SPLIT_BY_ROADS:
+        features = await _split_with_sql_algorithm(
+            aoi_featcol,
+            parsed_extract,
+            algorithm_enum,
+            {},
             options.include_roads,
             options.include_rivers,
             options.include_railways,
