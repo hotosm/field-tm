@@ -421,37 +421,67 @@ follow the guide [Here][5].
 
 ### Connecting The Data To External Applications
 
-If you want to visualise the submissions and create custom charts
-and diagrams using Field-TM submissions, then you can follow the steps
-below and load the submissions on any data analysis platform using **OData**.
+Field-TM submission data is accessible via **OData** — a standardised
+feed format supported by many data analysis tools including Excel,
+PowerBI, Tableau, Redash, and Grafana.
 
-OData endpoints are a standardised way to ingest
-this data into other tools: PowerBI, Tableau, Redash, Grafana.
+There are two OData endpoint types:
 
-Why PowerBI? You can use other tools too like Tableau, Redash, Grafana or even
-Excel. However, PowerBI is free to use, very powerful, and user friendly to use,
-despite being a proprietary Microsoft tool.
+- **Submission data** — all form submissions:
+  `/v1/projects/{projectId}/forms/{xmlFormId}.svc`
+- **Entity data** — the features/entities dataset:
+  `/v1/projects/{projectId}/datasets/{name}.svc`
 
-The steps shows how to use PowerBI and create custom visualisations.
-ODK already has good docs on this which you can refer to.
+For example:
+
+- `https://odk.hotosm.org/v1/projects/86/forms/df9135c8-84b1-4753-b348-e8963a8b4088.svc`
+- `https://odk.hotosm.org/v1/projects/86/datasets/features.svc`
+
+You can find the exact URLs for your project inside ODK Central under
+**Project → Form → OData Access**.
+
+Authentication uses **Basic Auth** with your ODK Central username and
+password.
+
+#### Visualising in Microsoft Excel
+
+Excel supports OData feeds natively via Power Query, making it a quick
+option for exploratory analysis and simple dashboards without installing
+additional software.
+
+1. Open Excel and go to the **Data** tab.
+2. Click **Get Data → From Other Sources → From OData Feed**.
+3. Paste your OData URL (submission or entity endpoint) and click **OK**.
+4. When prompted for authentication, select **Basic** and enter your
+   ODK Central username and password.
+5. The Power Query Navigator opens. Select the **`Submissions`** table
+   (or `value` for entity feeds) and click **Transform Data** to open
+   the Power Query Editor, or **Load** to import directly.
+6. In Power Query you can expand nested JSON columns, filter rows,
+   rename fields, and reshape the data before loading.
+7. Once loaded into the worksheet, use **Insert → PivotTable** or
+   **Insert → Chart** to build visualisations from the data.
+
+> **Tip:** Click **Data → Refresh All** at any time to pull the latest
+> submissions into your spreadsheet without repeating the setup.
+
+#### Visualising in PowerBI
+
+PowerBI is free, cross-platform, and well-suited for richer interactive
+dashboards. ODK also has dedicated documentation on this workflow:
 <https://docs.getodk.org/tutorial-mapping-households/>
 
-Step 1: Start a new project, add a new data source 'OData Feed'
-
-[Image here]
-
-Step 2: Use the OData URLs shown in the ODK docs:
-a. Submission data: /v1/projects/{projectId}/forms/{xmlFormId}.svc
-e.g. <https://odk.hotosm.org/v1/projects/86/forms/df9135c8-84b1-4753-b348-e8963a8b4088.svc>
-b. Entity data: /v1/projects/{projectId}/datasets/{name}.svc
-e.g. <https://odk.hotosm.org/v1/projects/86/datasets/features.svc>
-
-Step 3: Enter your credentials using Basic Auth
-
-Step 4: Preview the data
-
-Step 5: Transform data as needed, load into charts, graphs, etc, to create the
-dashboard you need.
+1. Open PowerBI Desktop and click **Get Data → OData feed**.
+2. Paste your OData URL and click **OK**.
+3. Select **Basic** authentication and enter your ODK Central username
+   and password.
+4. In the Navigator, select the **`Submissions`** (or **`value`**) table
+   and click **Transform Data**.
+5. Use the Power Query Editor to expand nested columns, filter, and
+   clean the data, then click **Close & Apply**.
+6. Build your report by dragging fields onto the canvas and adding
+   charts, maps, slicers, and other visuals.
+7. Click **Refresh** to pull in the latest submissions at any time.
 
 ## Manage project and users
 
