@@ -1,0 +1,18 @@
+{{- if and .Values.auth.bundled.enabled .Values.auth.bundled.db.enabled .Values.auth.bundled.db.persistence.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "field-tm.hankoDbServiceName" . }}-data
+  labels:
+    {{- include "field-tm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: hanko-db
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.auth.bundled.db.persistence.size }}
+  {{- with .Values.auth.bundled.db.persistence.storageClassName }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+{{- end }}
