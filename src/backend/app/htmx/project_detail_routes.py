@@ -41,11 +41,11 @@ from app.auth.auth_deps import (
     login_required,
 )
 from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import project_manager
+from app.auth.roles import check_access, project_manager
 from app.central import central_crud
 from app.config import decrypt_value
 from app.db.database import db_conn
-from app.db.enums import FieldMappingApp
+from app.db.enums import FieldMappingApp, ProjectRole
 from app.db.models import DbProject
 from app.i18n import _
 from app.projects import project_crud
@@ -234,6 +234,29 @@ def _show_qfc_collaborator_form(project: DbProject) -> bool:
     )
 
 
+async def _show_assignment_panel(
+    db: AsyncConnection, auth_user: object | None, project: DbProject
+) -> bool:
+    """Whether the viewer may see the manager-gated task assignment panel.
+
+    Mirrors the project_manager gate on the panel routes so non-managers
+    viewing a published project never trigger the lazy load (the global
+    htmx config would swap the 4xx auth error into the panel slot).
+    """
+    if auth_user is None:
+        return False
+    with suppress(Exception):
+        return bool(
+            await check_access(
+                auth_user,
+                db,
+                project_id=project.id,
+                role=ProjectRole.PROJECT_ADMIN,
+            )
+        )
+    return False
+
+
 @get(
     path="/projects/{project_id:int}",
     dependencies={
@@ -260,6 +283,9 @@ async def project_details(
                 "form_templates_json": json.dumps(form_templates),
                 "can_delete_project": _can_delete_project(auth_user, project),
                 "show_qfc_collaborator_form": _show_qfc_collaborator_form(project),
+                "show_assignment_panel": await _show_assignment_panel(
+                    db, auth_user, project
+                ),
             },
         )
     except KeyError:
@@ -271,6 +297,7 @@ async def project_details(
                 "form_templates_json": "[]",
                 "can_delete_project": False,
                 "show_qfc_collaborator_form": False,
+                "show_assignment_panel": False,
             },
         )
 

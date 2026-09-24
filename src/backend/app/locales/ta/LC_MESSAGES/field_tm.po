@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-06-06 03:42+0100\n"
+"POT-Creation-Date: 2026-06-12 21:52-0400\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: ta\n"
@@ -160,31 +160,31 @@ msgstr "%(action)s தோல்வியடைந்தது."
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack API ஆனது HTTP %(status_code)sஐ வழங்கியது."
 
-#: app/helpers/helper_routes.py:78
+#: app/helpers/helper_routes.py:81
 msgid "Failed to convert YAML form to XLSForm."
 msgstr "YAML படிவத்தை XLSForm ஆக மாற்ற முடியவில்லை."
 
-#: app/helpers/helper_routes.py:101
+#: app/helpers/helper_routes.py:104
 msgid "Provide a valid .json or .geojson file"
 msgstr "செல்லுபடியாகும் .xls அல்லது .xlsx கோப்பை வழங்கவும்"
 
-#: app/helpers/helper_routes.py:139
+#: app/helpers/helper_routes.py:149
 msgid "Provide a valid .csv"
 msgstr "செல்லுபடியாகும் .xls அல்லது .xlsx கோப்பை வழங்கவும்"
 
-#: app/helpers/helper_routes.py:193
+#: app/helpers/helper_routes.py:203
 msgid "Provide a valid .json file"
 msgstr "செல்லுபடியாகும் .xls அல்லது .xlsx கோப்பை வழங்கவும்"
 
-#: app/helpers/helper_routes.py:228
+#: app/helpers/helper_routes.py:238
 msgid "Could not login to raw-data-api"
 msgstr "raw-data-api இல் உள்நுழைய முடியவில்லை"
 
-#: app/helpers/helper_routes.py:252
+#: app/helpers/helper_routes.py:262
 msgid "No geometries present"
 msgstr "வடிவவியல் இல்லை"
 
-#: app/helpers/helper_routes.py:269
+#: app/helpers/helper_routes.py:279
 msgid "Your geojson file is invalid."
 msgstr "உங்கள் geojson கோப்பு தவறானது."
 
@@ -263,44 +263,44 @@ msgstr ""
 msgid "An unexpected error occurred while generating the QR code."
 msgstr "QR குறியீட்டை உருவாக்கும் போது எதிர்பாராத பிழை ஏற்பட்டது."
 
-#: app/htmx/project_detail_routes.py:298
+#: app/htmx/project_detail_routes.py:325
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "திட்டம் (%(project_id)s) கிடைக்கவில்லை."
 
-#: app/htmx/project_detail_routes.py:305
+#: app/htmx/project_detail_routes.py:332
 msgid "Only the project manager can delete this project."
 msgstr "இந்த திட்டத்தை திட்ட மேலாளர் மட்டுமே நீக்க முடியும்."
 
-#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:299
+#: app/htmx/project_detail_routes.py:370 app/templates/project_details.html:299
 msgid "Project not found."
 msgstr "திட்டம் கிடைக்கவில்லை."
 
-#: app/htmx/project_detail_routes.py:379
+#: app/htmx/project_detail_routes.py:406
 #: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "பிழை: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:413
+#: app/htmx/project_detail_routes.py:440
 #, python-format
 msgid "Added the following user(s) as project editors: %(names)s."
 msgstr "திட்ட ஆசிரியர்களாக பின்வரும் பயனர்(கள்) சேர்க்கப்பட்டனர்: %(names)s."
 
-#: app/htmx/project_detail_routes.py:417
+#: app/htmx/project_detail_routes.py:444
 #, python-format
 msgid "Could not add '%(username)s': %(reason)s"
 msgstr "'%(username)s' ஐச் சேர்க்க முடியவில்லை: %(reason)s"
 
-#: app/htmx/project_detail_routes.py:423
+#: app/htmx/project_detail_routes.py:450
 msgid "Add more collaborators"
 msgstr "மேலும் கூட்டுப்பணியாளர்களைச் சேர்க்கவும்"
 
-#: app/htmx/project_detail_routes.py:436
+#: app/htmx/project_detail_routes.py:463
 msgid "Invite QFieldCloud collaborators"
 msgstr "QFieldCloud கூட்டுப்பணியாளர்களை அழைக்கவும்"
 
-#: app/htmx/project_detail_routes.py:439
+#: app/htmx/project_detail_routes.py:466
 msgid ""
 "Mappers must have an account on QFieldCloud before you can give them "
 "access to this project."
@@ -308,7 +308,7 @@ msgstr ""
 "இந்த திட்டத்திற்கான அணுகலை வழங்குவதற்கு முன், மேப்பர்களுக்கு QFieldCloud "
 "இல் கணக்கு இருக்க வேண்டும்."
 
-#: app/htmx/project_detail_routes.py:445
+#: app/htmx/project_detail_routes.py:472
 msgid ""
 "Have each mapper create a free account at <a "
 "href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
@@ -318,7 +318,7 @@ msgstr ""
 "rel=\"noopener\" class=\"ftm-link--brand\">app.qfield.cloud</a> இல் இலவச "
 "கணக்கை உருவாக்க வேண்டும்."
 
-#: app/htmx/project_detail_routes.py:451
+#: app/htmx/project_detail_routes.py:478
 msgid ""
 "Enter their QFieldCloud usernames below (comma-separated for multiple "
 "users) and click submit. They will be added as editors and can log in to "
@@ -329,23 +329,23 @@ msgstr ""
 "அவர்கள் எடிட்டர்களாகச் சேர்க்கப்படுவார்கள் மற்றும் மேப்பிங்கைத் தொடங்க "
 "QField இல் உள்நுழையலாம்."
 
-#: app/htmx/project_detail_routes.py:457
+#: app/htmx/project_detail_routes.py:484
 msgid "e.g. alice, bob, charlie"
 msgstr "எ.கா. ஆலிஸ், பாப், சார்லி"
 
-#: app/htmx/project_detail_routes.py:458
+#: app/htmx/project_detail_routes.py:485
 msgid "Add collaborators"
 msgstr "கூட்டுப்பணியாளர்களைச் சேர்க்கவும்"
 
-#: app/htmx/project_detail_routes.py:550
+#: app/htmx/project_detail_routes.py:577
 msgid "Enter at least one QFieldCloud username."
 msgstr "குறைந்தது ஒரு QFieldCloud பயனர்பெயரை உள்ளிடவும்."
 
-#: app/htmx/project_detail_routes.py:560
+#: app/htmx/project_detail_routes.py:587
 msgid "QFieldCloud project ID not found for this project."
 msgstr "இந்த திட்டத்திற்கான QFieldCloud திட்ட ஐடி இல்லை."
 
-#: app/htmx/project_detail_routes.py:566
+#: app/htmx/project_detail_routes.py:593
 msgid ""
 "This project was created on a custom QFieldCloud instance. Use the "
 "QFieldCloud Admin tab to manage collaborators."
@@ -354,18 +354,42 @@ msgstr ""
 "கூட்டுப்பணியாளர்களை நிர்வகிக்க QFieldCloud நிர்வாகம் தாவலைப் "
 "பயன்படுத்தவும்."
 
-#: app/htmx/project_detail_routes.py:632
+#: app/htmx/project_detail_routes.py:659
 msgid "GeoJSON export is only available for QField projects."
 msgstr "GeoJSON ஏற்றுமதி QField திட்டங்களுக்கு மட்டுமே கிடைக்கும்."
 
-#: app/htmx/project_detail_routes.py:637
+#: app/htmx/project_detail_routes.py:664
 msgid "This project is not yet linked to a QFieldCloud project."
 msgstr "இந்தத் திட்டம் இன்னும் QFieldCloud திட்டத்துடன் இணைக்கப்படவில்லை."
 
-#: app/htmx/project_detail_routes.py:648
+#: app/htmx/project_detail_routes.py:675
 #, python-format
 msgid "Failed to export GeoJSON: %(error)s"
 msgstr "GeoJSON ஐ ஏற்றுமதி செய்ய முடியவில்லை: %(error)s"
+
+#: app/htmx/assignment/assignment_routes.py:223
+#: app/htmx/basemap/basemap_fragments.py:17
+#: app/htmx/setup_steps/setup_step_responses.py:90
+msgid "Project not found or access denied."
+msgstr "திட்டம் கிடைக்கவில்லை அல்லது அணுகல் மறுக்கப்பட்டது."
+
+#: app/htmx/assignment/assignment_routes.py:230
+#: app/projects/project_services.py:1285
+msgid "No task areas to assign. Split the project area into tasks first."
+msgstr ""
+
+#: app/htmx/assignment/assignment_routes.py:275
+msgid "No assignments data provided."
+msgstr ""
+
+#: app/htmx/assignment/assignment_routes.py:282
+#: app/projects/project_services.py:1193 app/projects/project_services.py:1264
+msgid "Invalid assignments data format."
+msgstr ""
+
+#: app/htmx/assignment/assignment_routes.py:302
+msgid "✓ Assignments saved"
+msgstr ""
 
 #: app/htmx/basemap/basemap_attach_flow.py:69
 msgid ""
@@ -414,11 +438,6 @@ msgid ""
 msgstr ""
 "இந்த வெளியீட்டில் QField அடிப்படை வரைபட இணைப்பு அமைக்கப்படவில்லை. "
 "%(config)s இல்லை."
-
-#: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:90
-msgid "Project not found or access denied."
-msgstr "திட்டம் கிடைக்கவில்லை அல்லது அணுகல் மறுக்கப்பட்டது."
 
 #: app/htmx/basemap/basemap_fragments.py:105
 msgid "Basemap attached to QField project successfully."
@@ -743,7 +762,7 @@ msgstr ""
 "பதிவிறக்கவும் அல்லது GeoJSON கோப்பை பதிவேற்றவும்."
 
 #: app/htmx/setup_steps/setup_step_extract_handlers.py:229
-#: app/htmx/setup_steps/setup_step_map_layers.py:27
+#: app/htmx/setup_steps/setup_step_map_layers.py:28
 msgid "Project AOI"
 msgstr "திட்ட AOI"
 
@@ -818,25 +837,25 @@ msgstr ""
 "ODK URL, பயனர் பெயர், கடவுச்சொல் (மூன்றும்) வழங்கவும்; அல்லது சேவையக "
 "இயல்புநிலைகளைப் பயன்படுத்த அனைத்தையும் காலியாக விடவும்."
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:39
+#: app/htmx/setup_steps/setup_step_map_layers.py:40
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "தரவு எடுக்கப்பட்டது (%(data_feature_count)s அம்சங்கள்)"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:52
+#: app/htmx/setup_steps/setup_step_map_layers.py:53
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "பணி எல்லைகள் (%(task_count)s பணிகள்)"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:61
+#: app/htmx/setup_steps/setup_step_map_layers.py:62
 msgid "Task ID"
 msgstr "பணி அடையாளம்"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:62
+#: app/htmx/setup_steps/setup_step_map_layers.py:63
 msgid "Building Count"
 msgstr "கட்டிடங்களின் எண்ணிக்கை"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:81
+#: app/htmx/setup_steps/setup_step_map_layers.py:82
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
@@ -844,7 +863,7 @@ msgstr ""
 "பணி எல்லைகள் எதுவும் கிடைக்கவில்லை. தயவுசெய்து மேலுள்ள \"Split AOI\" "
 "பொத்தானைப் பயன்படுத்தி முதலில் திட்டத்தைப் பணிகளாகப் பிரிக்கவும்."
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:132
+#: app/htmx/setup_steps/setup_step_map_layers.py:133
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
@@ -853,7 +872,7 @@ msgstr ""
 "✓ AOI வெற்றிகரமாகப் பிரிக்கப்பட்டது! %(algorithm)s பயன்படுத்தி "
 "%(task_count)s பணி பகுதிகள் உருவாக்கப்பட்டன."
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:139
+#: app/htmx/setup_steps/setup_step_map_layers.py:140
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -946,29 +965,29 @@ msgstr "பணி பகுதி தரவு வடிவம் தவறா�
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ பிரிக்கப்பட்ட பணிகள் வெற்றிகரமாகச் சேமிக்கப்பட்டன"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:56
-msgid "Could not reach Tasking Manager. Please try again later."
-msgstr ""
-
 #: app/htmx/setup_steps/setup_step_validate_routes.py:61
-#, python-format
-msgid "Tasking Manager project %(id)s was not found."
+msgid "Could not reach Tasking Manager. Please try again later."
 msgstr ""
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:66
 #, python-format
+msgid "Tasking Manager project %(id)s was not found."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:71
+#, python-format
 msgid "Tasking Manager returned an error (HTTP %(status)s)."
 msgstr ""
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:79
+#: app/htmx/setup_steps/setup_step_validate_routes.py:84
 msgid "Tasking Manager returned an invalid response."
 msgstr ""
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:89
+#: app/htmx/setup_steps/setup_step_validate_routes.py:94
 msgid "Tasking Manager project AOI did not contain any polygon geometries."
 msgstr ""
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:113
+#: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -977,7 +996,7 @@ msgstr ""
 "பரப்பு %(area_km2)s km² ஆகும்; இது %(area_limit)s km² வரம்பை மீறுகிறது. "
 "உங்கள் திட்டப் பரப்பை குறைக்கவும்."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:118
+#: app/htmx/setup_steps/setup_step_validate_routes.py:123
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -986,49 +1005,49 @@ msgstr ""
 "பரப்பு %(area_km2)s km² ஆகும். பெரிய பகுதிகள் (>%(area_warn)s km²) "
 "செயலாக்க அதிக நேரம் எடுக்கலாம்."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:143
+#: app/htmx/setup_steps/setup_step_validate_routes.py:148
 msgid "GeoJSON is required"
 msgstr "GeoJSON அவசியம்"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:153
+#: app/htmx/setup_steps/setup_step_validate_routes.py:158
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "எந்த புற்களவும் கிடைக்கவில்லை. திட்ட பகுதி ஒரு புற்கோணமாக இருக்க வேண்டும்."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:196
+#: app/htmx/setup_steps/setup_step_validate_routes.py:206
 msgid "Tasking Manager project ID must be a positive integer."
 msgstr ""
 
-#: app/projects/project_crud.py:136
+#: app/projects/project_crud.py:138
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
 msgstr ""
 "தேர்ந்தெடுக்கப்பட்ட பகுதி மிகப் பெரியது. 200 km² ஐ விட சிறிய பகுதியைத் "
 "தேர்ந்தெடுக்கவும்."
 
-#: app/projects/project_crud.py:147
+#: app/projects/project_crud.py:149
 msgid "Failed to generate data extract from the raw data API."
 msgstr "மூல தரவு API இலிருந்து தரவு சாற்றை உருவாக்க முடியவில்லை."
 
-#: app/projects/project_crud.py:901
+#: app/projects/project_crud.py:903
 msgid "QField project ID not found."
 msgstr "திட்டம் கிடைக்கவில்லை."
 
-#: app/projects/project_crud.py:934
+#: app/projects/project_crud.py:936
 msgid "Project name not found."
 msgstr "திட்டம் கிடைக்கவில்லை."
 
-#: app/projects/project_crud.py:941
+#: app/projects/project_crud.py:943
 msgid "ODK project ID not found."
 msgstr "திட்டம் கிடைக்கவில்லை."
 
-#: app/projects/project_crud.py:950
+#: app/projects/project_crud.py:952
 msgid "Appuser token not found."
 msgstr "திட்டம் கிடைக்கவில்லை."
 
-#: app/projects/project_crud.py:967
+#: app/projects/project_crud.py:969
 msgid "Failed to generate QR code."
 msgstr "மாதிரி படிவத்தை ஏற்ற முடியவில்லை."
 
-#: app/projects/project_services.py:75
+#: app/projects/project_services.py:79
 msgid ""
 "This project was created with a simplified workflow in FieldTM and is "
 "made to collect building data to enhance OpenStreetMap."
@@ -1037,25 +1056,50 @@ msgstr ""
 "உருவாக்கப்பட்டது, மேலும் OpenStreetMap-ஐ மேம்படுத்த கட்டிடத் தரவைச் "
 "சேகரிக்க உருவாக்கப்பட்டது."
 
-#: app/projects/project_services.py:82
+#: app/projects/project_services.py:86
 msgid "Unnamed Area"
 msgstr "பெயரில்லா பகுதி"
 
-#: app/projects/project_services.py:95
+#: app/projects/project_services.py:99
 #, python-brace-format
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "பகுதி {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:412
+#: app/projects/project_services.py:416
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:167
+#: app/projects/project_services.py:1200
+#, python-format
+msgid "Assignee must be %(max_length)s characters or fewer."
+msgstr ""
+
+#: app/projects/project_services.py:1211
+#: app/templates/partials/project_details/fragments/assignment_panel.html:127
+msgid "Group labels may only contain letters, numbers, hyphens and underscores."
+msgstr ""
+
+#: app/projects/project_services.py:1217
+#, python-format
+msgid "Group labels must be %(max_length)s characters or fewer."
+msgstr ""
+
+#: app/projects/project_services.py:1302
+#, python-format
+msgid "Invalid task id: %(task_id)s"
+msgstr ""
+
+#: app/projects/project_services.py:1307
+#, python-format
+msgid "Unknown task id: %(task_id)s"
+msgstr ""
+
+#: app/qfield/qfield_crud.py:168
 msgid "Project outline is missing or has no geometry."
 msgstr "திட்ட அவுட்லைன் காணவில்லை அல்லது வடிவியல் இல்லை."
 
-#: app/qfield/qfield_crud.py:173
+#: app/qfield/qfield_crud.py:174
 msgid "Project outline geometry has no coordinates."
 msgstr "திட்ட அவுட்லைன் வடிவவியலுக்கு ஆயங்கள் இல்லை."
 
@@ -2213,8 +2257,8 @@ msgstr "அழி"
 
 #: app/templates/partials/new_project/map_section.html:32
 #: app/templates/partials/project_details/setup_steps/step2_form.html:89
-#: app/templates/partials/project_details/setup_steps/step3_data.html:72
-#: app/templates/partials/project_details/setup_steps/step4_split.html:36
+#: app/templates/partials/project_details/setup_steps/step3_data.html:79
+#: app/templates/partials/project_details/setup_steps/step4_split.html:39
 msgid "More options"
 msgstr "படிவ விருப்பங்கள்:"
 
@@ -2236,7 +2280,7 @@ msgstr "தனிப்பயன் GeoJSON பதிவேற்று"
 #: app/templates/partials/new_project/map_section.html:55
 #: app/templates/partials/new_project/map_section.html:56
 #: app/templates/partials/project_details/setup_steps/step2_form.html:34
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+#: app/templates/partials/project_details/setup_steps/step3_data.html:66
 msgid "or"
 msgstr "அல்லது"
 
@@ -2321,7 +2365,7 @@ msgid "Project Location"
 msgstr "திட்ட இடம்"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-#: app/templates/partials/project_details/setup_steps.html:65
+#: app/templates/partials/project_details/setup_steps.html:83
 msgid "Survey Form"
 msgstr "கணக்கெடுப்பு படிவம்"
 
@@ -2355,39 +2399,39 @@ msgstr ""
 "பதிவேற்ற வேண்டுமெனில், ODK Central இல் உள்நுழைந்து படிவ அமைப்புகளில் "
 "அவற்றை பதிவேற்றவும்."
 
-#: app/templates/partials/project_details/setup_steps.html:14
+#: app/templates/partials/project_details/setup_steps.html:21
 msgid "Ready for Mapping"
 msgstr "வரைபடத்திற்குத் தயாராக உள்ளது"
 
-#: app/templates/partials/project_details/setup_steps.html:25
+#: app/templates/partials/project_details/setup_steps.html:32
 msgid "Loading QR code..."
 msgstr "QR குறியீடு ஏற்றப்படுகிறது..."
 
-#: app/templates/partials/project_details/setup_steps.html:37
+#: app/templates/partials/project_details/setup_steps.html:44
 msgid "Loading collaborator form..."
 msgstr "கூட்டுப்பணியாளர் படிவத்தை ஏற்றுகிறது..."
 
-#: app/templates/partials/project_details/setup_steps.html:44
+#: app/templates/partials/project_details/setup_steps.html:62
 msgid "Project Setup"
 msgstr "திட்ட அமைப்பு"
 
-#: app/templates/partials/project_details/setup_steps.html:56
+#: app/templates/partials/project_details/setup_steps.html:74
 msgid "Project setup progress"
 msgstr "திட்ட அமைப்பு"
 
-#: app/templates/partials/project_details/setup_steps.html:59
+#: app/templates/partials/project_details/setup_steps.html:77
 msgid "Project Details"
 msgstr "திட்ட AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:71
+#: app/templates/partials/project_details/setup_steps.html:89
 msgid "Get Data"
 msgstr "படி 3: தரவைப் பெறுக"
 
-#: app/templates/partials/project_details/setup_steps.html:77
+#: app/templates/partials/project_details/setup_steps.html:95
 msgid "Split Tasks"
 msgstr "AOI ஐப் பிரி"
 
-#: app/templates/partials/project_details/setup_steps.html:81
+#: app/templates/partials/project_details/setup_steps.html:99
 msgid "Finalise"
 msgstr "திட்டத்தை இறுதிப்படுத்து"
 
@@ -2445,7 +2489,7 @@ msgstr "பாலிலைன்கள்"
 msgid "points"
 msgstr "புள்ளிகள்"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+#: app/templates/partials/project_details/setup_steps/step4_split.html:136
 #: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
 msgstr "அம்சங்கள்"
@@ -2481,7 +2525,7 @@ msgstr ""
 msgid "Downloading..."
 msgstr "பதிவிறக்கப்படுகிறது..."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:27
+#: app/templates/partials/project_details/setup_steps/step3_data.html:31
 #: app/templates/partials/project_details/style_and_scripts.html:25
 msgid "Use OSM data"
 msgstr "OSM தரவை பதிவிறக்கு"
@@ -2498,7 +2542,7 @@ msgstr "சதுரப்படி பிரி"
 msgid "Split by buildings"
 msgstr "கட்டிடங்களின்படி பிரி"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:179
+#: app/templates/partials/project_details/setup_steps/step4_split.html:185
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split area"
 msgstr "மீண்டும் பிரி"
@@ -2593,6 +2637,129 @@ msgstr ""
 #: app/templates/partials/project_details/style_and_scripts.html:50
 msgid "Error:"
 msgstr "பிழை:"
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:8
+msgid ""
+"This project has a single task covering the whole area. Split the area "
+"into tasks to\n"
+"    assign mappers to specific task areas."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:14
+msgid "Task Assignments"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:16
+msgid ""
+"Select tasks on the map, then apply an assignee and group label. Changes "
+"are saved when\n"
+"    you press Save assignments."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:24
+#: app/templates/partials/project_details/fragments/assignment_summary.html:13
+msgid "Assignee"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:31
+msgid "Mapper name (free text)"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:42
+msgid "Group label"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:49
+msgid "e.g. NE"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:55
+#: app/templates/partials/project_details/fragments/assignment_panel.html:122
+msgid "Apply to selected"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:58
+msgid "Auto-group by quadrant"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:61
+msgid "Unassign selected"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:64
+msgid "Clear selection"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:90
+msgid "Save assignments"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:117
+#: app/templates/partials/project_details/fragments/assignment_summary.html:26
+msgid "Unassigned"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:118
+#, python-format
+msgid "Task %(task_id)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:119
+#, python-format
+msgid "Group: %(group)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:120
+#, python-format
+msgid "Assigned to: %(name)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:121
+#, python-format
+msgid "Apply to selected (%(count)s)"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:123
+msgid "Select one or more tasks on the map first."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:124
+msgid "Enter an assignee or group label to apply first."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:125
+#, python-format
+msgid "%(count)s unsaved changes"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:126
+msgid "Discard changes"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:128
+msgid "Could not load task areas."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:129
+msgid "Select all tasks"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:130
+#, python-format
+msgid "Select task %(task_id)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_summary.html:11
+msgid "Task"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_summary.html:12
+msgid "Group"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_summary.html:15
+msgid "Buildings"
+msgstr ""
 
 #: app/templates/partials/project_details/fragments/basemap_progress.html:5
 msgid ""
@@ -2789,7 +2956,14 @@ msgstr ""
 "மேலாளர் கணக்கை தானாக உருவாக்க முடியவில்லை. திட்டத்தை நிர்வகிக்க "
 "QFieldCloud இல் நிர்வாகியாக உள்நுழைக."
 
-#: app/templates/partials/project_details/fragments/split_preview.html:27
+#: app/templates/partials/project_details/fragments/split_preview.html:25
+#, python-format
+msgid ""
+"Accepting this split discards %(count)s existing task assignment(s). "
+"Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/split_preview.html:30
 msgid "Accept Task Choices"
 msgstr "பணி தேர்வுகளை ஏற்கவும்"
 
@@ -2919,95 +3093,104 @@ msgstr ""
 "எடுக்கவும், அல்லது வரைபடமிடுபவர்கள் அனைத்தையும் தொடக்கத்திலிருந்து "
 "சேகரிக்க காலி வரைபடத்துடன் தொடங்கவும்."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:53
+#: app/templates/partials/project_details/setup_steps/step3_data.html:26
+#: app/templates/partials/project_details/setup_steps/step3_data.html:55
+#: app/templates/partials/project_details/setup_steps/step3_data.html:163
+#, python-format
+msgid ""
+"Replacing the data extract discards %(count)s existing task "
+"assignment(s). Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:60
 msgid "Start with empty map"
 msgstr "காலி வரைபடத்துடன் தொடங்குங்கள்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:61
+#: app/templates/partials/project_details/setup_steps/step3_data.html:68
 msgid "upload your own map file (GeoJSON)"
 msgstr "தனிப்பயன் GeoJSON பதிவேற்று"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:79
+#: app/templates/partials/project_details/setup_steps/step3_data.html:86
 msgid "Override the default OSM source for this project."
 msgstr "இந்த திட்டத்திற்கு பரிந்துரைக்கப்பட்ட இயல்புநிலைகள் செயலில் உள்ளன."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+#: app/templates/partials/project_details/setup_steps/step3_data.html:92
 msgid "What to download"
 msgstr "எதைப் பதிவிறக்க வேண்டும்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:88
+#: app/templates/partials/project_details/setup_steps/step3_data.html:95
 msgid "OSM Buildings"
 msgstr "OSM கட்டிடங்கள்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:96
 msgid "OSM Highways"
 msgstr "OSM சாலைகள்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:90
+#: app/templates/partials/project_details/setup_steps/step3_data.html:97
 msgid "OSM Healthcare"
 msgstr "OSM சுகாதாரம்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:91
+#: app/templates/partials/project_details/setup_steps/step3_data.html:98
 msgid "OSM Toilets"
 msgstr "OSM கழிப்பறைகள்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:92
+#: app/templates/partials/project_details/setup_steps/step3_data.html:99
 msgid "OSM Religious"
 msgstr "OSM மதத்துறை"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:93
+#: app/templates/partials/project_details/setup_steps/step3_data.html:100
 msgid "OSM Landuse"
 msgstr "OSM நிலப்பயன்பாடு"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:94
+#: app/templates/partials/project_details/setup_steps/step3_data.html:101
 msgid "OSM Waterways"
 msgstr "OSM நீர்வழிகள்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:95
+#: app/templates/partials/project_details/setup_steps/step3_data.html:102
 msgid "OSM Water Points"
 msgstr "OSM நீர்புள்ளிகள்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:96
+#: app/templates/partials/project_details/setup_steps/step3_data.html:103
 msgid "OSM Waste Disposal"
 msgstr "OSM கழிவுப்பொருள் அகற்றம்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:97
+#: app/templates/partials/project_details/setup_steps/step3_data.html:104
 msgid "OSM Education"
 msgstr "OSM கல்வி"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:98
+#: app/templates/partials/project_details/setup_steps/step3_data.html:105
 msgid "OSM Cemeteries"
 msgstr "OSM கல்லறைகள்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:99
+#: app/templates/partials/project_details/setup_steps/step3_data.html:106
 msgid "OSM Amenities"
 msgstr "OSM வசதிகள்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+#: app/templates/partials/project_details/setup_steps/step3_data.html:111
 msgid "Feature shape"
 msgstr "அம்சங்கள்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:107
+#: app/templates/partials/project_details/setup_steps/step3_data.html:114
 msgid "Polygon (area)"
 msgstr "பலகோணம்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:108
+#: app/templates/partials/project_details/setup_steps/step3_data.html:115
 msgid "Line"
 msgstr "பாலியிலைன்"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:109
+#: app/templates/partials/project_details/setup_steps/step3_data.html:116
 msgid "Point"
 msgstr "புள்ளி"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:117
+#: app/templates/partials/project_details/setup_steps/step3_data.html:124
 msgid "Use Centroids (For OSM Data Download)"
 msgstr "மையப் புள்ளிகளைப் பயன்படுத்து (OSM தரவைப் பதிவிறக்க)"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:120
+#: app/templates/partials/project_details/setup_steps/step3_data.html:127
 msgid "Convert polygons to single points."
 msgstr "பல்கோணங்களை தனி புள்ளிகளாக மாற்றவும்."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:142
+#: app/templates/partials/project_details/setup_steps/step3_data.html:149
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "OSM தரவு எடுப்பு உருவாக்கப்படுகிறது... இது சிறிது நேரம் எடுக்கலாம்."
 
@@ -3041,11 +3224,21 @@ msgstr ""
 "முடிவை முன்னோட்டமிட்டு ஏற்கவும். அல்லது முழுப் பகுதியையும் ஒரு பணியாகப் "
 "பயன்படுத்த தவிர்க்கவும்."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:29
+#: app/templates/partials/project_details/setup_steps/step4_split.html:27
+#, python-format
+msgid "This will discard %(count)s existing task assignment(s). Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:32
 msgid "Skip splitting"
 msgstr "பிரிக்கப்படுகிறது..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:50
+#: app/templates/partials/project_details/setup_steps/step4_split.html:49
+#, python-format
+msgid "Re-splitting discards %(count)s existing task assignment(s). Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:56
 msgid ""
 "When splitting by building count, these linear features are used as "
 "natural task\n"
@@ -3054,79 +3247,79 @@ msgstr ""
 "கட்டிட எண்ணிக்கையால் பிரிக்கும் போது, இந்த கோடு அம்சங்கள் இயற்கையான பணி "
 "எல்லைகளாகப் பயன்படுத்தப்படுகின்றன."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:75
+#: app/templates/partials/project_details/setup_steps/step4_split.html:81
 msgid "Include roads"
 msgstr "சாலைகளைச் சேர்க்கவும்"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:84
+#: app/templates/partials/project_details/setup_steps/step4_split.html:90
 msgid "Include rivers"
 msgstr "நதிகளைச் சேர்க்கவும்"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:93
+#: app/templates/partials/project_details/setup_steps/step4_split.html:99
 msgid "Include railways"
 msgstr "ரயில்பாதைகளைச் சேர்க்கவும்"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:102
+#: app/templates/partials/project_details/setup_steps/step4_split.html:108
 msgid "Include aeroways"
 msgstr "விமானப் பாதைகளைச் சேர்க்கவும்"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:115
+#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 msgid "How to split"
 msgstr "எப்படி பிரிப்பது"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+#: app/templates/partials/project_details/setup_steps/step4_split.html:123
 msgid "Choose a method..."
 msgstr "முறையைத் தேர்ந்தெடுக்கவும்..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:118
+#: app/templates/partials/project_details/setup_steps/step4_split.html:124
 msgid "By number of buildings (faster)"
 msgstr "கட்டிட எண்ணிக்கையால் (வேகமானது)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:120
+#: app/templates/partials/project_details/setup_steps/step4_split.html:126
 msgid ""
 "By number of buildings (cleaner shapes) - unavailable\n"
 "            for large areas"
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:121
+#: app/templates/partials/project_details/setup_steps/step4_split.html:127
 msgid "By number of buildings (cleaner shapes)"
 msgstr "கட்டிட எண்ணிக்கையால் (சுத்தமான வடிவங்கள்)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:124
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
 msgid "By a regular grid"
 msgstr "வழக்கமான கட்டத்தால்"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:125
+#: app/templates/partials/project_details/setup_steps/step4_split.html:131
 msgid "Into a fixed number of tasks"
 msgstr "குறிப்பிட்ட பணிகளின் எண்ணிக்கைப்படி பிரி (விரைவில்)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:129
+#: app/templates/partials/project_details/setup_steps/step4_split.html:135
 msgid "Cleaner shapes is disabled for this area."
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+#: app/templates/partials/project_details/setup_steps/step4_split.html:136
 msgid ""
 "It becomes geometrically unstable above ~5,000 features. Use the\n"
 "          faster option instead."
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:137
+#: app/templates/partials/project_details/setup_steps/step4_split.html:143
 msgid "Buildings per task"
 msgstr "ஒரு பணிக்கு சராசரி கட்டிடங்கள்:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:148
+#: app/templates/partials/project_details/setup_steps/step4_split.html:154
 msgid "Number of tasks"
 msgstr "பணிகளின் எண்ணிக்கை:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:160
+#: app/templates/partials/project_details/setup_steps/step4_split.html:166
 msgid "Grid square size (metres)"
 msgstr "கட்ட சதுர அளவு (மீட்டர்)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:179
+#: app/templates/partials/project_details/setup_steps/step4_split.html:185
 msgid "Split Again"
 msgstr "மீண்டும் பிரி"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:213
+#: app/templates/partials/project_details/setup_steps/step4_split.html:219
 msgid "Splitting area into tasks... This may take a moment."
 msgstr "AOI பணிகளாகப் பிரிக்கப்படுகிறது... இது சிறிது நேரம் எடுக்கலாம்."
 

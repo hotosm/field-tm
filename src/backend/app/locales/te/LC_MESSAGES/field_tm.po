@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-06-06 03:42+0100\n"
+"POT-Creation-Date: 2026-06-12 21:52-0400\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: te\n"
@@ -160,31 +160,31 @@ msgstr "%(action)s విఫలమైంది."
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack API HTTP %(status_code)sని అందించింది."
 
-#: app/helpers/helper_routes.py:78
+#: app/helpers/helper_routes.py:81
 msgid "Failed to convert YAML form to XLSForm."
 msgstr "YAML ఫారమ్‌ని XLSFormకి మార్చడంలో విఫలమైంది."
 
-#: app/helpers/helper_routes.py:101
+#: app/helpers/helper_routes.py:104
 msgid "Provide a valid .json or .geojson file"
 msgstr "చెల్లుబాటు అయ్యే .xls లేదా .xlsx ఫైల్‌ను ఇవ్వండి"
 
-#: app/helpers/helper_routes.py:139
+#: app/helpers/helper_routes.py:149
 msgid "Provide a valid .csv"
 msgstr "చెల్లుబాటు అయ్యే .xls లేదా .xlsx ఫైల్‌ను ఇవ్వండి"
 
-#: app/helpers/helper_routes.py:193
+#: app/helpers/helper_routes.py:203
 msgid "Provide a valid .json file"
 msgstr "చెల్లుబాటు అయ్యే .xls లేదా .xlsx ఫైల్‌ను ఇవ్వండి"
 
-#: app/helpers/helper_routes.py:228
+#: app/helpers/helper_routes.py:238
 msgid "Could not login to raw-data-api"
 msgstr "raw-data-apiకి లాగిన్ చేయడం సాధ్యపడలేదు"
 
-#: app/helpers/helper_routes.py:252
+#: app/helpers/helper_routes.py:262
 msgid "No geometries present"
 msgstr "జ్యామితులు లేవు"
 
-#: app/helpers/helper_routes.py:269
+#: app/helpers/helper_routes.py:279
 msgid "Your geojson file is invalid."
 msgstr "మీ geojson ఫైల్ చెల్లదు."
 
@@ -261,44 +261,44 @@ msgstr ""
 msgid "An unexpected error occurred while generating the QR code."
 msgstr "QR కోడ్‌ను రూపొందిస్తున్నప్పుడు అనూహ్యమైన లోపం ఏర్పడింది."
 
-#: app/htmx/project_detail_routes.py:298
+#: app/htmx/project_detail_routes.py:325
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "ప్రాజెక్ట్ (%(project_id)s) కనబడలేదు."
 
-#: app/htmx/project_detail_routes.py:305
+#: app/htmx/project_detail_routes.py:332
 msgid "Only the project manager can delete this project."
 msgstr "ఈ ప్రాజెక్ట్‌ను ప్రాజెక్ట్ మేనేజర్ మాత్రమే తొలగించగలరు."
 
-#: app/htmx/project_detail_routes.py:343 app/templates/project_details.html:299
+#: app/htmx/project_detail_routes.py:370 app/templates/project_details.html:299
 msgid "Project not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/htmx/project_detail_routes.py:379
+#: app/htmx/project_detail_routes.py:406
 #: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "లోపం: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:413
+#: app/htmx/project_detail_routes.py:440
 #, python-format
 msgid "Added the following user(s) as project editors: %(names)s."
 msgstr "కింది వినియోగదారు(లు) ప్రాజెక్ట్ ఎడిటర్‌లుగా జోడించబడ్డారు: %(names)s."
 
-#: app/htmx/project_detail_routes.py:417
+#: app/htmx/project_detail_routes.py:444
 #, python-format
 msgid "Could not add '%(username)s': %(reason)s"
 msgstr "'%(username)s'ని జోడించడం సాధ్యపడలేదు: %(reason)s"
 
-#: app/htmx/project_detail_routes.py:423
+#: app/htmx/project_detail_routes.py:450
 msgid "Add more collaborators"
 msgstr "మరింత మంది సహకారులను జోడించండి"
 
-#: app/htmx/project_detail_routes.py:436
+#: app/htmx/project_detail_routes.py:463
 msgid "Invite QFieldCloud collaborators"
 msgstr "QFieldCloud సహకారులను ఆహ్వానించండి"
 
-#: app/htmx/project_detail_routes.py:439
+#: app/htmx/project_detail_routes.py:466
 msgid ""
 "Mappers must have an account on QFieldCloud before you can give them "
 "access to this project."
@@ -306,7 +306,7 @@ msgstr ""
 "మీరు ఈ ప్రాజెక్ట్‌కి యాక్సెస్ ఇవ్వడానికి ముందు మ్యాపర్‌లు తప్పనిసరిగా "
 "QFieldCloudలో ఖాతాను కలిగి ఉండాలి."
 
-#: app/htmx/project_detail_routes.py:445
+#: app/htmx/project_detail_routes.py:472
 msgid ""
 "Have each mapper create a free account at <a "
 "href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
@@ -316,7 +316,7 @@ msgstr ""
 "rel=\"noopener\" class=\"ftm-link--brand\">app.qfield.cloud</a>లో ఉచిత "
 "ఖాతాను సృష్టించేలా చేయండి."
 
-#: app/htmx/project_detail_routes.py:451
+#: app/htmx/project_detail_routes.py:478
 msgid ""
 "Enter their QFieldCloud usernames below (comma-separated for multiple "
 "users) and click submit. They will be added as editors and can log in to "
@@ -327,23 +327,23 @@ msgstr ""
 "వారు సంపాదకులుగా జోడించబడతారు మరియు మ్యాపింగ్ ప్రారంభించడానికి QFieldకి "
 "లాగిన్ చేయవచ్చు."
 
-#: app/htmx/project_detail_routes.py:457
+#: app/htmx/project_detail_routes.py:484
 msgid "e.g. alice, bob, charlie"
 msgstr "ఉదా ఆలిస్, బాబ్, చార్లీ"
 
-#: app/htmx/project_detail_routes.py:458
+#: app/htmx/project_detail_routes.py:485
 msgid "Add collaborators"
 msgstr "సహకారులను జోడించండి"
 
-#: app/htmx/project_detail_routes.py:550
+#: app/htmx/project_detail_routes.py:577
 msgid "Enter at least one QFieldCloud username."
 msgstr "కనీసం ఒక QFieldCloud వినియోగదారు పేరును నమోదు చేయండి."
 
-#: app/htmx/project_detail_routes.py:560
+#: app/htmx/project_detail_routes.py:587
 msgid "QFieldCloud project ID not found for this project."
 msgstr "ఈ ప్రాజెక్ట్ కోసం QFieldCloud ప్రాజెక్ట్ ID కనుగొనబడలేదు."
 
-#: app/htmx/project_detail_routes.py:566
+#: app/htmx/project_detail_routes.py:593
 msgid ""
 "This project was created on a custom QFieldCloud instance. Use the "
 "QFieldCloud Admin tab to manage collaborators."
@@ -351,18 +351,42 @@ msgstr ""
 "ఈ ప్రాజెక్ట్ అనుకూల QFieldCloud ఉదాహరణలో సృష్టించబడింది. సహకారులను "
 "నిర్వహించడానికి QFieldCloud అడ్మిన్ ట్యాబ్‌ని ఉపయోగించండి."
 
-#: app/htmx/project_detail_routes.py:632
+#: app/htmx/project_detail_routes.py:659
 msgid "GeoJSON export is only available for QField projects."
 msgstr "GeoJSON ఎగుమతి QField ప్రాజెక్ట్‌లకు మాత్రమే అందుబాటులో ఉంది."
 
-#: app/htmx/project_detail_routes.py:637
+#: app/htmx/project_detail_routes.py:664
 msgid "This project is not yet linked to a QFieldCloud project."
 msgstr "ఈ ప్రాజెక్ట్ ఇంకా QFieldCloud ప్రాజెక్ట్‌కి లింక్ చేయబడలేదు."
 
-#: app/htmx/project_detail_routes.py:648
+#: app/htmx/project_detail_routes.py:675
 #, python-format
 msgid "Failed to export GeoJSON: %(error)s"
 msgstr "GeoJSONని ఎగుమతి చేయడంలో విఫలమైంది: %(error)s"
+
+#: app/htmx/assignment/assignment_routes.py:223
+#: app/htmx/basemap/basemap_fragments.py:17
+#: app/htmx/setup_steps/setup_step_responses.py:90
+msgid "Project not found or access denied."
+msgstr "ప్రాజెక్ట్ కనబడలేదు లేదా ప్రాప్తి నిరాకరించబడింది."
+
+#: app/htmx/assignment/assignment_routes.py:230
+#: app/projects/project_services.py:1285
+msgid "No task areas to assign. Split the project area into tasks first."
+msgstr ""
+
+#: app/htmx/assignment/assignment_routes.py:275
+msgid "No assignments data provided."
+msgstr ""
+
+#: app/htmx/assignment/assignment_routes.py:282
+#: app/projects/project_services.py:1193 app/projects/project_services.py:1264
+msgid "Invalid assignments data format."
+msgstr ""
+
+#: app/htmx/assignment/assignment_routes.py:302
+msgid "✓ Assignments saved"
+msgstr ""
 
 #: app/htmx/basemap/basemap_attach_flow.py:69
 msgid ""
@@ -409,11 +433,6 @@ msgid ""
 msgstr ""
 "ఈ డిప్లాయ్‌మెంట్‌లో QField బేస్‌మ్యాప్ జతచేయడం కాన్ఫిగర్ చేయలేదు. "
 "%(config)s లేదు."
-
-#: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:90
-msgid "Project not found or access denied."
-msgstr "ప్రాజెక్ట్ కనబడలేదు లేదా ప్రాప్తి నిరాకరించబడింది."
 
 #: app/htmx/basemap/basemap_fragments.py:105
 msgid "Basemap attached to QField project successfully."
@@ -734,7 +753,7 @@ msgstr ""
 "GeoJSON ఫైల్‌ను అప్‌లోడ్ చేయండి."
 
 #: app/htmx/setup_steps/setup_step_extract_handlers.py:229
-#: app/htmx/setup_steps/setup_step_map_layers.py:27
+#: app/htmx/setup_steps/setup_step_map_layers.py:28
 msgid "Project AOI"
 msgstr "ప్రాజెక్ట్ AOI"
 
@@ -807,25 +826,25 @@ msgstr ""
 "ODK URL, వినియోగదారు పేరు, పాస్‌వర్డ్ (మూడింటినీ) ఇవ్వండి, లేదా సర్వర్ "
 "డిఫాల్ట్‌లను ఉపయోగించడానికి అన్నింటినీ ఖాళీగా వదిలేయండి."
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:39
+#: app/htmx/setup_steps/setup_step_map_layers.py:40
 #, python-format
 msgid "Data Extract (%(data_feature_count)s features)"
 msgstr "డేటా ఎక్స్‌ట్రాక్ట్ (%(data_feature_count)s లక్షణాలు)"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:52
+#: app/htmx/setup_steps/setup_step_map_layers.py:53
 #, python-format
 msgid "Task Boundaries (%(task_count)s tasks)"
 msgstr "పని సరిహద్దులు (%(task_count)s పనులు)"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:61
+#: app/htmx/setup_steps/setup_step_map_layers.py:62
 msgid "Task ID"
 msgstr "టాస్క్ ఐడి"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:62
+#: app/htmx/setup_steps/setup_step_map_layers.py:63
 msgid "Building Count"
 msgstr "భవనాల సంఖ్య"
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:81
+#: app/htmx/setup_steps/setup_step_map_layers.py:82
 msgid ""
 "No task boundaries found. Please split the project into tasks first using"
 " the \"Split AOI\" button above."
@@ -833,7 +852,7 @@ msgstr ""
 "పని సరిహద్దులు కనబడలేదు. దయచేసి ముందుగా పై ఉన్న \"Split AOI\" బటన్ "
 "ఉపయోగించి ప్రాజెక్ట్‌ను పనులుగా విభజించండి."
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:132
+#: app/htmx/setup_steps/setup_step_map_layers.py:133
 #, python-format
 msgid ""
 "✓ AOI split successfully! Generated %(task_count)s task areas using "
@@ -842,7 +861,7 @@ msgstr ""
 "✓ AOI విజయవంతంగా విభజించబడింది! %(algorithm)s ఉపయోగించి %(task_count)s "
 "పని ప్రాంతాలు రూపొందించబడ్డాయి."
 
-#: app/htmx/setup_steps/setup_step_map_layers.py:139
+#: app/htmx/setup_steps/setup_step_map_layers.py:140
 #, python-format
 msgid ""
 "Previewing %(task_count)s task boundaries%(data_extract_info)s. Review "
@@ -933,29 +952,29 @@ msgstr "చెల్లని పని ప్రాంతాల డేటా �
 msgid "✓ Split tasks saved successfully"
 msgstr "✓ విభజించిన పనులు విజయవంతంగా సేవ్ అయ్యాయి"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:56
-msgid "Could not reach Tasking Manager. Please try again later."
-msgstr ""
-
 #: app/htmx/setup_steps/setup_step_validate_routes.py:61
-#, python-format
-msgid "Tasking Manager project %(id)s was not found."
+msgid "Could not reach Tasking Manager. Please try again later."
 msgstr ""
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:66
 #, python-format
+msgid "Tasking Manager project %(id)s was not found."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:71
+#, python-format
 msgid "Tasking Manager returned an error (HTTP %(status)s)."
 msgstr ""
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:79
+#: app/htmx/setup_steps/setup_step_validate_routes.py:84
 msgid "Tasking Manager returned an invalid response."
 msgstr ""
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:89
+#: app/htmx/setup_steps/setup_step_validate_routes.py:94
 msgid "Tasking Manager project AOI did not contain any polygon geometries."
 msgstr ""
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:113
+#: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
 msgid ""
 "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
@@ -964,7 +983,7 @@ msgstr ""
 "ప్రాంతం %(area_km2)s km² ఉంది, ఇది %(area_limit)s km² పరిమితిని "
 "మించుతోంది. దయచేసి మీ ప్రాజెక్ట్ ప్రాంతాన్ని తగ్గించండి."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:118
+#: app/htmx/setup_steps/setup_step_validate_routes.py:123
 #, python-format
 msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
@@ -973,49 +992,49 @@ msgstr ""
 "ప్రాంతం %(area_km2)s km² ఉంది. పెద్ద ప్రాంతాలు (>%(area_warn)s km²) "
 "ప్రాసెస్ చేయడానికి ఎక్కువ సమయం పట్టవచ్చు."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:143
+#: app/htmx/setup_steps/setup_step_validate_routes.py:148
 msgid "GeoJSON is required"
 msgstr "GeoJSON అవసరం"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:153
+#: app/htmx/setup_steps/setup_step_validate_routes.py:158
 msgid "No polygon geometries found. Project area must be a polygon."
 msgstr "పాలిగాన్ జ్యామితులు కనబడలేదు. ప్రాజెక్ట్ ప్రాంతం ఒక పాలిగాన్ అయి ఉండాలి."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:196
+#: app/htmx/setup_steps/setup_step_validate_routes.py:206
 msgid "Tasking Manager project ID must be a positive integer."
 msgstr ""
 
-#: app/projects/project_crud.py:136
+#: app/projects/project_crud.py:138
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
 msgstr ""
 "ఎంచుకున్న ప్రాంతం చాలా పెద్దది. దయచేసి 200 km² కంటే చిన్న ప్రాంతాన్ని "
 "ఎంచుకోండి."
 
-#: app/projects/project_crud.py:147
+#: app/projects/project_crud.py:149
 msgid "Failed to generate data extract from the raw data API."
 msgstr "ముడి డేటా API నుండి డేటా సారాన్ని రూపొందించడంలో విఫలమైంది."
 
-#: app/projects/project_crud.py:901
+#: app/projects/project_crud.py:903
 msgid "QField project ID not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/projects/project_crud.py:934
+#: app/projects/project_crud.py:936
 msgid "Project name not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/projects/project_crud.py:941
+#: app/projects/project_crud.py:943
 msgid "ODK project ID not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/projects/project_crud.py:950
+#: app/projects/project_crud.py:952
 msgid "Appuser token not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/projects/project_crud.py:967
+#: app/projects/project_crud.py:969
 msgid "Failed to generate QR code."
 msgstr "టెంప్లేట్ ఫారమ్‌ను లోడ్ చేయలేకపోయాము."
 
-#: app/projects/project_services.py:75
+#: app/projects/project_services.py:79
 msgid ""
 "This project was created with a simplified workflow in FieldTM and is "
 "made to collect building data to enhance OpenStreetMap."
@@ -1024,25 +1043,50 @@ msgstr ""
 "OpenStreetMap ను మెరుగుపరచడానికి భవనాల డేటా సేకరించడానికి "
 "రూపొందించబడింది."
 
-#: app/projects/project_services.py:82
+#: app/projects/project_services.py:86
 msgid "Unnamed Area"
 msgstr "పేరు లేని ప్రాంతం"
 
-#: app/projects/project_services.py:95
+#: app/projects/project_services.py:99
 #, python-brace-format
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "ప్రాంతం {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:412
+#: app/projects/project_services.py:416
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/qfield/qfield_crud.py:167
+#: app/projects/project_services.py:1200
+#, python-format
+msgid "Assignee must be %(max_length)s characters or fewer."
+msgstr ""
+
+#: app/projects/project_services.py:1211
+#: app/templates/partials/project_details/fragments/assignment_panel.html:127
+msgid "Group labels may only contain letters, numbers, hyphens and underscores."
+msgstr ""
+
+#: app/projects/project_services.py:1217
+#, python-format
+msgid "Group labels must be %(max_length)s characters or fewer."
+msgstr ""
+
+#: app/projects/project_services.py:1302
+#, python-format
+msgid "Invalid task id: %(task_id)s"
+msgstr ""
+
+#: app/projects/project_services.py:1307
+#, python-format
+msgid "Unknown task id: %(task_id)s"
+msgstr ""
+
+#: app/qfield/qfield_crud.py:168
 msgid "Project outline is missing or has no geometry."
 msgstr "ప్రాజెక్ట్ అవుట్‌లైన్ లేదు లేదా జ్యామితి లేదు."
 
-#: app/qfield/qfield_crud.py:173
+#: app/qfield/qfield_crud.py:174
 msgid "Project outline geometry has no coordinates."
 msgstr "ప్రాజెక్ట్ అవుట్‌లైన్ జ్యామితికి కోఆర్డినేట్‌లు లేవు."
 
@@ -2193,8 +2237,8 @@ msgstr "తొలగించు"
 
 #: app/templates/partials/new_project/map_section.html:32
 #: app/templates/partials/project_details/setup_steps/step2_form.html:89
-#: app/templates/partials/project_details/setup_steps/step3_data.html:72
-#: app/templates/partials/project_details/setup_steps/step4_split.html:36
+#: app/templates/partials/project_details/setup_steps/step3_data.html:79
+#: app/templates/partials/project_details/setup_steps/step4_split.html:39
 msgid "More options"
 msgstr "ఫారమ్ ఎంపికలు:"
 
@@ -2216,7 +2260,7 @@ msgstr "కస్టమ్ GeoJSON అప్‌లోడ్ చేయండి"
 #: app/templates/partials/new_project/map_section.html:55
 #: app/templates/partials/new_project/map_section.html:56
 #: app/templates/partials/project_details/setup_steps/step2_form.html:34
-#: app/templates/partials/project_details/setup_steps/step3_data.html:59
+#: app/templates/partials/project_details/setup_steps/step3_data.html:66
 msgid "or"
 msgstr "లేదా"
 
@@ -2301,7 +2345,7 @@ msgid "Project Location"
 msgstr "ప్రాజెక్ట్ స్థానం"
 
 #: app/templates/partials/project_details/manager_setup_summary.html:25
-#: app/templates/partials/project_details/setup_steps.html:65
+#: app/templates/partials/project_details/setup_steps.html:83
 msgid "Survey Form"
 msgstr "సర్వే ఫారమ్"
 
@@ -2335,39 +2379,39 @@ msgstr ""
 "చేయాల్సి ఉంటే, ODK Central లో లాగిన్ అయి ఫారమ్ సెట్టింగ్‌లలో అప్‌లోడ్ "
 "చేయండి."
 
-#: app/templates/partials/project_details/setup_steps.html:14
+#: app/templates/partials/project_details/setup_steps.html:21
 msgid "Ready for Mapping"
 msgstr "మ్యాపింగ్‌కు సిద్ధం"
 
-#: app/templates/partials/project_details/setup_steps.html:25
+#: app/templates/partials/project_details/setup_steps.html:32
 msgid "Loading QR code..."
 msgstr "QR కోడ్ లోడ్ అవుతోంది..."
 
-#: app/templates/partials/project_details/setup_steps.html:37
+#: app/templates/partials/project_details/setup_steps.html:44
 msgid "Loading collaborator form..."
 msgstr "సహకారి ఫారమ్ లోడ్ అవుతోంది..."
 
-#: app/templates/partials/project_details/setup_steps.html:44
+#: app/templates/partials/project_details/setup_steps.html:62
 msgid "Project Setup"
 msgstr "ప్రాజెక్ట్ సెటప్"
 
-#: app/templates/partials/project_details/setup_steps.html:56
+#: app/templates/partials/project_details/setup_steps.html:74
 msgid "Project setup progress"
 msgstr "ప్రాజెక్ట్ సెటప్"
 
-#: app/templates/partials/project_details/setup_steps.html:59
+#: app/templates/partials/project_details/setup_steps.html:77
 msgid "Project Details"
 msgstr "ప్రాజెక్ట్ AOI"
 
-#: app/templates/partials/project_details/setup_steps.html:71
+#: app/templates/partials/project_details/setup_steps.html:89
 msgid "Get Data"
 msgstr "దశ 3: డేటాను పొందండి"
 
-#: app/templates/partials/project_details/setup_steps.html:77
+#: app/templates/partials/project_details/setup_steps.html:95
 msgid "Split Tasks"
 msgstr "AOI ని విభజించు"
 
-#: app/templates/partials/project_details/setup_steps.html:81
+#: app/templates/partials/project_details/setup_steps.html:99
 msgid "Finalise"
 msgstr "ప్రాజెక్ట్‌ను పూర్తిచేయండి"
 
@@ -2419,7 +2463,7 @@ msgstr "పాలీలైన్లు"
 msgid "points"
 msgstr "బిందువులు"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+#: app/templates/partials/project_details/setup_steps/step4_split.html:136
 #: app/templates/partials/project_details/style_and_scripts.html:20
 msgid "features"
 msgstr "లక్షణాలు"
@@ -2455,7 +2499,7 @@ msgstr ""
 msgid "Downloading..."
 msgstr "డౌన్‌లోడ్ అవుతోంది..."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:27
+#: app/templates/partials/project_details/setup_steps/step3_data.html:31
 #: app/templates/partials/project_details/style_and_scripts.html:25
 msgid "Use OSM data"
 msgstr "OSM డేటాను డౌన్‌లోడ్ చేయండి"
@@ -2472,7 +2516,7 @@ msgstr "చదరంగా విభజించు"
 msgid "Split by buildings"
 msgstr "భవనాల ప్రకారం విభజించు"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:179
+#: app/templates/partials/project_details/setup_steps/step4_split.html:185
 #: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Split area"
 msgstr "మళ్లీ విభజించు"
@@ -2567,6 +2611,129 @@ msgstr "%(project_type)s లో ప్రాజెక్ట్ రూపొం�
 #: app/templates/partials/project_details/style_and_scripts.html:50
 msgid "Error:"
 msgstr "లోపం:"
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:8
+msgid ""
+"This project has a single task covering the whole area. Split the area "
+"into tasks to\n"
+"    assign mappers to specific task areas."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:14
+msgid "Task Assignments"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:16
+msgid ""
+"Select tasks on the map, then apply an assignee and group label. Changes "
+"are saved when\n"
+"    you press Save assignments."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:24
+#: app/templates/partials/project_details/fragments/assignment_summary.html:13
+msgid "Assignee"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:31
+msgid "Mapper name (free text)"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:42
+msgid "Group label"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:49
+msgid "e.g. NE"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:55
+#: app/templates/partials/project_details/fragments/assignment_panel.html:122
+msgid "Apply to selected"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:58
+msgid "Auto-group by quadrant"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:61
+msgid "Unassign selected"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:64
+msgid "Clear selection"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:90
+msgid "Save assignments"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:117
+#: app/templates/partials/project_details/fragments/assignment_summary.html:26
+msgid "Unassigned"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:118
+#, python-format
+msgid "Task %(task_id)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:119
+#, python-format
+msgid "Group: %(group)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:120
+#, python-format
+msgid "Assigned to: %(name)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:121
+#, python-format
+msgid "Apply to selected (%(count)s)"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:123
+msgid "Select one or more tasks on the map first."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:124
+msgid "Enter an assignee or group label to apply first."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:125
+#, python-format
+msgid "%(count)s unsaved changes"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:126
+msgid "Discard changes"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:128
+msgid "Could not load task areas."
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:129
+msgid "Select all tasks"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_panel.html:130
+#, python-format
+msgid "Select task %(task_id)s"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_summary.html:11
+msgid "Task"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_summary.html:12
+msgid "Group"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/assignment_summary.html:15
+msgid "Buildings"
+msgstr ""
 
 #: app/templates/partials/project_details/fragments/basemap_progress.html:5
 msgid ""
@@ -2762,7 +2929,14 @@ msgstr ""
 "మేనేజర్ ఖాతా స్వయంచాలకంగా సృష్టించబడలేదు. ప్రాజెక్ట్‌ను నిర్వహించడానికి "
 "QFieldCloud లో admin గా లాగిన్ అవ్వండి."
 
-#: app/templates/partials/project_details/fragments/split_preview.html:27
+#: app/templates/partials/project_details/fragments/split_preview.html:25
+#, python-format
+msgid ""
+"Accepting this split discards %(count)s existing task assignment(s). "
+"Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/fragments/split_preview.html:30
 msgid "Accept Task Choices"
 msgstr "పని ఎంపికలను అంగీకరించండి"
 
@@ -2891,95 +3065,104 @@ msgstr ""
 "లేదా మ్యాపర్లు అన్నీ మొదటి నుంచి సేకరించేందుకు ఖాళీ మ్యాప్‌తో "
 "ప్రారంభించండి."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:53
+#: app/templates/partials/project_details/setup_steps/step3_data.html:26
+#: app/templates/partials/project_details/setup_steps/step3_data.html:55
+#: app/templates/partials/project_details/setup_steps/step3_data.html:163
+#, python-format
+msgid ""
+"Replacing the data extract discards %(count)s existing task "
+"assignment(s). Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:60
 msgid "Start with empty map"
 msgstr "ఖాళీ మ్యాప్‌తో ప్రారంభించండి"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:61
+#: app/templates/partials/project_details/setup_steps/step3_data.html:68
 msgid "upload your own map file (GeoJSON)"
 msgstr "కస్టమ్ GeoJSON అప్‌లోడ్ చేయండి"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:79
+#: app/templates/partials/project_details/setup_steps/step3_data.html:86
 msgid "Override the default OSM source for this project."
 msgstr "ఈ ప్రాజెక్ట్‌కు సిఫార్సు చేసిన డిఫాల్ట్‌లు సక్రియంగా ఉన్నాయి."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:85
+#: app/templates/partials/project_details/setup_steps/step3_data.html:92
 msgid "What to download"
 msgstr "ఏమి డౌన్‌లోడ్ చేయాలి"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:88
+#: app/templates/partials/project_details/setup_steps/step3_data.html:95
 msgid "OSM Buildings"
 msgstr "OSM భవనాలు"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:96
 msgid "OSM Highways"
 msgstr "OSM రహదారులు"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:90
+#: app/templates/partials/project_details/setup_steps/step3_data.html:97
 msgid "OSM Healthcare"
 msgstr "OSM ఆరోగ్య సేవలు"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:91
+#: app/templates/partials/project_details/setup_steps/step3_data.html:98
 msgid "OSM Toilets"
 msgstr "OSM మరుగుదొడ్లు"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:92
+#: app/templates/partials/project_details/setup_steps/step3_data.html:99
 msgid "OSM Religious"
 msgstr "OSM మత సంబంధిత"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:93
+#: app/templates/partials/project_details/setup_steps/step3_data.html:100
 msgid "OSM Landuse"
 msgstr "OSM భూ వినియోగం"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:94
+#: app/templates/partials/project_details/setup_steps/step3_data.html:101
 msgid "OSM Waterways"
 msgstr "OSM జలమార్గాలు"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:95
+#: app/templates/partials/project_details/setup_steps/step3_data.html:102
 msgid "OSM Water Points"
 msgstr "OSM నీటి కేంద్రాలు"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:96
+#: app/templates/partials/project_details/setup_steps/step3_data.html:103
 msgid "OSM Waste Disposal"
 msgstr "OSM వ్యర్థాల నిర్వాహణ"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:97
+#: app/templates/partials/project_details/setup_steps/step3_data.html:104
 msgid "OSM Education"
 msgstr "OSM విద్య"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:98
+#: app/templates/partials/project_details/setup_steps/step3_data.html:105
 msgid "OSM Cemeteries"
 msgstr "OSM సమాధి స్థలాలు"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:99
+#: app/templates/partials/project_details/setup_steps/step3_data.html:106
 msgid "OSM Amenities"
 msgstr "OSM సౌకర్యాలు"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:104
+#: app/templates/partials/project_details/setup_steps/step3_data.html:111
 msgid "Feature shape"
 msgstr "లక్షణాలు"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:107
+#: app/templates/partials/project_details/setup_steps/step3_data.html:114
 msgid "Polygon (area)"
 msgstr "బహుభుజం"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:108
+#: app/templates/partials/project_details/setup_steps/step3_data.html:115
 msgid "Line"
 msgstr "పాలీలైన్"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:109
+#: app/templates/partials/project_details/setup_steps/step3_data.html:116
 msgid "Point"
 msgstr "బిందువు"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:117
+#: app/templates/partials/project_details/setup_steps/step3_data.html:124
 msgid "Use Centroids (For OSM Data Download)"
 msgstr "కేంద్ర బిందువులను ఉపయోగించండి (OSM డేటా డౌన్‌లోడ్ కోసం)"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:120
+#: app/templates/partials/project_details/setup_steps/step3_data.html:127
 msgid "Convert polygons to single points."
 msgstr "బహుభుజాలను ఒక్కో పాయింట్లుగా మార్చండి."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:142
+#: app/templates/partials/project_details/setup_steps/step3_data.html:149
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "OSM డేటా ఎక్స్‌ట్రాక్ట్ రూపొందుతోంది... దీనికి కొంత సమయం పట్టవచ్చు."
 
@@ -3013,11 +3196,21 @@ msgstr ""
 "తర్వాత అంగీకరించండి. లేదా మొత్తం ప్రాంతాన్ని ఒకే పనిగా ఉపయోగించడానికి "
 "దాటవేయండి."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:29
+#: app/templates/partials/project_details/setup_steps/step4_split.html:27
+#, python-format
+msgid "This will discard %(count)s existing task assignment(s). Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:32
 msgid "Skip splitting"
 msgstr "విభజిస్తోంది..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:50
+#: app/templates/partials/project_details/setup_steps/step4_split.html:49
+#, python-format
+msgid "Re-splitting discards %(count)s existing task assignment(s). Continue?"
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step4_split.html:56
 msgid ""
 "When splitting by building count, these linear features are used as "
 "natural task\n"
@@ -3026,79 +3219,79 @@ msgstr ""
 "భవనాల సంఖ్య ఆధారంగా విభజించేటప్పుడు, ఈ రేఖీయ ఫీచర్లు సహజ పనుల "
 "సరిహద్దులుగా ఉపయోగించబడతాయి."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:75
+#: app/templates/partials/project_details/setup_steps/step4_split.html:81
 msgid "Include roads"
 msgstr "రహదారులను చేర్చండి"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:84
+#: app/templates/partials/project_details/setup_steps/step4_split.html:90
 msgid "Include rivers"
 msgstr "నదులను చేర్చండి"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:93
+#: app/templates/partials/project_details/setup_steps/step4_split.html:99
 msgid "Include railways"
 msgstr "రైలుమార్గాలను చేర్చండి"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:102
+#: app/templates/partials/project_details/setup_steps/step4_split.html:108
 msgid "Include aeroways"
 msgstr "విమాన మార్గాలను చేర్చండి"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:115
+#: app/templates/partials/project_details/setup_steps/step4_split.html:121
 msgid "How to split"
 msgstr "ఎలా విభజించాలి"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:117
+#: app/templates/partials/project_details/setup_steps/step4_split.html:123
 msgid "Choose a method..."
 msgstr "ఒక పద్ధతి ఎంచుకోండి..."
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:118
+#: app/templates/partials/project_details/setup_steps/step4_split.html:124
 msgid "By number of buildings (faster)"
 msgstr "భవనాల సంఖ్య ప్రకారం (వేగంగా)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:120
+#: app/templates/partials/project_details/setup_steps/step4_split.html:126
 msgid ""
 "By number of buildings (cleaner shapes) - unavailable\n"
 "            for large areas"
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:121
+#: app/templates/partials/project_details/setup_steps/step4_split.html:127
 msgid "By number of buildings (cleaner shapes)"
 msgstr "భవనాల సంఖ్య ప్రకారం (శుభ్రమైన ఆకారాలు)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:124
+#: app/templates/partials/project_details/setup_steps/step4_split.html:130
 msgid "By a regular grid"
 msgstr "నియమిత గ్రిడ్ ప్రకారం"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:125
+#: app/templates/partials/project_details/setup_steps/step4_split.html:131
 msgid "Into a fixed number of tasks"
 msgstr "నిర్దిష్ట పనుల సంఖ్య ప్రకారం విభజించు (త్వరలో)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:129
+#: app/templates/partials/project_details/setup_steps/step4_split.html:135
 msgid "Cleaner shapes is disabled for this area."
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:130
+#: app/templates/partials/project_details/setup_steps/step4_split.html:136
 msgid ""
 "It becomes geometrically unstable above ~5,000 features. Use the\n"
 "          faster option instead."
 msgstr ""
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:137
+#: app/templates/partials/project_details/setup_steps/step4_split.html:143
 msgid "Buildings per task"
 msgstr "ఒక పనికి సగటు భవనాలు:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:148
+#: app/templates/partials/project_details/setup_steps/step4_split.html:154
 msgid "Number of tasks"
 msgstr "పనుల సంఖ్య:"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:160
+#: app/templates/partials/project_details/setup_steps/step4_split.html:166
 msgid "Grid square size (metres)"
 msgstr "గ్రిడ్ చతురస్ర పరిమాణం (మీటర్లు)"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:179
+#: app/templates/partials/project_details/setup_steps/step4_split.html:185
 msgid "Split Again"
 msgstr "మళ్లీ విభజించు"
 
-#: app/templates/partials/project_details/setup_steps/step4_split.html:213
+#: app/templates/partials/project_details/setup_steps/step4_split.html:219
 msgid "Splitting area into tasks... This may take a moment."
 msgstr "AOI ను పనులుగా విభజిస్తోంది... దీనికి కొంత సమయం పట్టవచ్చు."
 

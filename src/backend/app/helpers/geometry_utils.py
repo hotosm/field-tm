@@ -160,6 +160,54 @@ def get_featcol_dominant_geom_type(featcol: dict) -> str:
     return max(geometry_counts, key=lambda key: geometry_counts[key])
 
 
+def _valid_task_id(task_id) -> bool:
+    """A valid task id is a positive integer (bools excluded)."""
+    return isinstance(task_id, int) and not isinstance(task_id, bool) and task_id > 0
+
+
+def stamp_missing_task_ids(featcol: dict) -> dict:
+    """Stamp a stable integer ``task_id`` onto features lacking a valid one.
+
+    A valid id is a unique positive integer; digit-strings are normalized to
+    int in place. Features whose id is missing, malformed (non-int, zero,
+    negative, bool), or a duplicate of an earlier feature's id are re-stamped
+    with the smallest unused positive integers (starting from 1), so the
+    collection always ends up with unique integer ids.
+    """
+    features = featcol.get("features", []) if isinstance(featcol, dict) else []
+
+    # First pass: normalize digit-strings and reserve valid first-seen ids
+    existing_ids = set()
+    for feature in features:
+        properties = feature.get("properties")
+        if not isinstance(properties, dict):
+            properties = {}
+            feature["properties"] = properties
+        task_id = properties.get("task_id")
+        if isinstance(task_id, str) and task_id.isdigit():
+            task_id = int(task_id)
+            properties["task_id"] = task_id
+        if _valid_task_id(task_id):
+            existing_ids.add(task_id)
+
+    # Second pass: re-stamp anything missing, malformed, or duplicated
+    next_id = 1
+    seen_ids = set()
+    for feature in features:
+        properties = feature["properties"]
+        task_id = properties.get("task_id")
+        if _valid_task_id(task_id) and task_id not in seen_ids:
+            seen_ids.add(task_id)
+            continue
+        while next_id in existing_ids:
+            next_id += 1
+        properties["task_id"] = next_id
+        existing_ids.add(next_id)
+        seen_ids.add(next_id)
+
+    return featcol
+
+
 async def check_crs(  # noqa: C901
     input_geojson: dict,
 ):

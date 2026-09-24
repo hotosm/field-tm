@@ -14,11 +14,13 @@ log = logging.getLogger(__name__)
 
 
 def parse_json_payload(
-    raw_value, invalid_message: str, log_prefix: str
+    raw_value, invalid_message: str, log_prefix: str, *, unescape: bool = True
 ) -> tuple[dict | None, Response | None]:
     try:
         normalized_value = (
-            html.unescape(raw_value) if isinstance(raw_value, str) else raw_value
+            html.unescape(raw_value)
+            if unescape and isinstance(raw_value, str)
+            else raw_value
         )
         return json.loads(normalized_value), None
     except (json.JSONDecodeError, TypeError) as e:

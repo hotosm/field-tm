@@ -2,6 +2,9 @@
 
 from litestar import Router
 
+from app.htmx.assignment.assignment_routes import (
+    ROUTE_HANDLERS as ASSIGNMENT_HANDLERS,
+)
 from app.htmx.basemap.basemap_routes import ROUTE_HANDLERS as BASEMAP_HANDLERS
 from app.htmx.landing_routes import landing, login_page, metrics_partial
 from app.htmx.project_create.project_create_page_routes import (
@@ -83,5 +86,6 @@ htmx_router = Router(
         *SETUP_STEP_VALIDATE_HANDLERS,
         *QFC_ADMIN_HANDLERS,
         *BASEMAP_HANDLERS,
+        *ASSIGNMENT_HANDLERS,
     ],
 )

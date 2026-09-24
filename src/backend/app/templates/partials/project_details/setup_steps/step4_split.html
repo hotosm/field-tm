@@ -23,6 +23,14 @@ if has_task_areas %}
       hx-post="/skip-task-split-htmx?project_id={% if project %}{{ project.id }}{% endif %}&mode=fragment"
       hx-target="#split-status"
       hx-swap="innerHTML"
+      {%
+      if
+      assigned_task_count
+      %}
+      hx-confirm="{{ _('This will discard %(count)s existing task assignment(s). Continue?') % {'count': assigned_task_count} }}"
+      {%
+      endif
+      %}
       class="wa-button wa-button--default"
       style="min-width: 120px"
     >
@@ -42,6 +50,14 @@ if has_task_areas %}
     hx-target="#split-status"
     hx-swap="innerHTML"
     hx-indicator="#split-loading"
+    {%
+    if
+    assigned_task_count
+    %}
+    hx-confirm="{{ _('Re-splitting discards %(count)s existing task assignment(s). Continue?') % {'count': assigned_task_count} }}"
+    {%
+    endif
+    %}
     style="margin-bottom: 15px"
   >
     <div id="split-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">

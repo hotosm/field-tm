@@ -9,6 +9,7 @@ from litestar.response import Response, Template
 
 from app.htmx.map_helpers import render_leaflet_map
 from app.i18n import _
+from app.projects.project_services import count_assigned_tasks
 
 from ..htmx_helpers import callout as _callout
 
@@ -152,6 +153,11 @@ def build_split_preview_response(
             "split_preview_msg": split_preview_msg,
             "map_html_content": map_html_content,
             "tasks_geojson_str": tasks_geojson_str,
+            # Accepting the split overwrites the stored task areas; warn
+            # first when that would discard existing assignments.
+            "discard_assignment_count": count_assigned_tasks(
+                getattr(project, "task_areas_geojson", None)
+            ),
         },
         media_type="text/html",
         status_code=status.HTTP_200_OK,

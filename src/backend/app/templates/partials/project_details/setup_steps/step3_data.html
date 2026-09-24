@@ -22,6 +22,14 @@
       hx-target="#osm-data-status"
       hx-swap="innerHTML"
       hx-indicator="#download-spinner"
+      {%
+      if
+      assigned_task_count
+      %}
+      hx-confirm="{{ _('Replacing the data extract discards %(count)s existing task assignment(s). Continue?') % {'count': assigned_task_count} }}"
+      {%
+      endif
+      %}
       class="wa-button wa-button--brand"
       style="min-width: 200px; position: relative"
     >
@@ -48,6 +56,14 @@
       hx-post="/collect-new-data-only-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
       hx-target="#osm-data-status"
       hx-swap="innerHTML"
+      {%
+      if
+      assigned_task_count
+      %}
+      hx-confirm="{{ _('Replacing the data extract discards %(count)s existing task assignment(s). Continue?') % {'count': assigned_task_count} }}"
+      {%
+      endif
+      %}
       class="wa-button wa-button--default"
       style="min-width: 200px"
     >
@@ -153,6 +169,14 @@
     hx-target="#osm-data-status"
     hx-swap="innerHTML"
     hx-encoding="multipart/form-data"
+    {%
+    if
+    assigned_task_count
+    %}
+    hx-confirm="{{ _('Replacing the data extract discards %(count)s existing task assignment(s). Continue?') % {'count': assigned_task_count} }}"
+    {%
+    endif
+    %}
     style="display: none"
   >
     <input type="file" name="data" id="geojson-file-input" accept=".geojson,.json" required />
