@@ -75,6 +75,8 @@ publish output_dir="site":
   #!/usr/bin/env sh
   set -eu
 
+  just test backend-with-coverage-upload
+  
   just docs openapi
   just docs build "{{ output_dir }}"
 
