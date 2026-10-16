@@ -74,3 +74,31 @@ Database service DNS name inside the cluster.
 {{- define "field-tm.dbServiceHost" -}}
 {{- printf "%s.%s.svc.cluster.local" (include "field-tm.dbServiceName" .) .Release.Namespace -}}
 {{- end }}
+
+{{/*
+Bundled Hanko auth service name.
+*/}}
+{{- define "field-tm.hankoServiceName" -}}
+{{- printf "%s-hanko" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end }}
+
+{{/*
+Bundled Hanko auth service DNS name inside the cluster.
+*/}}
+{{- define "field-tm.hankoServiceHost" -}}
+{{- printf "%s.%s.svc.cluster.local" (include "field-tm.hankoServiceName" .) .Release.Namespace -}}
+{{- end }}
+
+{{/*
+Bundled Hanko database service name.
+*/}}
+{{- define "field-tm.hankoDbServiceName" -}}
+{{- printf "%s-hanko-db" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- end }}
+
+{{/*
+Bundled Hanko database service DNS name inside the cluster.
+*/}}
+{{- define "field-tm.hankoDbServiceHost" -}}
+{{- printf "%s.%s.svc.cluster.local" (include "field-tm.hankoDbServiceName" .) .Release.Namespace -}}
+{{- end }}

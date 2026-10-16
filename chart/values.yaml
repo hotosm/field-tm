@@ -88,6 +88,57 @@ volumeMounts: []
 command: []
 args: []
 
+# Self-contained auth: deploy a bundled Hanko instance (+ its own PostGIS db)
+# alongside field-tm, mirroring deploy/compose.login.yaml. Set env.AUTH_PROVIDER
+# to "bundled" (the backend default) to point the backend at it automatically.
+auth:
+  bundled:
+    enabled: false
+    image:
+      repository: ghcr.io/teamhanko/hanko
+      tag: v2.1.0
+      pullPolicy: IfNotPresent
+    # HANKO_SECRET must be a base64-encoded 32-byte value, e.g.
+    # `openssl rand -base64 32`. Required whenever auth.bundled.enabled=true.
+    # TODO this is mostly for local dev, so do we need secret based config?
+    secret:
+      hankoSecret: ""
+      smtpUser: ""
+      smtpPassword: ""
+      googleClientSecret: ""
+    # Non-secret Hanko config. Mirrors contrib/login/hanko-config.tpl.yaml.
+    config:
+      # Origin field-tm is served on, e.g. https://field.example.com.
+      allowedOrigin: http://field.localhost
+      cookieDomain: field.localhost
+      redirectUrl: http://field.localhost
+      smtpHost: ""
+      smtpPort: 587
+      smtpFromAddress: ""
+      googleEnabled: false
+      googleClientId: ""
+    resources: {}
+    db:
+      # Default is an in-cluster PostGIS database, dedicated to Hanko (kept
+      # separate from the main `db` block). Set to false and provide `host`
+      # below to point at an external database instead.
+      enabled: true
+      image:
+        repository: ghcr.io/hotosm/postgis
+        tag: 18-3.6-alpine
+        pullPolicy: IfNotPresent
+      auth:
+        username: hanko
+        password: hanko
+        database: hanko
+      # Only used when db.enabled=false, to point at an external Hanko database.
+      host: ""
+      resources: {}
+      persistence:
+        enabled: true
+        size: 2Gi
+        storageClassName: ""
+
 db:
   # Default is to use an external database; enable for local/in-cluster PostGIS.
   enabled: false

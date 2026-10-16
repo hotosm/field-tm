@@ -1,0 +1,19 @@
+{{- if and .Values.auth.bundled.enabled .Values.auth.bundled.db.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "field-tm.hankoDbServiceName" . }}
+  labels:
+    {{- include "field-tm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: hanko-db
+spec:
+  type: ClusterIP
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+      protocol: TCP
+  selector:
+    {{- include "field-tm.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: hanko-db
+{{- end }}

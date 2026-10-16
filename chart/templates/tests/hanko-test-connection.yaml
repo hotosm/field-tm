@@ -1,0 +1,17 @@
+{{- if .Values.auth.bundled.enabled -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "field-tm.hankoServiceName" . }}-test-connection"
+  labels:
+    {{- include "field-tm.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "field-tm.hankoServiceName" . }}:8000/.well-known/jwks.json']
+  restartPolicy: Never
+{{- end }}

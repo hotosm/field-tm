@@ -1,0 +1,23 @@
+{{- if .Values.auth.bundled.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "field-tm.hankoServiceName" . }}
+  labels:
+    {{- include "field-tm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: hanko
+spec:
+  type: ClusterIP
+  ports:
+    - name: public
+      port: 8000
+      targetPort: public
+      protocol: TCP
+    - name: admin
+      port: 8001
+      targetPort: admin
+      protocol: TCP
+  selector:
+    {{- include "field-tm.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: hanko
+{{- end }}

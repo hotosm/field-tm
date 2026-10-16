@@ -45,6 +45,37 @@ kubectl
     --from-literal=OSM_SECRET_KEY=xxxxxxx
   ```
 
+## Bundled Hanko auth
+
+Set `auth.bundled.enabled=true` to deploy a self-hosted Hanko instance (plus
+its own in-cluster PostGIS database) alongside field-tm, mirroring
+`deploy/compose.login.yaml`. The backend's `HANKO_API_URL` is then pointed at
+the in-cluster Hanko service automatically - just make sure `AUTH_PROVIDER`
+(the backend default is `bundled`) matches.
+
+`auth.bundled.secret.hankoSecret` is required whenever `auth.bundled.enabled`
+is `true` - generate one with `openssl rand -base64 32`. Set
+`auth.bundled.config.allowedOrigin`, `cookieDomain` and `redirectUrl` to the
+public URL field-tm is served on (defaults are for local dev only).
+
+```bash
+helm upgrade --install field-tm . \
+  --set auth.bundled.enabled=true \
+  --set auth.bundled.secret.hankoSecret="$(openssl rand -base64 32)" \
+  --set auth.bundled.config.allowedOrigin=https://field.example.com \
+  --set auth.bundled.config.cookieDomain=field.example.com \
+  --set auth.bundled.config.redirectUrl=https://field.example.com
+```
+
+By default `auth.bundled.db.enabled=true` runs an in-cluster PostGIS database
+dedicated to Hanko. Set it to `false` and provide `auth.bundled.db.host` to
+point at an external database instead.
+
+This first pass covers the base Hanko `Deployment`/`Service`/config plus its
+own database - it does not yet wire up ingress for a public `login.<domain>`
+host (see `deploy/compose.login.yaml` for the equivalent reverse-proxy config)
+or SMTP/Google OAuth secrets beyond what's exposed under `auth.bundled`.
+
 ## Deployment
 
 ```bash

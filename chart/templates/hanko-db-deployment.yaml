@@ -1,0 +1,77 @@
+{{- if and .Values.auth.bundled.enabled .Values.auth.bundled.db.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "field-tm.hankoDbServiceName" . }}
+  labels:
+    {{- include "field-tm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: hanko-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "field-tm.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: hanko-db
+  template:
+    metadata:
+      labels:
+        {{- include "field-tm.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: hanko-db
+    spec:
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: postgis
+          image: "{{ .Values.auth.bundled.db.image.repository }}:{{ .Values.auth.bundled.db.image.tag }}"
+          imagePullPolicy: {{ .Values.auth.bundled.db.image.pullPolicy }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+          env:
+            - name: POSTGRES_USER
+              value: {{ .Values.auth.bundled.db.auth.username | quote }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.auth.bundled.db.auth.password | quote }}
+            - name: POSTGRES_DB
+              value: {{ .Values.auth.bundled.db.auth.database | quote }}
+          resources:
+            {{- toYaml .Values.auth.bundled.db.resources | nindent 12 }}
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: hanko-db-data
+              mountPath: /var/lib/postgresql
+      volumes:
+        - name: hanko-db-data
+          {{- if .Values.auth.bundled.db.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "field-tm.hankoDbServiceName" . }}-data
+          {{- else }}
+          emptyDir: {}
+          {{- end }}
+{{- end }}
