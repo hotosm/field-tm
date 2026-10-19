@@ -32,6 +32,8 @@ Item {
   property string currentUser: ""
   property var currentTask: undefined
   property bool currentTaskHasAddedFeature: false
+  property var myTaskIds: []
+  property var pendingTask: undefined
 
   property var tasksLayer: qgisProject.mapLayersByName("tasks")[0];
   property var surveyLayer: qgisProject.mapLayersByName("survey")[0];
@@ -114,6 +116,23 @@ Item {
           Layout.fillWidth: true
           Layout.preferredHeight: text !== "" ? contentHeight : 0
           font: Theme.tipFont
+          color: "#222222"
+          wrapMode: Text.WordWrap
+          linkColor: fieldTM.mainColor
+
+          text: fieldTM.myTaskIds.length > 0 ? `<a href=\"#mytasks\">${qsTranslate("FieldTM", "Your tasks: %1").arg(fieldTM.myTaskIds.map(id => "#" + id).join(", "))}</a>` : ""
+
+          onLinkActivated: (link) => {
+            if (link === "#mytasks") {
+              zoomToMyTasks();
+            }
+          }
+        }
+
+        Text {
+          Layout.fillWidth: true
+          Layout.preferredHeight: text !== "" ? contentHeight : 0
+          font: Theme.tipFont
           color: "#f67c0f"
           wrapMode: Text.WordWrap
 
@@ -139,6 +158,48 @@ Item {
             }
           }
         }
+      }
+    }
+
+    Rectangle {
+      id: taskInfoContainer
+      anchors {
+        top: parent.top
+        left: parent.left
+        right: parent.right
+        topMargin: 24
+      }
+
+      height: taskInfoText.text !== "" ? taskInfoText.contentHeight + 48 : 0
+      Behavior on height {
+        PropertyAnimation {
+          duration: 250
+          easing.type: Easing.OutQuart
+        }
+      }
+
+      color: "#ffffff"
+      border.width: 1
+      border.color: "#fdcfd6"
+      radius: 12
+      clip: true
+
+      Text {
+        id: taskInfoText
+        anchors {
+          top: parent.top
+          left: parent.left
+          right: parent.right
+          topMargin: 36
+          leftMargin: 12
+          rightMargin: 12
+        }
+        font: Theme.tipFont
+        color: "#222222"
+        wrapMode: Text.WordWrap
+        textFormat: Text.PlainText
+
+        text: fieldTM.currentTask !== undefined ? taskInfoSummary(fieldTM.currentTask) : ""
       }
     }
 
@@ -204,10 +265,12 @@ Item {
 
           onClicked: {
             if (fieldTM.currentTask !== undefined) {
-              if (fieldTM.reader) {
-                mainWindow.displayToast(qsTranslate("FieldTM", "Leaving task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+              const taskId = fieldTM.currentTask.attribute("task_id");
+              if (!fieldTM.reader && isAssignedToMe(fieldTM.currentTask)) {
+                releaseTask(fieldTM.currentTask);
+                mainWindow.displayToast(qsTranslate("FieldTM", "Released task #%1").arg(taskId));
               } else {
-                mainWindow.displayToast(qsTranslate("FieldTM", "Released task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+                mainWindow.displayToast(qsTranslate("FieldTM", "Leaving task #%1").arg(taskId));
               }
               fieldTM.currentTask = undefined;
             }
@@ -230,24 +293,8 @@ Item {
 
           onClicked: {
             if (fieldTM.currentTask !== undefined) {
-              // TODO: should we bail out when detecting incomplete survey features?
-
-              // Check if the task is ready to be marked as complete
-              //let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.surveyLayer, "intersects(@geometry, geom_from_wkt('" + fieldTM.currentTask.geometry.asWkt(8) + "'))")
-              //let allowMarkAsCompleted = it.hasNext()
-              //while (it.hasNext()) {
-              //  const feature = it.next()
-              //  if (feature.attribute("status") == "") { // type coercion required
-              //    allowMarkAsCompleted = false;
-              //  }
-              //}
-              //delete it;
-
               if (!fieldTM.reader) {
-                fieldTM.tasksLayer.startEditing();
-                fieldTM.tasksLayer.changeAttributeValue(fieldTM.currentTask.id, fieldTM.tasksLayer.fields.indexOf("status"), "completed");
-                fieldTM.tasksLayer.commitChanges();
-                pushToCloud();
+                setTaskAttributes(fieldTM.currentTask, { "status": "completed" });
 
                 mainWindow.displayToast(qsTranslate("FieldTM", "Marked task #%1 as completed").arg(fieldTM.currentTask.attribute("task_id")));
                 rewardEmitter.reward();
@@ -279,8 +326,7 @@ Item {
           visible: fieldTM.currentTask !== undefined
 
           onClicked: {
-            let filterExpression = "intersects(@geometry, geom_from_wkt('"+fieldTM.currentTask.geometry.asWkt(8)+"'))"
-            fieldTM.featureListForm.model.setFeatures(fieldTM.surveyLayer, filterExpression);
+            fieldTM.featureListForm.model.setFeatures(fieldTM.surveyLayer, taskIntersectsExpression(fieldTM.currentTask));
             featureListForm.extentController.zoomToAllFeatures();
           }
         }
@@ -309,6 +355,40 @@ Item {
           }
         }
       }
+    }
+  }
+
+  Dialog {
+    id: takeoverDialog
+    parent: mainWindow.contentItem
+    modal: true
+    font: Theme.defaultFont
+    title: qsTranslate("FieldTM", "Task already assigned")
+
+    property string assignee: ""
+
+    x: (mainWindow.width - width) / 2
+    y: (mainWindow.height - height - 80) / 2
+
+    Label {
+      width: Math.min(mainWindow.width - 60, 400)
+      font: Theme.defaultFont
+      color: Theme.mainTextColor
+      wrapMode: Text.WordWrap
+      textFormat: Text.PlainText
+      text: fieldTM.pendingTask !== undefined ? qsTranslate("FieldTM", "Task #%1 is assigned to %2. Enter it anyway? It will stay assigned to them.").arg(taskAttribute(fieldTM.pendingTask, "task_id")).arg(takeoverDialog.assignee) : ""
+    }
+
+    standardButtons: Dialog.Ok | Dialog.Cancel
+
+    onAccepted: {
+      if (fieldTM.pendingTask !== undefined) {
+        enterTask(fieldTM.pendingTask, false);
+      }
+      fieldTM.pendingTask = undefined;
+    }
+    onRejected: {
+      fieldTM.pendingTask = undefined;
     }
   }
 
@@ -398,6 +478,118 @@ Item {
     }
   }
 
+  // Quote a value as a QGIS expression string literal ('' escapes ').
+  function quoteExpressionString(value) {
+    return "'" + String(value === undefined || value === null ? "" : value).split("'").join("''") + "'";
+  }
+
+  function taskIntersectsExpression(task) {
+    return `intersects(@geometry, geom_from_wkt(${quoteExpressionString(task.geometry.asWkt(8))}))`;
+  }
+
+  function taskAttribute(task, name) {
+    const value = task.attribute(name);
+    return value === undefined || value === null ? "" : String(value);
+  }
+
+  function isAssignedToMe(task) {
+    return fieldTM.currentUser !== "" && taskAttribute(task, "assigned_to").toLowerCase() === fieldTM.currentUser.toLowerCase();
+  }
+
+  // Name of whoever else holds the task, or "" if it is free / ours.
+  function otherAssignee(task) {
+    if (isAssignedToMe(task)) {
+      return "";
+    }
+    const assignee = taskAttribute(task, "assigned_to");
+    if (assignee !== "") {
+      return assignee;
+    }
+    return taskAttribute(task, "status") === "in_progress" ? qsTranslate("FieldTM", "another mapper") : "";
+  }
+
+  function taskInfoSummary(task) {
+    let lines = [qsTranslate("FieldTM", "Task #%1").arg(taskAttribute(task, "task_id"))];
+    const group = taskAttribute(task, "assigned_group");
+    const assignee = taskAttribute(task, "assigned_to");
+    const comment = taskAttribute(task, "comment");
+    if (group !== "") {
+      lines.push(qsTranslate("FieldTM", "Team: %1").arg(group));
+    }
+    if (assignee !== "") {
+      lines.push(qsTranslate("FieldTM", "Assigned to: %1").arg(assignee));
+    }
+    if (comment !== "") {
+      lines.push(comment);
+    }
+    return lines.length > 1 ? lines.join("\n") : "";
+  }
+
+  function setTaskAttributes(task, values) {
+    fieldTM.tasksLayer.startEditing();
+    for (const name in values) {
+      fieldTM.tasksLayer.changeAttributeValue(task.id, fieldTM.tasksLayer.fields.indexOf(name), values[name]);
+      task.setAttribute(name, values[name]);
+    }
+    fieldTM.tasksLayer.commitChanges();
+    pushToCloud();
+    refreshMyTasks();
+  }
+
+  function claimTask(task) {
+    if (!fieldTM.reader && taskAttribute(task, "assigned_to") === "") {
+      setTaskAttributes(task, { "assigned_to": fieldTM.currentUser });
+      return true;
+    }
+    return false;
+  }
+
+  function releaseTask(task) {
+    let values = { "assigned_to": "" };
+    if (taskAttribute(task, "status") !== "completed") {
+      values["status"] = "available";
+    }
+    setTaskAttributes(task, values);
+  }
+
+  function enterTask(task, claim) {
+    fieldTM.currentTask = task;
+    const taskId = taskAttribute(task, "task_id");
+    if (fieldTM.reader) {
+      mainWindow.displayToast(qsTranslate("FieldTM", "Viewing task #%1").arg(taskId));
+    } else if (claim && claimTask(task)) {
+      mainWindow.displayToast(qsTranslate("FieldTM", "Assigned task #%1").arg(taskId));
+    } else {
+      mainWindow.displayToast(qsTranslate("FieldTM", "Entered task #%1").arg(taskId));
+    }
+  }
+
+  function refreshMyTasks() {
+    let ids = [];
+    if (fieldTM.currentUser !== "") {
+      let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, `lower(coalesce("assigned_to", '')) = lower(${quoteExpressionString(fieldTM.currentUser)}) and coalesce("status", '') != 'completed'`);
+      while (it.hasNext()) {
+        ids.push(it.next().attribute("task_id"));
+      }
+      delete it;
+    }
+    ids.sort((a, b) => a - b);
+    fieldTM.myTaskIds = ids;
+  }
+
+  function zoomToMyTasks() {
+    if (fieldTM.myTaskIds.length === 0) {
+      return;
+    }
+    let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, `"task_id" = ${quoteExpressionString(fieldTM.myTaskIds[0])}`);
+    if (it.hasNext()) {
+      const task = it.next();
+      const rectangle = GeometryUtils.reprojectRectangle(GeometryUtils.boundingBox(task.geometry), fieldTM.tasksLayer.crs, mapCanvas.mapSettings.destinationCrs);
+      mapCanvas.mapSettings.setExtent(rectangle, true);
+    }
+    delete it;
+  }
+
   function pushToCloud() {
     if (fieldTM.cloudProjectsModel.currentProject && fieldTM.cloudProjectsModel.currentProject.status === QFieldCloudProject.Idle) {
       fieldTM.cloudProjectsModel.projectPush(fieldTM.cloudProjectsModel.currentProjectId, false);
@@ -425,17 +617,12 @@ Item {
     if (fieldTM.currentTask != undefined && !fieldTM.reader) {
       // If it hadn't been assigned yet, lay claim on it
       if (fieldTM.currentTask.attribute("status") === "available") {
-        fieldTM.currentTask.setAttribute("status", "in_progress");
-
-        fieldTM.tasksLayer.startEditing();
-        fieldTM.tasksLayer.changeAttributeValue(fieldTM.currentTask.id, fieldTM.tasksLayer.fields.indexOf("status"), "in_progress");
-        fieldTM.tasksLayer.commitChanges();
-        pushToCloud();
+        setTaskAttributes(fieldTM.currentTask, { "status": "in_progress" });
       }
 
       if (!fieldTM.currentTaskHasAddedFeature && fieldTM.currentTask.attribute("status") !== "completed") {
-        // Check if the task is readu to be marked as complete
-        let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.surveyLayer, "intersects(@geometry, geom_from_wkt('" + fieldTM.currentTask.geometry.asWkt(8) + "'))")
+        // Check if the task is ready to be marked as complete
+        let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.surveyLayer, taskIntersectsExpression(fieldTM.currentTask))
         let markAsCompleted = it.hasNext()
         while (it.hasNext()) {
           const feature = it.next()
@@ -446,10 +633,7 @@ Item {
         delete it;
 
         if (markAsCompleted) {
-          fieldTM.tasksLayer.startEditing();
-          fieldTM.tasksLayer.changeAttributeValue(fieldTM.currentTask.id, fieldTM.tasksLayer.fields.indexOf("status"), "completed");
-          fieldTM.tasksLayer.commitChanges();
-          pushToCloud();
+          setTaskAttributes(fieldTM.currentTask, { "status": "completed" });
 
           mainWindow.displayToast(qsTranslate("FieldTM", "Completed task #%1").arg(fieldTM.currentTask.attribute("task_id")));
           rewardEmitter.reward();
@@ -510,7 +694,7 @@ Item {
     fieldTM.currentTaskHasAddedFeature = false
 
     if (currentTask != undefined) {
-      ExpressionContextUtils.setLayerVariable(tasksLayer,"current_task_id", currentTask.id);
+      ExpressionContextUtils.setLayerVariable(tasksLayer, "current_task_id", currentTask.attribute("task_id"));
       // Hide tasks from identify while inside a task so taps land on buildings
       // without a disambiguation popup. Bit 0 = QgsMapLayer::Identifiable.
       tasksLayer.flags = tasksLayer.flags & ~1;
@@ -528,8 +712,9 @@ Item {
     fieldTM.qfieldSettings.autoOpenFormSingleIdentify = true;
     fieldTM.qfieldSettings.autoZoomToIdentifiedFeature = true;
 
-    fieldTM.currentUser = projectInfo.cloudUserInformation.username;
+    fieldTM.currentUser = projectInfo.cloudUserInformation.username || "";
     fieldTM.reader = cloudProjectsModel.currentProject && cloudProjectsModel.currentProject.userRole === "reader";
+    ExpressionContextUtils.setLayerVariable(tasksLayer, "fieldtm_current_user", fieldTM.currentUser);
 
     // Single-task projects skip the locking UX: auto-claim the lone task so taps
     // land directly on the survey layer.
@@ -541,20 +726,15 @@ Item {
 
     if (fieldTM.singleTaskMode) {
       fieldTM.currentTask = firstTask;
-      if (!fieldTM.reader && fieldTM.currentTask.attribute("assigned_to") == "") {
-        fieldTM.tasksLayer.startEditing();
-        fieldTM.tasksLayer.changeAttributeValue(fieldTM.currentTask.id, fieldTM.tasksLayer.fields.indexOf("assigned_to"), fieldTM.currentUser);
-        fieldTM.tasksLayer.commitChanges();
-        pushToCloud();
-      }
+      claimTask(firstTask);
     } else {
-      let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, `"status" = 'in_progress' and "assigned_to" = '${fieldTM.currentUser}'`);
-      if (it.hasNext()) {
-        fieldTM.currentTask = it.next();
-      } else {
-        fieldTM.currentTask = undefined;
-      }
+      let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, `"status" = 'in_progress' and lower(coalesce("assigned_to", '')) = lower(${quoteExpressionString(fieldTM.currentUser)})`);
+      fieldTM.currentTask = it.hasNext() ? it.next() : undefined;
       delete it;
+    }
+    refreshMyTasks();
+    if (fieldTM.currentTask === undefined) {
+      zoomToMyTasks();
     }
 
     const pointHandler = iface.findItemByObjectName("pointHandler");
@@ -583,20 +763,16 @@ Item {
                                    const rectangle = GeometryUtils.reprojectRectangle(GeometryUtils.createRectangleFromPoints(tl, br), mapCanvas.mapSettings.destinationCrs, fieldTM.tasksLayer.crs);
 
                                    let it = LayerUtils.createFeatureIteratorFromRectangle(fieldTM.tasksLayer, rectangle);
-                                   if (it.hasNext()) {
-                                     fieldTM.currentTask = it.next();
-
-                                     if (!fieldTM.reader && fieldTM.currentTask.attribute("assigned_to") == "") {
-                                       fieldTM.tasksLayer.startEditing();
-                                       fieldTM.tasksLayer.changeAttributeValue(fieldTM.currentTask.id, fieldTM.tasksLayer.fields.indexOf("assigned_to"), fieldTM.currentUser);
-                                       fieldTM.tasksLayer.commitChanges();
-                                       pushToCloud();
-                                     }
-
-                                     if (fieldTM.reader) {
-                                       mainWindow.displayToast(qsTranslate("FieldTM", "Viewing task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+                                   const task = it.hasNext() ? it.next() : undefined;
+                                   delete it;
+                                   if (task !== undefined) {
+                                     const other = fieldTM.reader ? "" : otherAssignee(task);
+                                     if (other !== "") {
+                                       fieldTM.pendingTask = task;
+                                       takeoverDialog.assignee = other;
+                                       takeoverDialog.open();
                                      } else {
-                                       mainWindow.displayToast(qsTranslate("FieldTM", "Assigned task #%1").arg(fieldTM.currentTask.attribute("task_id")));
+                                       enterTask(task, true);
                                      }
                                    }
                                    return true;

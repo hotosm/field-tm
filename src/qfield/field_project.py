@@ -72,6 +72,7 @@ def xlsform_to_project(
     extent_rect = QgsReferencedRectangle(QgsRectangle(*extent_bbox), crs)
 
     from xlsform2qgis.converter import XLSFormConverter
+
     converter = XLSFormConverter(str(xlsform_path))
 
     if not converter.is_valid():
@@ -93,8 +94,7 @@ def xlsform_to_project(
             converter.set_geometries(features_layer)
         else:
             log.warning(
-                "Could not load features layer from %s, "
-                "proceeding without features",
+                "Could not load features layer from %s, proceeding without features",
                 features_gpkg_path,
             )
 
@@ -171,14 +171,18 @@ def _prepare_tasks_layer(
 ) -> Optional[str]:
     """Convert task GeoJSON to a packaged GeoPackage when available.
 
-    Adds ``status`` and ``assigned_to`` string columns to the tasks layer
-    so the field-tm QField plugin can drive task assignment state.
+    Ensures task plan columns (see ``_add_plugin_task_fields``) so the
+    field-tm QField plugin can drive task assignment state.
     """
     log.info("Processing task geometries")
     set_project_file_permissions(project_path)
     tasks_geojson_path = project_path / "tasks.geojson"
-    if not (tasks_geojson_path.exists() and validate_geometry_file(tasks_geojson_path, log)):
-        log.warning("No valid task geometries found, project will not have a tasks layer")
+    if not (
+        tasks_geojson_path.exists() and validate_geometry_file(tasks_geojson_path, log)
+    ):
+        log.warning(
+            "No valid task geometries found, project will not have a tasks layer"
+        )
         return None
 
     tasks_gpkg_path_input = analyse_and_fix_geometries(str(tasks_geojson_path), log)
@@ -191,35 +195,110 @@ def _prepare_tasks_layer(
     return str(tasks_gpkg_path_final)
 
 
+# String columns the field-tm QField plugin reads/writes on the tasks layer.
+# Values come from the task plan GeoJSON properties when present.
+PLUGIN_TASK_STRING_FIELDS = (
+    "status",
+    "assigned_to",
+    "assigned_group",
+    "comment",
+    "colour",
+)
+
+
+def _is_blank(value) -> bool:
+    """True for None, QVariant NULL or empty string."""
+    return value is None or str(value) in ("", "NULL")
+
+
+def _fill_blank_task_fields(layer, feature) -> None:
+    """Default blank task fields so plugin comparisons work."""
+    fields = layer.fields()
+    if _is_blank(feature["task_id"]):
+        layer.changeAttributeValue(
+            feature.id(), fields.indexOf("task_id"), feature.id()
+        )
+    for name in PLUGIN_TASK_STRING_FIELDS:
+        if _is_blank(feature[name]):
+            default = "available" if name == "status" else ""
+            layer.changeAttributeValue(feature.id(), fields.indexOf(name), default)
+
+
 def _add_plugin_task_fields(tasks_gpkg_path: str, log: logging.Logger) -> None:
-    """Add ``status`` and ``assigned_to`` string columns to the tasks layer."""
+    """Ensure task plan columns exist on the tasks layer.
+
+    Existing values from the input GeoJSON are kept; NULLs become ``""``
+    (``status`` defaults to ``available``) so plugin comparisons work.
+    """
     from qgis.core import QgsField, QgsVectorLayer
     from qgis.PyQt.QtCore import QMetaType
 
     layer = QgsVectorLayer(tasks_gpkg_path, "tasks", "ogr")
     if not layer.isValid():
-        log.warning("Could not open tasks GPKG to add plugin fields: %s", tasks_gpkg_path)
+        log.warning(
+            "Could not open tasks GPKG to add plugin fields: %s", tasks_gpkg_path
+        )
         return
-
-    status_field = QgsField("status", QMetaType.Type.QString)
-    assigned_to_field = QgsField("assigned_to", QMetaType.Type.QString)
 
     if not layer.startEditing():
         log.warning("Could not start editing tasks layer to add plugin fields")
         return
-    layer.addAttribute(status_field)
-    layer.addAttribute(assigned_to_field)
+    if layer.fields().indexOf("task_id") == -1:
+        layer.addAttribute(QgsField("task_id", QMetaType.Type.Int))
+    for name in PLUGIN_TASK_STRING_FIELDS:
+        if layer.fields().indexOf(name) == -1:
+            layer.addAttribute(QgsField(name, QMetaType.Type.QString))
 
-    status_idx = layer.fields().indexOf("status")
-    assigned_idx = layer.fields().indexOf("assigned_to")
     for feature in layer.getFeatures():
-        layer.changeAttributeValue(feature.id(), status_idx, "available")
-        layer.changeAttributeValue(feature.id(), assigned_idx, "")
+        _fill_blank_task_fields(layer, feature)
 
     if not layer.commitChanges():
         log.warning("Failed to commit plugin fields to tasks layer")
         return
-    log.info("Added status/assigned_to fields to tasks layer")
+    log.info("Ensured task plan fields on tasks layer")
+
+
+def _apply_task_colour_style(project, log: logging.Logger) -> None:
+    """Outline tasks in their ``colour`` property (e.g. team colour).
+
+    Only applied when at least one task has a colour; tasks without one
+    keep the bundled outline.
+    """
+    from qgis.core import QgsProperty, QgsRenderContext, QgsSymbolLayer
+
+    layers = project.mapLayersByName("tasks")
+    if not layers:
+        return
+    layer = layers[0]
+    if layer.fields().indexOf("colour") == -1:
+        return
+    if all(_is_blank(f["colour"]) for f in layer.getFeatures()):
+        return
+
+    renderer = layer.renderer()
+    if renderer is None:
+        return
+    has_colour = "coalesce(\"colour\", '') != ''"
+    for symbol in renderer.symbols(QgsRenderContext()):
+        for sl in symbol.symbolLayers():
+            if sl.layerType() != "SimpleFill":
+                continue
+            c = sl.strokeColor()
+            default = f"{c.red()},{c.green()},{c.blue()},{c.alpha()}"
+            sl.setDataDefinedProperty(
+                QgsSymbolLayer.Property.StrokeColor,
+                QgsProperty.fromExpression(
+                    f"if({has_colour}, \"colour\", '{default}')"
+                ),
+            )
+            sl.setDataDefinedProperty(
+                QgsSymbolLayer.Property.StrokeWidth,
+                QgsProperty.fromExpression(
+                    f"if({has_colour}, 0.8, {sl.strokeWidth()})"
+                ),
+            )
+    layer.triggerRepaint()
+    log.info("Applied task colour styling")
 
 
 def _add_plugin_survey_fields(project, log: logging.Logger) -> None:
@@ -244,14 +323,14 @@ def _add_plugin_survey_fields(project, log: logging.Logger) -> None:
             log.warning("Could not start editing survey layer to add plugin fields")
             return
         layer.addAttribute(QgsField("status", QMetaType.Type.QString))
-    
+
         status_idx = layer.fields().indexOf("status")
         for feature in layer.getFeatures():
             layer.changeAttributeValue(feature.id(), status_idx, "")
-    
+
         if not layer.commitChanges():
             log.warning("Failed to commit plugin fields to survey layer")
-            return    
+            return
         log.info("Added status field to survey layer")
     else:
         log.debug("Survey layer already has 'status' field; skipping creation")
@@ -441,7 +520,9 @@ def _load_bundled_basemaps(project, styles_dir: Path, log: logging.Logger) -> No
 
     qlr_path = styles_dir / "basemaps.qlr"
     if not qlr_path.is_file():
-        log.debug("No basemaps.qlr in plugin styles dir; skipping bundled basemap group")
+        log.debug(
+            "No basemaps.qlr in plugin styles dir; skipping bundled basemap group"
+        )
         return
 
     ok, message = QgsLayerDefinition.loadLayerDefinition(
@@ -509,7 +590,9 @@ def _set_basemap_map_themes(project, log: logging.Logger) -> None:
     log.info("Defined OpenStreetMap and Satellite map themes")
 
 
-def _read_job_inputs(db_url: str, job_id: str, project_path: Path, log: logging.Logger) -> None:
+def _read_job_inputs(
+    db_url: str, job_id: str, project_path: Path, log: logging.Logger
+) -> None:
     """Read input files from the qgis_jobs table and write to local temp dir."""
     with psycopg.connect(db_url) as conn, conn.cursor() as cur:
         cur.execute(
@@ -577,9 +660,9 @@ def _write_job_outputs(
             continue
 
         relative_key = file_path.relative_to(final_dir).as_posix()
-        output_files[relative_key] = base64.b64encode(
-            file_path.read_bytes()
-        ).decode("ascii")
+        output_files[relative_key] = base64.b64encode(file_path.read_bytes()).decode(
+            "ascii"
+        )
         log.debug(
             "Collected output file: %s (%d bytes)",
             relative_key,
@@ -595,7 +678,6 @@ def _write_job_outputs(
 
     log.info("Wrote %d output files to DB for job %s", len(output_files), job_id)
     return len(output_files)
-
 
 
 def generate_qgis_project(
@@ -638,17 +720,24 @@ def generate_qgis_project(
             open_in_edit_mode,
             log,
         )
-        tasks_gpkg_path_final = _prepare_tasks_layer(project_path, final_output_dir, log)
+        tasks_gpkg_path_final = _prepare_tasks_layer(
+            project_path, final_output_dir, log
+        )
 
         log.info("Opening generated QGIS project to add task layer")
         project = _load_generated_project(project_file)
         _add_task_layer_to_project(project, tasks_gpkg_path_final, log)
         _add_plugin_survey_fields(project, log)
         if tasks_gpkg_path_final:
-            _add_project_area_layer(project, tasks_gpkg_path_final, final_output_dir, log)
+            _add_project_area_layer(
+                project, tasks_gpkg_path_final, final_output_dir, log
+            )
         _normalize_root_layer_order(project, log)
 
-        _apply_plugin_and_styles(project, plugin_zip, final_output_dir, project_file, log)
+        _apply_plugin_and_styles(
+            project, plugin_zip, final_output_dir, project_file, log
+        )
+        _apply_task_colour_style(project, log)
 
         # Add metadata details
         project_metadata = project.metadata()
@@ -690,7 +779,11 @@ def generate_qgis_project(
 
 def _qfc_api_root(qfield_cloud_url: Optional[str] = None) -> str:
     """Resolve QFieldCloud API URL from payload or environment."""
-    base = (qfield_cloud_url or os.environ.get("QFIELDCLOUD_URL") or "").strip().rstrip("/")
+    base = (
+        (qfield_cloud_url or os.environ.get("QFIELDCLOUD_URL") or "")
+        .strip()
+        .rstrip("/")
+    )
     if not base:
         raise RuntimeError("QFIELDCLOUD_URL is required for basemap attachment")
     if base.endswith("/api/v1"):

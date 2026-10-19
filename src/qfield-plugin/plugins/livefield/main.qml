@@ -1,3 +1,4 @@
+import QtCore
 import QtQuick
 import QtQuick.Controls
 import QtWebSockets
@@ -8,6 +9,9 @@ import Theme
 
 import "qrc:/qml" as QFieldItems
 
+// Opt-in live location sharing. Nothing is sent until the user explicitly
+// enables sharing (persisted in Settings). A project variable
+// `fieldtm_livefield_enabled` = false hides the plugin entirely.
 Item {
   id: plugin
 
@@ -21,7 +25,31 @@ Item {
   property string userName: projectInfo && projectInfo.cloudUserInformation ? (projectInfo.cloudUserInformation.username || "") : ""
   property string groupToken: cloudProjectsModel && cloudProjectsModel.currentProject ? (cloudProjectsModel.currentProject.owner + "/" + cloudProjectsModel.currentProject.name) : ""
 
+  property bool allowedByProject: true
+  readonly property bool sharingEnabled: allowedByProject && liveFieldSettings.sharingEnabled
+
+  Settings {
+    id: liveFieldSettings
+    category: "fieldtm_livefield"
+    property bool sharingEnabled: false
+  }
+
+  function readProjectVariable() {
+    try {
+      const vars = ExpressionContextUtils.projectVariables(qgisProject);
+      const value = vars ? vars["fieldtm_livefield_enabled"] : undefined;
+      if (value !== undefined && value !== null && value !== "") {
+        plugin.allowedByProject = !(value === false || String(value).toLowerCase() === "false" || String(value) === "0");
+      }
+    } catch (e) {
+      plugin.allowedByProject = true;
+    }
+  }
+
   function tryAutoConnect() {
+    if (!sharingEnabled) {
+      return
+    }
     if (ws.active || ws.status === WebSocket.Open) {
       return
     }
@@ -32,12 +60,54 @@ Item {
     ws.active = true
   }
 
+  function stopSharing() {
+    liveFieldSettings.sharingEnabled = false
+    ws.active = false
+    devicesModel.clear()
+  }
+
   onUserNameChanged: tryAutoConnect()
   onGroupTokenChanged: tryAutoConnect()
 
   Component.onCompleted: {
-    iface.addItemToPluginsToolbar(pluginButton)
+    readProjectVariable()
+    if (allowedByProject) {
+      iface.addItemToPluginsToolbar(pluginButton)
+    }
     tryAutoConnect()
+  }
+
+  Dialog {
+    id: consentDialog
+    title: qsTr("Share live location?")
+    focus: true
+    font: Theme.defaultFont
+    parent: mainWindow.contentItem
+    modal: true
+
+    x: (mainWindow.width - width) / 2
+    y: (mainWindow.height - height - 80) / 2
+
+    Label {
+      width: Math.min(mainWindow.width - 60, 400)
+      font: Theme.defaultFont
+      color: Theme.mainTextColor
+      wrapMode: Text.WordWrap
+      text: qsTr("LiveField sends your QFieldCloud username, GPS position, speed and heading about once per second to %1. Everyone else sharing in this project can see you on their map while you share. You can stop at any time from this button.").arg(plugin.serverUrl)
+    }
+
+    standardButtons: Dialog.Ok | Dialog.Cancel
+    onAccepted: {
+      liveFieldSettings.sharingEnabled = true
+      plugin.tryAutoConnect()
+      if (!plugin.userName || !plugin.groupToken) {
+        mainWindow.displayToast(qsTr("LiveField: waiting for QFieldCloud project to load"))
+      }
+    }
+
+    Component.onCompleted: {
+      standardButton(Dialog.Ok).text = qsTr("Start sharing")
+    }
   }
 
   Connections {
@@ -45,7 +115,7 @@ Item {
 
     property real lastPush: 0
     function onPositionInformationChanged() {
-      if (ws.status == WebSocket.Open && Date.now() - lastPush > 1000) {
+      if (plugin.sharingEnabled && ws.status == WebSocket.Open && Date.now() - lastPush > 1000) {
         ws.sendPosition()
         lastPush = Date.now()
       }
@@ -210,13 +280,10 @@ Item {
     }
 
     standardButtons: Dialog.Ok | Dialog.Close
-    onAccepted: {
-      ws.active = false
-      devicesModel.clear()
-    }
+    onAccepted: plugin.stopSharing()
 
     Component.onCompleted: {
-      standardButton(Dialog.Ok).text = "Disconnect"
+      standardButton(Dialog.Ok).text = qsTr("Stop sharing")
     }
   }
 
@@ -239,7 +306,7 @@ Item {
     }
 
     onErrorStringChanged: {
-      if (errorString !== '') {
+      if (errorString !== '' && plugin.sharingEnabled) {
         mainWindow.displayToast('WebSocket error: ' + errorString)
       }
     }
@@ -312,6 +379,8 @@ Item {
     onClicked: {
       if (ws.status == WebSocket.Open) {
         detailsDialog.open()
+      } else if (!plugin.sharingEnabled) {
+        consentDialog.open()
       } else {
         plugin.tryAutoConnect()
         if (!plugin.userName || !plugin.groupToken) {

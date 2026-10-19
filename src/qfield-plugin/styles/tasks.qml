@@ -6,6 +6,7 @@
       <rule filter="&quot;status&quot; = 'in_progress' and &quot;task_id&quot; != coalesce(@current_task_id, -1)" label="In Progress" key="{9fe5bc8b-2918-4b61-9d3b-56b7f04f4844}" symbol="1"/>
       <rule filter="&quot;status&quot; = 'completed' and &quot;task_id&quot; != coalesce(@current_task_id, -1)" label="Completed" key="{223921ca-5bea-41d2-9955-ee3c295a8d5c}" symbol="2"/>
       <rule filter="&quot;task_id&quot; = @current_task_id" label="My Task" key="{4d28ce70-0a98-4b2f-b5be-faa00c07bab2}" symbol="3"/>
+      <rule filter="@fieldtm_current_user != '' and lower(coalesce(&quot;assigned_to&quot;, '')) = lower(@fieldtm_current_user) and &quot;status&quot; != 'completed' and &quot;task_id&quot; != coalesce(@current_task_id, -1)" label="Assigned to me" key="{e2f3a4b5-c6d7-4e8f-9a0b-1c2d3e4f5a6b}" symbol="4"/>
     </rules>
     <symbols>
       <symbol name="0" is_animated="0" frame_rate="10" alpha="1" force_rhr="0" type="fill" clip_to_extent="1">
@@ -303,6 +304,53 @@
             <Option value="MM" name="trim_distance_start_unit" type="QString"/>
             <Option value="0" name="tweak_dash_pattern_on_corners" type="QString"/>
             <Option value="0" name="use_custom_dash" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="width_map_unit_scale" type="QString"/>
+          </Option>
+          <data_defined_properties>
+            <Option type="Map">
+              <Option value="" name="name" type="QString"/>
+              <Option name="properties"/>
+              <Option value="collection" name="type" type="QString"/>
+            </Option>
+          </data_defined_properties>
+        </layer>
+      </symbol>
+      <symbol name="4" is_animated="0" frame_rate="10" alpha="1" force_rhr="0" type="fill" clip_to_extent="1">
+        <data_defined_properties>
+          <Option type="Map">
+            <Option value="" name="name" type="QString"/>
+            <Option name="properties"/>
+            <Option value="collection" name="type" type="QString"/>
+          </Option>
+        </data_defined_properties>
+        <layer enabled="1" pass="2" class="SimpleLine" locked="0" id="{b7c1f0a2-3d4e-4f5a-9b6c-7d8e9f0a1b2c}">
+          <Option type="Map">
+            <Option value="0" name="align_dash_pattern" type="QString"/>
+            <Option value="square" name="capstyle" type="QString"/>
+            <Option value="5;2" name="customdash" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="customdash_map_unit_scale" type="QString"/>
+            <Option value="MM" name="customdash_unit" type="QString"/>
+            <Option value="0" name="dash_pattern_offset" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="dash_pattern_offset_map_unit_scale" type="QString"/>
+            <Option value="MM" name="dash_pattern_offset_unit" type="QString"/>
+            <Option value="1" name="draw_inside_polygon" type="QString"/>
+            <Option value="round" name="joinstyle" type="QString"/>
+            <Option value="215,63,63,255,rgb:0.8431373,0.2470588,0.2470588,1" name="line_color" type="QString"/>
+            <Option value="solid" name="line_style" type="QString"/>
+            <Option value="1" name="line_width" type="QString"/>
+            <Option value="MM" name="line_width_unit" type="QString"/>
+            <Option value="0" name="offset" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+            <Option value="MM" name="offset_unit" type="QString"/>
+            <Option value="0" name="ring_filter" type="QString"/>
+            <Option value="0" name="trim_distance_end" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="trim_distance_end_map_unit_scale" type="QString"/>
+            <Option value="MM" name="trim_distance_end_unit" type="QString"/>
+            <Option value="0" name="trim_distance_start" type="QString"/>
+            <Option value="3x:0,0,0,0,0,0" name="trim_distance_start_map_unit_scale" type="QString"/>
+            <Option value="MM" name="trim_distance_start_unit" type="QString"/>
+            <Option value="0" name="tweak_dash_pattern_on_corners" type="QString"/>
+            <Option value="1" name="use_custom_dash" type="QString"/>
             <Option value="3x:0,0,0,0,0,0" name="width_map_unit_scale" type="QString"/>
           </Option>
           <data_defined_properties>
