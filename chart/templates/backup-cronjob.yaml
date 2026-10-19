@@ -1,0 +1,121 @@
+{{- if .Values.backup.enabled -}}
+{{- $s3 := .Values.backup.s3 -}}
+{{- $name := printf "%s-backup" (include "field-tm.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- if not $s3.bucket }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "field-tm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backup
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes:
+    - ReadWriteOnce
+  {{- with .Values.backup.persistence.storageClassName }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.backup.persistence.size }}
+---
+{{- end }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "field-tm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backup
+spec:
+  schedule: {{ .Values.backup.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        metadata:
+          labels:
+            {{- include "field-tm.selectorLabels" . | nindent 12 }}
+            app.kubernetes.io/component: backup
+        spec:
+          restartPolicy: OnFailure
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- $dumpContainer := ternary "initContainers" "containers" (not (empty $s3.bucket)) }}
+          {{ $dumpContainer }}:
+            - name: pg-dump
+              image: "{{ .Values.backup.image.repository }}:{{ .Values.backup.image.tag }}"
+              imagePullPolicy: {{ .Values.backup.image.pullPolicy }}
+              {{- with .Values.backup.securityContext }}
+              securityContext:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              env:
+                {{- with include "field-tm.dbEnv" . | trim }}{{ . | nindent 16 }}{{- end }}
+                - name: RETENTION_DAYS
+                  value: {{ .Values.backup.retentionDays | quote }}
+              {{- if .Values.existingSecret.name }}
+              envFrom:
+                - secretRef:
+                    name: {{ .Values.existingSecret.name | quote }}
+              {{- end }}
+              command:
+                - /bin/sh
+                - -ec
+                - |
+                  export PGPASSWORD="$FTM_DB_PASSWORD"
+                  file="/backup/field-tm-$(date +%Y%m%d-%H%M%S).dump"
+                  pg_dump -h "$FTM_DB_HOST" -U "$FTM_DB_USER" -d "$FTM_DB_NAME" -Fc -f "$file"
+                  echo "Wrote $file"
+                  {{- if not $s3.bucket }}
+                  find /backup -name 'field-tm-*.dump' -mtime +"$RETENTION_DAYS" -delete
+                  {{- end }}
+              resources:
+                {{- toYaml .Values.backup.resources | nindent 16 }}
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+          {{- if $s3.bucket }}
+          containers:
+            - name: s3-upload
+              image: "{{ $s3.image.repository }}:{{ $s3.image.tag }}"
+              imagePullPolicy: {{ $s3.image.pullPolicy }}
+              {{- with .Values.backup.securityContext }}
+              securityContext:
+                {{- toYaml . | nindent 16 }}
+              {{- end }}
+              env:
+                - name: AWS_DEFAULT_REGION
+                  value: {{ $s3.region | quote }}
+                {{- with $s3.endpoint }}
+                - name: AWS_ENDPOINT_URL
+                  value: {{ . | quote }}
+                {{- end }}
+              {{- with $s3.existingSecret }}
+              envFrom:
+                - secretRef:
+                    name: {{ . | quote }}
+              {{- end }}
+              command: ["aws", "s3", "cp", "--recursive", "/backup/", {{ printf "%s/" (trimSuffix "/" $s3.bucket) | quote }}]
+              resources:
+                {{- toYaml .Values.backup.resources | nindent 16 }}
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+          {{- end }}
+          volumes:
+            - name: backup
+              {{- if $s3.bucket }}
+              emptyDir: {}
+              {{- else }}
+              persistentVolumeClaim:
+                claimName: {{ $name }}
+              {{- end }}
+{{- end }}

@@ -76,101 +76,49 @@ Database service DNS name inside the cluster.
 {{- end }}
 
 {{/*
-Bundled Hanko auth service name.
+Database connection env (FTM_DB_*) for the in-cluster db.
+With an external db these come from existingSecret instead.
 */}}
-{{- define "field-tm.hankoServiceName" -}}
-{{- printf "%s-hanko" .Release.Name | trunc 63 | trimSuffix "-" -}}
+{{- define "field-tm.dbEnv" -}}
+{{- if .Values.db.enabled }}
+- name: FTM_DB_HOST
+  value: {{ include "field-tm.dbServiceHost" . | quote }}
+- name: FTM_DB_USER
+  value: {{ .Values.db.auth.username | quote }}
+- name: FTM_DB_PASSWORD
+  value: {{ .Values.db.auth.password | quote }}
+- name: FTM_DB_NAME
+  value: {{ .Values.db.auth.database | quote }}
+{{- end }}
 {{- end }}
 
 {{/*
-Bundled Hanko auth service DNS name inside the cluster.
+Auth and monitoring env for the backend container.
 */}}
-{{- define "field-tm.hankoServiceHost" -}}
-{{- printf "%s.%s.svc.cluster.local" (include "field-tm.hankoServiceName" .) .Release.Namespace -}}
+{{- define "field-tm.authEnv" -}}
+{{- $provider := .Values.auth.provider | default "hotosm" -}}
+{{- if not (has $provider (list "hotosm" "custom" "disabled")) -}}
+{{- fail (printf "auth.provider must be one of hotosm, custom, disabled (got %q)" $provider) -}}
 {{- end }}
-
-{{/*
-Bundled Hanko database service name.
-*/}}
-{{- define "field-tm.hankoDbServiceName" -}}
-{{- printf "%s-hanko-db" .Release.Name | trunc 63 | trimSuffix "-" -}}
+- name: AUTH_PROVIDER
+  value: {{ $provider | quote }}
+{{- if eq $provider "custom" }}
+- name: HANKO_API_URL
+  value: {{ required "auth.hankoApiUrl is required when auth.provider=custom" .Values.auth.hankoApiUrl | quote }}
+- name: LOGIN_URL
+  value: {{ required "auth.loginUrl is required when auth.provider=custom" .Values.auth.loginUrl | quote }}
 {{- end }}
-
-{{/*
-Bundled Hanko database service DNS name inside the cluster.
-*/}}
-{{- define "field-tm.hankoDbServiceHost" -}}
-{{- printf "%s.%s.svc.cluster.local" (include "field-tm.hankoDbServiceName" .) .Release.Namespace -}}
+{{- if or .Values.sentry.dsn .Values.sentry.existingSecret }}
+- name: MONITORING
+  value: sentry
+- name: SENTRY_DSN
+  {{- if .Values.sentry.existingSecret }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.sentry.existingSecret | quote }}
+      key: SENTRY_DSN
+  {{- else }}
+  value: {{ .Values.sentry.dsn | quote }}
+  {{- end }}
 {{- end }}
-
-{{/*
-Bundled Hanko database mode: shared | dedicated | external (validated).
-  shared    - a separate database on the chart's in-cluster field-tm db (db.enabled=true)
-  dedicated - a separate in-cluster PostGIS deployment just for Hanko
-  external  - an existing Postgres server at auth.bundled.db.host
-*/}}
-{{- define "field-tm.hankoDbMode" -}}
-{{- $mode := .Values.auth.bundled.db.mode | default "shared" -}}
-{{- if not (has $mode (list "shared" "dedicated" "external")) -}}
-{{- fail (printf "auth.bundled.db.mode must be one of shared, dedicated, external (got %q)" $mode) -}}
-{{- end -}}
-{{- if and (eq $mode "shared") (not .Values.db.enabled) -}}
-{{- fail "auth.bundled.db.mode=shared needs the in-cluster field-tm database (db.enabled=true); use mode=external to point at your external server, or mode=dedicated" -}}
-{{- end -}}
-{{- if not (regexMatch "^[a-zA-Z_][a-zA-Z0-9_]*$" .Values.auth.bundled.db.auth.database) -}}
-{{- fail "auth.bundled.db.auth.database must be a plain identifier (letters, digits, underscore)" -}}
-{{- end -}}
-{{- $mode -}}
-{{- end }}
-
-{{/*
-Bundled Hanko database host, user and password for the selected mode.
-In shared mode Hanko connects with the main field-tm db credentials.
-*/}}
-{{- define "field-tm.hankoDbHost" -}}
-{{- $mode := include "field-tm.hankoDbMode" . -}}
-{{- if eq $mode "shared" -}}
-{{- include "field-tm.dbServiceHost" . -}}
-{{- else if eq $mode "dedicated" -}}
-{{- include "field-tm.hankoDbServiceHost" . -}}
-{{- else -}}
-{{- required "auth.bundled.db.host is required when auth.bundled.db.mode=external" .Values.auth.bundled.db.host -}}
-{{- end -}}
-{{- end }}
-
-{{- define "field-tm.hankoDbUser" -}}
-{{- if eq (include "field-tm.hankoDbMode" .) "shared" -}}
-{{- .Values.db.auth.username -}}
-{{- else -}}
-{{- .Values.auth.bundled.db.auth.username -}}
-{{- end -}}
-{{- end }}
-
-{{- define "field-tm.hankoDbPassword" -}}
-{{- if eq (include "field-tm.hankoDbMode" .) "shared" -}}
-{{- .Values.db.auth.password -}}
-{{- else -}}
-{{- .Values.auth.bundled.db.auth.password -}}
-{{- end -}}
-{{- end }}
-
-{{/*
-Public URL scheme, derived from ingress TLS.
-*/}}
-{{- define "field-tm.publicScheme" -}}
-{{- if and .Values.ingress.enabled .Values.ingress.tls.enabled -}}https{{- else -}}http{{- end -}}
-{{- end }}
-
-{{/*
-Public origin field-tm is served on, e.g. https://field.example.com.
-*/}}
-{{- define "field-tm.publicOrigin" -}}
-{{- printf "%s://%s" (include "field-tm.publicScheme" .) .Values.ingress.host -}}
-{{- end }}
-
-{{/*
-Public hostname for the bundled Hanko API (defaults to login.<ingress.host>).
-*/}}
-{{- define "field-tm.hankoPublicHost" -}}
-{{- .Values.auth.bundled.ingress.host | default (printf "login.%s" .Values.ingress.host) -}}
 {{- end }}

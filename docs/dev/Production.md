@@ -1,61 +1,101 @@
 # Production Deployment
 
-Use this guide if you want to run Field-TM on a server.
+**Helm is the supported production path.** The Docker Compose files in
+`deploy/` still work, but are deprecated and community-supported
+(see [below](#docker-compose-deprecated)).
 
-There are two supported production paths:
+## Helm
 
-**Docker Compose** (this guide) - for single-server deployments:
+See [`chart/README.md`](../../chart/README.md) for all chart values.
 
-- core deployment from `deploy/compose.sub.yaml`
-- optional self-hosted ODK overlay from `deploy/compose.odk.yaml`
-- optional self-hosted Hanko overlay from `deploy/compose.login.yaml`
-
-**Kubernetes / Helm** - for cluster deployments, see
-[`chart/README.md`](../../chart/README.md).
-
-The `install.sh` flow is deprecated and should not be used.
-
-## Recommended host
-
-- Ubuntu Linux
-- a non-root user with `sudo`
-- a DNS record pointing your domain to the server
-
-## 1. Clone the repo
+### 1. Create secrets
 
 ```bash
-git clone https://github.com/hotosm/field-tm.git
-cd field-tm
+kubectl create namespace field-tm
+kubectl create secret generic api-ftm-vars --namespace field-tm \
+  --from-literal=ENCRYPTION_KEY="$(openssl rand -base64 32)" \
+  --from-literal=FTM_DB_HOST=your-db-host \
+  --from-literal=FTM_DB_USER=fieldtm \
+  --from-literal=FTM_DB_PASSWORD=xxxxxxx \
+  --from-literal=FTM_DB_NAME=fieldtm \
+  --from-literal=ODK_CENTRAL_URL=https://odk.example.com \
+  --from-literal=ODK_CENTRAL_USER=xxxxxxx \
+  --from-literal=ODK_CENTRAL_PASSWD=xxxxxxx
 ```
 
-You do not need to check out a release tag manually.
-`just start prod` will prompt you to select a version interactively.
+Any variable from the [configuration reference](#configuration-reference)
+can go in this secret.
 
-## 2. Prepare the machine
+### 2. Install
 
 ```bash
-just prep machine
+helm upgrade --install field-tm oci://ghcr.io/hotosm/charts/field-tm \
+  --namespace field-tm \
+  --set existingSecret.name=api-ftm-vars \
+  --set ingress.enabled=true \
+  --set ingress.host=field.example.com \
+  --set ingress.tls.enabled=true
 ```
 
-Run this as a non-root user. It installs and configures the container runtime
-(runc, containerd, nerdctl) in rootless mode.
+Upgrade by re-running the same command with `--version <release>`.
+Migrations run automatically in an init container.
 
-## 3. Configure `.env`
+### Auth
+
+The chart defaults to `auth.provider=hotosm` (shared login at
+login.hotosm.org). To use your own Hanko instance, for example one run with
+`deploy/compose.login.yaml`, set `auth.provider=custom`, `auth.hankoApiUrl`
+and `auth.loginUrl`.
+
+### Monitoring
+
+Create a secret with key `SENTRY_DSN` and set `sentry.existingSecret` to its
+name. This sets `MONITORING=sentry`. Leave it unset to disable monitoring.
+
+## Backup & restore
+
+The chart runs a nightly `pg_dump -Fc` CronJob (`backup.enabled`, default
+`true`):
+
+- with `backup.s3.bucket` set, dumps are uploaded to S3-compatible storage
+  (`backup.s3.endpoint`, `backup.s3.existingSecret` with
+  `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`). Set retention with a bucket
+  lifecycle rule.
+- otherwise they are written to the `<release>-field-tm-backup` PVC and
+  pruned after `backup.retentionDays`.
+
+Run a backup now:
 
 ```bash
-just config setup
+kubectl -n field-tm create job --from=cronjob/field-tm-backup backup-manual
 ```
 
-This runs an interactive wizard that:
+Restore a dump (scale the backend down first):
 
-1. Generates `.env` from `.env.example`
-2. Asks for your domain and Let's Encrypt email
-3. Lets you choose an auth provider
-4. Auto-generates secure secrets and database passwords
-5. Pauses so you can review and edit `.env` before continuing
+```bash
+kubectl -n field-tm scale deploy/field-tm --replicas=0
+aws s3 cp s3://my-bucket/field-tm/field-tm-YYYYMMDD-HHMMSS.dump ./restore.dump
+pg_restore --clean --if-exists --no-owner \
+  -h <db-host> -U fieldtm -d fieldtm ./restore.dump
+kubectl -n field-tm scale deploy/field-tm --replicas=1
+```
 
-For advanced or automated setups you can instead run
-`just config generate-dotenv` and edit `.env` by hand.
+For the PVC, copy the file out with `kubectl cp` from a pod mounting the
+backup PVC, or run `pg_restore` from such a pod.
+
+For the deprecated compose stack:
+
+```bash
+docker compose -f deploy/compose.sub.yaml exec -T fieldtm-db \
+  pg_dump -U fieldtm -Fc fieldtm > field-tm.dump
+docker compose -f deploy/compose.sub.yaml exec -T fieldtm-db \
+  pg_restore --clean --if-exists --no-owner -U fieldtm -d fieldtm < field-tm.dump
+```
+
+## Configuration reference
+
+Set these in the chart's `existingSecret` (or `env`), or in `.env` for
+compose.
 
 ### Base settings
 
@@ -89,7 +129,6 @@ If you use `AUTH_PROVIDER=hotosm`, set:
 
 - `OSM_CLIENT_ID`: OAuth2 client ID from OpenStreetMap
 - `OSM_CLIENT_SECRET`: OAuth2 client secret
-- `OSM_SECRET_KEY`: Secret key for signing OSM tokens
 
 Optional OSM settings:
 
@@ -193,9 +232,64 @@ For Sentry, set:
 - `RAW_DATA_API_AUTH_TOKEN` (default: _(empty)_): Token for the raw-data-api,
   if required
 
-## 5. Deploy
+## Docker Compose (deprecated)
 
-### Core Field-TM
+Compose deployments are community-supported. New deployments should use Helm.
+
+The stack is:
+
+- core deployment from `deploy/compose.sub.yaml`
+- optional self-hosted ODK overlay from `deploy/compose.odk.yaml`
+- optional self-hosted Hanko overlay from `deploy/compose.login.yaml`
+
+The `install.sh` flow is deprecated and should not be used.
+
+### Recommended host
+
+- Ubuntu Linux
+- a non-root user with `sudo`
+- a DNS record pointing your domain to the server
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/hotosm/field-tm.git
+cd field-tm
+```
+
+You do not need to check out a release tag manually.
+`just start prod` will prompt you to select a version interactively.
+
+### 2. Prepare the machine
+
+```bash
+just prep machine
+```
+
+Run this as a non-root user. It installs and configures the container runtime
+(runc, containerd, nerdctl) in rootless mode.
+
+### 3. Configure `.env`
+
+```bash
+just config setup
+```
+
+This runs an interactive wizard that:
+
+1. Generates `.env` from `.env.example`
+2. Asks for your domain and Let's Encrypt email
+3. Lets you choose an auth provider
+4. Auto-generates secure secrets and database passwords
+5. Pauses so you can review and edit `.env` before continuing
+
+For advanced or automated setups you can instead run
+`just config generate-dotenv` and edit `.env` by hand. See the
+[configuration reference](#configuration-reference) for all variables.
+
+### 4. Deploy
+
+#### Core Field-TM
 
 Use this when ODK Central and QFieldCloud are managed outside this stack.
 
@@ -203,13 +297,13 @@ Use this when ODK Central and QFieldCloud are managed outside this stack.
 just start prod
 ```
 
-### Field-TM with self-hosted ODK Central
+#### Field-TM with self-hosted ODK Central
 
 ```bash
 just start prod-with-odk
 ```
 
-### Field-TM with self-hosted Hanko login
+#### Field-TM with self-hosted Hanko login
 
 Set `AUTH_PROVIDER=bundled` in `.env` (or select it during `just config setup`),
 then run `just start prod` - the login overlay is included automatically.
@@ -222,7 +316,7 @@ All commands will:
 4. Generate `.env` if missing
 5. Deploy the compose stack
 
-## 6. Verify
+### 5. Verify
 
 After deployment:
 
@@ -232,7 +326,7 @@ After deployment:
 - inspect running containers with `docker compose ps`
 - inspect logs with `docker compose logs backend`
 
-## Upgrading
+### Upgrading
 
 To upgrade to a newer release:
 
@@ -246,23 +340,22 @@ Select the new version from the menu. Your `.env` is preserved between
 upgrades. If a new release adds env vars, check `.env.example` for new
 entries and add them to your `.env`.
 
-## Compose files
+### Compose files
 
 - `deploy/compose.sub.yaml`: core Field-TM, PostgreSQL, BunkerWeb, QGIS wrapper
 - `deploy/compose.odk.yaml`: adds self-hosted ODK Central
 - `deploy/compose.login.yaml`: adds self-hosted Hanko login
-- `deploy/compose.qfield.yaml`: reserved for QFieldCloud-related overlays
 
 Do not run `docker compose` directly against `deploy/compose.sub.yaml` without
 preprocessing. It uses `${FTM_DOMAIN}` in environment key names, so it must go
 through `envsubst`. The `just start prod*` commands handle this correctly.
 
-## Help, Field-TM is broken
+### Help, Field-TM is broken
 
 Production issues usually fall into a few categories. Work through these steps
 in order.
 
-### Check the containers are running
+#### Check the containers are running
 
 ```bash
 docker compose -f deploy/compose.sub.yaml ps
@@ -278,7 +371,7 @@ docker compose -f deploy/compose.sub.yaml logs <service-name>
 Replace `<service-name>` with `backend`, `proxy`, `fieldtm-db`, `migrations`,
 `qfield-qgis`, or `dns`.
 
-### Backend won't start
+#### Backend won't start
 
 - Check `docker compose -f deploy/compose.sub.yaml logs backend` for Python
   tracebacks.
@@ -287,7 +380,7 @@ Replace `<service-name>` with `backend`, `proxy`, `fieldtm-db`, `migrations`,
 - If the `migrations` service failed, the backend will not start. Check
   `docker compose -f deploy/compose.sub.yaml logs migrations` for SQL errors.
 
-### HTTPS / Let's Encrypt issues
+#### HTTPS / Let's Encrypt issues
 
 - BunkerWeb handles TLS automatically. If the site loads on HTTP but not HTTPS,
   check the proxy logs:
@@ -297,7 +390,7 @@ Replace `<service-name>` with `backend`, `proxy`, `fieldtm-db`, `migrations`,
   During testing, uncomment `USE_LETS_ENCRYPT_STAGING: yes` in
   `deploy/compose.sub.yaml`.
 
-### DNS resolution failures inside containers
+#### DNS resolution failures inside containers
 
 The production stack uses a custom dnsmasq container (`dns`) because
 nerdctl/containerd doesn't resolve container names the same way Docker does.
@@ -309,21 +402,21 @@ If services can't reach each other:
   A restart may fix transient issues:
   `docker compose -f deploy/compose.sub.yaml restart dns`
 
-### Database issues
+#### Database issues
 
 - Connect directly to check the database is accepting connections:
   `docker compose -f deploy/compose.sub.yaml exec fieldtm-db pg_isready`
 - If the volume was deleted or corrupted, data will be lost. The database
   volume is `field-tm-db-data`. Back it up regularly.
 
-### ODK Central not reachable (self-hosted)
+#### ODK Central not reachable (self-hosted)
 
 - Check all Central containers are running:
   `docker compose -f deploy/compose.sub.yaml -f deploy/compose.odk.yaml ps`
 - Verify `ODK_CENTRAL_URL`, `ODK_CENTRAL_USER`, and `ODK_CENTRAL_PASSWD` in
   `.env` match the Central instance.
 
-### Restarting everything cleanly
+#### Restarting everything cleanly
 
 If all else fails, a full recreate (without losing data):
 
@@ -339,7 +432,7 @@ docker compose -f deploy/compose.sub.yaml down -v
 just start prod
 ```
 
-### Getting help
+#### Getting help
 
 - Check the [GitHub issues](https://github.com/hotosm/field-tm/issues) for
   known problems.

@@ -64,11 +64,13 @@ services:
     extends:
       file: compose.yaml
       service: mail
+    profiles: !reset []
 
   central:
     extends:
       file: compose.yaml
       service: central
+    profiles: !reset []
     # We don't need proxy or pyxform
     depends_on: !override
       central-db:
@@ -91,4 +93,5 @@ services:
     extends:
       file: compose.yaml
       service: central-db
+    profiles: !reset []
     ports: []

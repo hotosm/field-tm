@@ -2,7 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
   "schedule": ["before 7am on the first day of the month"],
-  "enabledManagers": ["pep621", "npm"],
+  "enabledManagers": [
+    "pep621",
+    "npm",
+    "docker-compose",
+    "dockerfile",
+    "helm-values",
+    "github-actions"
+  ],
   "rangeStrategy": "update-lockfile",
   "lockFileMaintenance": {
     "enabled": false
@@ -15,6 +22,12 @@
     "@shoelace-style/shoelace"
   ],
   "packageRules": [
+    {
+      "description": "One monthly PR for all minor/patch updates",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
+    },
     {
       "matchUpdateTypes": ["patch"],
       "automerge": true

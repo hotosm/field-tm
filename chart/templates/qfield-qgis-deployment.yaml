@@ -52,16 +52,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
           env:
-            {{- if .Values.db.enabled }}
-            - name: FTM_DB_HOST
-              value: {{ include "field-tm.dbServiceHost" . | quote }}
-            - name: FTM_DB_USER
-              value: {{ .Values.db.auth.username | quote }}
-            - name: FTM_DB_PASSWORD
-              value: {{ .Values.db.auth.password | quote }}
-            - name: FTM_DB_NAME
-              value: {{ .Values.db.auth.database | quote }}
-            {{- end }}
+            {{- with include "field-tm.dbEnv" . | trim }}{{ . | nindent 12 }}{{- end }}
             {{- $qgisEnv := mustMergeOverwrite (deepCopy .Values.env) .Values.qfieldQgis.env }}
             {{- range $key, $val := $qgisEnv }}
             - name: {{ $key }}

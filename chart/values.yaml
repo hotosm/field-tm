@@ -88,70 +88,50 @@ volumeMounts: []
 command: []
 args: []
 
-# Self-contained auth: deploy a bundled Hanko instance alongside field-tm,
-# mirroring deploy/compose.login.yaml. When enabled, the backend is pointed at
-# it automatically (AUTH_PROVIDER=bundled, HANKO_API_URL, HANKO_PUBLIC_URL), and
-# the login page is served by field-tm itself at /login.
+# Login provider (Hanko). Self-hosters wanting their own Hanko can run
+# deploy/compose.login.yaml and use provider=custom.
 auth:
-  bundled:
-    enabled: false
+  # hotosm   - shared HOT login at login.hotosm.org (default)
+  # custom   - your own Hanko; set hankoApiUrl and loginUrl
+  # disabled - no login, public read-only access
+  provider: hotosm
+  hankoApiUrl: ""
+  loginUrl: ""
+
+# Sentry monitoring. Enabled when dsn or existingSecret is set.
+sentry:
+  dsn: ""
+  # Name of a secret with key SENTRY_DSN (preferred over dsn).
+  existingSecret: ""
+
+# Nightly pg_dump. Uploads to S3 when s3.bucket is set, otherwise keeps
+# retentionDays of dumps on a PVC.
+backup:
+  enabled: true
+  schedule: "0 2 * * *"
+  # pg_dump must be >= the server major version.
+  image:
+    repository: postgres
+    tag: 18-alpine
+    pullPolicy: IfNotPresent
+  retentionDays: 7
+  persistence:
+    size: 10Gi
+    storageClassName: ""
+  s3:
+    # e.g. s3://my-bucket/field-tm (use bucket lifecycle rules for retention)
+    bucket: ""
+    # Leave empty for AWS; set for MinIO/Garage/etc.
+    endpoint: ""
+    region: us-east-1
+    # Secret with keys AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
+    existingSecret: ""
     image:
-      repository: ghcr.io/teamhanko/hanko
-      tag: v2.1.0
+      repository: amazon/aws-cli
+      tag: "2.38.0"
       pullPolicy: IfNotPresent
-    # HANKO_SECRET must be a base64-encoded 32-byte value, e.g.
-    # `openssl rand -base64 32`. Required whenever auth.bundled.enabled=true.
-    # TODO this is mostly for local dev, so do we need secret based config?
-    secret:
-      hankoSecret: ""
-      smtpUser: ""
-      smtpPassword: ""
-      googleClientSecret: ""
-    # The browser talks to Hanko directly, so it needs a public hostname.
-    # When ingress.enabled=true, a rule for this host is added to the field-tm
-    # Ingress (and to its TLS hosts). Defaults to login.<ingress.host>.
-    ingress:
-      host: ""
-    # Non-secret Hanko config. Mirrors contrib/login/hanko-config.tpl.yaml.
-    config:
-      # Leave empty to derive from ingress.host / ingress.tls.enabled, e.g.
-      # allowedOrigin=https://field.example.com, cookieDomain=field.example.com.
-      allowedOrigin: ""
-      cookieDomain: ""
-      redirectUrl: ""
-      smtpHost: ""
-      smtpPort: 587
-      smtpFromAddress: ""
-      googleEnabled: false
-      googleClientId: ""
-    resources: {}
-    db:
-      # Where Hanko stores its data:
-      #   shared    - (default) a separate database named `auth.database` on the
-      #               chart's in-cluster field-tm db, using the main `db.auth`
-      #               credentials. Created automatically. Requires db.enabled=true.
-      #   dedicated - a separate in-cluster PostGIS deployment just for Hanko.
-      #   external  - an existing Postgres server at `host`. The database must
-      #               already exist (it can live on the same server as field-tm).
-      mode: shared
-      # Image for the dedicated db (and the wait/create-db init container).
-      image:
-        repository: ghcr.io/hotosm/postgis
-        tag: 18-3.6-alpine
-        pullPolicy: IfNotPresent
-      auth:
-        # username/password are ignored in shared mode (db.auth is used).
-        username: hanko
-        password: hanko
-        database: hanko
-      # Only used when mode=external.
-      host: ""
-      # Only used when mode=dedicated.
-      resources: {}
-      persistence:
-        enabled: true
-        size: 2Gi
-        storageClassName: ""
+  resources: {}
+  securityContext: {}
 
 db:
   # Default is to use an external database; enable for local/in-cluster PostGIS.

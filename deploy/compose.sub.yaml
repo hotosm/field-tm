@@ -17,7 +17,7 @@
 
 # Core FieldTM production compose file.
 # ODK Central and QFieldCloud are managed externally; see compose.odk.yaml
-# and compose.qfield.yaml for optional self-hosted addons.
+# for optional self-hosted addons.
 #
 # NOTE: This file uses ${FTM_DOMAIN} in bunkerweb env var KEY names,
 # which requires envsubst preprocessing before passing to docker compose.

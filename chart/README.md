@@ -34,52 +34,50 @@ kubectl
   - key: FTM_DOMAIN
   - key: OSM_CLIENT_ID
   - key: OSM_CLIENT_SECRET
-  - key: OSM_SECRET_KEY
 
   ```bash
   kubectl create secret generic api-ftm-vars --namespace field-tm \
     --from-literal=ENCRYPTION_KEY=xxxxxxx \
     --from-literal=FTM_DOMAIN=some.domain.com \
     --from-literal=OSM_CLIENT_ID=xxxxxxx \
-    --from-literal=OSM_CLIENT_SECRET=xxxxxxx \
-    --from-literal=OSM_SECRET_KEY=xxxxxxx
+    --from-literal=OSM_CLIENT_SECRET=xxxxxxx
   ```
 
-## Bundled Hanko auth
+## Auth
 
-Set `auth.bundled.enabled=true` to deploy a self-hosted Hanko instance (plus
-its own in-cluster PostGIS database) alongside field-tm, mirroring
-`deploy/compose.login.yaml`. The backend's `HANKO_API_URL` is then pointed at
-the in-cluster Hanko service automatically - just make sure `AUTH_PROVIDER`
-(the backend default is `bundled`) matches.
-
-`auth.bundled.secret.hankoSecret` is required whenever `auth.bundled.enabled`
-is `true` - generate one with `openssl rand -base64 32`. Set
-`auth.bundled.config.allowedOrigin`, `cookieDomain` and `redirectUrl` to the
-public URL field-tm is served on (defaults are for local dev only).
+`auth.provider` defaults to `hotosm` (shared login at login.hotosm.org).
+To use your own Hanko instance (e.g. run with `deploy/compose.login.yaml`):
 
 ```bash
 helm upgrade --install field-tm . \
-  --set auth.bundled.enabled=true \
-  --set auth.bundled.secret.hankoSecret="$(openssl rand -base64 32)" \
-  --set auth.bundled.config.allowedOrigin=https://field.example.com \
-  --set auth.bundled.config.cookieDomain=field.example.com \
-  --set auth.bundled.config.redirectUrl=https://field.example.com
+  --set auth.provider=custom \
+  --set auth.hankoApiUrl=https://login.example.com \
+  --set auth.loginUrl=https://login.example.com/app
 ```
 
-By default `auth.bundled.db.enabled=true` runs an in-cluster PostGIS database
-dedicated to Hanko. Set it to `false` and provide `auth.bundled.db.host` to
-point at an external database instead.
+## Monitoring
 
-This first pass covers the base Hanko `Deployment`/`Service`/config plus its
-own database - it does not yet wire up ingress for a public `login.<domain>`
-host (see `deploy/compose.login.yaml` for the equivalent reverse-proxy config)
-or SMTP/Google OAuth secrets beyond what's exposed under `auth.bundled`.
+Set `sentry.existingSecret` (a secret with key `SENTRY_DSN`) or `sentry.dsn`
+to enable Sentry (`MONITORING=sentry`). Unset means monitoring is off.
+
+## Backups
+
+`backup.enabled` (default `true`) runs a nightly `pg_dump -Fc` CronJob.
+
+- With `backup.s3.bucket` set, dumps are uploaded with `aws s3 cp`. Set
+  `backup.s3.endpoint` for non-AWS storage and `backup.s3.existingSecret` to a
+  secret with `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`. Use bucket
+  lifecycle rules for retention.
+- Otherwise dumps go to a PVC (`<release>-field-tm-backup`, kept on uninstall)
+  and are deleted after `backup.retentionDays`.
+
+See `docs/dev/Production.md` for restore steps.
 
 ## Deployment
 
 ```bash
-helm upgrade --install field-tm oci://ghcr.io/hotosm/field-tm --namespace field-tm
+helm upgrade --install field-tm oci://ghcr.io/hotosm/charts/field-tm \
+  --namespace field-tm
 ```
 
 By default the chart expects an external database (`db.enabled=false`).

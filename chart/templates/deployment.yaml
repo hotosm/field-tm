@@ -70,16 +70,8 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           env:
-            {{- if .Values.db.enabled }}
-            - name: FTM_DB_HOST
-              value: {{ include "field-tm.dbServiceHost" . | quote }}
-            - name: FTM_DB_USER
-              value: {{ .Values.db.auth.username | quote }}
-            - name: FTM_DB_PASSWORD
-              value: {{ .Values.db.auth.password | quote }}
-            - name: FTM_DB_NAME
-              value: {{ .Values.db.auth.database | quote }}
-            {{- end }}
+            {{- with include "field-tm.dbEnv" . | trim }}{{ . | nindent 12 }}{{- end }}
+            {{- with include "field-tm.authEnv" . | trim }}{{ . | nindent 12 }}{{- end }}
             {{- range $key, $val := .Values.env }}
             - name: {{ $key }}
               value: {{ $val | quote }}
@@ -123,24 +115,12 @@ spec:
               {{- else }}
               value: "localhost"
               {{- end }}
-            {{- if .Values.db.enabled }}
-            - name: FTM_DB_HOST
-              value: {{ include "field-tm.dbServiceHost" . | quote }}
-            - name: FTM_DB_USER
-              value: {{ .Values.db.auth.username | quote }}
-            - name: FTM_DB_PASSWORD
-              value: {{ .Values.db.auth.password | quote }}
-            - name: FTM_DB_NAME
-              value: {{ .Values.db.auth.database | quote }}
-            {{- end }}
+            {{- with include "field-tm.dbEnv" . | trim }}{{ . | nindent 12 }}{{- end }}
             {{- if .Values.qfieldQgis.enabled }}
             - name: QFIELDCLOUD_QGIS_URL
               value: "http://{{ include "field-tm.fullname" . }}-qgis:8080"
             {{- end }}
-            {{- if .Values.auth.bundled.enabled }}
-            - name: HANKO_API_URL
-              value: "http://{{ include "field-tm.hankoServiceName" . }}:8000"
-            {{- end }}
+            {{- with include "field-tm.authEnv" . | trim }}{{ . | nindent 12 }}{{- end }}
             {{- range $key, $val := .Values.env }}
             - name: {{ $key }}
               value: {{ $val | quote }}

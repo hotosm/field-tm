@@ -18,6 +18,9 @@
 
 set dotenv-load
 
+# Pinned commit of https://github.com/hotosm/justfiles
+justfiles_ref := "89058003230655cbb0de76cd81ff57e959f27067"
+
 # Auto-detect nerdctl when docker is not installed (e.g. after `just prep machine`)
 docker := env("DOCKER_ALIAS", if `command -v docker >/dev/null 2>&1 && echo found || echo missing` == "found" { "docker" } else { "nerdctl" })
 
@@ -41,19 +44,19 @@ help:
 
 # Prep module from https://github.com/hotosm/justfiles
 prep *args:
-    @curl -sS https://raw.githubusercontent.com/hotosm/justfiles/main/prep.just \
+    @curl -sS https://raw.githubusercontent.com/hotosm/justfiles/{{justfiles_ref}}/prep.just \
       -o {{justfile_directory()}}/tasks/prep.just;
     @just --justfile {{justfile_directory()}}/tasks/prep.just {{args}}
 
 # Chart module from https://github.com/hotosm/justfiles
 chart *args:
-    @curl -sS https://raw.githubusercontent.com/hotosm/justfiles/main/chart.just \
+    @curl -sS https://raw.githubusercontent.com/hotosm/justfiles/{{justfiles_ref}}/chart.just \
       -o {{justfile_directory()}}/tasks/chart.just;
     @just --justfile {{justfile_directory()}}/tasks/chart.just --set chart_name "field-tm" {{args}}
 
 # Delete local database, S3, and ODK Central data
 clean:
-  {{docker}} compose down -v
+  {{docker}} compose --profile "*" down -v
 
 # Run pre-commit hooks
 lint:

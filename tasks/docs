@@ -20,7 +20,6 @@ openapi:
 
   OSM_CLIENT_ID="x" \
   OSM_CLIENT_SECRET="y" \
-  OSM_SECRET_KEY="z" \
   docker compose run --rm --no-deps --entrypoint python backend -c \
     "import json; from app.main import api; print(json.dumps(api.openapi_schema.to_schema(), separators=(',', ':')))" \
     > docs/openapi/openapi.json
@@ -53,6 +52,14 @@ build output_dir="site":
   # Include the coverage report (from `just test backend-coverage`), if present
   if [ -d coverage/htmlcov ]; then
     cp -R coverage/htmlcov "{{ output_dir }}/coverage"
+  fi
+
+  # Include the standalone planner at /planner/ (same gh-pages site)
+  if [ -f src/planner/package.json ]; then
+    docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp \
+      -v "$PWD/src/planner:/app" -w /app node:24-alpine \
+      sh -c 'npx -y pnpm@10 install --frozen-lockfile && npx -y pnpm@10 build'
+    cp -R src/planner/dist "{{ output_dir }}/planner"
   fi
 
 # Run docs website locally in a container

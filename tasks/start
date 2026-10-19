@@ -24,13 +24,37 @@ docker := env("DOCKER_ALIAS", if `command -v docker >/dev/null 2>&1 && echo foun
 default:
   just --justfile {{justfile()}} --list start
 
-# Start Field-TM (auth disabled)
+# Start core Field-TM: proxy, backend, db (auth disabled)
 [no-cd]
 dev:
   #!/usr/bin/env sh
 
   cd {{justfile_directory()}}
   AUTH_PROVIDER=disabled {{docker}} compose up -d
+
+# Start Field-TM with ODK Central and QFieldCloud (auth disabled)
+[no-cd]
+dev-full:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
+  AUTH_PROVIDER=disabled {{docker}} compose --profile central --profile qfield up -d
+
+# Start Field-TM with ODK Central (auth disabled)
+[no-cd]
+dev-odk:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
+  AUTH_PROVIDER=disabled {{docker}} compose --profile central up -d
+
+# Start Field-TM with QFieldCloud (auth disabled)
+[no-cd]
+dev-qfield:
+  #!/usr/bin/env sh
+
+  cd {{justfile_directory()}}
+  AUTH_PROVIDER=disabled {{docker}} compose --profile qfield up -d
 
 # Prompt the user to select a release tag, checkout, and export GIT_BRANCH.
 # Exits if the working tree is dirty or no tags are found.
@@ -147,14 +171,15 @@ backend-no-docker:
 
   uv run --group dev pybabel compile -d app/locales
 
+  # Task planner at /planner/ needs `just build planner` first
   FTM_DOMAIN="" OSM_CLIENT_ID="" OSM_CLIENT_SECRET="" \
-  OSM_SECRET_KEY="" ENCRYPTION_KEY="" \
+  ENCRYPTION_KEY="" PLANNER_DIR="{{justfile_directory()}}/src/planner/dist" \
     uv run uvicorn app.main:api --host 0.0.0.0 --port 8000
 
-# Start Field-TM without ODK Central
+# Deprecated alias: `dev` no longer starts ODK Central
 [no-cd]
 without-central:
-  {{docker}} compose --profile no-odk up -d
+  just start dev
 
 # Start Field-TM with self-hosted Hanko auth (contrib/login)
 [no-cd]
@@ -166,6 +191,7 @@ login:
   {{docker}} compose \
     -f compose.yaml \
     -f contrib/login/compose.yaml \
+    --profile login \
     up -d
 
   echo
@@ -225,6 +251,7 @@ tunnel:
   {{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
+    --profile central \
     up --wait
 
   # Workaround to until PR merged:
@@ -269,6 +296,7 @@ _get-tunnel-url service_name:
   service_url=$({{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
+    --profile central \
     logs {{service_name}}-tunnel | \
     grep 'Your quick Tunnel' -A 1 | tail -n 1 | \
     sed -n 's/.*| *\(https:\/\/[^ ]*\).*/\1/p')

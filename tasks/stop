@@ -26,7 +26,7 @@ default:
 # Stop Field-TM
 [no-cd]
 all:
-  {{docker}} compose down
+  {{docker}} compose --profile "*" down
 
 # Stop Field-TM & login service
 [no-cd]
@@ -38,6 +38,7 @@ login:
   {{docker}} compose \
     -f compose.yaml \
     -f contrib/login/compose.yaml \
+    --profile "*" \
     down --remove-orphans
   
   {{docker}} volume rm field-tm_hanko_config
@@ -48,6 +49,7 @@ josm:
   {{docker}} compose \
     -f compose.yaml \
     -f contrib/josm/compose.yaml \
+    --profile "*" \
     down
   
 # Stop Field-TM & tunnels
@@ -56,5 +58,6 @@ tunnel:
   {{docker}} compose \
     -f compose.yaml \
     -f contrib/tunnel/compose.yaml \
+    --profile "*" \
     down
 

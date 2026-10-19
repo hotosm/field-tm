@@ -37,7 +37,6 @@ env:
   ENCRYPTION_KEY: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
   OSM_CLIENT_ID: local-dev
   OSM_CLIENT_SECRET: local-dev
-  OSM_SECRET_KEY: local-dev
 
 db:
   enabled: true

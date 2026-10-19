@@ -10,9 +10,9 @@ RUN apt-get update --quiet \
     && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-warn-script-location --break-system-packages \
       --no-cache-dir \
-      # Switch to master branch after https://github.com/opengisch/convert2qgis/pull/79 merged
-      git+https://github.com/opengisch/xlsform2qgis.git#use_tabs_imp \
-      git+https://github.com/opengisch/libqfieldsync.git \
+      # Pinned to master SHAs (the old `#use_tabs_imp` fragment was ignored by pip)
+      git+https://github.com/opengisch/xlsform2qgis.git@f7fdecc1a0c0249aa56b2258158bd234f7e85010 \
+      git+https://github.com/opengisch/libqfieldsync.git@aad2ea69b21b72209db1df5be54c25138a32048f \
       psycopg[c]
 
 
