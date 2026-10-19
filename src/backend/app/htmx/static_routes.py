@@ -20,9 +20,12 @@
 
 from pathlib import Path
 
-from litestar import get
+from litestar import Request, get
 from litestar import status_codes as status
-from litestar.response import Response
+from litestar.response import File, Redirect, Response
+
+from app.config import settings
+from app.i18n import _
 
 
 @get("/static/css/{filename:str}")
@@ -80,44 +83,86 @@ async def serve_static_js(filename: str) -> Response:
     )
 
 
-@get("/static/images/{filename:str}")
-async def serve_static_image(filename: str) -> Response:
-    """Serve static image files."""
+@get("/static/images/{path:path}")
+async def serve_static_image(path: str) -> Response:
+    """Serve static image files (including subfolders, e.g. apps/)."""
     allowed_media_types = {
         ".svg": "image/svg+xml",
         ".png": "image/png",
         ".jpg": "image/jpeg",
         ".jpeg": "image/jpeg",
     }
-    static_dir = Path(__file__).parent.parent / "static" / "images"
-    file_path = static_dir / filename
-    suffix = Path(filename).suffix.lower()
+    static_dir = (Path(__file__).parent.parent / "static" / "images").resolve()
+    file_path = (static_dir / path.lstrip("/")).resolve()
+    suffix = file_path.suffix.lower()
 
-    # Security: only allow known image extensions and ensure no path traversal
-    if (
-        suffix not in allowed_media_types
-        or ".." in filename
-        or "/" in filename
-        or "\\" in filename
-    ):
-        return Response(
-            content="Forbidden",
-            status_code=status.HTTP_403_FORBIDDEN,
+    if suffix not in allowed_media_types or not file_path.is_relative_to(static_dir):
+        return Response(content="Forbidden", status_code=status.HTTP_403_FORBIDDEN)
+    if not file_path.is_file():
+        return Response(content="Not Found", status_code=status.HTTP_404_NOT_FOUND)
+
+    return Response(
+        content=file_path.read_bytes(),
+        media_type=allowed_media_types[suffix],
+        headers={"Cache-Control": "public, max-age=3600"},
+    )
+
+
+# Explicit types: never send Content-Encoding for PGlite's *.gz bundles.
+_PLANNER_MEDIA_TYPES = {
+    ".html": "text/html",
+    ".js": "text/javascript",
+    ".mjs": "text/javascript",
+    ".css": "text/css",
+    ".wasm": "application/wasm",
+    ".svg": "image/svg+xml",
+    ".png": "image/png",
+    ".json": "application/json",
+    ".gz": "application/gzip",
+}
+
+
+@get(["/planner", "/planner/{path:path}"], include_in_schema=False)
+async def serve_planner(request: Request, path: str = "/") -> Response:
+    """Serve the task planner build (relative asset paths need the slash)."""
+    if request.scope.get("raw_path", b"").rstrip(b"?") == b"/planner":
+        query = f"?{request.url.query}" if request.url.query else ""
+        return Redirect(
+            f"/planner/{query}", status_code=status.HTTP_301_MOVED_PERMANENTLY
         )
 
-    if not file_path.exists():
+    root = Path(settings.PLANNER_DIR).resolve()
+    file_path = (root / path.lstrip("/")).resolve()
+    if file_path.is_dir():
+        file_path = file_path / "index.html"
+    if not file_path.is_relative_to(root) or not file_path.is_file():
+        message = (
+            _("Not found.")
+            if root.is_dir()
+            else _(
+                "The task planner has not been built. Run `just build planner`, "
+                "or set PLANNER_DIR to the planner build directory."
+            )
+        )
         return Response(
-            content="Not Found",
+            content=f"<!doctype html><title>Task planner</title><p>{message}</p>",
+            media_type="text/html",
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    with open(file_path, "rb") as f:
-        content = f.read()
-
-    return Response(
-        content=content,
-        media_type=allowed_media_types[suffix],
-        headers={"Cache-Control": "public, max-age=3600"},
+    hashed = file_path.parent.name == "assets"
+    return File(
+        path=file_path,
+        media_type=_PLANNER_MEDIA_TYPES.get(
+            file_path.suffix.lower(), "application/octet-stream"
+        ),
+        content_disposition_type="inline",
+        headers={
+            "X-Frame-Options": "SAMEORIGIN",
+            "Cache-Control": "public, max-age=31536000, immutable"
+            if hashed
+            else "no-cache",
+        },
     )
 
 

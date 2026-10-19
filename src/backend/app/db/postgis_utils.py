@@ -19,8 +19,6 @@
 
 import json
 import logging
-from datetime import datetime, timezone
-from random import getrandbits
 from typing import Optional
 
 from litestar import status_codes as status
@@ -214,45 +212,3 @@ def _split_records_to_feature_collections(
             detail=msg,
         )
     return result_dict
-
-
-def add_required_geojson_properties(
-    featcol: dict,
-) -> dict:
-    """Add required geojson properties if not present."""
-    features = featcol.get("features", [])
-    current_date = datetime.now(timezone.utc)
-
-    for feature in features:
-        properties = feature.get("properties", {})
-        # Check for id type embedded in properties
-        if feature_id := feature.get("id"):
-            properties["osm_id"] = feature_id
-        else:
-            osm_id = (
-                properties.get("osm_id")
-                or properties.get("id")
-                or properties.get("fid")
-                # NOTE 32-bit int is max supported by standard postgres Integer
-                or getrandbits(30)
-            )
-
-            if isinstance(osm_id, str) and "/" in osm_id:
-                osm_id = osm_id.split("/")[0]
-
-            # Ensure negative osm_id if it's derived
-            if not properties.get("osm_id"):
-                osm_id = -abs(int(osm_id))
-
-            feature["id"] = str(osm_id)
-            properties["osm_id"] = osm_id
-
-        properties.setdefault("tags", "")
-        properties.setdefault("version", 1)
-        properties.setdefault("changeset", 1)
-        properties.setdefault("timestamp", str(current_date))
-        properties.setdefault("created_by", "")
-
-        feature["properties"] = properties
-
-    return featcol

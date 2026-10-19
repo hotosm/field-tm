@@ -49,7 +49,7 @@ def get_user_sub(user: object) -> str:
     - HOTOSM  → ``hotosm|<id>``
     - BUNDLED → ``fieldtm|<id>``
     - others  → preserve any existing ``provider|id`` form or fall back to ``osm|<id>``
-    - ``custom|<id>`` is preserved for the internal local admin/debug user.
+    - ``custom|<id>`` is preserved for the internal local admin user.
     """
     provider_prefixes = {
         AuthProvider.HOTOSM: "hotosm",
@@ -99,7 +99,7 @@ def get_user_is_admin(user: object) -> bool:
 
 
 def get_local_admin_auth_user() -> SimpleNamespace:
-    """Return the internal local admin principal used by debug/disabled auth."""
+    """Return the internal local admin principal used when auth is disabled."""
     return SimpleNamespace(
         sub=_LOCAL_ADMIN_RAW_SUB,
         username=_LOCAL_ADMIN_USERNAME,
@@ -107,29 +107,20 @@ def get_local_admin_auth_user() -> SimpleNamespace:
     )
 
 
+def auth_disabled() -> bool:
+    """Whether auth is explicitly disabled (local development only)."""
+    return settings.AUTH_PROVIDER == AuthProvider.DISABLED
+
+
 async def login_required(request: Request) -> object:
     """Dependency for endpoints requiring login."""
-    if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
+    if auth_disabled():
         return get_local_admin_auth_user()
     return await get_current_user(request)
 
 
 async def get_optional_auth_user(request: Request) -> object | None:
-    """Return the authenticated user when present, otherwise None.
-
-    In debug or auth-disabled mode we keep the existing local-admin shortcut so
-    manager workflows remain accessible without a session.
-    """
-    if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
+    """Return the authenticated user when present, otherwise None."""
+    if auth_disabled():
         return get_local_admin_auth_user()
     return await get_current_user_optional(request)
-
-
-async def public_endpoint(request: Request) -> object:
-    """Optional-auth dependency with a service-account fallback."""
-    if settings.DEBUG or settings.AUTH_PROVIDER == AuthProvider.DISABLED:
-        return get_local_admin_auth_user()
-    user = await get_current_user_optional(request)
-    if user:
-        return user
-    return SimpleNamespace(sub="osm|20386219", username="svcftm", is_admin=False)

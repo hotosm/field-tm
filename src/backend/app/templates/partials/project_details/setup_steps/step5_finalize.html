@@ -1,4 +1,27 @@
-{% if has_xlsform and has_data_extract and has_task_areas %}
+{% if not syncs %}
+<div id="step-5-container" class="ftm-step ftm-step--pending">
+  <div class="ftm-step__header">
+    <h3 class="ftm-step__title">{{ _("Publish Project") }}</h3>
+    <wa-badge variant="success">{{ _("Ready") }}</wa-badge>
+  </div>
+  <p class="ftm-step-intro">
+    {{ _("Publish the project so your team can open the tasks, download them and share links.
+    Nothing is sent to %(app)s; your team coordinates there.") % {"app": app.name if app else _("the
+    app")} }}
+  </p>
+  <div class="ftm-step__actions">
+    <button
+      type="button"
+      class="wa-button wa-button--brand"
+      hx-post="/create-project-htmx?project_id={{ project.id }}"
+      hx-target="#finalise-status"
+    >
+      {{ _("Publish Project") }}
+    </button>
+  </div>
+  <div id="finalise-status" class="ftm-step__status"></div>
+</div>
+{% else %}
 <div id="step-5-container" class="ftm-step ftm-step--pending">
   <div class="ftm-step__header">
     <h3 class="ftm-step__title">{{ _("Finalise Project") }}</h3>

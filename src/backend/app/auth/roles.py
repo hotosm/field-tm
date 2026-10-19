@@ -23,23 +23,19 @@ an AuthUser object in a standard format.
 """
 
 import logging
-from typing import Annotated, Optional
+from typing import Optional
 
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
-from litestar.params import Dependency
 from psycopg import AsyncConnection
 from psycopg.rows import class_row
 
-from app.auth.auth_deps import get_user_sub, get_user_username
+from app.auth.auth_deps import get_user_sub
 from app.auth.auth_schemas import ProjectUserDict
-from app.db.enums import (
-    ProjectRole,
-    ProjectStatus,
-    ProjectVisibility,
-)
+from app.db.enums import ProjectRole, ProjectVisibility
 from app.db.models import DbProject, DbUser
 from app.i18n import _
+from app.projects.project_deps import get_project_by_id
 
 log = logging.getLogger(__name__)
 
@@ -53,11 +49,10 @@ async def check_access(
 ) -> Optional[DbUser]:
     """Check if the user has access to a project.
 
-    Simplified rules:
-    - Global ADMINs (`is_admin=True`) always have access.
-    - For project-specific access, we check the `user_roles` table:
-        * PROJECT_ADMIN: must have PROJECT_ADMIN role for the project.
-        * MAPPER (or None): must have at least MAPPER role for the project.
+    - Global admins always have access.
+    - The project creator, or a user with PROJECT_MANAGER in `user_roles`,
+      has PROJECT_MANAGER (and MAPPER) access.
+    - MAPPER access also accepts a MAPPER role in `user_roles`.
     - `check_completed=True` blocks access to COMPLETED / ARCHIVED projects.
     """
     user_sub = get_user_sub(user)
@@ -84,34 +79,34 @@ async def check_access(
     if project_id is None or role is None:
         return db_user
 
+    # Project creators manage their own projects; managers may also map.
+    roles = [ProjectRole.PROJECT_MANAGER.value]
+    if role == ProjectRole.MAPPER:
+        roles.append(ProjectRole.MAPPER.value)
     async with db.cursor() as cur:
-        # Optionally block completed / archived projects
-        if check_completed:
-            await cur.execute(
-                """
-                SELECT 1
-                FROM projects
-                WHERE id = %(project_id)s
-                  AND status IN ('COMPLETED', 'ARCHIVED')
-                """,
-                {"project_id": project_id},
-            )
-            if await cur.fetchone():
-                return None
-
-        # Check project role
         await cur.execute(
             """
             SELECT 1
-            FROM user_roles
-            WHERE user_sub = %(user_sub)s
-              AND project_id = %(project_id)s
-              AND role = %(role)s
+            FROM projects p
+            WHERE p.id = %(project_id)s
+              AND NOT (
+                %(check_completed)s AND p.status IN ('COMPLETED', 'ARCHIVED')
+              )
+              AND (
+                p.created_by_sub = %(user_sub)s
+                OR EXISTS (
+                    SELECT 1 FROM user_roles ur
+                    WHERE ur.project_id = p.id
+                      AND ur.user_sub = %(user_sub)s
+                      AND ur.role = ANY(%(roles)s::projectrole[])
+                )
+              )
             """,
             {
                 "user_sub": user_sub,
                 "project_id": project_id,
-                "role": role.value if isinstance(role, ProjectRole) else role,
+                "roles": roles,
+                "check_completed": check_completed,
             },
         )
         has_role = await cur.fetchone()
@@ -119,27 +114,10 @@ async def check_access(
     return db_user if has_role else None
 
 
-async def super_admin(
-    auth_user: Annotated[object, Dependency(skip_validation=True)],
-    db: AsyncConnection,
-) -> DbUser:
-    """Super admin role, with access to all endpoints.
-
-    Note: auth_user should be injected via login_required dependency.
-
-    Returns:
-        DbUser: Pydantic model of the authenticated admin user.
-    """
-    db_user = await check_access(auth_user, db)
-
-    if db_user:
-        return db_user
-
-    username = get_user_username(auth_user)
-    log.error("User %s requested an admin endpoint, but is not admin", username)
-    raise HTTPException(
+def _forbidden() -> HTTPException:
+    return HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
-        detail=_("User must be an administrator"),
+        detail=_("User does not have permission to access the project."),
     )
 
 
@@ -158,22 +136,9 @@ async def wrap_check_access(
         role=role,
         check_completed=check_completed,
     )
-
     if not db_user:
-        msg = _("User does not have permission to access the project.")
-        # NOTE workaround to allow a mix of svcftm access on mapper frontend
-        # for public projects, but also blocking access for svcftm on
-        # mapper frontend if the project is private. We must send 401 and
-        # not 403 to make managing this easier
-        if get_user_username(user_data) == "svcftm":
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=msg)
-        else:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=msg)
-
-    return {
-        "user": db_user,
-        "project": project,
-    }
+        raise _forbidden()
+    return {"user": db_user, "project": project}
 
 
 async def project_manager(
@@ -182,73 +147,34 @@ async def project_manager(
     auth_user: object,
     check_completed: bool = False,
 ) -> ProjectUserDict:
-    """Only allow access to project managers.
+    """Only allow access to project managers (or global admins).
 
-    Args:
-        project_id: The project ID from the path parameter.
-        db: Database connection.
-        auth_user: Authenticated user from login_required.
-        check_completed: Whether to check if project is completed/archived.
-
-    Returns:
-        ProjectUserDict containing user and project.
+    Permission is checked before the (large) project row is loaded.
     """
-    project = await DbProject.one(db, project_id, warn_on_missing_token=False)
-    return await wrap_check_access(
-        project,
-        db,
+    db_user = await check_access(
         auth_user,
-        ProjectRole.PROJECT_ADMIN,
+        db,
+        project_id=project_id,
+        role=ProjectRole.PROJECT_MANAGER,
         check_completed=check_completed,
     )
+    if not db_user:
+        raise _forbidden()
+    project = await get_project_by_id(db, project_id)
+    return {"user": db_user, "project": project}
 
 
-async def mapper(
-    project_id: int,
+async def ensure_project_viewable(
     db: AsyncConnection,
-    auth_user: object,
-    check_completed: bool = False,
-) -> ProjectUserDict:
-    """Allow permission for mappers.
-
-    In public projects, this is all users.
-    In private projects, users must be explicitly granted permission.
-
-    Args:
-        project_id: The project ID from the path parameter.
-        db: Database connection.
-        auth_user: Authenticated user from login_required.
-        check_completed: Whether to check if project is completed/archived.
-
-    Returns:
-        ProjectUserDict containing user and project.
-    """
-    project = await DbProject.one(db, project_id, warn_on_missing_token=False)
-
-    if check_completed and project.status in [
-        ProjectStatus.COMPLETED,
-        ProjectStatus.ARCHIVED,
-    ]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=_("Project is locked since it is in %(state)s state.")
-            % {"state": project.status.value},
-        )
-
-    # If project is public, skip permission check
+    project: DbProject,
+    auth_user: object | None,
+) -> None:
+    """Public projects are open to guests; private ones need a project role."""
     if project.visibility == ProjectVisibility.PUBLIC:
-        return {
-            "user": await DbUser.one(db, get_user_sub(auth_user)),
-            "project": project,
-        }
-
-    # As the default user for temp auth (svcftm) does not have valid permissions
-    # on any project, this will block access for temp login users on projects
-    # that are not public
-    return await wrap_check_access(
-        project,
-        db,
-        auth_user,
-        ProjectRole.MAPPER,
-        check_completed=check_completed,
-    )
+        return
+    if auth_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=_("You must be logged in to view this project."),
+        )
+    await wrap_check_access(project, db, auth_user, ProjectRole.MAPPER)

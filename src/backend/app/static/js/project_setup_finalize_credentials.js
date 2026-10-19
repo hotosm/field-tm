@@ -136,13 +136,14 @@ export function initProjectSetupFinalizeCredentials({
         let response;
 
         if (isOdk) {
-          const params = new URLSearchParams({
-            external_project_instance_url: creds.url,
-            external_project_username: creds.username,
-            external_project_password: creds.password,
-          });
-          response = await fetch(`/api/v1/central/test-credentials?${params}`, {
+          response = await fetch("/api/v1/central/test-credentials", {
             method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              external_project_instance_url: creds.url,
+              external_project_username: creds.username,
+              external_project_password: creds.password,
+            }),
           });
         } else if (isQField) {
           response = await fetch("/api/v1/qfield/test-credentials", {

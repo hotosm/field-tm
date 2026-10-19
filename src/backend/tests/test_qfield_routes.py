@@ -118,6 +118,51 @@ def test_build_tasks_geojson_keeps_stored_ids_and_stamps_legacy_rows():
     assert stored_ids == [2, 1, 4, 3]
 
 
+def test_build_tasks_geojson_passes_assignments_and_resets_status():
+    """Assignment fields reach the tasks layer; every task starts available."""
+    project = SimpleNamespace(
+        task_areas_geojson={
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": None,
+                    "properties": {
+                        "task_id": 3,
+                        "assigned_group": "team-a",
+                        "assigned_to": "Chomba",
+                        "comment": "Start Monday",
+                        "colour": "#d63f3f",
+                        "status": "completed",
+                        "building_count": 4,
+                    },
+                },
+                {"type": "Feature", "geometry": None, "properties": {"task_id": 1}},
+            ],
+        },
+        outline=None,
+    )
+
+    first, second = (f["properties"] for f in _build_tasks_geojson(project)["features"])
+
+    assert first == {
+        "task_id": 3,
+        "status": "available",
+        "assigned_group": "team-a",
+        "assigned_to": "Chomba",
+        "comment": "Start Monday",
+        "colour": "#d63f3f",
+    }
+    assert second == {
+        "task_id": 1,
+        "status": "available",
+        "assigned_group": None,
+        "assigned_to": None,
+        "comment": None,
+        "colour": None,
+    }
+
+
 def test_build_tasks_geojson_restamps_duplicate_and_invalid_ids():
     """Duplicate or malformed stored ids must come out as unique integers."""
     project = SimpleNamespace(

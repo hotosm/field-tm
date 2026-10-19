@@ -365,61 +365,6 @@ extra_head %}
     line-height: 1.5;
   }
 
-  .landing-footer {
-    background-color: var(--hot-color-primary-900);
-    color: white;
-    padding: 34px 0 36px 0;
-  }
-
-  .landing-footer-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-bottom: 20px;
-  }
-
-  .landing-footer-top a,
-  .landing-footer-help a,
-  .landing-footer-social a {
-    color: #ffffff;
-    text-decoration: none;
-  }
-
-  .landing-footer-top a {
-    font-weight: 600;
-    opacity: 0.95;
-  }
-
-  .landing-footer-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    gap: 14px;
-  }
-
-  .landing-footer-help {
-    color: rgba(255, 255, 255, 0.85);
-    line-height: 1.55;
-  }
-
-  .landing-footer-social {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .landing-footer-social a {
-    padding: 6px 10px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.36);
-    font-size: 0.8rem;
-    letter-spacing: 0.04em;
-  }
-
   @keyframes landing-fade-up {
     from {
       opacity: 0;
@@ -465,10 +410,6 @@ extra_head %}
     .landing-use-cases,
     .landing-resources {
       margin-bottom: 52px;
-    }
-
-    .landing-footer {
-      padding-top: 28px;
     }
   }
 
@@ -670,31 +611,5 @@ extra_head %}
       </a>
     </div>
   </section>
-
-  <footer class="landing-footer">
-    <div class="landing-shell">
-      <div class="landing-footer-bottom">
-        <div class="landing-footer-help">
-          {{ _("Need help or have a request?") }}
-          <a href="https://roadmap.hotosm.org/#tech-request" target="_blank" rel="noopener"
-            >{{ _("Submit a tech request") }}</a
-          >
-        </div>
-        <div class="landing-footer-social">
-          <a href="https://bsky.app/profile/hotosm.org" target="_blank" rel="noopener"> Bluesky </a>
-          <a
-            href="https://www.linkedin.com/company/humanitarian-openstreetmap-team"
-            target="_blank"
-            rel="noopener"
-            >LinkedIn</a
-          >
-          <a href="https://www.facebook.com/hotosm" target="_blank" rel="noopener">Facebook</a>
-          <a href="https://www.instagram.com/_hotosm/" target="_blank" rel="noopener">Instagram</a>
-          <a href="https://www.youtube.com/user/hotosm" target="_blank" rel="noopener">YouTube</a>
-          <a href="https://github.com/hotosm/field-tm" target="_blank" rel="noopener">GitHub</a>
-        </div>
-      </div>
-    </div>
-  </footer>
 </main>
 {% endblock %}

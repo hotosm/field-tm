@@ -1,0 +1,5 @@
+{% if app.logo %}
+<img src="{{ app.logo }}" alt="" class="ftm-app-logo" loading="lazy" />
+{% else %}
+<span class="ftm-app-logo ftm-app-logo--initial" aria-hidden="true">{{ app.name[:1] }}</span>
+{% endif %}

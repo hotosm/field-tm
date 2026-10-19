@@ -23,19 +23,7 @@ SET row_security = off;
 
 -- PostGIS
 
-CREATE SCHEMA IF NOT EXISTS tiger;
-ALTER SCHEMA tiger OWNER TO current_user;
-
-CREATE SCHEMA IF NOT EXISTS tiger_data;
-ALTER SCHEMA tiger_data OWNER TO current_user;
-
-CREATE SCHEMA IF NOT EXISTS topology;
-ALTER SCHEMA topology OWNER TO current_user;
-
-CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
-CREATE EXTENSION IF NOT EXISTS postgis_tiger_geocoder WITH SCHEMA tiger;
-CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
 -- Required for area-splitter PostGIS StraightSkeleton usage
 CREATE EXTENSION IF NOT EXISTS postgis_sfcgal WITH SCHEMA public;
 

@@ -21,8 +21,7 @@ from litestar import Router, post
 from litestar import status_codes as status
 from litestar.di import Provide
 
-from app.auth.auth_deps import public_endpoint
-from app.db.database import db_conn
+from app.auth.auth_deps import login_required
 from app.qfield import qfield_schemas
 from app.qfield.qfield_crud import qfc_credentials_test
 
@@ -30,14 +29,12 @@ from app.qfield.qfield_crud import qfc_credentials_test
 @post(
     "/test-credentials",
     summary="Test QFieldCloud credentials by attempting to open a session.",
-    dependencies={
-        "db": Provide(db_conn),
-        "current_user": Provide(public_endpoint),
-    },
     status_code=status.HTTP_200_OK,
+    dependencies={"current_user": Provide(login_required)},
 )
 async def qfc_creds_test(
     data: qfield_schemas.QFieldCloud,
+    current_user: object,
 ) -> None:
     """Test QFieldCloud credentials by attempting to open a session."""
     await qfc_credentials_test(data)
@@ -46,7 +43,5 @@ async def qfc_creds_test(
 qfield_router = Router(
     path="/api/v1/qfield",
     tags=["api"],
-    route_handlers=[
-        qfc_creds_test,
-    ],
+    route_handlers=[qfc_creds_test],
 )

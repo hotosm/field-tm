@@ -51,7 +51,7 @@ class AuthProvider(str, Enum):
     """Authentication provider options."""
 
     BUNDLED = "bundled"  # self-hosted Hanko via contrib/login (default)
-    DISABLED = "disabled"  # no authentication - public access only
+    DISABLED = "disabled"  # no login, every request is the local admin (dev only)
     HOTOSM = "hotosm"  # centralised HOT login at login.hotosm.org
     CUSTOM = "custom"  # user-supplied HANKO_API_URL / LOGIN_URL
 
@@ -161,11 +161,10 @@ class Settings(BaseSettings):
 
     FTM_DOMAIN: str
     FTM_DEV_PORT: Optional[str] = None
-    APP_NAME: str = "Field-TM"
     DEBUG: bool = False
     # Auth provider - controls which Hanko instance and login page are used.
     #   bundled  - self-hosted Hanko via `just start login` (default)
-    #   disabled - no authentication, public access only
+    #   disabled - no login; every request acts as the local admin (dev only!)
     #   hotosm   - centralised HOT login (auto-configures HANKO_API_URL + LOGIN_URL)
     #   custom   - bring your own Hanko; set HANKO_API_URL + LOGIN_URL explicitly
     AUTH_PROVIDER: AuthProvider = AuthProvider.BUNDLED
@@ -194,12 +193,12 @@ class Settings(BaseSettings):
                 raise ValueError("HANKO_API_URL must be set when AUTH_PROVIDER=custom")
         return self
 
+    # Built task planner (src/planner/dist), served at /planner/.
+    PLANNER_DIR: str = "/opt/planner"
+
     LOG_LEVEL: str = "INFO"
     PYODK_LOG_LEVEL: str = "CRITICAL"
     ENCRYPTION_KEY: SecretStr
-    # NOTE HS384 is used for simplicity of implementation and compatibility with
-    # existing Fernet based database value encryption
-    JWT_ENCRYPTION_ALGORITHM: str = "HS384"
 
     EXTRA_CORS_ORIGINS: Optional[str | list[str]] = None
 
@@ -305,27 +304,6 @@ class Settings(BaseSettings):
             base = value.split("/api/v1")[0].rstrip("/")
         return f"{base}/api/v1/"
 
-    OSM_CLIENT_ID: str
-    OSM_CLIENT_SECRET: SecretStr
-    # NOTE www is required for now
-    # https://github.com/openstreetmap/operations/issues/951#issuecomment-1748717154
-    OSM_URL: HttpUrlStr = "https://www.openstreetmap.org"
-    OSM_SCOPE: list[str] = ["read_prefs", "send_messages"]
-    OSM_SECRET_KEY: SecretStr
-
-    @computed_field
-    @property
-    def manager_osm_login_redirect_uri(self) -> str:
-        """The constructed OSM redirect URL for manager frontend.
-
-        Must be set in the OAuth2 config for the openstreetmap profile.
-        """
-        if self.DEBUG:
-            uri = "http://127.0.0.1:7051/osmauth"
-        else:
-            uri = f"https://{self.FTM_DOMAIN}/osmauth"
-        return uri
-
     RAW_DATA_API_URL: HttpUrlStr = "https://api-prod.raw-data.hotosm.org/v1"
     RAW_DATA_API_AUTH_TOKEN: Optional[SecretStr] = None
 
@@ -384,12 +362,6 @@ def get_cipher_suite():
     """Cache cypher suite."""
     # Fernet is used by cryptography as a simple and effective default
     # it enforces a 32 char secret.
-    #
-    # In the future we could migrate this to HS384 encryption, which we also
-    # use for our JWT signing. Ideally this needs 48 characters, but for now
-    # we are stuck at 32 char to maintain support with Fernet (reuse the same key).
-    #
-    # However this would require a migration for all existing instances of Field-TM.
     return Fernet(settings.ENCRYPTION_KEY.get_secret_value())
 
 

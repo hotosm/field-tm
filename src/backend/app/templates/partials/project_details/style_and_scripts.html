@@ -24,13 +24,6 @@
       downloading: {{ _("Downloading...")|tojson }},
       downloadOsmData: {{ _("Use OSM data")|tojson }},
       invalidGeojsonFileType: {{ _("Invalid file type. Please upload a .geojson or .json file.")|tojson }},
-      confirmNoSplitting: {{ _("Confirm No Splitting")|tojson }},
-      splitBySquare: {{ _("Split by grid")|tojson }},
-      splitByBuildings: {{ _("Split by buildings")|tojson }},
-      splitAoi: {{ _("Split area")|tojson }},
-      selectOption: {{ _("Select Option")|tojson }},
-      confirming: {{ _("Confirming...")|tojson }},
-      splitting: {{ _("Splitting...")|tojson }},
       odkCentral: {{ _("ODK Central")|tojson }},
       qfield: {{ _("QField")|tojson }},
       mappingTool: {{ _("the mapping tool")|tojson }},
@@ -50,8 +43,6 @@
       errorPrefix: {{ _("Error:")|tojson }},
       finalizeCompleteEvent: 'project-setup:finalize-complete',
       step3CompleteEvent: 'project-setup:step3-complete',
-      step4CompleteEvent: 'project-setup:step4-complete',
-      step4PreviewReadyEvent: 'project-setup:step4-preview-ready',
     };
     import('/static/js/project_setup_shared.js')
       .then((shared) => {
@@ -74,15 +65,6 @@
             // Keep setup flow usable even if optional form/data script fails to load.
           });
 
-        // Step 4: Split area behavior is loaded from static module
-        import('/static/js/project_setup_split.js')
-          .then(({ initProjectSetupSplit }) => {
-            initProjectSetupSplit({ i18nStrings });
-          })
-          .catch(() => {
-            // Keep setup flow usable even if optional split script fails to load.
-          });
-
         // Step 5: Finalise Project behavior is loaded from static module
         const projectType = {% if field_mapping_app_value %}"{{ field_mapping_app_value|e }}"{% else %}null{% endif %};
         import('/static/js/project_setup_finalize.js')
@@ -97,7 +79,5 @@
         // Keep setup flow usable even if shared setup script fails to load.
       });
 
-    // NOTE: We intentionally do not auto-load Leaflet previews on page load.
-    // This keeps Step 3 "completed" state collapsed (no reserved space for the map).
   })();
 </script>

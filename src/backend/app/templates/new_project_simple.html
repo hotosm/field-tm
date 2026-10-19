@@ -1,5 +1,6 @@
 {% extends "layout.html" %} {% block title %}{{ _("Quick Setup - OSM Buildings") }} - Field Tasking
-Manager{% endblock %} {% block content %}
+Manager{% endblock %} {% block extra_head %}{% include "partials/new_project/leaflet_head.html" %}{%
+endblock %} {% block content %}
 <div class="ftm-page ftm-page--narrow">
   <div style="margin-bottom: 16px">
     <wa-button href="/new" variant="default" size="s">← {{ _("Back") }}</wa-button>

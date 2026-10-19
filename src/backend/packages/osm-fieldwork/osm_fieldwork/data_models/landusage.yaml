@@ -1,7 +1,0 @@
-select:
-  osm_id: id
-from:
-  - ways_poly
-where:
-  tags:
-    - landuse: not null

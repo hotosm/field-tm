@@ -27,13 +27,10 @@ from geojson_pydantic import (
     MultiPolygon,
     Polygon,
 )
-from litestar.datastructures import UploadFile
-from litestar.dto import DataclassDTO, DTOConfig
 from pydantic import (
     AliasChoices,
     AwareDatetime,
     BaseModel,
-    ConfigDict,
     Field,
     ValidationError,
     ValidationInfo,
@@ -43,128 +40,16 @@ from pydantic.functional_validators import field_validator, model_validator
 from app.central.central_schemas import ODKCentral
 from app.config import encrypt_value, settings
 from app.db.enums import (
-    DbGeomType,
     FieldMappingApp,
     ProjectPriority,
     ProjectStatus,
-    XLSFormType,
 )
-from app.db.models import DbProject, slugify
+from app.db.models import slugify
 from app.helpers.geometry_utils import merge_featcol_polygons_sync
-from app.qfield.qfield_schemas import QFieldCloud
-
-
-class SplitFormData(BaseModel):
-    """Form data for split square task split."""
-
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    project_geojson: UploadFile
-    extract_geojson: UploadFile | None = None
-
-
-class CreateProjectRequest(ODKCentral, QFieldCloud):
-    """Single payload to create a complete project end-to-end."""
-
-    project_name: str
-    field_mapping_app: FieldMappingApp
-    description: str
-    outline: dict
-    hashtags: list[str] | None = None
-
-    template_form_id: int | None = None
-    xlsform_base64: str | None = None
-    need_verification_fields: bool = True
-    include_photo_upload: bool = True
-    mandatory_photo_upload: bool = False
-    use_odk_collect: bool = False
-    default_language: str = "english"
-
-    geojson: dict | None = None
-    osm_category: XLSFormType | None = None
-    geom_type: DbGeomType = DbGeomType.POLYGON
-    centroid: bool = False
-
-    algorithm: SplittingAlgorithm | None = None
-    no_of_buildings: int = 10
-    no_of_tasks: int = 10
-    dimension_meters: int = 100
-    include_roads: bool = True
-    include_rivers: bool = True
-    include_railways: bool = True
-    include_aeroways: bool = True
-
-    cleanup: bool = False
-
-    @field_validator("osm_category", mode="before")
-    @classmethod
-    def normalize_osm_category(cls, value):
-        """Accept internal preset keys as well as enum display values."""
-        if isinstance(value, str):
-            try:
-                return XLSFormType[value.strip().lower()]
-            except KeyError:
-                return value
-        return value
-
-    @model_validator(mode="after")
-    def validate_xlsform_source(self):
-        """Require exactly one XLSForm source."""
-        has_template = self.template_form_id is not None
-        has_upload = bool(self.xlsform_base64)
-        if has_template == has_upload:
-            raise ValueError(
-                "Provide exactly one XLSForm source: "
-                "template_form_id or xlsform_base64."
-            )
-        return self
-
-
-class CreateProjectResponse(BaseModel):
-    """Response after full project creation."""
-
-    project_id: int
-    ftm_url: str | None = None
-    downstream_url: str
-    manager_username: str | None = None
-    manager_password: str | None = None
-
 
 # ============================================================================
 # DTOs for endpoint responses
 # ============================================================================
-
-
-# DTO for project responses (excludes sensitive/internal fields)
-class ProjectOut(DataclassDTO[DbProject]):
-    """DTO that excludes sensitive fields from project responses."""
-
-    config = DTOConfig(
-        exclude={
-            "xlsform_content",  # Don't serialize binary XLSForm content
-            "external_project_password_encrypted",  # Don't expose encrypted passwords
-        },
-    )
-
-
-# DTO for project summaries (subset of DbProject fields for listings)
-# NOTE: For paginated responses, use PaginatedProjectSummariesOut instead
-class ProjectSummary(DataclassDTO[DbProject]):
-    """DTO for project summaries with subset of fields."""
-
-    config = DTOConfig(
-        include={
-            "id",
-            "project_name",
-            "hashtags",
-            "location_str",
-            "description",
-            "external_project_id",
-            "external_project_instance_url",
-            "status",
-            "visibility",
-            "field_mapping_app",
-        },
-    )
 
 
 # ============================================================================
@@ -406,9 +291,3 @@ class ProjectUpdate(ProjectInBase, ODKCentral):
     creation_status: Optional[str] = None
     creation_error: Optional[str] = None
     creation_updated_at: Optional[AwareDatetime] = None
-
-    # Async advanced-flow split workflow state. Status is derived from
-    # these two columns: both NULL = running, error set = failed,
-    # result set = ready for preview.
-    split_error: Optional[str] = None
-    split_result_geojson: Optional[dict] = None

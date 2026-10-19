@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS buildings;
+DROP TABLE IF EXISTS pg_temp.buildings;
 CREATE TEMP TABLE buildings AS (
     SELECT
         b.*,
@@ -22,7 +22,7 @@ USING gist (geom);
 -- Clean up the table which may have gaps and stuff from spatial indexing
 -- VACUUM ANALYZE buildings;
 
-DROP TABLE IF EXISTS splitpolygons;
+DROP TABLE IF EXISTS pg_temp.splitpolygons;
 CREATE TEMP TABLE splitpolygons AS (
     WITH polygonsfeaturecount AS (
         SELECT
@@ -46,9 +46,9 @@ ON splitpolygons
 USING gist (geom);
 -- VACUUM ANALYZE splitpolygons;
 
-DROP TABLE polygonsnocount;
+DROP TABLE pg_temp.polygonsnocount;
 
--- DROP TABLE IF EXISTS lowfeaturecountpolygons;
+-- DROP TABLE IF EXISTS pg_temp.lowfeaturecountpolygons;
 -- CREATE TABLE lowfeaturecountpolygons AS (
 -- -- Grab the polygons with fewer than the requisite number of features
 --     WITH lowfeaturecountpolys AS (

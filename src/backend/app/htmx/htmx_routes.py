@@ -2,9 +2,6 @@
 
 from litestar import Router
 
-from app.htmx.assignment.assignment_routes import (
-    ROUTE_HANDLERS as ASSIGNMENT_HANDLERS,
-)
 from app.htmx.basemap.basemap_routes import ROUTE_HANDLERS as BASEMAP_HANDLERS
 from app.htmx.landing_routes import landing, login_page, metrics_partial
 from app.htmx.project_create.project_create_page_routes import (
@@ -32,9 +29,6 @@ from app.htmx.setup_steps.setup_step_extract_routes import (
 from app.htmx.setup_steps.setup_step_finalize_routes import (
     ROUTE_HANDLERS as SETUP_STEP_FINALIZE_HANDLERS,
 )
-from app.htmx.setup_steps.setup_step_split_routes import (
-    ROUTE_HANDLERS as SETUP_STEP_SPLIT_HANDLERS,
-)
 from app.htmx.setup_steps.setup_step_validate_routes import (
     ROUTE_HANDLERS as SETUP_STEP_VALIDATE_HANDLERS,
 )
@@ -44,6 +38,7 @@ from app.htmx.static_routes import (
     serve_favicon_png,
     serve_favicon_svg,
     serve_maskable_icon,
+    serve_planner,
     serve_pwa_64,
     serve_pwa_192,
     serve_pwa_512,
@@ -51,6 +46,7 @@ from app.htmx.static_routes import (
     serve_static_image,
     serve_static_js,
 )
+from app.htmx.task_plan_routes import ROUTE_HANDLERS as TASK_PLAN_HANDLERS
 
 htmx_router = Router(
     path="/",
@@ -77,7 +73,7 @@ htmx_router = Router(
         serve_static_image,
         *PROJECT_CREATE_XLSFORM_HANDLERS,
         *SETUP_STEP_EXTRACT_HANDLERS,
-        *SETUP_STEP_SPLIT_HANDLERS,
+        *TASK_PLAN_HANDLERS,
         *SETUP_STEP_FINALIZE_HANDLERS,
         project_qrcode_htmx,
         qfc_collaborator_form_htmx,
@@ -86,6 +82,6 @@ htmx_router = Router(
         *SETUP_STEP_VALIDATE_HANDLERS,
         *QFC_ADMIN_HANDLERS,
         *BASEMAP_HANDLERS,
-        *ASSIGNMENT_HANDLERS,
+        serve_planner,
     ],
 )

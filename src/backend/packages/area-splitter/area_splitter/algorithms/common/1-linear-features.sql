@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS polygonsnocount;
+DROP TABLE IF EXISTS pg_temp.polygonsnocount;
 -- Create a new polygon layer of splits by lines
 
 DO $$

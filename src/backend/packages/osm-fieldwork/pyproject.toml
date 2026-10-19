@@ -9,13 +9,9 @@ authors = [
     {name = "Anuj Gupta", email = "anuj.naxa@gmail.com"},
 ]
 dependencies = [
-    "geojson>=3.0.0",
-    "PyYAML>=6.0.0",
-    "segno>=1.5.2",
     "pandas>=1.5.0",
     "python-calamine>=0.3.1",
     "openpyxl>=3.0.10",
-    "requests>=2.26.0",
     "aiohttp>=3.8.4",
     "yxf>=1.0.0",
 ]
@@ -39,11 +35,6 @@ documentation = "https://hotosm.github.io/osm-fieldwork"
 repository = "https://github.com/hotosm/field-tm/blob/main/src/backend/packages/osm-fieldwork"
 
 [project.scripts]
-basemapper = "osm_fieldwork.basemapper:main"
-osm2favorites = "osm_fieldwork.osm2favorities:main"
-odk2osm = "osm_fieldwork.odk2osm:main"
-odk_client = "osm_fieldwork.odk_client:main"
-make_data_extract = "osm_fieldwork.make_data_extract:main"
 ftm_xlsform = "osm_fieldwork.update_xlsform:run"
 
 [build-system]

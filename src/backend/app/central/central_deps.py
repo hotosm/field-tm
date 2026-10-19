@@ -30,7 +30,7 @@ from urllib.parse import urlparse
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
 from litestar.exceptions import HTTPException
-from osm_fieldwork.OdkCentralAsync import OdkDataset, OdkForm, OdkProject
+from osm_fieldwork.OdkCentralAsync import OdkDataset
 from pyodk.client import Client
 
 from app.central.central_schemas import ODKCentral
@@ -151,42 +151,6 @@ async def get_odk_dataset(odk_creds: Optional[ODKCentral]):
         ) from conn_error
 
 
-@asynccontextmanager
-async def get_odk_project(odk_creds: Optional[ODKCentral]):
-    """Wrap getting an OdkProject object with ConnectionError handling."""
-    creds = _resolve_odk_creds(odk_creds)
-    try:
-        async with OdkProject(
-            url=creds.external_project_instance_url,
-            user=creds.external_project_username,
-            passwd=creds.external_project_password,
-        ) as odk_central:
-            yield odk_central
-    except ConnectionError as conn_error:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(conn_error),
-        ) from conn_error
-
-
-@asynccontextmanager
-async def get_async_odk_form(odk_creds: Optional[ODKCentral]):
-    """Wrap getting an OdkDataset object with ConnectionError handling."""
-    creds = _resolve_odk_creds(odk_creds)
-    try:
-        async with OdkForm(
-            url=creds.external_project_instance_url,
-            user=creds.external_project_username,
-            passwd=creds.external_project_password,
-        ) as odk_central:
-            yield odk_central
-    except ConnectionError as conn_error:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(conn_error),
-        ) from conn_error
-
-
 async def validate_xlsform_extension(xlsform: UploadFile):
     """Validate an XLSForm has .xls or .xlsx extension."""
     filename = Path(xlsform.filename)
@@ -199,8 +163,3 @@ async def validate_xlsform_extension(xlsform: UploadFile):
             detail=_("Provide a valid .xls or .xlsx file"),
         )
     return BytesIO(await xlsform.read())
-
-
-async def read_xlsform(xlsform: UploadFile) -> BytesIO:
-    """Read an XLSForm, validate extension, return wrapped in BytesIO."""
-    return await validate_xlsform_extension(xlsform)

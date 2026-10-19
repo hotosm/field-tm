@@ -14,6 +14,7 @@
 
 import json
 import logging
+import os
 import sys
 from pathlib import Path
 
@@ -32,11 +33,18 @@ logging.basicConfig(
 
 log = logging.getLogger(__name__)
 
+# Dev compose database; tests override it with FTM_DB_URL
+DEFAULT_DB_URL = (
+    f"postgresql://fieldtm:{os.getenv('FTM_DB_PASSWORD', 'fieldtm')}"
+    "@fieldtm-db:5432/fieldtm"
+)
+
 
 @pytest.fixture(scope="session")
 def db():
     """Existing psycopg connection."""
-    return psycopg.connect("postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm")
+    url = os.getenv("FTM_DB_URL", DEFAULT_DB_URL)
+    return psycopg.connect(url)
 
 
 @pytest.fixture(scope="session")

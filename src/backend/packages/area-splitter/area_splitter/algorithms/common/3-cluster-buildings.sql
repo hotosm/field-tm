@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS clusteredbuildings;
+DROP TABLE IF EXISTS pg_temp.clusteredbuildings;
 
 DO $$
 DECLARE
@@ -16,7 +16,7 @@ BEGIN
     END IF;
 
 -- Calculate a tentative number of tasks per partition.
-    DROP TABLE IF EXISTS partition_tasks;
+    DROP TABLE IF EXISTS pg_temp.partition_tasks;
     create TEMP table partition_tasks as
         select polyid, numfeatures,
         greatest(1,ceil(numfeatures/features_per_cluster))::int tasks

@@ -2,7 +2,7 @@
 
 # ruff: noqa: D103
 
-from litestar import get, post
+from litestar import post
 from litestar.datastructures import UploadFile
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
@@ -13,7 +13,7 @@ from psycopg import AsyncConnection
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import mapper
+from app.auth.roles import project_manager
 from app.db.database import db_conn
 
 from .setup_step_extract_handlers import (
@@ -21,7 +21,6 @@ from .setup_step_extract_handlers import (
     handle_collect_new_data_only,
     handle_discard_data_extract,
     handle_download_osm_data,
-    handle_preview_geojson,
     handle_submit_geojson_data_extract,
     handle_upload_geojson,
 )
@@ -57,10 +56,10 @@ def _submitted_bool(data: dict | None, key: str, default: bool) -> bool:
     dependencies={
         "db": Provide(db_conn),
         "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
+        "current_user": Provide(project_manager),
     },
 )
-async def download_osm_data_htmx(  # noqa: PLR0913
+async def download_osm_data_htmx(  # noqa: PLR0913, PLR0917
     request: HTMXRequest,
     db: AsyncConnection,
     current_user: ProjectUserDict,
@@ -92,7 +91,7 @@ async def download_osm_data_htmx(  # noqa: PLR0913
     dependencies={
         "db": Provide(db_conn),
         "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
+        "current_user": Provide(project_manager),
     },
 )
 async def upload_geojson_htmx(
@@ -111,35 +110,12 @@ async def upload_geojson_htmx(
     return await handle_upload_geojson(db, data, project_id)
 
 
-@get(
-    path="/preview-geojson-htmx",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
-    },
-)
-async def preview_geojson_htmx(
-    request: HTMXRequest,
-    db: AsyncConnection,
-    current_user: ProjectUserDict,
-    auth_user: object,
-    project_id: int = Parameter(),
-) -> Response:
-    _project, not_found_response = _authorized_project_or_response(
-        current_user, project_id
-    )
-    if not_found_response:
-        return not_found_response
-    return await handle_preview_geojson(db, project_id)
-
-
 @post(
     path="/collect-new-data-only-htmx",
     dependencies={
         "db": Provide(db_conn),
         "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
+        "current_user": Provide(project_manager),
     },
 )
 async def collect_new_data_only_htmx(
@@ -162,7 +138,7 @@ async def collect_new_data_only_htmx(
     dependencies={
         "db": Provide(db_conn),
         "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
+        "current_user": Provide(project_manager),
     },
 )
 async def submit_geojson_data_extract_htmx(
@@ -186,7 +162,7 @@ async def submit_geojson_data_extract_htmx(
     dependencies={
         "db": Provide(db_conn),
         "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
+        "current_user": Provide(project_manager),
     },
 )
 async def accept_data_extract_htmx(
@@ -209,7 +185,7 @@ async def accept_data_extract_htmx(
     dependencies={
         "db": Provide(db_conn),
         "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
+        "current_user": Provide(project_manager),
     },
 )
 async def discard_data_extract_htmx(
@@ -230,7 +206,6 @@ async def discard_data_extract_htmx(
 ROUTE_HANDLERS = [
     download_osm_data_htmx,
     upload_geojson_htmx,
-    preview_geojson_htmx,
     collect_new_data_only_htmx,
     submit_geojson_data_extract_htmx,
     accept_data_extract_htmx,

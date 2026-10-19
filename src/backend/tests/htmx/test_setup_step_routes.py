@@ -21,15 +21,10 @@ from app.htmx.setup_steps.setup_step_extract_routes import (
 from app.htmx.setup_steps.setup_step_finalize_routes import (
     create_project_htmx,
 )
-from app.htmx.setup_steps.setup_step_map_layers import (
-    build_split_preview_response,
-    task_boundaries_layer,
-)
 from app.htmx.setup_steps.setup_step_responses import (
     build_finalize_error_html,
     build_odk_finalize_success_html,
     build_qfield_finalize_success_html,
-    step4_completion_response,
 )
 from app.projects.project_services import (
     ODKFinalizeResult,
@@ -136,57 +131,26 @@ def _point_feature_collection(count: int) -> dict:
     }
 
 
-async def test_project_setup_split_step_shows_feature_count_and_recommendation(
-    client, db, project
-):
-    """Split step should show the extract feature count and suggested split values."""
+async def test_project_setup_tasks_step_links_to_planner(client, db, project):
+    """Once form and data are ready, the Tasks step opens the planner."""
     await DbProject.update(
         db,
         project.id,
         DbProject(
             xlsform_content=b"test xlsform",
-            data_extract_geojson=_point_feature_collection(200),
+            data_extract_geojson=_point_feature_collection(3),
         ),
     )
     await db.commit()
 
-    response = await client.get(
-        f"/projects/{project.id}",
-        headers={"HX-Request": "true"},
-    )
+    response = await client.get(f"/projects/{project.id}")
 
     assert response.status_code == status.HTTP_200_OK
-    assert 'id="split-feature-count"' in response.text
-    assert "<strong>200</strong>" in response.text
-    assert 'id="no-of-buildings-recommendation"' in response.text
-    assert "Recommendation: 5 (about 40 tasks)" in response.text
-    assert "Recommendation: 40 (about 5 buildings per task)" in response.text
-    assert 'name="no_of_buildings"\n            value="5"' in response.text
-    assert 'name="no_of_tasks"\n            value="40"' in response.text
-
-
-async def test_project_setup_split_step_without_features_has_no_recommendation(
-    client, db, project
-):
-    """Empty extracts skip splitting, so no recommendation should be shown."""
-    await DbProject.update(
-        db,
-        project.id,
-        DbProject(
-            xlsform_content=b"test xlsform",
-            data_extract_geojson={"type": "FeatureCollection", "features": []},
-        ),
-    )
-    await db.commit()
-
-    response = await client.get(
-        f"/projects/{project.id}",
-        headers={"HX-Request": "true"},
-    )
-
-    assert response.status_code == status.HTTP_200_OK
-    assert 'id="split-feature-count"' not in response.text
-    assert "Recommendation:" not in response.text
+    assert f'href="/planner/?project={project.id}"' in response.text
+    assert f'src="/planner/?project={project.id}&view=1"' in response.text
+    assert "Use whole area as one task" in response.text
+    # Finalise waits until tasks are decided.
+    assert 'id="step-5-container"' not in response.text
 
 
 async def test_collect_new_data_only_htmx_sets_empty_feature_collection(
@@ -207,14 +171,12 @@ async def test_collect_new_data_only_htmx_sets_empty_feature_collection(
     assert trigger_payload["nextStep"] == 4
     assert trigger_payload["code"] == "collect_new_data_enabled"
     assert "Collect-new-data mode selected" in response.text
-    assert "Task splitting is skipped" in response.text
 
     updated_project = await DbProject.one(db, project.id)
     assert updated_project.data_extract_geojson == {
         "type": "FeatureCollection",
         "features": [],
     }
-    assert updated_project.task_areas_geojson == {}
 
 
 async def test_download_osm_data_htmx_returns_requested_no_data_message(monkeypatch):
@@ -430,29 +392,6 @@ async def test_accept_data_extract_htmx_404_without_staged_extract(monkeypatch):
     assert response.status_code == status.HTTP_404_NOT_FOUND
 
 
-def test_task_boundaries_layer_uses_translated_popup_labels():
-    """Task boundary popups should show translated labels without layer name."""
-    layer = task_boundaries_layer(
-        {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "geometry": None,
-                    "properties": {"task_id": 3, "building_count": 14},
-                }
-            ],
-        }
-    )
-
-    assert layer["popup_options"]["showLayerName"] is False
-    assert layer["popup_options"]["propertyLabels"] == {
-        "task_id": "Task ID",
-        "building_count": "Building Count",
-    }
-    assert layer["popup_options"]["propertyOrder"] == ["task_id", "building_count"]
-
-
 def test_build_odk_finalize_success_html_includes_manager_credentials():
     """ODK finalize helper should return template context with manager credentials."""
     result = ODKFinalizeResult(
@@ -508,73 +447,6 @@ def test_build_qfield_finalize_success_html_emits_finalize_event():
     assert trigger_payload is not None
     assert trigger_payload["provider"] == "QField"
     assert trigger_payload["projectId"] == 99
-
-
-def test_build_split_preview_response_emits_step4_preview_event(monkeypatch):
-    """Split preview helper should emit explicit step4-preview-ready trigger."""
-    monkeypatch.setattr(
-        "app.htmx.setup_steps.setup_step_map_layers.render_leaflet_map",
-        lambda **_kwargs: "<div id='leaflet-map-split-preview'></div>",
-    )
-
-    project = SimpleNamespace(
-        outline={
-            "type": "Polygon",
-            "coordinates": [
-                [[0.0, 0.0], [0.0, 1.0], [1.0, 1.0], [1.0, 0.0], [0.0, 0.0]]
-            ],
-        }
-    )
-    tasks_featcol = {
-        "type": "FeatureCollection",
-        "features": [
-            {
-                "type": "Feature",
-                "geometry": {
-                    "type": "Polygon",
-                    "coordinates": [
-                        [[0.0, 0.0], [0.0, 0.5], [0.5, 0.5], [0.5, 0.0], [0.0, 0.0]]
-                    ],
-                },
-                "properties": {"task_id": 1, "building_count": 5},
-            }
-        ],
-    }
-    data_extract = {"type": "FeatureCollection", "features": []}
-
-    response_template = build_split_preview_response(
-        project_id=44,
-        algorithm="TOTAL_TASKS",
-        tasks_featcol=tasks_featcol,
-        data_extract=data_extract,
-        project=project,
-    )
-
-    hx_trigger = json.loads(response_template.headers.get("HX-Trigger", "{}"))
-    trigger_payload = hx_trigger.get("project-setup:step4-preview-ready")
-    assert trigger_payload is not None
-    assert trigger_payload["projectId"] == 44
-    assert trigger_payload["taskCount"] == 1
-
-
-def test_step4_completion_response_uses_explicit_project_id_in_trigger():
-    """Step4 completion helper should emit provided project id in trigger payload."""
-    request = Mock()
-    request.template_context = {}
-
-    response = step4_completion_response(
-        request=request,
-        project_id=77,
-        message="done",
-        mode="refresh",
-    )
-
-    hx_trigger = json.loads(response.headers.get("HX-Trigger", "{}"))
-    trigger_payload = hx_trigger.get("project-setup:step4-complete")
-    assert trigger_payload is not None
-    assert trigger_payload["projectId"] == 77
-    assert trigger_payload["step"] == 4
-    assert trigger_payload["nextStep"] == 5
 
 
 def test_build_finalize_error_html_prefers_friendly_text_for_plain_errors():

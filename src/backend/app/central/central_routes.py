@@ -20,40 +20,27 @@
 from litestar import Router, post
 from litestar import status_codes as status
 from litestar.di import Provide
-from litestar.params import Parameter
 
-from app.auth.auth_deps import public_endpoint
+from app.auth.auth_deps import login_required
 from app.central import central_crud, central_schemas
-from app.db.database import db_conn
 
 
 @post(
     "/test-credentials",
     summary="Test ODK Central credentials by attempting to open a session.",
     status_code=status.HTTP_200_OK,
-    dependencies={
-        "db": Provide(db_conn),
-        "current_user": Provide(public_endpoint),
-    },
+    dependencies={"current_user": Provide(login_required)},
 )
 async def odk_creds_test(
-    external_project_instance_url: str | None = Parameter(default=None),
-    external_project_username: str | None = Parameter(default=None),
-    external_project_password: str | None = Parameter(default=None),
+    data: central_schemas.ODKCentral,
+    current_user: object,
 ) -> None:
     """Test ODK Central credentials by attempting to open a session."""
-    odk_creds = central_schemas.ODKCentral(
-        external_project_instance_url=external_project_instance_url,
-        external_project_username=external_project_username,
-        external_project_password=external_project_password,
-    )
-    await central_crud.odk_credentials_test(odk_creds)
+    await central_crud.odk_credentials_test(data)
 
 
 central_router = Router(
     path="/api/v1/central",
     tags=["api"],
-    route_handlers=[
-        odk_creds_test,
-    ],
+    route_handlers=[odk_creds_test],
 )

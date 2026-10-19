@@ -15,6 +15,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
+from app.central import central_crud
 from app.central.central_schemas import ODKCentral
 from app.db.models import DbProject
 from app.projects import project_services
@@ -27,6 +28,7 @@ from app.projects.project_services import (
     derive_simple_project_metadata,
     finalize_odk_project,
     save_task_areas,
+    sync_odk_tasks,
 )
 from app.qfield.qfield_crud import _build_tasks_geojson
 
@@ -916,6 +918,96 @@ async def test_build_task_entities_uses_stored_task_ids():
 
     assert [entity["label"] for entity in task_entities] == ["Task 7", "Task 3"]
     assert [entity["data"]["task_id"] for entity in task_entities] == ["7", "3"]
+
+
+@pytest.mark.asyncio
+async def test_build_task_entities_include_assignments_and_colour():
+    """Task entities carry assignments; the colour styles the task."""
+    project = FakeProject(
+        task_areas_geojson={
+            "type": "FeatureCollection",
+            "features": [
+                _task_feature(
+                    properties={
+                        "task_id": 2,
+                        "assigned_group": "team-a",
+                        "assigned_to": "Chomba",
+                        "comment": "Start Monday",
+                        "colour": "#d63f3f",
+                    }
+                ),
+                _task_feature(properties={"task_id": 3}),
+            ],
+        }
+    )
+
+    async def fake_feature_geojson_to_entity_dict(feature, **kwargs):
+        return {"label": "", "data": {"geometry": "geom"}}
+
+    with patch(
+        "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+        side_effect=fake_feature_geojson_to_entity_dict,
+    ):
+        assigned, plain = await _build_task_entities(project)
+
+    assert assigned["data"] == {
+        "geometry": "geom",
+        "task_id": "2",
+        "status": "ready",
+        "assigned_group": "team-a",
+        "assigned_to": "Chomba",
+        "comment": "Start Monday",
+        "colour": "#d63f3f",
+        "fill": "#d63f3f33",
+        "stroke": "#d63f3f",
+        "stroke-width": "3",
+    }
+    assert plain["data"]["assigned_to"] == ""
+    assert plain["data"]["stroke"] == "#3388ff"
+
+
+@pytest.mark.asyncio
+async def test_sync_odk_tasks_keeps_field_status():
+    """Re-sync upserts task entities without resetting their status."""
+    project = FakeProject(
+        task_areas_geojson={
+            "type": "FeatureCollection",
+            "features": [_task_feature(properties={"task_id": 1})],
+        }
+    )
+
+    async def fake_feature_geojson_to_entity_dict(feature, **kwargs):
+        return {"label": "", "data": {"geometry": "geom"}}
+
+    with (
+        patch(
+            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            side_effect=fake_feature_geojson_to_entity_dict,
+        ),
+        patch(
+            "app.projects.project_services.central_crud.create_entity_list",
+            new_callable=AsyncMock,
+        ) as mock_create,
+    ):
+        await sync_odk_tasks(project, None, 17)
+
+    kwargs = mock_create.await_args.kwargs
+    assert mock_create.await_args.args == (None, 17)
+    assert kwargs["dataset_name"] == "tasks"
+    assert kwargs["keep_existing"] == frozenset({"status"})
+    assert "assigned_to" in kwargs["properties"]
+
+
+def test_entity_update_skips_kept_properties():
+    """Kept properties are only written when the entity lacks them."""
+    source = {"label": "Task 1", "status": "ready", "assigned_to": "Bo"}
+    target = {"status": "mapped", "assigned_to": "Al"}
+
+    update = central_crud._get_entity_update_data(
+        source, target, keep_existing=frozenset({"status"})
+    )
+
+    assert update == {"assigned_to": "Bo"}
 
 
 @pytest.mark.asyncio

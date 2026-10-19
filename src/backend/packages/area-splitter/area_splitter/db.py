@@ -164,18 +164,18 @@ def drop_tables(conn: psycopg.Connection):
     """
     log.debug("Running tables cleanup")
     with conn.cursor() as cur:
-        cur.execute("DROP VIEW IF EXISTS lines_view;")
-        cur.execute("DROP TABLE IF EXISTS buildings CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS clusteredbuildings CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS dumpedpoints CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS lowfeaturecountpolygons CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS voronois CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS taskpolygons CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS unsimplifiedtaskpolygons CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS splitpolygons CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS project_aoi CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS ways_poly CASCADE;")
-        cur.execute("DROP TABLE IF EXISTS ways_line CASCADE;")
+        cur.execute("DROP VIEW IF EXISTS pg_temp.lines_view;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.buildings CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.clusteredbuildings CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.dumpedpoints CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.lowfeaturecountpolygons CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.voronois CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.taskpolygons CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.unsimplifiedtaskpolygons CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.splitpolygons CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.project_aoi CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.ways_poly CASCADE;")
+        cur.execute("DROP TABLE IF EXISTS pg_temp.ways_line CASCADE;")
 
 
 def aoi_to_postgis(conn: psycopg.Connection, geom: dict) -> None:
@@ -235,7 +235,8 @@ def insert_geoms_batch(
 
     query = (
         f"INSERT INTO {table_name} (geom, osm_id, tags) "
-        "VALUES (ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON(%(geom)s), 4326)), %(osm_id)s, %(tags)s)"
+        "VALUES (ST_MakeValid(ST_SetSRID(ST_GeomFromGeoJSON(%(geom)s), 4326)), "
+        "%(osm_id)s, %(tags)s)"
     )
     prepared = [{**row, "tags": Json(row.get("tags"))} for row in rows]
     cur.executemany(query, prepared)

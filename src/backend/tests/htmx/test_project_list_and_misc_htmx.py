@@ -11,47 +11,11 @@ from app.config import AuthProvider, settings
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
 from app.htmx.landing_routes import _safe_return_path
-from app.htmx.map_helpers import render_leaflet_map
 from app.htmx.project_list_routes import project_listing
 
 # We patch where project_crud is used/defined.
 # htmx_routes imports `from app.projects import project_crud`
 # so we patch `app.projects.project_crud.get_project_qrcode`
-
-
-def test_render_leaflet_map_serializes_popup_options():
-    """Leaflet helper should pass popup configuration through to the frontend."""
-    html = render_leaflet_map(
-        map_id="leaflet-map-test",
-        geojson_layers=[
-            {
-                "data": {
-                    "type": "FeatureCollection",
-                    "features": [
-                        {
-                            "type": "Feature",
-                            "geometry": None,
-                            "properties": {"task_id": 3, "building_count": 14},
-                        }
-                    ],
-                },
-                "name": "Task Boundaries (1 tasks)",
-                "popup_options": {
-                    "showLayerName": False,
-                    "propertyLabels": {
-                        "task_id": "Task ID",
-                        "building_count": "Building Count",
-                    },
-                    "propertyOrder": ["task_id", "building_count"],
-                },
-            }
-        ],
-    )
-
-    assert '"showLayerName": false' in html
-    assert '"task_id": "Task ID"' in html
-    assert '"building_count": "Building Count"' in html
-    assert '"propertyOrder": ["task_id", "building_count"]' in html
 
 
 async def test_project_details_shows_odk_media_upload_guidance(client, db, project):
@@ -282,7 +246,7 @@ def test_layout_template_renders_locale_selector_in_header():
     assert 'data-locale-switch="pt"' in rendered
     assert 'data-locale-switch="pt_br"' in rendered
     assert "ftm-header-lang-menu" in rendered
-    assert "landing-footer-social" in rendered
+    assert "ftm-footer__social" in rendered
     assert "Need help or have a request?" in rendered
     assert 'href="https://roadmap.hotosm.org/#tech-request"' in rendered
     assert "Submit a tech request" in rendered
@@ -442,3 +406,58 @@ def test_login_page_redirects_for_external_login_app():
 
     assert "show-profile" not in rendered
     assert "window.location.replace" in rendered
+
+
+async def test_project_listing_paginates():
+    """An extra row means there is a next page; page 2 links back."""
+    projects = [Mock(id=i) for i in range(13)]
+    with patch(
+        "app.htmx.project_list_routes.DbProject.all", new_callable=AsyncMock
+    ) as mock_all:
+        mock_all.return_value = projects
+        response = await project_listing.fn(
+            request=Mock(query_params={"page": "2", "search": "roads"}),
+            db=Mock(),
+            auth_user=Mock(),
+        )
+
+    assert mock_all.await_args.kwargs["skip"] == 12
+    assert mock_all.await_args.kwargs["limit"] == 13
+    assert len(response.context["projects"]) == 12
+    assert response.context["prev_href"] == "/projects?search=roads&sort=newest"
+    assert response.context["next_href"] == "/projects?search=roads&sort=newest&page=3"
+
+
+@pytest.mark.parametrize("page", ["0", "-3", "abc"])
+async def test_project_listing_invalid_page_falls_back_to_first(page):
+    """Invalid page numbers show the first page without a previous link."""
+    with patch(
+        "app.htmx.project_list_routes.DbProject.all", new_callable=AsyncMock
+    ) as mock_all:
+        mock_all.return_value = []
+        response = await project_listing.fn(
+            request=Mock(query_params={"page": page}), db=Mock(), auth_user=Mock()
+        )
+
+    assert mock_all.await_args.kwargs["skip"] == 0
+    assert response.context["prev_href"] is None
+    assert response.context["next_href"] is None
+
+
+async def test_project_list_cards_are_links_and_layout_has_footer(client, project):
+    """Cards are keyboard-accessible links; the shared footer is on every page."""
+    response = await client.get("/projects")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert f'class="ftm-project-card-link" href="/projects/{project.id}"' in (
+        response.text
+    )
+    assert "https://roadmap.hotosm.org/#tech-request" in response.text
+    assert "user-scalable=no" not in response.text
+
+
+async def test_landing_page_has_single_footer(client):
+    """The landing page uses the shared layout footer only."""
+    response = await client.get("/")
+
+    assert response.text.count("https://roadmap.hotosm.org/#tech-request") == 1

@@ -103,7 +103,6 @@ def _normalize_project_jsonb_fields(model_dump: dict[str, Any]) -> None:
     jsonb_fields = (
         "data_extract_geojson",
         "task_areas_geojson",
-        "split_result_geojson",
     )
     for key in jsonb_fields:
         if isinstance(model_dump.get(key), dict):
@@ -113,7 +112,6 @@ def _normalize_project_jsonb_fields(model_dump: dict[str, Any]) -> None:
 _JSONB_CAST_FIELDS = (
     "data_extract_geojson",
     "task_areas_geojson",
-    "split_result_geojson",
 )
 
 
@@ -136,6 +134,8 @@ def _project_update_placeholders(model_dump: dict[str, Any]) -> list[sql.Composa
                 value=sql.Placeholder(key),
             )
         )
+    if "updated_at" not in model_dump:
+        placeholders.append(sql.SQL("updated_at = now()"))
     return placeholders
 
 
@@ -190,7 +190,7 @@ class DbUser:
         return db_user
 
     @classmethod
-    async def all(  # noqa: PLR0913
+    async def all(  # noqa: PLR0913, PLR0917
         cls,
         db: AsyncConnection,
         skip: Optional[int] = None,
@@ -423,8 +423,6 @@ class DbProject:
     creation_status: Optional[str] = None
     creation_error: Optional[str] = None
     creation_updated_at: Optional[AwareDatetime] = None
-    split_error: Optional[str] = None
-    split_result_geojson: Optional[dict] = None
     created_at: Optional[AwareDatetime] = None
     updated_at: Optional[AwareDatetime] = None
     # Encrypted ODK appuser token (may be null until generated)
@@ -471,7 +469,7 @@ class DbProject:
         return db_project
 
     @classmethod
-    async def all(  # noqa: PLR0913
+    async def all(  # noqa: PLR0913, PLR0917
         cls,
         db: AsyncConnection,
         skip: Optional[int] = None,

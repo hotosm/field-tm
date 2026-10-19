@@ -136,24 +136,29 @@ class QFieldProjectResult:
 # ---------------------------------------------------------------------------
 
 
+_COORD_NESTING = {
+    "Point": 0,
+    "LineString": 1,
+    "MultiPoint": 1,
+    "Polygon": 2,
+    "MultiLineString": 2,
+    "MultiPolygon": 3,
+}
+
+
 def _flatten_geom_coords(geom: dict) -> list:
     """Flatten all coordinates in a GeoJSON geometry to a list of [lon, lat] pairs."""
     geom_type = geom.get("type", "")
-    coords = geom.get("coordinates", [])
-    if geom_type == "Point":
-        return [coords]
-    if geom_type in ("LineString", "MultiPoint"):
-        return list(coords)
-    if geom_type in ("Polygon", "MultiLineString"):
-        return [c for ring in coords for c in ring]
-    if geom_type == "MultiPolygon":
-        return [c for poly in coords for ring in poly for c in ring]
     if geom_type == "GeometryCollection":
-        result = []
-        for sub_geom in geom.get("geometries", []):
-            result.extend(_flatten_geom_coords(sub_geom))
-        return result
-    return []
+        return [
+            c for sub in geom.get("geometries", []) for c in _flatten_geom_coords(sub)
+        ]
+    if geom_type not in _COORD_NESTING:
+        return []
+    coords = [geom.get("coordinates", [])]
+    for _level in range(_COORD_NESTING[geom_type]):
+        coords = [c for part in coords for c in part]
+    return coords
 
 
 def _outline_to_bbox_str(outline: dict) -> str:
@@ -279,58 +284,64 @@ def _qgis_safe_property_value(key: str, value):
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
 
 
+def _parse_json_tags(tags):
+    """Return a dict for JSON object strings, else the value unchanged."""
+    if not (isinstance(tags, str) and tags.startswith("{") and tags.endswith("}")):
+        return tags
+    try:
+        parsed = json.loads(tags)
+    except (json.JSONDecodeError, TypeError):
+        return tags
+    return parsed if isinstance(parsed, dict) else tags
+
+
 def _qgis_safe_tags_value(tags) -> str:
     """Normalize the ``tags`` property to a QGIS-safe string."""
-    result = ""
     if not tags:
-        return result
+        return ""
+    tags = _parse_json_tags(tags)
     if isinstance(tags, dict):
-        result = ";".join(f"{k}={v}" for k, v in tags.items())
-    elif isinstance(tags, list):
-        result = json.dumps(tags, ensure_ascii=False, separators=(",", ":"))
-    elif not (isinstance(tags, str) and tags.startswith("{") and tags.endswith("}")):
-        result = str(tags)
-    else:
-        try:
-            tags_dict = json.loads(tags)
-        except (json.JSONDecodeError, TypeError):
-            result = str(tags)
-        else:
-            if isinstance(tags_dict, dict):
-                result = ";".join(f"{k}={v}" for k, v in tags_dict.items())
-            else:
-                result = str(tags)
-    return result
+        return ";".join(f"{k}={v}" for k, v in tags.items())
+    if isinstance(tags, list):
+        return json.dumps(tags, ensure_ascii=False, separators=(",", ":"))
+    return str(tags)
+
+
+TASK_PLAN_FIELDS = ("assigned_group", "assigned_to", "comment", "colour")
 
 
 def _build_tasks_geojson(project: DbProject) -> dict:
-    """Build a tasks FeatureCollection from project data.
+    """Build the tasks layer FeatureCollection for the QField plugin.
 
-    If ``task_areas_geojson`` contains features, use them (and ensure each has
-    a ``task_id``).  If empty/absent, create a single task from the outline.
+    Uses the task plan (``task_areas_geojson``) if it has features, else one
+    task from the outline. Every task starts ``available``; the plugin owns
+    status from then on.
     """
     task_areas = project.task_areas_geojson
     if task_areas and isinstance(task_areas, dict) and task_areas.get("features"):
-        # Stored ids are authoritative (stamped by save_task_areas); stamping
-        # here is in-memory only, covering legacy rows saved before ids were
-        # persisted. Such projects keep derivation-based ids until re-saved.
-        return stamp_missing_task_ids(task_areas)
+        # Stored ids are authoritative; stamping covers legacy rows in memory.
+        features = stamp_missing_task_ids(task_areas)["features"]
+    else:
+        geometry = _extract_geometry(project.outline)
+        if not geometry:
+            return {"type": "FeatureCollection", "features": []}
+        features = [{"type": "Feature", "geometry": geometry, "properties": {}}]
 
-    # Fallback: single task from outline
-    geometry = _extract_geometry(project.outline)
-    if not geometry:
-        return {"type": "FeatureCollection", "features": []}
-
-    return {
-        "type": "FeatureCollection",
-        "features": [
+    tasks = []
+    for task_id, feature in enumerate(features, start=1):
+        properties = feature.get("properties") or {}
+        tasks.append(
             {
                 "type": "Feature",
-                "geometry": geometry,
-                "properties": {"task_id": 1},
+                "geometry": feature.get("geometry"),
+                "properties": {
+                    "task_id": properties.get("task_id", task_id),
+                    "status": "available",
+                    **{key: properties.get(key) or None for key in TASK_PLAN_FIELDS},
+                },
             }
-        ],
-    }
+        )
+    return {"type": "FeatureCollection", "features": tasks}
 
 
 def _build_features_geojson(project: DbProject) -> dict:
@@ -1436,30 +1447,6 @@ async def qfc_credentials_test(qfc_creds: QFieldCloud):
 # ---------------------------------------------------------------------------
 # Delete QFieldCloud project
 # ---------------------------------------------------------------------------
-
-
-async def delete_qfield_project(db: AsyncConnection, project_id: int) -> str:
-    """Delete a project from QFieldCloud using the stored ``external_project_id``."""
-    project = await DbProject.one(db, project_id)
-
-    qfield_project_id = project.external_project_id
-    if not qfield_project_id:
-        return f"No QField project id set for project ID {project_id}"
-
-    loop = get_running_loop()
-    async with qfield_client() as client:
-        try:
-            await loop.run_in_executor(
-                None,
-                partial(client.delete_project, qfield_project_id),
-            )
-        except Exception:
-            return (
-                f"QField project {qfield_project_id} not found "
-                f"(may already be deleted)."
-            )
-
-    return f"Project {project_id} deleted from QFieldCloud."
 
 
 # ---------------------------------------------------------------------------

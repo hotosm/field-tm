@@ -25,15 +25,20 @@ from unittest.mock import Mock
 import pytest
 from litestar import status_codes as status
 
-from app.db.enums import FieldMappingApp
+from app.db.enums import FieldMappingApp, ProjectVisibility
 from app.db.models import DbProject
 from app.htmx import project_detail_routes
 
 
 async def test_project_details_includes_form_templates_json(monkeypatch):
     """The HTMX page should inline form template options for step 1."""
-    project = Mock(id=7, xlsform_content=None)
+    project = Mock(id=7, xlsform_content=None, visibility=ProjectVisibility.PUBLIC)
     forms = [{"id": 1, "title": "OSM Buildings"}]
+
+    async def fake_is_manager(*_args):
+        return True
+
+    monkeypatch.setattr(project_detail_routes, "_is_project_manager", fake_is_manager)
 
     async def fake_one(_db, project_id):
         assert project_id == project.id
@@ -63,13 +68,22 @@ async def test_project_details_includes_form_templates_json(monkeypatch):
 
 async def test_project_details_allows_delete_for_project_creator(monkeypatch):
     """Project creator should get delete controls in HTMX context."""
-    project = Mock(id=9, xlsform_content=b"sheet", created_by_sub="fieldtm|7")
+    project = Mock(
+        id=9,
+        xlsform_content=b"sheet",
+        created_by_sub="fieldtm|7",
+        visibility=ProjectVisibility.PUBLIC,
+    )
 
     async def fake_one(_db, project_id):
         assert project_id == project.id
         return project
 
+    async def fake_is_manager(*_args):
+        return True
+
     monkeypatch.setattr(project_detail_routes.DbProject, "one", fake_one)
+    monkeypatch.setattr(project_detail_routes, "_is_project_manager", fake_is_manager)
 
     response = await project_detail_routes.project_details.fn(
         request=Mock(),

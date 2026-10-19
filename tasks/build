@@ -40,6 +40,11 @@ backend:
   #   - type=gha
   COMPOSE_BAKE=true {{docker}} compose build backend
 
+# Build the task planner (src/planner/dist, served at /planner/)
+[no-cd]
+planner:
+  cd {{justfile_directory()}}/src/planner && pnpm install --frozen-lockfile && pnpm build
+
 # Build backend development server container
 [no-cd]
 backend-dev:

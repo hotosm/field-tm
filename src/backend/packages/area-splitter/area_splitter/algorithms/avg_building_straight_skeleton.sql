@@ -43,7 +43,7 @@
  * removing a tiny touching region from both of the hulls.
  */
 
-DROP TABLE IF EXISTS taskpolygons;
+DROP TABLE IF EXISTS pg_temp.taskpolygons;
 create TEMP table taskpolygons AS (
   -- explain analyze
   WITH
@@ -203,6 +203,6 @@ create TEMP table taskpolygons AS (
 );
 
 -- /* For testing:
- DROP TABLE IF EXISTS my_taskpolygons;
+ DROP TABLE IF EXISTS pg_temp.my_taskpolygons;
  CREATE TEMP table my_taskpolygons AS select * from taskpolygons;
  -- */

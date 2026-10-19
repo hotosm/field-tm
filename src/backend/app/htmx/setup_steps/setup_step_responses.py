@@ -228,7 +228,6 @@ def build_data_extract_preview_response(
     *,
     status_message: str,
     preview_message: str,
-    map_html_content: str,
     project_id: int,
 ) -> Template:
     return Template(
@@ -237,49 +236,9 @@ def build_data_extract_preview_response(
             "status_variant": "success",
             "status_message": status_message,
             "preview_message": preview_message,
-            "map_html_content": map_html_content,
             "project_id": project_id,
         },
         media_type="text/html",
         status_code=status.HTTP_200_OK,
         headers={"Vary": "HX-Request"},
-    )
-
-
-def is_fragment_mode(mode: str | None) -> bool:
-    return (mode or "").strip().lower() == "fragment"
-
-
-def step4_completion_response(
-    *,
-    request: object,
-    project_id: int,
-    message: str,
-    mode: str | None,
-    project: "DbProject | None" = None,
-) -> Response:
-    trigger_payload = {
-        "projectId": project_id,
-        "step": 4,
-        "nextStep": 5,
-        "code": "step4_complete",
-        "message": message,
-    }
-    if not is_fragment_mode(mode):
-        return Response(
-            content=_callout("success", message),
-            media_type="text/html",
-            status_code=status.HTTP_200_OK,
-            headers=_hx_trigger_header("project-setup:step4-complete", trigger_payload),
-        )
-
-    return Template(
-        template_name="partials/project_details/setup_steps.html",
-        context={"project": project},
-        media_type="text/html",
-        status_code=status.HTTP_200_OK,
-        headers={
-            "Vary": "HX-Request",
-            **_hx_trigger_header("project-setup:step4-complete", trigger_payload),
-        },
     )

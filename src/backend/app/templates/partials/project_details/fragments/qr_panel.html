@@ -1,0 +1,47 @@
+<div class="ftm-qr-panel">
+  <h3 class="ftm-qr-panel__title">{{ _("Scan QR Code") }}</h3>
+  <p class="ftm-qr-panel__description">
+    {{ _("Use %(app_name)s to scan this QR code and load the project.") % {"app_name": app_name} }}
+  </p>
+  <div class="ftm-qr-panel__image-wrap">
+    <img
+      src="{{ qr_code_data_url }}"
+      alt="{{ _('Project QR Code') }}"
+      class="ftm-qr-panel__image"
+    />
+  </div>
+  <div>
+    {% if open_app_url %}
+    <wa-button href="{{ open_app_url }}" variant="brand">
+      {{ _("Open in %(app_name)s") % {"app_name": app_name} }}
+    </wa-button>
+    <p style="margin: 6px 0 12px 0; font-size: 0.8em; color: #666">
+      {{ _("If %(app_name)s is installed on this device.") % {"app_name": app_name} }}
+    </p>
+    {% endif %}
+    <wa-button
+      href="{{ qr_code_data_url }}"
+      download="{{ qr_download_name }}.png"
+      variant="default"
+    >
+      {{ _("Download QR Code") }}
+    </wa-button>
+  </div>
+  {% if mapper_username and mapper_password %}
+  <div
+    class="ftm-qr-panel__mapper-creds"
+    style="margin-top: 16px; padding: 12px 16px; background: #f5f5f5; border-radius: 8px"
+  >
+    <h4 style="margin: 0 0 8px 0; font-size: 0.95em">{{ _("Mapper Login (QFieldCloud)") }}</h4>
+    <p style="margin: 0; font-size: 0.9em">
+      <strong>{{ _("Username:") }}</strong> <code>{{ mapper_username }}</code>
+    </p>
+    <p style="margin: 4px 0 0 0; font-size: 0.9em">
+      <strong>{{ _("Password:") }}</strong> <code>{{ mapper_password }}</code>
+    </p>
+    <p style="margin: 8px 0 0 0; font-size: 0.8em; color: #666">
+      {{ _("Scan the QR code, then enter these credentials in QField.") }}
+    </p>
+  </div>
+  {% endif %}
+</div>

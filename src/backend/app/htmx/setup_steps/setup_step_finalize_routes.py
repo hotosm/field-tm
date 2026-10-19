@@ -21,10 +21,12 @@ from app.central.central_schemas import ODKCentral
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp
 from app.i18n import _
+from app.projects.mapping_apps import is_sync_app
 from app.projects.project_services import (
     ServiceError,
     finalize_odk_project,
     finalize_qfield_project,
+    publish_project,
 )
 from app.projects.project_services import ValidationError as SvcValidationError
 from app.qfield.qfield_schemas import QFieldCloud
@@ -44,6 +46,9 @@ from ..setup_steps.setup_step_responses import (
 )
 from ..setup_steps.setup_step_responses import (
     html_error_response as _html_error_response,
+)
+from ..setup_steps.setup_step_responses import (
+    hx_redirect_response as _hx_redirect_response,
 )
 
 log = logging.getLogger(__name__)
@@ -90,6 +95,10 @@ async def create_project_htmx(
             project_id=project_id,
             data=data,
         )
+
+    if project_type and not is_sync_app(project_type):
+        await publish_project(db, project_id)
+        return _hx_redirect_response(f"/projects/{project_id}")
 
     return _html_error_response(
         _("Project mapping app is not configured for finalisation."),

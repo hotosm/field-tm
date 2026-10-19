@@ -45,9 +45,6 @@ def test_settings_hotosm_provider_sets_centralized_login_url():
     settings = Settings(
         FTM_DOMAIN="localhost",
         ENCRYPTION_KEY="MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
-        OSM_CLIENT_ID="test",
-        OSM_CLIENT_SECRET="test",
-        OSM_SECRET_KEY="test",
         AUTH_PROVIDER=AuthProvider.HOTOSM,
     )
 
@@ -60,9 +57,6 @@ def test_settings_disabled_provider_keeps_auth_urls_optional():
     settings = Settings(
         FTM_DOMAIN="localhost",
         ENCRYPTION_KEY="MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=",
-        OSM_CLIENT_ID="test",
-        OSM_CLIENT_SECRET="test",
-        OSM_SECRET_KEY="test",
         AUTH_PROVIDER=AuthProvider.DISABLED,
     )
 

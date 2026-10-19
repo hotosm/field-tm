@@ -20,6 +20,21 @@ FROM ghcr.io/astral-sh/uv:${UV_IMG_TAG} AS uv
 FROM ghcr.io/hotosm/lightningcss:1.31.1 AS lightningcss
 
 
+# Task planner static build, served by the backend at /planner/.
+# The planner imports the splitter SQL from ../backend/packages/..., so keep
+# the same layout under /src.
+FROM docker.io/node:24-alpine AS planner-build
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+RUN corepack enable && corepack prepare pnpm@12.11.2 --activate
+WORKDIR /src/planner
+COPY planner/package.json planner/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+COPY backend/packages/area-splitter/area_splitter/algorithms \
+    /src/backend/packages/area-splitter/area_splitter/algorithms
+COPY planner/ ./
+RUN pnpm build
+
+
 # Includes all labels and timezone info to extend from
 FROM docker.io/python:${PYTHON_IMG_TAG}-slim-trixie AS base
 ARG APP_VERSION
@@ -170,6 +185,7 @@ FROM runtime-base AS runtime
 COPY --chown=appuser:appuser migrations/ /opt/migrations/
 COPY --chown=appuser:appuser backend/app/ /opt/app/
 COPY --chown=appuser:appuser qfield-plugin/ /opt/qfield-plugin/
+COPY --from=planner-build --chown=appuser:appuser /src/planner/dist/ /opt/planner/
 RUN find /opt/app/locales -path '*/LC_MESSAGES/*.po' \
     -exec sh -c 'msgfmt "$1" -o "${1%.po}.mo"' _ {} \;
 
@@ -195,6 +211,7 @@ EOT
 COPY --chown=appuser:appuser migrations/ /opt/migrations/
 COPY --chown=appuser:appuser backend/app/ /opt/app/
 COPY --chown=appuser:appuser qfield-plugin/ /opt/qfield-plugin/
+COPY --from=planner-build --chown=appuser:appuser /src/planner/dist/ /opt/planner/
 RUN find /opt/app/locales -path '*/LC_MESSAGES/*.po' \
     -exec sh -c 'msgfmt "$1" -o "${1%.po}.mo"' _ {} \;
 COPY --chown=appuser:appuser backend/pyproject.toml /opt/pyproject.toml

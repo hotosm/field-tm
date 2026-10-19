@@ -32,95 +32,11 @@ from litestar.exceptions import HTTPException
 
 from app.central.central_crud import create_odk_project
 from app.central.central_schemas import ODKCentral
-from app.db.enums import FieldMappingApp, ProjectStatus, XLSFormType
+from app.db.enums import FieldMappingApp, ProjectStatus
 from app.helpers.geometry_utils import check_crs
 from app.projects import project_crud, project_services
-from app.projects.project_schemas import CreateProjectRequest, ProjectUpdate
+from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_crud import QFieldProjectResult
-
-
-@pytest.mark.parametrize(
-    ("feature_count", "buildings_per_task", "no_of_tasks"),
-    [
-        (3, 3, 1),
-        (50, 5, 10),
-        (200, 5, 40),
-        (1000, 10, 100),
-        (1234, 13, 95),
-        (10000, 100, 100),
-        (25000, 250, 100),
-    ],
-)
-def test_recommend_split_targets_about_100_tasks(
-    feature_count, buildings_per_task, no_of_tasks
-):
-    """Recommendation keeps projects to ~100 tasks with at least 5 buildings each."""
-    recommendation = project_services.recommend_split(feature_count)
-
-    assert recommendation is not None
-    assert recommendation.feature_count == feature_count
-    assert recommendation.buildings_per_task == buildings_per_task
-    assert recommendation.no_of_tasks == no_of_tasks
-
-
-@pytest.mark.parametrize("feature_count", [0, -1])
-def test_recommend_split_returns_none_without_features(feature_count):
-    """Nothing to split means no recommendation."""
-    assert project_services.recommend_split(feature_count) is None
-
-
-def test_create_project_request_split_defaults():
-    """API split defaults should match the onboarding UI default."""
-    payload = CreateProjectRequest(
-        project_name="test",
-        field_mapping_app="ODK",
-        description="test",
-        outline={
-            "type": "Polygon",
-            "coordinates": [
-                [
-                    [85.317, 27.705],
-                    [85.317, 27.704],
-                    [85.318, 27.704],
-                    [85.318, 27.705],
-                    [85.317, 27.705],
-                ]
-            ],
-        },
-        xlsform_base64=base64.b64encode(b"dummy").decode(),
-    )
-
-    assert payload.no_of_buildings == 10
-    assert payload.no_of_tasks == 10
-    assert payload.include_roads is True
-    assert payload.include_rivers is True
-    assert payload.include_railways is True
-    assert payload.include_aeroways is True
-
-
-def test_create_project_request_accepts_internal_osm_category_key():
-    """API payloads may provide the internal OSM preset key."""
-    payload = CreateProjectRequest(
-        project_name="test",
-        field_mapping_app="QField",
-        description="test",
-        outline={
-            "type": "Polygon",
-            "coordinates": [
-                [
-                    [85.317, 27.705],
-                    [85.317, 27.704],
-                    [85.318, 27.704],
-                    [85.318, 27.705],
-                    [85.317, 27.705],
-                ]
-            ],
-        },
-        xlsform_base64=base64.b64encode(b"dummy").decode(),
-        osm_category="buildings",
-    )
-
-    assert payload.osm_category == XLSFormType.buildings
 
 
 @pytest.mark.parametrize(
@@ -736,10 +652,8 @@ async def test_split_aoi_building_algorithms_run_sync_without_kwargs(
     result = await project_services.split_aoi(
         db=Mock(commit=AsyncMock()),
         project_id=1,
-        options=project_services.SplitAoiOptions(
-            algorithm=algorithm,
-            no_of_buildings=50,
-        ),
+        algorithm=algorithm,
+        num_buildings=50,
     )
 
     assert callable(captured.get("func"))
@@ -751,111 +665,6 @@ async def test_split_aoi_building_algorithms_run_sync_without_kwargs(
     assert algorithm_params["include_aeroways"] == "TRUE"
     assert result["type"] == "FeatureCollection"
     assert len(result["features"]) == 1
-
-
-async def test_split_aoi_total_tasks_passes_num_enumerators(monkeypatch):
-    """TOTAL_TASKS should pass num_enumerators into area-splitter."""
-    project = Mock(
-        outline={
-            "type": "Polygon",
-            "coordinates": [
-                [
-                    [85.30, 27.71],
-                    [85.30, 27.70],
-                    [85.31, 27.70],
-                    [85.31, 27.71],
-                    [85.30, 27.71],
-                ]
-            ],
-        },
-        data_extract_geojson={
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [
-                            [
-                                [85.30, 27.71],
-                                [85.30, 27.70],
-                                [85.31, 27.70],
-                                [85.31, 27.71],
-                                [85.30, 27.71],
-                            ]
-                        ],
-                    },
-                    "properties": {"osm_id": 1},
-                }
-            ],
-        },
-    )
-
-    async def fake_project_one(_db, _project_id):
-        return project
-
-    captured: dict = {}
-
-    async def fake_run_sync(func, *args):
-        captured["func"] = func
-        captured["args"] = args
-        return {
-            "type": "FeatureCollection",
-            "features": [
-                {
-                    "type": "Feature",
-                    "geometry": project.outline,
-                    "properties": {"task_id": 1},
-                }
-            ],
-        }
-
-    async def fake_check_crs(_featcol):
-        return None
-
-    monkeypatch.setattr(project_services.DbProject, "one", fake_project_one)
-    monkeypatch.setattr(project_services.to_thread, "run_sync", fake_run_sync)
-    monkeypatch.setattr(project_services, "check_crs", fake_check_crs)
-
-    result = await project_services.split_aoi(
-        db=Mock(commit=AsyncMock()),
-        project_id=1,
-        options=project_services.SplitAoiOptions(
-            algorithm="TOTAL_TASKS",
-            no_of_tasks=6,
-        ),
-    )
-
-    assert callable(captured.get("func"))
-    algorithm_params = captured["func"].keywords["algorithm_params"]
-    assert algorithm_params["num_enumerators"] == 6
-    assert algorithm_params["include_roads"] == "TRUE"
-    assert algorithm_params["include_rivers"] == "TRUE"
-    assert algorithm_params["include_railways"] == "TRUE"
-    assert algorithm_params["include_aeroways"] == "TRUE"
-    assert result["type"] == "FeatureCollection"
-    assert len(result["features"]) == 1
-
-
-async def test_split_aoi_rejects_disabled_split_by_roads(monkeypatch):
-    """SPLIT_BY_ROADS is hidden from the UI and must be rejected server-side."""
-    project = Mock(outline={"type": "Polygon", "coordinates": []})
-
-    async def fake_project_one(_db, _project_id):
-        return project
-
-    async def fail_run_sync(*_args):
-        raise AssertionError("Disabled algorithm should not run the splitter")
-
-    monkeypatch.setattr(project_services.DbProject, "one", fake_project_one)
-    monkeypatch.setattr(project_services.to_thread, "run_sync", fail_run_sync)
-
-    with pytest.raises(project_services.ValidationError, match="not available yet"):
-        await project_services.split_aoi(
-            db=Mock(commit=AsyncMock()),
-            project_id=1,
-            options=project_services.SplitAoiOptions(algorithm="SPLIT_BY_ROADS"),
-        )
 
 
 async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
@@ -927,6 +736,7 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
         properties,
         dataset_name,
         entities_list,
+        **_kwargs,
     ):
         created_datasets.append(
             {
@@ -1017,6 +827,9 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
 
     tasks_dataset = next(ds for ds in created_datasets if ds["dataset_name"] == "tasks")
     assert tasks_dataset["entities_list"][0]["label"] == "Task 1"
+    assert {"assigned_group", "assigned_to", "comment", "colour"} <= set(
+        tasks_dataset["properties"]
+    )
 
     assert result.odk_url == "https://central.example.org/#/projects/17"
     assert result.manager_username == "field-tm-manager-17@fieldtm.org"
@@ -1214,3 +1027,56 @@ async def test_delete_project_with_downstream_keeps_ftm_on_remote_failure(monkey
 if __name__ == "__main__":
     """Main func if file invoked directly."""
     pytest.main()
+
+
+async def test_fail_stale_jobs_marks_old_in_progress_jobs_failed(
+    db, project, stub_project
+):
+    """Jobs older than 30 minutes fail; recent ones keep running."""
+    old = "now() - interval '2 hours'"
+    async with db.cursor() as cur:
+        await cur.execute(
+            f"""
+            UPDATE projects SET creation_status = 'in_progress',
+                creation_updated_at = {old},
+                basemap_attach_status = 'in_progress',
+                basemap_attach_updated_at = {old},
+                updated_at = {old}
+            WHERE id = %(id)s
+            """,  # noqa: S608
+            {"id": project.id},
+        )
+        await cur.execute(
+            """
+            UPDATE projects SET creation_status = 'in_progress',
+                creation_updated_at = now()
+            WHERE id = %(id)s
+            """,
+            {"id": stub_project.id},
+        )
+        await cur.execute(
+            """
+            INSERT INTO qgis_jobs (job_id, created_at)
+            VALUES (gen_random_uuid(), now() - interval '2 hours'),
+                   (gen_random_uuid(), now())
+            RETURNING job_id
+            """
+        )
+        old_job, new_job = [row[0] for row in await cur.fetchall()]
+    await db.commit()
+
+    await project_crud.fail_stale_jobs(db)
+
+    stale = await project_crud.DbProject.one(db, project.id)
+    assert stale.creation_status == "failed"
+    assert stale.creation_error
+    assert stale.basemap_attach_status == "failed"
+    fresh = await project_crud.DbProject.one(db, stub_project.id)
+    assert fresh.creation_status == "in_progress"
+    async with db.cursor() as cur:
+        await cur.execute(
+            "SELECT job_id FROM qgis_jobs WHERE job_id = ANY(%(ids)s)",
+            {"ids": [old_job, new_job]},
+        )
+        remaining = [row[0] for row in await cur.fetchall()]
+    assert remaining == [new_job]

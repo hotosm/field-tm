@@ -18,7 +18,6 @@
 
 from typing import Optional, TypedDict
 
-from litestar.dto import DataclassDTO, DTOConfig
 from pydantic import BaseModel, ConfigDict, computed_field
 
 from app.db.models import DbProject, DbUser
@@ -68,10 +67,3 @@ class AuthUser(BaseModel):
         """
         if self.picture:
             self.profile_img = self.picture
-
-
-# DTO for user details returned to frontend (includes project_roles)
-class FTMUser(DataclassDTO[DbUser]):
-    """DTO for user details returned to frontend (includes project_roles)."""
-
-    config = DTOConfig()

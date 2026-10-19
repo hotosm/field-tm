@@ -67,8 +67,6 @@ CREATE TABLE projects (
     creation_status character varying DEFAULT 'ready',
     creation_error text,
     creation_updated_at timestamp with time zone,
-    split_error text,
-    split_result_geojson jsonb,
     created_at timestamp with time zone NOT NULL DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now()
 );

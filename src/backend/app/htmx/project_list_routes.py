@@ -18,6 +18,8 @@
 
 """Project listing HTMX routes."""
 
+from urllib.parse import urlencode
+
 from litestar import get
 from litestar.di import Provide
 from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
@@ -30,6 +32,7 @@ from app.db.database import db_conn
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
 
+PAGE_SIZE = 12
 PROJECT_SORT_OPTIONS = {
     "newest",
     "oldest",
@@ -43,6 +46,20 @@ def _create_project_href(auth_user: object | None) -> str:
     if settings.AUTH_PROVIDER == AuthProvider.DISABLED or auth_user is not None:
         return "/new"
     return "/login?return_to=%2Fnew"
+
+
+def _parse_page(raw: str | None) -> int:
+    try:
+        return max(int(raw or 1), 1)
+    except ValueError:
+        return 1
+
+
+def _page_href(filters: dict[str, str], page: int) -> str:
+    params = {key: value for key, value in filters.items() if value}
+    if page > 1:
+        params["page"] = str(page)
+    return f"/projects?{urlencode(params)}" if params else "/projects"
 
 
 @get(
@@ -68,20 +85,32 @@ async def project_listing(
         except ValueError:
             selected_status = None
 
+    page = _parse_page(request.query_params.get("page"))
+    # Fetch one extra row to know whether a next page exists.
     projects = (
         await DbProject.all(
             db,
-            limit=12,
+            skip=(page - 1) * PAGE_SIZE,
+            limit=PAGE_SIZE + 1,
             status=selected_status,
             search=search_query or None,
             sort_by=selected_sort,
         )
         or []
     )
+    has_next = len(projects) > PAGE_SIZE
+    filters = {
+        "status": selected_status.value if selected_status else "",
+        "search": search_query,
+        "sort": selected_sort,
+    }
     return HTMXTemplate(
         template_name="home.html",
         context={
-            "projects": projects,
+            "projects": projects[:PAGE_SIZE],
+            "page": page,
+            "prev_href": _page_href(filters, page - 1) if page > 1 else None,
+            "next_href": _page_href(filters, page + 1) if has_next else None,
             "selected_status": selected_status.value if selected_status else "",
             "search_query": search_query,
             "selected_sort": selected_sort,

@@ -5,13 +5,12 @@ import logging
 from geojson_aoi import parse_aoi
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
-from litestar.response import Response, Template
+from litestar.response import Response
 from psycopg import AsyncConnection
 
 from app.config import settings
 from app.db.models import DbProject
 from app.helpers.geometry_utils import check_crs
-from app.htmx.map_helpers import render_leaflet_map
 from app.i18n import _
 from app.projects import project_schemas
 from app.projects.project_services import (
@@ -64,35 +63,16 @@ async def handle_download_osm_data(
             project_id=project_id,
             geojson_data=featcol_single_geom_type,
         )
-
-        map_html_content = render_leaflet_map(
-            map_id="leaflet-map-download",
-            geojson_layers=[
-                {
-                    "data": featcol_single_geom_type,
-                    "name": _("Data Extract"),
-                    "color": "#3388ff",
-                    "weight": 2,
-                    "opacity": 0.8,
-                    "fillOpacity": 0.3,
-                }
-            ],
-            height="500px",
-            show_controls=False,
-        )
-
         status_message = _(
             "OSM data downloaded successfully! Found %(feature_count)s features."
         ) % {"feature_count": feature_count}
         preview_message = _(
-            "Previewing %(feature_count)s features on map. Review the data "
-            'below. If satisfied, click "Accept Data Extract" to save. '
+            'If this looks right, click "Accept Data Extract". '
             "Otherwise, try downloading again with different parameters."
-        ) % {"feature_count": feature_count}
+        )
         return _build_data_extract_preview_response(
             status_message=status_message,
             preview_message=preview_message,
-            map_html_content=map_html_content,
             project_id=project_id,
         )
     except (SvcValidationError, ServiceError) as e:
@@ -155,35 +135,16 @@ async def handle_upload_geojson(
             project_id=project_id,
             geojson_data=featcol,
         )
-
-        map_html_content = render_leaflet_map(
-            map_id="leaflet-map-upload",
-            geojson_layers=[
-                {
-                    "data": featcol,
-                    "name": _("Data Extract"),
-                    "color": "#3388ff",
-                    "weight": 2,
-                    "opacity": 0.8,
-                    "fillOpacity": 0.3,
-                }
-            ],
-            height="500px",
-            show_controls=False,
-        )
-
         upload_success_msg = _(
             "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
         ) % {"feature_count": feature_count}
         upload_preview_msg = _(
-            "Previewing %(feature_count)s features on map. Review the data "
-            'below. If satisfied, click "Accept Data Extract" to save. '
+            'If this looks right, click "Accept Data Extract". '
             "Otherwise, try uploading a different file."
-        ) % {"feature_count": feature_count}
+        )
         return _build_data_extract_preview_response(
             status_message=upload_success_msg,
             preview_message=upload_preview_msg,
-            map_html_content=map_html_content,
             project_id=project_id,
         )
 
@@ -191,85 +152,6 @@ async def handle_upload_geojson(
         return _service_error_response(e)
     except Exception as e:
         log.error(f"Error uploading GeoJSON via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)
-
-
-async def handle_preview_geojson(db: AsyncConnection, project_id: int) -> Response:
-    """Render a saved project data extract preview."""
-    try:
-        project = await DbProject.one(db, project_id)
-        geojson_data = project.data_extract_geojson
-
-        if not geojson_data:
-            return Response(
-                content=_callout(
-                    "warning",
-                    _(
-                        "No GeoJSON data found. Please download OSM data or "
-                        "upload a GeoJSON file first."
-                    ),
-                ),
-                media_type="text/html",
-                status_code=status.HTTP_404_NOT_FOUND,
-            )
-
-        feature_count = len(geojson_data.get("features", []))
-        geojson_layers = []
-
-        if project.outline:
-            aoi_featcol = {
-                "type": "FeatureCollection",
-                "features": [
-                    {"type": "Feature", "geometry": project.outline, "properties": {}}
-                ],
-            }
-            geojson_layers.append(
-                {
-                    "data": aoi_featcol,
-                    "name": _("Project AOI"),
-                    "color": "#d63f3f",
-                    "weight": 2,
-                    "opacity": 0.8,
-                    "fillOpacity": 0.1,
-                }
-            )
-
-        geojson_layers.append(
-            {
-                "data": geojson_data,
-                "name": _("Data Extract (%(feature_count)s features)")
-                % {"feature_count": feature_count},
-                "color": "#3388ff",
-                "weight": 2,
-                "opacity": 0.8,
-                "fillOpacity": 0.3,
-            }
-        )
-
-        map_html_content = render_leaflet_map(
-            map_id="leaflet-map-preview",
-            geojson_layers=geojson_layers,
-            height="500px",
-            show_controls=True,
-        )
-
-        preview_msg = _(
-            "Previewing %(feature_count)s data features on map. Review the "
-            "data, then continue to the next step."
-        ) % {"feature_count": feature_count}
-
-        return Template(
-            template_name="partials/project_details/fragments/map_preview.html",
-            context={
-                "preview_message": preview_msg,
-                "map_html_content": map_html_content,
-            },
-            media_type="text/html",
-            status_code=status.HTTP_200_OK,
-        )
-
-    except Exception as e:
-        log.error(f"Error previewing GeoJSON via HTMX: {e}", exc_info=True)
         return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)
 
 
@@ -283,17 +165,13 @@ async def handle_collect_new_data_only(
             project_id,
             project_schemas.ProjectUpdate(
                 data_extract_geojson={"type": "FeatureCollection", "features": []},
-                task_areas_geojson={},
             ),
         )
         await db.commit()
         return _hx_trigger_response(
             _callout(
                 "success",
-                _(
-                    "✓ Collect-new-data mode selected. Task splitting is "
-                    "skipped and you can continue."
-                ),
+                _("✓ Collect-new-data mode selected. You can continue."),
             ),
             event="project-setup:step3-complete",
             payload={
@@ -346,8 +224,7 @@ async def handle_submit_geojson_data_extract(
         )
 
         saved_message = _(
-            "✓ Data extract successfully saved! You can now proceed to Step 4 "
-            "(split tasks)."
+            "✓ Data extract successfully saved! You can now continue to the Tasks step."
         )
         return _hx_trigger_response(
             _callout("success", saved_message),
@@ -435,19 +312,15 @@ async def handle_discard_data_extract(
 ) -> Response:
     """Clear the staged extract so the user can choose a data source again.
 
-    Called when the user clicks "Discard" on the preview. Also nulls
-    ``task_areas_geojson`` because any split would have been based on the
-    discarded extract.
+    Called when the user clicks "Discard" on the preview.
     """
     try:
-        await DbProject.update(
-            db,
-            project_id,
-            project_schemas.ProjectUpdate(
-                data_extract_geojson=None,
-                task_areas_geojson=None,
-            ),
-        )
+        # Raw SQL: DbProject.update drops None values.
+        async with db.cursor() as cur:
+            await cur.execute(
+                "UPDATE projects SET data_extract_geojson = NULL WHERE id = %(id)s",
+                {"id": project_id},
+            )
         await db.commit()
         log.info(f"Discarded staged data extract for project {project_id}")
         return Response(

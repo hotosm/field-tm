@@ -17,26 +17,26 @@
 #
 """Test functionality of update_form.py."""
 import io
+import re
 from io import BytesIO
 from pathlib import Path
-import re
 
-from openpyxl import Workbook, load_workbook, worksheet
 import pandas as pd
+from openpyxl import Workbook, load_workbook, worksheet
 from pyxform.xls2xform import convert as xform_convert
 
+from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
+from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.update_xlsform import (
     _configure_form_settings,
     _normalize_language_token,
-    _resolve_qfield_form_language,
     append_field_mapping_fields,
     modify_form_for_qfield,
 )
 from osm_fieldwork.xlsforms import buildings, healthcare
-from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
-from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 
-async def test_merge_mandatory_fields():
+
+async def test_merge_mandatory_fields(tmp_path):
     """Merge the mandatory fields XLSForm to a test survey form."""
     test_form = Path(__file__).parent / "test_data" / "test_form_for_mandatory_fields.xls"
 
@@ -46,8 +46,7 @@ async def test_merge_mandatory_fields():
     xformid, updated_form = await append_field_mapping_fields(form_bytes, "buildings")
     workbook = load_workbook(filename=BytesIO(updated_form.getvalue()))
     # Write merged xlsform to file for debugging
-    with open("merged_xlsform.xlsx", "wb") as merged_xlsform:
-        merged_xlsform.write(updated_form.getvalue())
+    (tmp_path / "merged_xlsform.xlsx").write_bytes(updated_form.getvalue())
 
     # remove duplicate field names in 'survey'
     survey = workbook["survey"]

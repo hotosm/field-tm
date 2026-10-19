@@ -15,7 +15,7 @@ from psycopg import AsyncConnection
 
 from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import mapper
+from app.auth.roles import project_manager
 from app.db.database import db_conn
 from app.htmx.htmx_schemas import XLSFormUploadData
 from app.i18n import _
@@ -76,7 +76,7 @@ async def get_template_xlsform(
     dependencies={
         "db": Provide(db_conn),
         "auth_user": Provide(login_required),
-        "current_user": Provide(mapper),
+        "current_user": Provide(project_manager),
     },
 )
 async def upload_xlsform_htmx(

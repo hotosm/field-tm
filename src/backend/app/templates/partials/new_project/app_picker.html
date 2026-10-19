@@ -1,0 +1,34 @@
+<div id="app-picker">
+  {% if reason %}
+  <wa-callout variant="brand" style="margin-bottom: 12px"><span>{{ reason }}</span></wa-callout>
+  {% endif %}
+  <div class="ftm-app-grid">
+    {% for app in apps %}
+    <label class="ftm-radio-card">
+      <input
+        type="radio"
+        name="field_mapping_app"
+        value="{{ app.key.value }}"
+        required
+        style="margin: 4px 0 0"
+        {{ "checked" if app.key.value == selected }}
+      />
+      {% include "partials/app_logo.html" %}
+      <span class="ftm-radio-card__text">
+        <span style="font-weight: 600">{{ app.name }}</span>
+        {% if app.key in recommended %}
+        <wa-badge variant="success" style="align-self: flex-start">{{ _("Recommended") }}</wa-badge>
+        {% endif %}
+        <small class="ftm-form-help" style="margin: 0">{{ app.description }}</small>
+        <small class="ftm-form-help" style="margin: 0"
+          >{{ _("Good for:") }} {{ app.good_for }}</small
+        >
+        <small class="ftm-form-help" style="margin: 0">
+          {% if app.syncs %}{{ _("Tasks sync to the app.") }}{% else %}{{ _("Mappers download task
+          files.") }}{% endif %}
+        </small>
+      </span>
+    </label>
+    {% endfor %}
+  </div>
+</div>

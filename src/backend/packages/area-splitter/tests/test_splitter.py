@@ -14,6 +14,7 @@
 
 import json
 import logging
+import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from time import sleep
@@ -44,7 +45,11 @@ TESTDATA_DIR = str(Path(__file__).parent / "testdata")
 # splitBySQL commits and closes whatever connection it is given, so scenario
 # tests below open a fresh connection per call instead of sharing the
 # session-scoped `db` fixture (which later tests still rely on).
-DB_URL = "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm"
+DEFAULT_DB_URL = (
+    f"postgresql://fieldtm:{os.getenv('FTM_DB_PASSWORD', 'fieldtm')}"
+    "@fieldtm-db:5432/fieldtm"
+)
+DB_URL = os.getenv("FTM_DB_URL", DEFAULT_DB_URL)
 
 
 class _RecordingCursor:
@@ -411,9 +416,7 @@ def test_split_by_sql_total_tasks_passes_num_enumerators(
 def test_split_by_sql_roads_requires_no_legacy_param(
     monkeypatch, aoi_json, extract_json
 ):
-    """SPLIT_BY_ROADS has no required_params, so it needs neither num_buildings
-    nor num_enumerators to resolve algorithm params successfully.
-    """
+    """SPLIT_BY_ROADS resolves params without num_buildings or num_enumerators."""
     captured = {}
 
     def fake_split_by_sql(
@@ -479,7 +482,7 @@ def test_split_by_sql_ftm_no_extract(aoi_json):
     features = split_by_sql(
         aoi_json,
         # Use separate db connection for longer running test
-        "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
+        DB_URL,
         num_buildings=5,
     )
     # NOTE This may change over time as it calls the live API
@@ -493,7 +496,7 @@ def test_split_by_sql_ftm_multi_geom(extract_json):
         parsed_featcol = json.load(jsonfile)
     features = split_by_sql(
         parsed_featcol,
-        "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
+        DB_URL,
         num_buildings=10,
         osm_extract=extract_json,
     )
@@ -825,7 +828,7 @@ def test_split_by_square_cli():
                 "--boundary",
                 str(infile),
                 "--dburl",
-                "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
+                DB_URL,
                 "--meters",
                 "100",
                 "--extract",
@@ -886,7 +889,7 @@ def test_split_by_sql_cli():
                 "--boundary",
                 str(infile),
                 "--dburl",
-                "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
+                DB_URL,
                 "--number",
                 "10",
                 "--extract",
@@ -918,7 +921,7 @@ def test_split_by_sql_cli_no_extract():
                 "--boundary",
                 str(infile),
                 "--dburl",
-                "postgresql://fieldtm:fieldtm@fieldtm-db:5432/fieldtm",
+                DB_URL,
                 "--number",
                 "10",
                 "--outfile",

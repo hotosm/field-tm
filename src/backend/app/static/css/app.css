@@ -214,7 +214,21 @@ hotosm-auth {
     border-color 0.2s ease;
 }
 
+.ftm-project-card-link {
+  display: block;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.ftm-project-card-link:focus-visible {
+  outline: 2px solid var(--ftm-brand);
+  outline-offset: 2px;
+  border-radius: 0.75rem;
+}
+
 .ftm-project-card:hover,
+.ftm-project-card-link:focus-visible .ftm-project-card,
 .ftm-project-card:focus-within {
   transform: translateY(-0.125rem);
   border-color: color-mix(in oklab, var(--ftm-brand) 28%, white);
@@ -595,7 +609,7 @@ hotosm-auth {
 }
 
 .ftm-radio-card:hover,
-.ftm-radio-card--selected {
+.ftm-radio-card:has(input:checked) {
   border-color: var(--hot-color-primary-600);
   background-color: var(--hot-color-primary-50);
 }
@@ -724,6 +738,45 @@ hotosm-auth {
   margin-bottom: 15px;
 }
 
+/* Native buttons and links styled like wa-button */
+.wa-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--wa-color-neutral-border-normal, #c9c9c9);
+  border-radius: var(--ftm-radius-sm, 6px);
+  background: var(--wa-color-neutral-fill-quiet, #f3f3f3);
+  color: var(--wa-color-neutral-on-quiet, #2c2c2c);
+  font: inherit;
+  font-weight: var(--hot-font-weight-semibold, 600);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.wa-button:hover {
+  filter: brightness(0.95);
+}
+
+.wa-button:focus-visible {
+  outline: 2px solid var(--ftm-brand);
+  outline-offset: 2px;
+}
+
+.wa-button--brand,
+.wa-button--primary {
+  border-color: var(--ftm-brand);
+  background: var(--ftm-brand);
+  color: #fff;
+}
+
+.wa-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .ftm-step__actions > button.wa-button {
   min-width: 180px;
 }
@@ -770,11 +823,6 @@ hotosm-auth {
   padding: 8px;
   border: 1px solid var(--ftm-border);
   border-radius: var(--ftm-radius-sm);
-}
-
-.ftm-split-submit {
-  display: flex;
-  align-items: flex-end;
 }
 
 /* --- Form config ------------------------------------------ */
@@ -861,18 +909,6 @@ hotosm-auth {
   flex: 0 0 auto;
 }
 
-.ftm-split-feature-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px 14px;
-  margin-top: 6px;
-}
-
-.ftm-split-feature-options .ftm-checkbox-label {
-  display: flex;
-  align-items: center;
-}
-
 .ftm-config-note {
   padding: 8px;
   border-radius: var(--ftm-radius-sm);
@@ -891,10 +927,6 @@ hotosm-auth {
 @media (max-width: 900px) {
   .ftm-split-grid,
   .ftm-split-grid--advanced {
-    grid-template-columns: 1fr;
-  }
-
-  .ftm-split-feature-options {
     grid-template-columns: 1fr;
   }
 }
@@ -1161,10 +1193,71 @@ hotosm-auth {
   height: 32px;
 }
 
-.ftm-app-logo--header {
+.ftm-app-logo--header .ftm-app-logo {
   width: 36px;
   height: 36px;
   flex-shrink: 0;
+}
+
+.ftm-app-logo--initial {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: var(--ftm-border);
+  font-weight: 700;
+}
+
+/* --- Mapping app picker and task map ----------------------- */
+.ftm-app-option {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ftm-app-option .ftm-app-logo {
+  width: 40px;
+  height: 40px;
+}
+
+.ftm-app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.ftm-app-grid .ftm-radio-card {
+  align-items: flex-start;
+}
+
+.ftm-app-questions {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  border-radius: var(--ftm-radius);
+  background: var(--hot-color-neutral-50, #f6f8fa);
+}
+
+.ftm-app-questions fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.ftm-app-questions legend {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.ftm-task-map {
+  width: 100%;
+  height: 480px;
+  border: 1px solid var(--ftm-border);
+  border-radius: var(--ftm-radius-sm);
 }
 
 /* --- Private badge ---------------------------------------- */
@@ -1827,4 +1920,45 @@ hotosm-auth {
   .ftm-stepper__label {
     font-size: 0.7rem;
   }
+}
+
+/* Shared site footer */
+.ftm-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 48px;
+  padding: 28px max(16px, calc((100% - 1200px) / 2));
+  background-color: var(--hot-color-primary-900, #2c3038);
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.55;
+}
+
+.ftm-footer a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.ftm-footer__social {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ftm-footer__social a {
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.ftm-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 0 1.5rem 1.5rem;
 }

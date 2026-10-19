@@ -15,20 +15,17 @@
       ( project.field_mapping_app.value if project.field_mapping_app and (project.field_mapping_app
       is not string) and project.field_mapping_app.value else (project.field_mapping_app if
       project.field_mapping_app else none) ) %} {% set field_mapping_app_upper =
-      field_mapping_app_value.upper() if field_mapping_app_value else none %} {% set has_xlsform =
-      project.xlsform_content is not none and project.xlsform_content %} {% set has_data_extract =
-      project.data_extract_geojson is not none and project.data_extract_geojson %} {% set
-      is_empty_data_extract = project.data_extract_geojson == {} %} {% set has_task_areas =
-      project.task_areas_geojson is not none %} {% set is_no_splitting = project.task_areas_geojson
-      == {} %}
+      field_mapping_app_value.upper() if field_mapping_app_value else none %} {% set app =
+      mapping_app(project.field_mapping_app) %} {% set has_xlsform = project.xlsform_content is not
+      none and project.xlsform_content %} {% set has_data_extract = project.data_extract_geojson is
+      not none and project.data_extract_geojson %} {% set is_empty_data_extract =
+      project.data_extract_geojson == {} %} {% set has_task_areas = project.task_areas_geojson is
+      not none %} {% set is_no_splitting = project.task_areas_geojson == {} %}
       <div class="ftm-project-title-wrap">
-        {% if field_mapping_app_value %}
-        <img
-          src="/static/images/{{ field_mapping_app_value.lower() }}-logo.svg"
-          alt="{{ field_mapping_app_value }}"
-          class="ftm-app-logo ftm-app-logo--header"
-          onerror="this.style.display = 'none'"
-        />
+        {% if app %}
+        <span class="ftm-app-logo--header" title="{{ app.name }}"
+          >{% include "partials/app_logo.html" %}</span
+        >
         {% endif %}
         <h1 style="margin: 0">{{ project.project_name or _('Unnamed Project') }}</h1>
         <wa-badge
@@ -37,7 +34,7 @@
           {{ status_value }}
         </wa-badge>
       </div>
-      {% if field_mapping_app_upper == 'QFIELD' and project.external_project_id %}
+      {% if is_manager and field_mapping_app_upper == 'QFIELD' and project.external_project_id %}
       <wa-button
         id="ftm-export-geojson-link"
         variant="brand"
@@ -51,7 +48,21 @@
     </div>
 
     <div style="padding: 20px">
-      {% if field_mapping_app_upper == 'QFIELD' and project.external_project_id %}
+      {% if project.creation_status == 'in_progress' %}
+      <wa-callout variant="brand" style="margin-bottom: 16px">
+        <span
+          >{{ _("This project is still being created. Refresh the page in a minute or two.")
+          }}</span
+        >
+      </wa-callout>
+      {% elif project.creation_status == 'failed' %}
+      <wa-callout variant="danger" style="margin-bottom: 16px">
+        <strong>{{ _("Project creation failed.") }}</strong>
+        <div>{{ project.creation_error or _("An unexpected error occurred.") }}</div>
+        <div>{{ _("Create the project again, or contact an admin if this keeps happening.") }}</div>
+      </wa-callout>
+      {% endif %} {% if is_manager and field_mapping_app_upper == 'QFIELD' and
+      project.external_project_id %}
       <div
         id="ftm-export-geojson-status"
         role="status"
@@ -167,7 +178,7 @@
         })();
       </script>
       {% endif %} {% if status_value == 'PUBLISHED' %} {% include
-      "partials/project_details/setup_steps.html" %}
+      "partials/project_details/setup_steps.html" %} {% if is_manager %}
 
       <div class="ftm-manager-section">
         <h2 class="ftm-manager-section__title">{{ _("Project Metadata") }}</h2>
@@ -175,7 +186,7 @@
           {{ _("Project metadata and setup information for managers.") }}
         </p>
       </div>
-      {% endif %} {% if project.location_str %}
+      {% endif %} {% endif %} {% if project.location_str %}
       <p class="ftm-project-location-line">📍 {{ project.location_str }}</p>
       {% endif %}
 
@@ -273,9 +284,13 @@
           {% endif %}
         </p>
       </div>
-      {% endif %} {% if status_value == 'PUBLISHED' %} {% include
+      {% endif %} {% if not is_manager %} {% if status_value != 'PUBLISHED' %}
+      <wa-callout variant="neutral" style="margin-top: 16px">
+        <span>{{ _("This project is not ready for mapping yet.") }}</span>
+      </wa-callout>
+      {% endif %} {% elif status_value == 'PUBLISHED' %} {% if app and app.syncs %} {% include
       "partials/project_details/manager_setup_summary.html" %} {% include
-      "partials/project_details/basemap_section.html" %} {% else %} {% include
+      "partials/project_details/basemap_section.html" %} {% endif %} {% else %} {% include
       "partials/project_details/setup_steps.html" %} {% endif %}
     </div>
 

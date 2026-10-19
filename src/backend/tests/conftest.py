@@ -28,12 +28,14 @@ import pytest
 import pytest_asyncio
 from asgi_lifespan import LifespanManager
 from httpx import ASGITransport, AsyncClient
+from litestar.exceptions import HTTPException
 
+from app.auth import auth_deps
 from app.auth.auth_deps import get_local_admin_auth_user
 from app.auth.auth_schemas import AuthUser
 from app.auth.user_crud import get_or_create_user
 from app.central import central_crud, central_schemas
-from app.config import encrypt_value, settings
+from app.config import AuthProvider, encrypt_value, settings
 from app.db.database import close_db_connection_pool, get_db_connection_pool
 from app.db.enums import (
     FieldMappingApp,
@@ -280,13 +282,18 @@ async def client() -> AsyncIterator[AsyncClient]:
     """The Litestar test server."""
     # NOTE we increase startup_timeout from 5s --> 30s to avoid timeouts
     # during slow initialisation / startup (due to yaml conversion etc)
-    manager = None
     try:
-        async with LifespanManager(litestar_api, startup_timeout=30) as manager:
+        async with LifespanManager(litestar_api, startup_timeout=30):
+
+            async def app_with_fresh_state(scope, receive, send):
+                # asgi-lifespan shares one state dict across requests, but
+                # Litestar caches per-request data (query, response started)
+                # in it; give each request its own.
+                scope["state"] = {}
+                await litestar_api(scope, receive, send)
+
             async with AsyncClient(
-                transport=ASGITransport(
-                    app=manager.app,
-                ),
+                transport=ASGITransport(app=app_with_fresh_state),
                 base_url=f"http://{settings.FTM_DOMAIN}",
                 follow_redirects=True,
             ) as ac:
@@ -310,3 +317,33 @@ async def client() -> AsyncIterator[AsyncClient]:
         else:
             # Re-raise if it's not a cleanup issue
             raise
+
+
+@pytest_asyncio.fixture(scope="function")
+async def login_as(db, monkeypatch):
+    """Enable auth and log in as a new non-admin user (None = anonymous)."""
+    current = {"user": None}
+
+    async def _current_user(request):
+        if current["user"] is None:
+            raise HTTPException(status_code=401, detail="Not logged in")
+        return current["user"]
+
+    async def _optional_user(request):
+        return current["user"]
+
+    monkeypatch.setattr(settings, "AUTH_PROVIDER", AuthProvider.BUNDLED)
+    monkeypatch.setattr(auth_deps, "get_current_user", _current_user)
+    monkeypatch.setattr(auth_deps, "get_current_user_optional", _optional_user)
+
+    async def _login(username: str | None):
+        if username is None:
+            current["user"] = None
+            return None
+        user = AuthUser(sub=f"fieldtm|{username}-{uuid4().hex[:8]}", username=username)
+        current["user"] = user
+        db_user = await get_or_create_user(db, user)
+        await db.commit()
+        return db_user
+
+    return _login

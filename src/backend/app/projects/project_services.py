@@ -24,9 +24,6 @@ exceptions (not HTTP exceptions), returning plain data structures.
 
 import json
 import logging
-import math
-import re
-import unicodedata
 from asyncio import TimeoutError as AsyncTimeoutError
 from asyncio import get_running_loop
 from dataclasses import dataclass
@@ -37,7 +34,7 @@ from typing import Optional
 import aiohttp
 from anyio import to_thread
 from area_splitter import SplittingAlgorithm
-from area_splitter.splitter import split_by_sql, split_by_square
+from area_splitter.splitter import split_by_sql
 from geojson_aoi import parse_aoi
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
@@ -163,60 +160,6 @@ class QFieldFinalizeResult:
     qfield_url: str
     manager_username: Optional[str]
     manager_password: Optional[str]
-
-
-@dataclass(slots=True)
-class SplitAoiOptions:
-    """Options that control AOI splitting."""
-
-    algorithm: str
-    no_of_buildings: int = 10
-    no_of_tasks: int = 10
-    dimension_meters: int = 100
-    include_roads: bool = True
-    include_rivers: bool = True
-    include_railways: bool = True
-    include_aeroways: bool = True
-    # None = splitter default (270s, sized for the sync route behind nginx).
-    # 0 = disable the cap entirely; set this from background-task callers
-    # where there is no proxy budget to protect.
-    statement_timeout_ms: Optional[int] = None
-
-
-# Targets for the split recommendation shown in the manual setup flow:
-# keep projects to roughly 100 task areas, ideally with no more than 100
-# buildings per task, and avoid tasks so small they are not worth claiming.
-_RECOMMENDED_MAX_TASKS = 100
-_RECOMMENDED_MIN_BUILDINGS_PER_TASK = 5
-
-
-@dataclass(slots=True)
-class SplitRecommendation:
-    """Suggested split parameters for a given number of features."""
-
-    feature_count: int
-    buildings_per_task: int
-    no_of_tasks: int
-
-
-def recommend_split(feature_count: int) -> Optional[SplitRecommendation]:
-    """Recommend buildings-per-task so a project has ~100 tasks at most.
-
-    E.g. 200 features -> 5/task (40 tasks), 1,000 -> 10/task (100 tasks),
-    10,000 -> 100/task (100 tasks). Returns None when there is nothing to split.
-    """
-    if feature_count <= 0:
-        return None
-    buildings_per_task = max(
-        _RECOMMENDED_MIN_BUILDINGS_PER_TASK,
-        math.ceil(feature_count / _RECOMMENDED_MAX_TASKS),
-    )
-    buildings_per_task = min(buildings_per_task, feature_count)
-    return SplitRecommendation(
-        feature_count=feature_count,
-        buildings_per_task=buildings_per_task,
-        no_of_tasks=math.ceil(feature_count / buildings_per_task),
-    )
 
 
 @dataclass(slots=True)
@@ -937,8 +880,6 @@ async def save_data_extract(
         project_id,
         project_schemas.ProjectUpdate(
             data_extract_geojson=geojson_data,
-            # Reset split status when a new extract is accepted.
-            task_areas_geojson=None,
         ),
     )
     await db.commit()
@@ -950,17 +891,6 @@ async def save_data_extract(
     return feature_count
 
 
-async def _save_empty_task_areas(db: AsyncConnection, project_id: int) -> dict:
-    """Persist the no-split sentinel value and return it."""
-    await DbProject.update(
-        db,
-        project_id,
-        project_schemas.ProjectUpdate(task_areas_geojson={}),
-    )
-    await db.commit()
-    return {}
-
-
 def _as_aoi_feature_collection(outline: dict) -> dict:
     """Wrap a project outline geometry in a single-feature collection."""
     return {
@@ -969,216 +899,46 @@ def _as_aoi_feature_collection(outline: dict) -> dict:
     }
 
 
-def _is_empty_data_extract(parsed_extract) -> bool:
-    """Return True when the project has no usable data extract for splitting."""
-    return parsed_extract == {} or (
-        isinstance(parsed_extract, dict)
-        and parsed_extract.get("type") == "FeatureCollection"
-        and len(parsed_extract.get("features", [])) == 0
-    )
-
-
-def _validate_split_extract(parsed_extract) -> None:
-    """Ensure the data extract is valid for building-based algorithms."""
-    if (
-        not parsed_extract
-        or not isinstance(parsed_extract, dict)
-        or parsed_extract.get("type") != "FeatureCollection"
-    ):
-        raise ValidationError(
-            "Data extract required for task splitting algorithm. "
-            "Please download OSM data or upload GeoJSON first and accept it."
-        )
-
-
-async def _split_with_sql_algorithm(  # noqa: PLR0913
-    aoi_featcol: dict,
-    parsed_extract: dict,
-    algorithm_enum: SplittingAlgorithm,
-    algorithm_params: dict,
-    include_roads: bool,
-    include_rivers: bool,
-    include_railways: bool,
-    include_aeroways: bool,
-    *,
-    statement_timeout_ms: Optional[int] = None,
-) -> dict:
-    """Run one of the SQL-backed split algorithms (building-based or roads-only)."""
-    _validate_split_extract(parsed_extract)
-    algorithm_params = {
-        **algorithm_params,
-        "include_roads": "TRUE" if include_roads else "FALSE",
-        "include_rivers": "TRUE" if include_rivers else "FALSE",
-        "include_railways": "TRUE" if include_railways else "FALSE",
-        "include_aeroways": "TRUE" if include_aeroways else "FALSE",
-    }
-    split_sql_call = partial(
-        split_by_sql,
-        aoi_featcol,
-        settings.FTM_DB_URL,
-        num_buildings=None,
-        outfile=None,
-        osm_extract=parsed_extract,
-        algorithm=algorithm_enum,
-        algorithm_params=algorithm_params,
-        statement_timeout_ms=statement_timeout_ms,
-    )
-    return await to_thread.run_sync(split_sql_call)
-
-
-async def _split_with_square_algorithm(
-    aoi_featcol: dict,
-    parsed_extract,
-    dimension_meters: int,
-) -> dict:
-    """Run square-grid splitting."""
-    valid_extract = (
-        parsed_extract
-        if (
-            parsed_extract
-            and isinstance(parsed_extract, dict)
-            and parsed_extract.get("type") == "FeatureCollection"
-        )
-        else None
-    )
-    return await to_thread.run_sync(
-        split_by_square,
-        aoi_featcol,
-        settings.FTM_DB_URL,
-        dimension_meters,
-        valid_extract,
-        None,
-    )
-
-
-# Implemented but hidden from the UI until validated on real projects.
-DISABLED_SPLIT_ALGORITHMS = frozenset({SplittingAlgorithm.SPLIT_BY_ROADS})
-
-
-def _parse_split_algorithm(algorithm: Optional[str]) -> SplittingAlgorithm:
-    """Validate the requested splitting algorithm is known and enabled."""
-    if not algorithm:
-        raise ValidationError("Please select a splitting option.")
-
-    try:
-        algorithm_enum = SplittingAlgorithm(algorithm)
-    except ValueError as err:
-        raise ValidationError(f"Invalid algorithm type: {algorithm}") from err
-
-    if algorithm_enum in DISABLED_SPLIT_ALGORITHMS:
-        raise ValidationError(f"Splitting algorithm {algorithm} is not available yet.")
-
-    return algorithm_enum
-
-
 async def split_aoi(
     db: AsyncConnection,
     project_id: int,
-    options: SplitAoiOptions,
+    algorithm: SplittingAlgorithm,
+    num_buildings: int,
+    statement_timeout_ms: Optional[int] = None,
 ) -> dict:
-    """Split a project AOI into task areas.
+    """Split a project AOI by building count (used by the simple flow).
 
-    Args:
-        db: Database connection.
-        project_id: The project ID.
-        options: Parsed splitting options.
-
-    Returns:
-        A GeoJSON FeatureCollection of task areas, or empty dict for NO_SPLITTING.
-
-    Raises:
-        ValidationError: If algorithm is invalid or required data is missing.
-        NotFoundError: If project outline is missing.
+    Custom projects split in the browser-based task planner instead.
     """
     project = await DbProject.one(db, project_id)
-
     if not project.outline:
         raise NotFoundError("Project outline not found. Cannot split AOI.")
+    extract = project.data_extract_geojson
+    if not isinstance(extract, dict) or extract.get("type") != "FeatureCollection":
+        raise ValidationError("Data extract required for task splitting.")
 
-    algorithm = options.algorithm
-    algorithm_enum = _parse_split_algorithm(algorithm)
-
-    # Handle NO_SPLITTING case
-    if algorithm_enum == SplittingAlgorithm.NO_SPLITTING:
-        await _save_empty_task_areas(db, project_id)
-        log.info(
-            f"No splitting selected for project {project_id}. "
-            "Will use whole AOI as single task."
-        )
-        return {}
-
-    aoi_featcol = _as_aoi_feature_collection(project.outline)
-
-    # Get data extract from database
-    parsed_extract = project.data_extract_geojson
-
-    # If data extract is empty, skip splitting
-    if _is_empty_data_extract(parsed_extract):
-        log.info(
-            f"Empty data extract for project {project_id}. "
-            "Skipping split and saving empty task areas."
-        )
-        return await _save_empty_task_areas(db, project_id)
-
-    # Perform splitting based on algorithm
-    log.info(f"Splitting AOI for project {project_id} using algorithm: {algorithm}")
-
-    # Commit before the split worker so the outer connection doesn't sit
-    # idle-in-transaction (with locks/snapshot) for the duration of the
-    # threaded split on its own connection.
+    # Don't hold the outer transaction open during the threaded split.
     await db.commit()
-
-    if algorithm_enum in (
-        SplittingAlgorithm.AVG_BUILDING_VORONOI,
-        SplittingAlgorithm.AVG_BUILDING_SKELETON,
-    ):
-        features = await _split_with_sql_algorithm(
-            aoi_featcol,
-            parsed_extract,
-            algorithm_enum,
-            {"num_buildings": options.no_of_buildings},
-            options.include_roads,
-            options.include_rivers,
-            options.include_railways,
-            options.include_aeroways,
-            statement_timeout_ms=options.statement_timeout_ms,
-        )
-    elif algorithm_enum == SplittingAlgorithm.DIVIDE_BY_SQUARE:
-        features = await _split_with_square_algorithm(
-            aoi_featcol,
-            parsed_extract,
-            options.dimension_meters,
-        )
-    elif algorithm_enum == SplittingAlgorithm.TOTAL_TASKS:
-        features = await _split_with_sql_algorithm(
-            aoi_featcol,
-            parsed_extract,
-            algorithm_enum,
-            {"num_enumerators": options.no_of_tasks},
-            options.include_roads,
-            options.include_rivers,
-            options.include_railways,
-            options.include_aeroways,
-        )
-    elif algorithm_enum == SplittingAlgorithm.SPLIT_BY_ROADS:
-        features = await _split_with_sql_algorithm(
-            aoi_featcol,
-            parsed_extract,
-            algorithm_enum,
-            {},
-            options.include_roads,
-            options.include_rivers,
-            options.include_railways,
-            options.include_aeroways,
-        )
-    else:
-        raise ValidationError(f"Algorithm {algorithm} not yet implemented.")
-
+    split = partial(
+        split_by_sql,
+        _as_aoi_feature_collection(project.outline),
+        settings.FTM_DB_URL,
+        num_buildings=None,
+        outfile=None,
+        osm_extract=extract,
+        algorithm=algorithm,
+        algorithm_params={
+            "num_buildings": num_buildings,
+            "include_roads": "TRUE",
+            "include_rivers": "TRUE",
+            "include_railways": "TRUE",
+            "include_aeroways": "TRUE",
+        },
+        statement_timeout_ms=statement_timeout_ms,
+    )
+    features = await to_thread.run_sync(split)
     if not features or not features.get("features"):
-        raise ValidationError(
-            "No task areas generated. Please try different parameters."
-        )
-
+        raise ValidationError("No task areas generated.")
     await check_crs(features)
     return features
 
@@ -1226,162 +986,6 @@ async def save_task_areas(
         f"(empty: {is_empty}, count: {task_count})"
     )
     return task_count
-
-
-# Charset matches ODK Central's dataset property name rules
-# (central_schemas.ALLOWED_PROPERTY_PATTERN), so group labels stay
-# sync-safe for the later ODK/QField assignment push PRs. Empty
-# string is allowed and means "ungrouped".
-ASSIGNED_GROUP_PATTERN = re.compile(r"^[a-zA-Z0-9_-]*$")
-ASSIGNED_GROUP_MAX_LENGTH = 100
-ASSIGNED_TO_MAX_LENGTH = 100
-
-
-def _clean_assigned_to(value: object) -> str:
-    """Stringify an assignee value and strip control/format characters."""
-    text = str(value) if value is not None else ""
-    return "".join(
-        char for char in text if unicodedata.category(char) not in ("Cc", "Cf")
-    )
-
-
-def _validate_assignment_entry(entry: object) -> dict:
-    """Validate one per-task assignment edit, returning cleaned values.
-
-    Raises:
-        ValidationError: If the entry shape or a value is invalid.
-    """
-    if not isinstance(entry, dict):
-        raise ValidationError(_("Invalid assignments data format."))
-
-    cleaned: dict[str, str] = {}
-    if "assigned_to" in entry:
-        assigned_to = _clean_assigned_to(entry["assigned_to"])
-        if len(assigned_to) > ASSIGNED_TO_MAX_LENGTH:
-            raise ValidationError(
-                _("Assignee must be %(max_length)s characters or fewer.")
-                % {"max_length": ASSIGNED_TO_MAX_LENGTH}
-            )
-        cleaned["assigned_to"] = assigned_to
-    if "assigned_group" in entry:
-        assigned_group = (
-            str(entry["assigned_group"]) if entry["assigned_group"] is not None else ""
-        )
-        if not ASSIGNED_GROUP_PATTERN.match(assigned_group):
-            raise ValidationError(
-                _(
-                    "Group labels may only contain letters, numbers, "
-                    "hyphens and underscores."
-                )
-            )
-        if len(assigned_group) > ASSIGNED_GROUP_MAX_LENGTH:
-            raise ValidationError(
-                _("Group labels must be %(max_length)s characters or fewer.")
-                % {"max_length": ASSIGNED_GROUP_MAX_LENGTH}
-            )
-        cleaned["assigned_group"] = assigned_group
-    return cleaned
-
-
-def count_assigned_tasks(task_areas: dict | None) -> int:
-    """Count stored task features carrying a non-empty assignment.
-
-    Used by the split/extract lifecycle guards to warn before actions
-    that overwrite or reset ``task_areas_geojson`` (and would silently
-    discard those assignments).
-    """
-    if not isinstance(task_areas, dict):
-        return 0
-    count = 0
-    for feature in task_areas.get("features") or []:
-        properties = feature.get("properties") or {}
-        if properties.get("assigned_to") or properties.get("assigned_group"):
-            count += 1
-    return count
-
-
-async def save_task_assignments(
-    db: AsyncConnection,
-    project_id: int,
-    assignments: dict,
-) -> int:
-    """Merge per-task assignment edits into stored task area properties.
-
-    Assignments are advisory metadata on each task feature; task ``status``
-    is owned by the field apps and is never written here.
-
-    Args:
-        db: Database connection.
-        project_id: The project ID.
-        assignments: Mapping of task id to a dict with optional
-            ``assigned_to`` / ``assigned_group`` string values.
-
-    Returns:
-        Number of task features updated.
-
-    Raises:
-        ValidationError: If the payload shape, a task id, or a value is invalid.
-    """
-    if not isinstance(assignments, dict):
-        raise ValidationError(_("Invalid assignments data format."))
-
-    # Row-lock the project so the read-merge-write below is atomic with
-    # respect to concurrent assignment saves and re-splits; without it a
-    # racing save could write a stale FeatureCollection back over edits
-    # committed in between. The lock is released by the commit below.
-    async with db.cursor() as cur:
-        await cur.execute(
-            """
-            SELECT task_areas_geojson
-            FROM projects
-            WHERE id = %(project_id)s
-            FOR UPDATE
-            """,
-            {"project_id": project_id},
-        )
-        row = await cur.fetchone()
-    task_areas = row[0] if row else None
-    features = task_areas.get("features") if isinstance(task_areas, dict) else None
-    if not features:
-        raise ValidationError(
-            _("No task areas to assign. Split the project area into tasks first.")
-        )
-
-    # Stored task_id is authoritative (stamped by save_task_areas); stamp in
-    # memory for legacy rows saved before ids were persisted, mirroring
-    # _build_task_entities. The stamped ids then persist with this save.
-    stamp_missing_task_ids(task_areas)
-    properties_by_task_id = {
-        feature["properties"]["task_id"]: feature["properties"] for feature in features
-    }
-
-    updated_count = 0
-    for raw_task_id, entry in assignments.items():
-        try:
-            task_id = int(raw_task_id)
-        except (TypeError, ValueError) as err:
-            raise ValidationError(
-                _("Invalid task id: %(task_id)s") % {"task_id": raw_task_id}
-            ) from err
-        properties = properties_by_task_id.get(task_id)
-        if properties is None:
-            raise ValidationError(
-                _("Unknown task id: %(task_id)s") % {"task_id": task_id}
-            )
-        properties.update(_validate_assignment_entry(entry))
-        updated_count += 1
-
-    await DbProject.update(
-        db,
-        project_id,
-        project_schemas.ProjectUpdate(task_areas_geojson=task_areas),
-    )
-    await db.commit()
-
-    log.info(
-        f"Saved task assignments for project {project_id} (updated: {updated_count})"
-    )
-    return updated_count
 
 
 def _validate_odk_finalization_prereqs(
@@ -1510,15 +1114,35 @@ async def _build_feature_dataset_payload(
     return entity_properties, entities_list
 
 
-def _task_entity_style(entity_dict: dict, task_number: int) -> dict:
-    """Apply the canonical styling/metadata for a task entity."""
-    entity_dict["label"] = f"Task {task_number}"
+TASK_ENTITY_PROPERTIES = [
+    "geometry",
+    "task_id",
+    "status",
+    "assigned_group",
+    "assigned_to",
+    "comment",
+    "colour",
+    "fill",
+    "stroke",
+    "stroke-width",
+]
+
+
+def _task_entity_style(entity_dict: dict, properties: dict) -> dict:
+    """Build a task entity from a task plan feature's properties."""
+    task_id = properties["task_id"]
+    colour = properties.get("colour") or "#3388ff"
+    entity_dict["label"] = f"Task {task_id}"
     entity_dict["data"] = {
         "geometry": entity_dict["data"]["geometry"],
-        "task_id": str(task_number),
+        "task_id": str(task_id),
         "status": "ready",
-        "fill": "#3388ff33",
-        "stroke": "#3388ff",
+        "assigned_group": properties.get("assigned_group") or "",
+        "assigned_to": properties.get("assigned_to") or "",
+        "comment": properties.get("comment") or "",
+        "colour": properties.get("colour") or "",
+        "fill": f"{colour}33",
+        "stroke": colour,
         "stroke-width": "3",
     }
     return entity_dict
@@ -1541,12 +1165,11 @@ async def _build_task_entities(project: DbProject) -> list[dict]:
         for feature in task_areas.get("features", []):
             if not feature.get("geometry"):
                 continue
-            task_id = feature["properties"]["task_id"]
             entity_dict = await central_crud.feature_geojson_to_entity_dict(
                 feature,
                 additional_features=True,
             )
-            task_entities.append(_task_entity_style(entity_dict, task_id))
+            task_entities.append(_task_entity_style(entity_dict, feature["properties"]))
 
     if task_entities:
         return task_entities
@@ -1563,7 +1186,27 @@ async def _build_task_entities(project: DbProject) -> list[dict]:
         outline_feature,
         additional_features=True,
     )
-    return [_task_entity_style(entity_dict, 1)]
+    return [_task_entity_style(entity_dict, {"task_id": 1})]
+
+
+async def sync_odk_tasks(
+    project: DbProject,
+    odk_creds: Optional[ODKCentral],
+    project_odk_id: int,
+) -> None:
+    """Create or update the ODK `tasks` entity list from the task plan.
+
+    Updates keep each entity's `status`, which mappers change in the field.
+    Tasks removed from the plan are left in ODK.
+    """
+    await central_crud.create_entity_list(
+        odk_creds,
+        project_odk_id,
+        properties=TASK_ENTITY_PROPERTIES,
+        dataset_name="tasks",
+        entities_list=await _build_task_entities(project),
+        keep_existing=frozenset({"status"}),
+    )
 
 
 async def _create_manager_credentials(
@@ -1655,31 +1298,7 @@ async def finalize_odk_project(
     )
 
     # Step 3: Upload task entities (always needed for entity-based task selection)
-    task_entities = await _build_task_entities(project)
-
-    if task_entities:
-        try:
-            async with central_deps.get_odk_dataset(custom_odk_creds) as odk_central:
-                datasets = await odk_central.listDatasets(project_odk_id)
-                if any(ds.get("name") == "tasks" for ds in datasets):
-                    log.info("Tasks dataset already exists, will be replaced")
-        except Exception as e:
-            log.warning(f"Could not check existing datasets: {e}")
-
-        await central_crud.create_entity_list(
-            custom_odk_creds,
-            project_odk_id,
-            properties=[
-                "geometry",
-                "task_id",
-                "status",
-                "fill",
-                "stroke",
-                "stroke-width",
-            ],
-            dataset_name="tasks",
-            entities_list=task_entities,
-        )
+    await sync_odk_tasks(project, custom_odk_creds, project_odk_id)
 
     # Step 4: Upload XLSForm
     xlsform_bytes = BytesIO(project.xlsform_content)
@@ -1719,6 +1338,16 @@ async def finalize_odk_project(
         manager_username=manager_username,
         manager_password=manager_password,
     )
+
+
+async def publish_project(db: AsyncConnection, project_id: int) -> None:
+    """Publish a files-only (Type B) project: there is nothing to sync."""
+    await DbProject.update(
+        db,
+        project_id,
+        project_schemas.ProjectUpdate(status=ProjectStatus.PUBLISHED),
+    )
+    await db.commit()
 
 
 async def finalize_qfield_project(

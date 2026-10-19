@@ -10,6 +10,7 @@ from litestar.response import Response, Template
 
 from app.auth.auth_deps import get_optional_auth_user
 from app.config import AuthProvider, settings
+from app.projects.mapping_apps import app_picker_context
 
 from ..setup_steps.setup_step_responses import (
     hx_redirect_response as _hx_redirect_response,
@@ -61,7 +62,25 @@ async def new_project_custom(
     login_redirect = await _redirect_to_login_if_needed(request, auth_user)
     if login_redirect:
         return login_redirect
-    return HTMXTemplate(template_name="new_project_custom.html")
+    return HTMXTemplate(
+        template_name="new_project_custom.html", context=app_picker_context()
+    )
+
+
+@get(path="/new/app-picker")
+async def app_picker(
+    mapping_type: str = "",
+    for_osm: str = "",
+    well_mapped: str = "",
+    field_mapping_app: str = "",
+) -> Template:
+    """App picker fragment, re-rendered as the guided questions are answered."""
+    return HTMXTemplate(
+        template_name="partials/new_project/app_picker.html",
+        context=app_picker_context(
+            mapping_type, for_osm, well_mapped, field_mapping_app
+        ),
+    )
 
 
 @get(
@@ -84,4 +103,5 @@ ROUTE_HANDLERS = [
     new_project_chooser,
     new_project_custom,
     new_project_simple,
+    app_picker,
 ]

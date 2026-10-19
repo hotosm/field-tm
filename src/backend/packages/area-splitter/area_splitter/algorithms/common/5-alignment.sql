@@ -12,7 +12,7 @@ USING gist (geom);
 -- that the earlier stages deliberately separated. Empty geometry when the
 -- AOI has no intersecting linear features, in which case the filter is a
 -- no-op.
-DROP TABLE IF EXISTS splitline_union;
+DROP TABLE IF EXISTS pg_temp.splitline_union;
 CREATE TEMP TABLE splitline_union AS
     SELECT COALESCE(
         ST_Difference(
@@ -36,7 +36,7 @@ DECLARE
     merges_remaining INTEGER = NULL;
 BEGIN
 
-    DROP TABLE IF EXISTS leastfeaturepolygons;
+    DROP TABLE IF EXISTS pg_temp.leastfeaturepolygons;
     IF num_enumerators > 0 THEN
       merges_remaining = (SELECT COUNT(*) FROM taskpolygons) - num_enumerators;
       IF merges_remaining < 0 THEN
@@ -142,6 +142,6 @@ BEGIN
     END LOOP;
 END $$;
 
-DROP TABLE IF EXISTS leastfeaturepolygons;
-DROP TABLE IF EXISTS splitline_union;
+DROP TABLE IF EXISTS pg_temp.leastfeaturepolygons;
+DROP TABLE IF EXISTS pg_temp.splitline_union;
 -- VACUUM ANALYZE taskpolygons;

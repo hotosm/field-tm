@@ -20,7 +20,6 @@ from app.projects.project_crud import claim_simple_project_basemap_generation
 from app.projects.project_services import (
     ConflictError,
     ServiceError,
-    SplitAoiOptions,
     create_project_stub,
     download_osm_data,
     finalize_qfield_project,
@@ -219,22 +218,10 @@ async def finalize_simple_project_creation(
             algorithm.value,
             buildings_per_task,
         )
+        # Runs in a background task, so no proxy timeout to protect: let
+        # CG_StraightSkeleton run to completion (statement_timeout_ms=0).
         tasks_geojson = await split_aoi(
-            db,
-            project_id,
-            SplitAoiOptions(
-                algorithm=algorithm.value,
-                no_of_buildings=buildings_per_task,
-                include_roads=True,
-                include_rivers=True,
-                include_railways=True,
-                include_aeroways=True,
-                # Simple flow runs in a background task (see
-                # run_simple_project_creation_background); no reverse-proxy
-                # budget to protect, so let CG_StraightSkeleton run to
-                # completion instead of capping at 270s.
-                statement_timeout_ms=0,
-            ),
+            db, project_id, algorithm, buildings_per_task, statement_timeout_ms=0
         )
         await save_task_areas(db, project_id, tasks_geojson)
 

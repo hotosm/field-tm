@@ -17,20 +17,17 @@
 #
 """Logic for interaction with ODK Central & data."""
 
-import csv
-import json
 import logging
 import re
 import secrets
 import string
 from asyncio import gather
 from contextlib import suppress
-from io import BytesIO, StringIO
+from io import BytesIO
 from typing import Optional, Union
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 import pandas as pd
-from geojson_aoi import parse_aoi
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
@@ -41,13 +38,11 @@ from pyxform.xls2xform import convert as xform_convert
 from app.central import central_deps, central_schemas
 from app.config import settings
 from app.db.enums import DbGeomType
-from app.db.models import DbProject, DbTemplateXLSForm
+from app.db.models import DbTemplateXLSForm
 from app.helpers.geometry_utils import (
     geojson_to_javarosa_geom,
-    javarosa_to_geojson_geom,
 )
 from app.i18n import _
-from app.projects import project_schemas
 
 log = logging.getLogger(__name__)
 
@@ -137,21 +132,6 @@ def _duplicate_form_conflict_from_body(body: dict) -> bool:
             return True
 
     return "xmlFormId" in str(body.get("message", ""))
-
-
-async def list_odk_projects(
-    odk_central: Optional[central_schemas.ODKCentral] = None,
-):
-    """List all projects on a remote ODK Server."""
-    try:
-        async with central_deps.pyodk_client(odk_central) as client:
-            return [project.model_dump() for project in client.projects.list()]
-    except Exception as e:
-        log.exception(f"Error listing ODK projects: {e}", stack_info=True)
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("Error listing projects on ODK Central: %(error)s") % {"error": e},
-        ) from e
 
 
 async def create_odk_project(
@@ -249,28 +229,6 @@ async def create_odk_xform(
         ) from e
 
 
-async def list_submissions(
-    project_id: int,
-    odk_central: Optional[central_schemas.ODKCentral] = None,
-    form_id: Optional[str] = None,
-):
-    """List all submissions for a project, aggregated from associated users."""
-    if not form_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=_("form_id is required to list submissions with pyodk."),
-        )
-
-    async with central_deps.pyodk_client(odk_central) as client:
-        return [
-            submission.model_dump()
-            for submission in client.submissions.list(
-                project_id=project_id,
-                form_id=form_id,
-            )
-        ]
-
-
 async def get_form_list(db: AsyncConnection) -> list:
     """Returns the list of {id:title} for XLSForms in the database."""
     try:
@@ -287,6 +245,24 @@ async def get_form_list(db: AsyncConnection) -> list:
 # these themselves, so don't fail validation when the survey references them.
 _INJECTED_CHOICE_LISTS = frozenset({"yes_no", "mapping_mode", "digitisation_problem"})
 _SELECT_TYPE_RE = re.compile(r"^\s*(select_one|select_multiple)\s+(\S+)")
+
+
+def _missing_choice_lists(
+    types: list, available_lists: set[str]
+) -> list[tuple[int, str]]:
+    """Return (row, list_name) for select questions using undefined lists."""
+    invalid = []
+    for offset, type_value in enumerate(types):
+        match = None if pd.isna(type_value) else _SELECT_TYPE_RE.match(str(type_value))
+        # select_one_from_file references a CSV (has a "."), not a choices list
+        if (
+            match
+            and "." not in match.group(2)
+            and match.group(2) not in available_lists
+        ):
+            # +2: header row is row 1, dataframe is 0-indexed
+            invalid.append((offset + 2, match.group(2)))
+    return invalid
 
 
 def _validate_user_xlsform_choices(xlsform: BytesIO) -> None:
@@ -324,21 +300,7 @@ def _validate_user_xlsform_choices(xlsform: BytesIO) -> None:
             if str(value).strip()
         )
 
-    invalid: list[tuple[int, str]] = []
-    for offset, type_value in enumerate(survey_df["type"].tolist()):
-        if pd.isna(type_value):
-            continue
-        match = _SELECT_TYPE_RE.match(str(type_value))
-        if not match:
-            continue
-        list_ref = match.group(2)
-        if "." in list_ref:
-            # select_one_from_file uses a CSV; not a choices list
-            continue
-        if list_ref not in available_lists:
-            # +2: header row is row 1, dataframe is 0-indexed
-            invalid.append((offset + 2, list_ref))
-
+    invalid = _missing_choice_lists(survey_df["type"].tolist(), available_lists)
     if not invalid:
         return
 
@@ -435,105 +397,6 @@ async def validate_and_update_user_xlsform(
     return await read_and_test_xform(updated_file_bytes)
 
 
-async def update_odk_central_xform(
-    xform_id: str,
-    odk_id: int,
-    xlsform: BytesIO,
-    odk_credentials: central_schemas.ODKCentral,
-) -> None:
-    """Update and publish the XForm for a project.
-
-    Args:
-        xform_id (str): The UUID of the existing XForm in ODK Central.
-        odk_id (int): ODK Central form ID.
-        xlsform (UploadFile): XForm data.
-        odk_credentials (central_schemas.ODKCentral): ODK Central creds.
-
-    Returns: None
-    """
-    xform_bytesio = await read_and_test_xform(xlsform)
-
-    async with central_deps.pyodk_client(odk_credentials) as client:
-        client.forms.update(
-            project_id=odk_id,
-            form_id=xform_id,
-            definition=xform_bytesio.getvalue(),
-        )
-
-
-async def update_project_xlsform(
-    db: AsyncConnection,
-    project: DbProject,
-    xlsform: BytesIO,
-    xform_id: str,
-):
-    """Update both the ODK Central and FieldTM XLSForm."""
-    # Update ODK Central form data
-    await update_odk_central_xform(
-        xform_id,
-        project.external_project_id,
-        xlsform,
-        None,  # ODK credentials not stored on project, use env vars
-    )
-
-    await DbProject.update(
-        db,
-        project.id,
-        project_schemas.ProjectUpdate(
-            xlsform_content=xlsform.getvalue(),
-        ),
-    )
-    await db.commit()
-
-
-async def convert_geojson_to_odk_csv(
-    input_geojson: BytesIO,
-) -> StringIO:
-    """Convert GeoJSON features to ODK CSV format.
-
-    Used for form upload media (dataset) in ODK Central.
-
-    Args:
-        input_geojson (BytesIO): GeoJSON file to convert.
-
-    Returns:
-        feature_csv (StringIO): CSV of features in XLSForm format for ODK.
-    """
-    parsed_geojson = parse_aoi(settings.FTM_DB_URL, input_geojson.getvalue())
-
-    if not parsed_geojson:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("Conversion GeoJSON --> CSV failed"),
-        )
-
-    csv_buffer = StringIO()
-    csv_writer = csv.writer(csv_buffer)
-
-    header = ["osm_id", "tags", "version", "changeset", "timestamp", "geometry"]
-    csv_writer.writerow(header)
-
-    features = parsed_geojson.get("features", [])
-    for feature in features:
-        geometry = feature.get("geometry")
-        javarosa_geom = await geojson_to_javarosa_geom(geometry)
-
-        properties = feature.get("properties", {})
-        osm_id = properties.get("osm_id")
-        tags = properties.get("tags")
-        version = properties.get("version")
-        changeset = properties.get("changeset")
-        timestamp = properties.get("timestamp")
-
-        csv_row = [osm_id, tags, version, changeset, timestamp, javarosa_geom]
-        csv_writer.writerow(csv_row)
-
-    # Reset buffer position to start to .read() works
-    csv_buffer.seek(0)
-
-    return csv_buffer
-
-
 def flatten_json(data: dict, target: dict):
     """Flatten json properties to a single level.
 
@@ -552,78 +415,6 @@ def flatten_json(data: dict, target: dict):
             flatten_json(v, target)
         else:
             target[k] = v
-
-
-async def convert_odk_submission_json_to_geojson(
-    input_json: Union[BytesIO, list],
-) -> dict:
-    """Convert ODK submission JSON file to GeoJSON.
-
-    Used for loading into QGIS.
-
-    Args:
-        input_json (BytesIO): ODK JSON submission list.
-
-    Returns:
-        geojson (BytesIO): GeoJSON format ODK submission.
-    """
-    if isinstance(input_json, list):
-        submission_json = input_json
-    else:
-        submission_json = json.loads(input_json.getvalue())
-
-    if not submission_json:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("Project contains no submissions yet"),
-        )
-
-    all_features = []
-    for submission in submission_json:
-        # Remove unnecessary keys
-        keys_to_remove = ["meta", "__id", "__system"]
-        for key in keys_to_remove:
-            submission.pop(key)
-
-        # Ensure no nesting of the properties (flat struct)
-        data = {}
-        flatten_json(submission, data)
-
-        # Process primary geometry
-        geojson_geom = await javarosa_to_geojson_geom(data.pop("xlocation", {}))
-
-        # Identify and process additional geometries
-        additional_geometries = []
-        for geom_field in list(data.keys()):
-            if geom_field.endswith("_geom"):
-                id_field = geom_field[:-5]  # Remove "_geom" suffix
-                geom_data = data.pop(geom_field, {})
-
-                # Convert geometry
-                geom = await javarosa_to_geojson_geom(geom_data)
-
-                feature = {
-                    "type": "Feature",
-                    "id": data.get(id_field),
-                    "geometry": geom,
-                    "properties": {
-                        "is_additional_geom": True,
-                        "id_field": id_field,
-                        "geom_field": geom_field,
-                    },
-                }
-                additional_geometries.append(feature)
-
-        feature = {
-            "type": "Feature",
-            "id": data.get("xlocation"),
-            "geometry": geojson_geom,
-            "properties": data,
-        }
-        all_features.append(feature)
-        all_features.extend(additional_geometries)
-
-    return {"type": "FeatureCollection", "features": all_features}
 
 
 async def feature_geojson_to_entity_dict(
@@ -809,11 +600,12 @@ def _index_entities_by_label(entity_table: dict | list | None) -> dict[str, dict
 def _get_entity_update_data(
     source_row: dict[str, str],
     target_row: dict,
+    keep_existing: frozenset[str] = frozenset(),
 ) -> dict[str, str]:
     """Build the smallest update payload needed to align an existing entity."""
     update_data = {}
     for key, value in source_row.items():
-        if key == "label":
+        if key == "label" or (key in keep_existing and key in target_row):
             continue
 
         existing_value = target_row.get(key)
@@ -830,6 +622,7 @@ def _upsert_entity_rows(
     project_id: int,
     dataset_name: str,
     merge_rows: list[dict[str, str]],
+    keep_existing: frozenset[str] = frozenset(),
 ) -> None:
     """Insert new entities and minimally update existing ones by label."""
     target_by_label = _index_entities_by_label(
@@ -847,7 +640,7 @@ def _upsert_entity_rows(
             to_insert.append(source_row)
             continue
 
-        update_data = _get_entity_update_data(source_row, target_row)
+        update_data = _get_entity_update_data(source_row, target_row, keep_existing)
         if not update_data:
             continue
 
@@ -889,8 +682,11 @@ async def create_entity_list(
     properties: list[str],
     dataset_name: str = "features",
     entities_list: list[central_schemas.EntityDict] = None,
+    keep_existing: frozenset[str] = frozenset(),
 ) -> None:
     """Create a new Entity list (dataset) in ODK and upsert entities.
+
+    Properties in `keep_existing` are only set on new entities.
 
     Notes on implementation:
     - Dataset creation uses the async ODK client (`osm_fieldwork.OdkCentralAsync`)
@@ -945,66 +741,7 @@ async def create_entity_list(
             required_keys,
             existing_property_names,
         )
-        _upsert_entity_rows(client, pid, dataset_name, merge_rows)
-
-
-async def create_entity(
-    odk_creds: Optional[central_schemas.ODKCentral],
-    entity_uuid: UUID,
-    odk_id: int,
-    properties: list[str],
-    entity: central_schemas.EntityDict,
-    dataset_name: str = "features",
-) -> dict:  # noqa: PLR0913
-    """Create a new Entity in ODK."""
-    log.info(f"Creating ODK Entity in dataset '{dataset_name}' (ODK ID: {odk_id})")
-    try:
-        properties = central_schemas.entity_fields_to_list(properties)
-
-        label = entity.get("label")
-        data = entity.get("data")
-
-        if not label or not data:
-            log.error("Missing required entity fields: 'label' or 'data'")
-            raise ValueError("Entity must contain 'label' and 'data' fields")
-
-        async with central_deps.pyodk_client(odk_creds) as client:
-            response = client.entities.create(
-                label=label,
-                data=data,
-                entity_list_name=dataset_name,
-                project_id=odk_id,
-                uuid=str(entity_uuid),  # pyodk only accepts string UUID
-            )
-
-        log.info(f"Entity '{label}' successfully created in ODK")
-        return response
-
-    except Exception as e:
-        log.exception(f"Failed to create entity in ODK: {str(e)}")
-        raise
-
-
-async def delete_entity(
-    odk_creds: central_schemas.ODKCentral,
-    odk_id: int,
-    entity_uuid: UUID,
-    dataset_name: str = "features",
-) -> None:
-    """Delete an Entity in ODK."""
-    log.info(f"Deleting ODK Entity in dataset '{dataset_name}' (ODK ID: {odk_id})")
-    try:
-        async with central_deps.pyodk_client(odk_creds) as client:
-            client.entities.delete(
-                uuid=str(entity_uuid),
-                entity_list_name=dataset_name,
-                project_id=odk_id,
-            )
-        log.info(f"Entity {entity_uuid} successfully deleted from ODK")
-
-    except Exception as e:
-        log.exception(f"Failed to delete entity {entity_uuid} in ODK: {str(e)}")
-        raise
+        _upsert_entity_rows(client, pid, dataset_name, merge_rows, keep_existing)
 
 
 async def get_appuser_token(

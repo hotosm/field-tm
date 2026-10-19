@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.13"
 
 [manifest]
@@ -515,9 +515,9 @@ dependencies = [
     { name = "geojson-aoi-parser" },
     { name = "geojson-pydantic" },
     { name = "hotosm-auth", extra = ["litestar"] },
+    { name = "httpx" },
     { name = "litestar", extra = ["jinja"] },
     { name = "osm-fieldwork" },
-    { name = "osm-login-python" },
     { name = "pg-nearest-city" },
     { name = "psycopg", extra = ["c", "pool"] },
     { name = "pydantic" },
@@ -527,6 +527,7 @@ dependencies = [
     { name = "pyxform" },
     { name = "qfieldcloud-sdk" },
     { name = "raw-data-api-py" },
+    { name = "segno" },
     { name = "uvicorn" },
 ]
 
@@ -558,7 +559,6 @@ monitoring = [
 test = [
     { name = "asgi-lifespan" },
     { name = "coverage" },
-    { name = "httpx" },
     { name = "pyinstrument" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -571,9 +571,9 @@ requires-dist = [
     { name = "geojson-aoi-parser", specifier = "==0.3.5" },
     { name = "geojson-pydantic", specifier = "==1.1.2" },
     { name = "hotosm-auth", extras = ["litestar"], git = "https://github.com/hotosm/login.git?subdirectory=auth-libs%2Fpython&rev=a2a1ce2a395c" },
+    { name = "httpx", specifier = "==0.28.1" },
     { name = "litestar", extras = ["jinja"], specifier = "==2.21.1" },
     { name = "osm-fieldwork", editable = "packages/osm-fieldwork" },
-    { name = "osm-login-python", specifier = "==2.0.0" },
     { name = "pg-nearest-city", specifier = "==2.0.0" },
     { name = "psycopg", extras = ["c", "pool"], specifier = "==3.3.5" },
     { name = "pydantic", specifier = "==2.9.2" },
@@ -583,6 +583,7 @@ requires-dist = [
     { name = "pyxform", specifier = "==4.0.0" },
     { name = "qfieldcloud-sdk", git = "https://github.com/hotosm/qfieldcloud-sdk-python?rev=feat%2Ftemp-cgi-plus-user-api" },
     { name = "raw-data-api-py", specifier = "==0.3.0" },
+    { name = "segno", specifier = "==1.6.6" },
     { name = "uvicorn", specifier = "==0.41.0" },
 ]
 
@@ -612,7 +613,6 @@ monitoring = [
 test = [
     { name = "asgi-lifespan", specifier = "==2.1.0" },
     { name = "coverage", specifier = "==7.15.2" },
-    { name = "httpx", specifier = "==0.28.1" },
     { name = "pyinstrument", specifier = "==5.0.3" },
     { name = "pytest", specifier = "==8.3.5" },
     { name = "pytest-asyncio", specifier = "==0.24.0" },
@@ -668,15 +668,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/d3/c3/0fc2c97dea550df9afd072a37c1e95421652e3206bbeaa02378b24c2b480/frozenlist-1.6.0-cp313-cp313t-win32.whl", hash = "sha256:a4d96dc5bcdbd834ec6b0f91027817214216b5b30316494d2b1aebffb87c534f", size = 128797, upload-time = "2025-04-17T22:38:14.013Z" },
     { url = "https://files.pythonhosted.org/packages/ae/f5/79c9320c5656b1965634fe4be9c82b12a3305bdbc58ad9cb941131107b20/frozenlist-1.6.0-cp313-cp313t-win_amd64.whl", hash = "sha256:e18036cb4caa17ea151fd5f3d70be9d354c99eb8cf817a3ccde8a7873b074348", size = 134709, upload-time = "2025-04-17T22:38:15.551Z" },
     { url = "https://files.pythonhosted.org/packages/71/3e/b04a0adda73bd52b390d730071c0d577073d3d26740ee1bad25c3ad0f37b/frozenlist-1.6.0-py3-none-any.whl", hash = "sha256:535eec9987adb04701266b92745d6cdcef2e77669299359c3009c3404dd5d191", size = 12404, upload-time = "2025-04-17T22:38:51.668Z" },
-]
-
-[[package]]
-name = "geojson"
-version = "3.2.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/85/5a/33e761df75c732fcea94aaf01f993d823138581d10c91133da58bc231e63/geojson-3.2.0.tar.gz", hash = "sha256:b860baba1e8c6f71f8f5f6e3949a694daccf40820fa8f138b3f712bd85804903", size = 24574, upload-time = "2024-12-21T19:35:29.835Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/18/67/a7fa2d650602731c90e0a86279841b4586e14228199e8c09165ba4863e29/geojson-3.2.0-py3-none-any.whl", hash = "sha256:69d14156469e13c79479672eafae7b37e2dcd19bdfd77b53f74fa8fe29910b52", size = 15040, upload-time = "2024-12-21T19:37:02.149Z" },
 ]
 
 [[package]]
@@ -886,15 +877,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/f2/97/ebf4da567aa6827c909642694d71c9fcf53e5b504f2d96afea02718862f3/iniconfig-2.1.0.tar.gz", hash = "sha256:3abbd2e30b36733fee78f9c7f7308f2d0050e88f0087fd25c2645f63c773e1c7", size = 4793, upload-time = "2025-03-19T20:09:59.721Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2c/e1/e6716421ea10d38022b952c159d5161ca1193197fb744506875fbb87ea7b/iniconfig-2.1.0-py3-none-any.whl", hash = "sha256:9deba5723312380e77435581c6bf4935c94cbfab9b1ed33ef8d238ea168eb760", size = 6050, upload-time = "2025-03-19T20:10:01.071Z" },
-]
-
-[[package]]
-name = "itsdangerous"
-version = "2.2.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/9c/cb/8ac0172223afbccb63986cc25049b154ecfb5e85932587206f42317be31d/itsdangerous-2.2.0.tar.gz", hash = "sha256:e0050c0b7da1eea53ffaf149c0cfbb5c6e2e2b69c4bef22c81fa6eb73e5f6173", size = 54410, upload-time = "2024-04-16T21:28:15.614Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/04/96/92447566d16df59b2a776c0fb82dbc4d9e07cd95062562af01e408583fc4/itsdangerous-2.2.0-py3-none-any.whl", hash = "sha256:c6242fc49e35958c8b15141343aa660db5fc54d4f13a1db01a3f5891b98700ef", size = 16234, upload-time = "2024-04-16T21:28:14.499Z" },
 ]
 
 [[package]]
@@ -1286,15 +1268,6 @@ wheels = [
 ]
 
 [[package]]
-name = "oauthlib"
-version = "3.2.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6d/fa/fbf4001037904031639e6bfbfc02badfc7e12f137a8afa254df6c4c8a670/oauthlib-3.2.2.tar.gz", hash = "sha256:9859c40929662bec5d64f34d01c99e093149682a3f38915dc0655d5a633dd918", size = 177352, upload-time = "2022-10-17T20:04:27.471Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/7e/80/cab10959dc1faead58dc8384a781dfbf93cb4d33d50988f7a69f1b7c9bbe/oauthlib-3.2.2-py3-none-any.whl", hash = "sha256:8139f29aac13e25d502680e9e19963e83f16838d48a0d71c287fe40e7067fbca", size = 151688, upload-time = "2022-10-17T20:04:24.037Z" },
-]
-
-[[package]]
 name = "openpyxl"
 version = "3.1.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1541,41 +1514,19 @@ version = "0.23.0"
 source = { editable = "packages/osm-fieldwork" }
 dependencies = [
     { name = "aiohttp" },
-    { name = "geojson" },
     { name = "openpyxl" },
     { name = "pandas" },
     { name = "python-calamine" },
-    { name = "pyyaml" },
-    { name = "requests" },
-    { name = "segno" },
     { name = "yxf" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", specifier = ">=3.8.4" },
-    { name = "geojson", specifier = ">=3.0.0" },
     { name = "openpyxl", specifier = ">=3.0.10" },
     { name = "pandas", specifier = ">=1.5.0" },
     { name = "python-calamine", specifier = ">=0.3.1" },
-    { name = "pyyaml", specifier = ">=6.0.0" },
-    { name = "requests", specifier = ">=2.26.0" },
-    { name = "segno", specifier = ">=1.5.2" },
     { name = "yxf", specifier = ">=1.0.0" },
-]
-
-[[package]]
-name = "osm-login-python"
-version = "2.0.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "itsdangerous" },
-    { name = "pydantic" },
-    { name = "requests-oauthlib" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/71/32/1aae4704a91d288157a8dcb27cd47ca3b3b16d714b3d695966dacc896e31/osm-login-python-2.0.0.tar.gz", hash = "sha256:01fa35402e1342820c725068f4e41c81dcce064e07058f8a206d98a8b6f04bb9", size = 17339, upload-time = "2024-08-09T10:35:43.764Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/4d/e1/4de4056c1b766149aaa5707b3e51b00f56d1fa37ba3d5bc797ec6625fb77/osm_login_python-2.0.0-py3-none-any.whl", hash = "sha256:1289410fb1967f584ee52b02d96c85ff2cb104068481fa6530d5f3b138ec7afc", size = 17136, upload-time = "2024-08-09T10:35:42.173Z" },
 ]
 
 [[package]]
@@ -2192,19 +2143,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/63/70/2bf7780ad2d390a8d301ad0b550f1581eadbd9a20f896afe06353c2a2913/requests-2.32.3.tar.gz", hash = "sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760", size = 131218, upload-time = "2024-05-29T15:37:49.536Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f9/9b/335f9764261e915ed497fcdeb11df5dfd6f7bf257d4a6a2a686d80da4d54/requests-2.32.3-py3-none-any.whl", hash = "sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6", size = 64928, upload-time = "2024-05-29T15:37:47.027Z" },
-]
-
-[[package]]
-name = "requests-oauthlib"
-version = "2.0.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "oauthlib" },
-    { name = "requests" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/42/f2/05f29bc3913aea15eb670be136045bf5c5bbf4b99ecb839da9b422bb2c85/requests-oauthlib-2.0.0.tar.gz", hash = "sha256:b3dffaebd884d8cd778494369603a9e7b58d29111bf6b41bdc2dcd87203af4e9", size = 55650, upload-time = "2024-03-22T20:32:29.939Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/5d/63d4ae3b9daea098d5d6f5da83984853c1bbacd5dc826764b249fe119d24/requests_oauthlib-2.0.0-py2.py3-none-any.whl", hash = "sha256:7dd8a5c40426b779b0868c404bdef9768deccf22749cde15852df527e6269b36", size = 24179, upload-time = "2024-03-22T20:32:28.055Z" },
 ]
 
 [[package]]

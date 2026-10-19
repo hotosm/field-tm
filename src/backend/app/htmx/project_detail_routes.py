@@ -41,11 +41,11 @@ from app.auth.auth_deps import (
     login_required,
 )
 from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import check_access, project_manager, wrap_check_access
+from app.auth.roles import check_access, ensure_project_viewable, project_manager
 from app.central import central_crud
 from app.config import decrypt_value
 from app.db.database import db_conn
-from app.db.enums import FieldMappingApp, ProjectRole, ProjectVisibility
+from app.db.enums import FieldMappingApp, ProjectRole
 from app.db.models import DbProject
 from app.i18n import _
 from app.projects import project_crud
@@ -93,158 +93,23 @@ def _can_delete_project(auth_user: object | None, project: DbProject) -> bool:
     return False
 
 
-async def _ensure_project_viewable(
-    db: AsyncConnection,
-    project: DbProject,
-    auth_user: object | None,
-) -> None:
-    """Public projects stay open to guests, private ones need a project role.
-
-    The optional-auth variant of the `mapper` dependency, which cannot be used
-    here as it requires `login_required`.
-    """
-    if project.visibility == ProjectVisibility.PUBLIC:
-        return
-
-    if auth_user is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=_("You must be logged in to view this project."),
-        )
-
-    await wrap_check_access(project, db, auth_user, ProjectRole.MAPPER)
-
-
-def _mapper_credentials_html(project: DbProject) -> str:
-    """Render QField mapper credentials when they are available."""
-    if project.field_mapping_app != FieldMappingApp.QFIELD:
-        return ""
-
-    mapper_username = project.external_project_username
-    mapper_password = None
-    if project.external_project_password_encrypted:
-        with suppress(Exception):
-            mapper_password = decrypt_value(project.external_project_password_encrypted)
-
-    if not (mapper_username and mapper_password):
-        return ""
-
-    return f"""
-            <div class="ftm-qr-panel__mapper-creds" style="
-                margin-top: 16px;
-                padding: 12px 16px;
-                background: #f5f5f5;
-                border-radius: 8px;
-            ">
-                <h4 style="margin: 0 0 8px 0; font-size: 0.95em;">
-                    {_("Mapper Login (QFieldCloud)")}
-                </h4>
-                <p style="margin: 0; font-size: 0.9em;">
-                    <strong>{_("Username:")}</strong> <code>{mapper_username}</code>
-                </p>
-                <p style="margin: 4px 0 0 0; font-size: 0.9em;">
-                    <strong>{_("Password:")}</strong> <code>{mapper_password}</code>
-                </p>
-                <p style="margin: 8px 0 0 0; font-size: 0.8em; color: #666;">
-                    {_("Scan the QR code, then enter these credentials in QField.")}
-                </p>
-            </div>"""
-
-
-def _qrcode_panel_html(
-    qr_code_data_url: str,
-    qr_download_name: str,
-    app_name: str,
-    mapper_creds_html: str,
-    open_app_url: str | None = None,
-) -> str:
-    """Build the QR code HTML payload."""
-    scan_qr_code = _("Scan QR Code")
-    scan_description = _(
-        "Use %(app_name)s to scan this QR code and load the project."
-    ) % {"app_name": app_name}
-    project_qr_code = _("Project QR Code")
-    download_qr_code = _("Download QR Code")
-    open_button_html = ""
-    if open_app_url:
-        open_in_app = _("Open in %(app_name)s") % {"app_name": app_name}
-        open_hint = _("If %(app_name)s is installed on this device.") % {
-            "app_name": app_name
-        }
-        open_button_html = f"""
-                <wa-button
-                    href="{open_app_url}"
-                    variant="brand"
-                >
-                    {open_in_app}
-                </wa-button>
-                <p style="margin: 6px 0 12px 0; font-size: 0.8em; color: #666;">
-                    {open_hint}
-                </p>
-        """
-    return f"""
-        <div class="ftm-qr-panel">
-            <h3 class="ftm-qr-panel__title">{scan_qr_code}</h3>
-            <p class="ftm-qr-panel__description">
-                {scan_description}
-            </p>
-            <div class="ftm-qr-panel__image-wrap">
-                <img
-                    src="{qr_code_data_url}"
-                    alt="{project_qr_code}"
-                    class="ftm-qr-panel__image"
-                />
-            </div>
-            <div>
-                {open_button_html}
-                <wa-button
-                    onclick="downloadQRCode('{qr_code_data_url}', '{qr_download_name}')"
-                    variant="default"
-                >
-                    {download_qr_code}
-                </wa-button>
-            </div>
-            {mapper_creds_html}
-        </div>
-        <script>
-            if (typeof window.downloadQRCode !== "function") {{
-                window.downloadQRCode = function downloadQRCode(dataUrl, filename) {{
-                    const link = document.createElement("a");
-                    link.href = dataUrl;
-                    link.download = filename + ".png";
-                    link.click();
-                }};
-            }}
-        </script>
-        """
-
-
-def _friendly_qr_error(exc: Exception) -> str:
-    """Map low-level QR generation failures to a user-friendly message."""
-    raw = str(exc).lower()
-    if any(
-        kw in raw
-        for kw in (
-            "connection",
-            "connect",
-            "refused",
-            "timeout",
-            "unreachable",
-            "network",
-        )
+async def _mapper_credentials(
+    db: AsyncConnection, project: DbProject, auth_user: object | None
+) -> tuple[str | None, str | None]:
+    """QField mapper credentials, only for logged-in users with a project role."""
+    if project.field_mapping_app != FieldMappingApp.QFIELD or auth_user is None:
+        return None, None
+    if not project.external_project_password_encrypted:
+        return None, None
+    if not await check_access(
+        auth_user, db, project_id=project.id, role=ProjectRole.MAPPER
     ):
-        return _(
-            "Cannot reach the mapping server. "
-            "Check that ODK Central or QFieldCloud is running."
-        )
-    if any(kw in raw for kw in ("500", "server error", "internal")):
-        return _("The mapping server returned an error. Check its logs for details.")
-    if any(kw in raw for kw in ("401", "403", "unauthorized", "forbidden")):
-        return _(
-            "Authentication failed connecting to the mapping server. "
-            "Check the configured credentials."
-        )
-    return _("An unexpected error occurred while generating the QR code.")
+        return None, None
+    try:
+        password = decrypt_value(project.external_project_password_encrypted)
+    except Exception:
+        return None, None
+    return project.external_project_username, password
 
 
 def _show_qfc_collaborator_form(project: DbProject) -> bool:
@@ -256,27 +121,17 @@ def _show_qfc_collaborator_form(project: DbProject) -> bool:
     )
 
 
-async def _show_assignment_panel(
+async def _is_project_manager(
     db: AsyncConnection, auth_user: object | None, project: DbProject
 ) -> bool:
-    """Whether the viewer may see the manager-gated task assignment panel.
-
-    Mirrors the project_manager gate on the panel routes so non-managers
-    viewing a published project never trigger the lazy load (the global
-    htmx config would swap the 4xx auth error into the panel slot).
-    """
+    """Whether the viewer may use the manager-only parts of the project page."""
     if auth_user is None:
         return False
-    with suppress(Exception):
-        return bool(
-            await check_access(
-                auth_user,
-                db,
-                project_id=project.id,
-                role=ProjectRole.PROJECT_ADMIN,
-            )
+    return bool(
+        await check_access(
+            auth_user, db, project_id=project.id, role=ProjectRole.PROJECT_MANAGER
         )
-    return False
+    )
 
 
 @get(
@@ -295,20 +150,20 @@ async def project_details(
     """Render project details page."""
     try:
         project = await DbProject.one(db, project_id)
-        await _ensure_project_viewable(db, project, auth_user)
+        await ensure_project_viewable(db, project, auth_user)
+        is_manager = await _is_project_manager(db, auth_user, project)
         form_templates = []
-        if not project.xlsform_content:
+        if is_manager and not project.xlsform_content:
             form_templates = await central_crud.get_form_list(db)
         return HTMXTemplate(
             template_name="project_details.html",
             context={
                 "project": project,
+                "is_manager": is_manager,
                 "form_templates_json": json.dumps(form_templates),
                 "can_delete_project": _can_delete_project(auth_user, project),
-                "show_qfc_collaborator_form": _show_qfc_collaborator_form(project),
-                "show_assignment_panel": await _show_assignment_panel(
-                    db, auth_user, project
-                ),
+                "show_qfc_collaborator_form": is_manager
+                and _show_qfc_collaborator_form(project),
             },
         )
     except KeyError:
@@ -317,10 +172,10 @@ async def project_details(
             template_name="project_details.html",
             context={
                 "project": None,
+                "is_manager": False,
                 "form_templates_json": "[]",
                 "can_delete_project": False,
                 "show_qfc_collaborator_form": False,
-                "show_assignment_panel": False,
             },
         )
 
@@ -386,7 +241,7 @@ async def project_qrcode_htmx(
     project_id: int = Parameter(),
     username: str = Parameter(default="fieldtm_user"),
     auth_user: object | None = None,
-) -> Response:
+) -> HTMXTemplate | Response:
     """Generate and return QR code for a published project.
 
     Gated by the same rule as the project detail page that embeds it: anyone
@@ -401,7 +256,7 @@ async def project_qrcode_htmx(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
-    await _ensure_project_viewable(db, project, auth_user)
+    await ensure_project_viewable(db, project, auth_user)
 
     try:
         # Use CRUD function to generate QR code
@@ -416,17 +271,19 @@ async def project_qrcode_htmx(
             and project.external_project_id
         ):
             open_app_url = f"qfield://cloud?project={project.external_project_id}"
-        html_content = _qrcode_panel_html(
-            qr_code_data_url,
-            qr_download_name,
-            app_name,
-            _mapper_credentials_html(project),
-            open_app_url=open_app_url,
+        mapper_username, mapper_password = await _mapper_credentials(
+            db, project, auth_user
         )
-        return Response(
-            content=html_content,
-            media_type="text/html",
-            status_code=status.HTTP_200_OK,
+        return HTMXTemplate(
+            template_name="partials/project_details/fragments/qr_panel.html",
+            context={
+                "qr_code_data_url": qr_code_data_url,
+                "qr_download_name": qr_download_name,
+                "app_name": app_name,
+                "open_app_url": open_app_url,
+                "mapper_username": mapper_username,
+                "mapper_password": mapper_password,
+            },
         )
 
     except HTTPException as e:

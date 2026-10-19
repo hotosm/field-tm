@@ -58,28 +58,6 @@ export function initProjectSetupFinalize({ i18nStrings, projectId, projectType }
     }
   });
 
-  document.body.addEventListener(i18nStrings.step4PreviewReadyEvent, function () {
-    setTimeout(function () {
-      const mapContainer = document.getElementById("leaflet-map-split-preview");
-      if (mapContainer) {
-        mapContainer.scrollIntoView({ behavior: "smooth", block: "center" });
-        return;
-      }
-      const splitStatus = document.getElementById("split-status");
-      if (splitStatus) {
-        splitStatus.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }, 300);
-  });
-
-  document.body.addEventListener(i18nStrings.step4CompleteEvent, function () {
-    if (projectId) {
-      window.location.assign(`/projects/${projectId}`);
-    } else {
-      window.location.reload();
-    }
-  });
-
   function getProjectTypeName() {
     if (isOdk) return i18nStrings.odkCentral;
     if (isQField) return i18nStrings.qfield;

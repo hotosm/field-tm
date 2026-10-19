@@ -1,4 +1,16 @@
-CREATE TYPE fieldmappingapp AS ENUM ('QField', 'ODK', 'FieldTM');
+CREATE TYPE fieldmappingapp AS ENUM (
+    'QField',
+    'ODK',
+    'FieldTM',
+    'EveryDoor',
+    'StreetComplete',
+    'CoMapeo',
+    'CoMaps',
+    'Panoramax',
+    'SketchMap',
+    'ChatMap',
+    'Other'
+);
 ALTER TYPE fieldmappingapp OWNER TO CURRENT_USER;
 
 CREATE TYPE projectstatus AS ENUM (

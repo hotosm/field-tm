@@ -43,11 +43,11 @@ class ProjectRole(StrEnum, Enum):
 
     Simplified to:
         - MAPPER = default for all contributors
-        - PROJECT_ADMIN = per-project admin with full control over that project
+        - PROJECT_MANAGER = per-project manager with full control over that project
     """
 
     MAPPER = "MAPPER"
-    PROJECT_ADMIN = "PROJECT_ADMIN"
+    PROJECT_MANAGER = "PROJECT_MANAGER"
 
 
 class ProjectVisibility(StrEnum, Enum):
@@ -62,27 +62,6 @@ class ProjectVisibility(StrEnum, Enum):
 
     PUBLIC = "PUBLIC"
     PRIVATE = "PRIVATE"
-
-
-class CommunityType(StrEnum, Enum):
-    """Community type."""
-
-    OSM_COMMUNITY = "OSM_COMMUNITY"
-    COMPANY = "COMPANY"
-    NON_PROFIT = "NON_PROFIT"
-    UNIVERSITY = "UNIVERSITY"
-    OTHER = "OTHER"
-
-
-class ReviewStateEnum(StrEnum, Enum):
-    """Review states of submission.
-
-    NOTE that these values must be camelCase to match what ODK Central requires.
-    """
-
-    HASISSUES = "hasIssues"
-    APPROVED = "approved"
-    REJECTED = "rejected"
 
 
 class DbGeomType(StrEnum, Enum):
@@ -117,16 +96,16 @@ class XLSFormType(StrEnum, Enum):
     amenities = "OSM Amenities"
 
 
-class SubmissionDownloadType(StrEnum, Enum):
-    """File type to download for ODK submission data."""
-
-    GEOJSON = "geojson"
-    JSON = "json"
-    CSV = "csv"
-
-
 class FieldMappingApp(StrEnum, Enum):
-    """Downstream field mapping application type."""
+    """Field mapping app. QField and ODK sync tasks; the rest get files."""
 
     QFIELD = "QField"
     ODK = "ODK"
+    EVERYDOOR = "EveryDoor"
+    STREETCOMPLETE = "StreetComplete"
+    COMAPEO = "CoMapeo"
+    COMAPS = "CoMaps"
+    PANORAMAX = "Panoramax"
+    SKETCHMAP = "SketchMap"
+    CHATMAP = "ChatMap"
+    OTHER = "Other"

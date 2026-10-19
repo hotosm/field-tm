@@ -81,77 +81,80 @@
   {% if projects %}
   <div class="ftm-card-grid">
     {% for project in projects %}
-    <wa-card
-      class="ftm-project-card"
-      with-header
-      onclick="window.location.href='/projects/{{ project.id }}'"
-    >
-      <div slot="header" class="ftm-project-card__header">
-        <div class="ftm-project-card__header-meta">
-          <span class="ftm-project-card__id">
-            #{{ project.id }}{% if project.visibility and project.visibility.value == 'PRIVATE' %}
-            <span class="ftm-private-icon" title='{{ _("Private Project") }}'>🔒</span>{% endif %}
-          </span>
-          <div class="ftm-project-card__badges">
-            {% if project.status %} {% set status_value = project.status.value if
-            project.status.value else (project.status if project.status is string else 'DRAFT') %}
-            {% if status_value != 'PUBLISHED' %}
-            <wa-badge
-              variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'COMPLETED' %}success{% elif status_value == 'ARCHIVED' %}error{% else %}neutral{% endif %}"
-            >
-              {{ status_value }}
-            </wa-badge>
-            {% endif %} {% endif %} {% if project.field_mapping_app %} {% if
-            project.field_mapping_app.value %} {% set app_name = project.field_mapping_app.value %}
-            {% else %} {% set app_name = project.field_mapping_app %} {% endif %}
-            <img
-              src="/static/images/{{ app_name.lower() }}-logo.svg"
-              alt="{{ app_name }}"
-              class="ftm-app-logo"
-              onerror="this.style.display = 'none'"
-            />
-            {% endif %}
-          </div>
-        </div>
-        <span class="ftm-project-card__name"
-          >{{ project.project_name or _('Unnamed Project') }}</span
-        >
-      </div>
-      <div class="ftm-project-card__body">
-        <div class="ftm-project-card__content-top">
-          {% if project.location_str %}
-          <div class="ftm-project-card__location">
-            <span class="ftm-project-card__location-inner">
-              <span style="color: #888">📍</span>
-              <span style="line-height: 1.4">{{ _("Location:") }} {{ project.location_str }}</span>
+    <a class="ftm-project-card-link" href="/projects/{{ project.id }}">
+      <wa-card class="ftm-project-card" with-header>
+        <div slot="header" class="ftm-project-card__header">
+          <div class="ftm-project-card__header-meta">
+            <span class="ftm-project-card__id">
+              #{{ project.id }}{% if project.visibility and project.visibility.value == 'PRIVATE' %}
+              <span class="ftm-private-icon" title='{{ _("Private Project") }}'>🔒</span>{% endif %}
             </span>
+            <div class="ftm-project-card__badges">
+              {% if project.status %} {% set status_value = project.status.value if
+              project.status.value else (project.status if project.status is string else 'DRAFT') %}
+              {% if status_value != 'PUBLISHED' %}
+              <wa-badge
+                variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'COMPLETED' %}success{% elif status_value == 'ARCHIVED' %}error{% else %}neutral{% endif %}"
+              >
+                {{ status_value }}
+              </wa-badge>
+              {% endif %} {% endif %} {% set app = mapping_app(project.field_mapping_app) %} {% if
+              app %}<span title="{{ app.name }}">{% include "partials/app_logo.html" %}</span>{%
+              endif %}
+            </div>
           </div>
-          {% endif %}
+          <span class="ftm-project-card__name"
+            >{{ project.project_name or _('Unnamed Project') }}</span
+          >
         </div>
-        <p class="ftm-project-card__description">{{ project.description or '' }}</p>
-        <div class="ftm-project-card__meta">
-          {% if project.hashtags %}
-          <div class="ftm-project-card__tags">
-            {% for tag in project.hashtags[:4] %}
-            <wa-badge variant="neutral" style="font-size: 0.8em">{{ tag }}</wa-badge>
-            {% endfor %} {% if project.hashtags|length > 4 %}
-            <wa-badge variant="neutral" style="font-size: 0.8em"
-              >+{{ project.hashtags|length - 4 }}</wa-badge
-            >
+        <div class="ftm-project-card__body">
+          <div class="ftm-project-card__content-top">
+            {% if project.location_str %}
+            <div class="ftm-project-card__location">
+              <span class="ftm-project-card__location-inner">
+                <span style="color: #888">📍</span>
+                <span style="line-height: 1.4"
+                  >{{ _("Location:") }} {{ project.location_str }}</span
+                >
+              </span>
+            </div>
             {% endif %}
           </div>
-          {% endif %} {% if project.created_at %}
-          <div class="ftm-project-card__footer">
-            {{ _("Created:") }} {{ project.created_at.strftime('%Y-%m-%d') if project.created_at
-            else _('N/A') }}
+          <p class="ftm-project-card__description">{{ project.description or '' }}</p>
+          <div class="ftm-project-card__meta">
+            {% if project.hashtags %}
+            <div class="ftm-project-card__tags">
+              {% for tag in project.hashtags[:4] %}
+              <wa-badge variant="neutral" style="font-size: 0.8em">{{ tag }}</wa-badge>
+              {% endfor %} {% if project.hashtags|length > 4 %}
+              <wa-badge variant="neutral" style="font-size: 0.8em"
+                >+{{ project.hashtags|length - 4 }}</wa-badge
+              >
+              {% endif %}
+            </div>
+            {% endif %} {% if project.created_at %}
+            <div class="ftm-project-card__footer">
+              {{ _("Created:") }} {{ project.created_at.strftime('%Y-%m-%d') if project.created_at
+              else _('N/A') }}
+            </div>
+            {% endif %}
           </div>
-          {% endif %}
         </div>
-      </div>
-    </wa-card>
+      </wa-card>
+    </a>
     {% endfor %}
   </div>
-  {% else %}
+  {% if prev_href or next_href %}
+  <nav class="ftm-pagination" aria-label="{{ _('Project pages') }}">
+    {% if prev_href %}
+    <wa-button href="{{ prev_href }}" variant="default">← {{ _("Previous") }}</wa-button>
+    {% endif %}
+    <span>{{ _("Page %(page)s") % {"page": page} }}</span>
+    {% if next_href %}
+    <wa-button href="{{ next_href }}" variant="default">{{ _("Next") }} →</wa-button>
+    {% endif %}
+  </nav>
+  {% endif %} {% else %}
   <p class="ftm-empty-state">
     {{ _("No projects found. Create your first project to get started!") }}
   </p>

@@ -22,6 +22,7 @@ import json
 import logging
 import zlib
 from base64 import b64encode
+from datetime import datetime, timedelta, timezone
 from io import BytesIO
 from pathlib import Path
 from traceback import format_exc
@@ -40,7 +41,6 @@ from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from psycopg import AsyncConnection, sql
 from psycopg.rows import class_row
 
-# from app.auth.providers.osm import get_osm_token, send_osm_message
 from app.central import central_crud, central_deps, central_schemas
 from app.config import settings
 from app.db.enums import FieldMappingApp, ProjectStatus, XLSFormType
@@ -54,7 +54,6 @@ from app.helpers.geometry_utils import (
     get_featcol_dominant_geom_type,
     javarosa_to_geojson_geom,
 )
-from app.helpers.helper_schemas import PaginatedResponse, PaginationInfo
 from app.i18n import _
 from app.projects import project_deps
 
@@ -217,6 +216,44 @@ async def read_and_insert_xlsforms(db: AsyncConnection, directory: str) -> None:
             """
             await cur.execute(delete_query, {"titles": list(forms_to_delete)})
             log.info(f"Deleted XLSForms from the database: {forms_to_delete}")
+
+
+async def fail_stale_jobs(db: AsyncConnection) -> None:
+    """Fail background jobs left running by a crash or restart.
+
+    Background work runs as in-process asyncio tasks, so anything still
+    "in progress" well after it started can never finish.
+    """
+    retry_msg = _("This job was interrupted. Please try again.")
+    statements = [
+        """
+        UPDATE projects
+        SET creation_status = 'failed',
+            creation_error = %(msg)s,
+            creation_updated_at = now()
+        WHERE creation_status = 'in_progress'
+          AND coalesce(creation_updated_at, updated_at) < %(cutoff)s
+        """,
+        """
+        UPDATE projects
+        SET basemap_attach_status = 'failed',
+            basemap_attach_error = %(msg)s,
+            basemap_attach_updated_at = now()
+        WHERE basemap_attach_status = 'in_progress'
+          AND coalesce(basemap_attach_updated_at, updated_at) < %(cutoff)s
+        """,
+        """
+        UPDATE projects
+        SET basemap_status = 'failed'
+        WHERE basemap_status = 'searching' AND updated_at < %(cutoff)s
+        """,
+        "DELETE FROM qgis_jobs WHERE created_at < now() - interval '1 hour'",
+    ]
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=30)
+    async with db.cursor() as cur:
+        for statement in statements:
+            await cur.execute(statement, {"msg": retry_msg, "cutoff": cutoff})
+    await db.commit()
 
 
 async def claim_simple_project_basemap_generation(
@@ -548,124 +585,6 @@ async def generate_project_files(
         return False
 
 
-def _empty_feature_collection_json() -> str:
-    """Return an empty GeoJSON feature collection as JSON text."""
-    return json.dumps({"type": "FeatureCollection", "features": []})
-
-
-def _serialize_stored_task_areas(task_areas_geojson) -> str | None:
-    """Serialize task areas stored directly on the project row."""
-    if task_areas_geojson is None:
-        return None
-    if task_areas_geojson == {}:
-        return _empty_feature_collection_json()
-    if isinstance(task_areas_geojson, dict):
-        return json.dumps(task_areas_geojson)
-    if isinstance(task_areas_geojson, str):
-        return task_areas_geojson
-    return None
-
-
-def _project_odk_credentials_from_settings() -> central_schemas.ODKCentral:
-    """Build ODK credentials from environment settings."""
-    return central_schemas.ODKCentral(
-        external_project_instance_url=settings.ODK_CENTRAL_URL,
-        external_project_username=settings.ODK_CENTRAL_USER,
-        external_project_password=settings.ODK_CENTRAL_PASSWD.get_secret_value()
-        if settings.ODK_CENTRAL_PASSWD
-        else "",
-    )
-
-
-async def _task_geometry_from_odk(project: DbProject) -> str | None:
-    """Load task geometry from ODK entities and serialize as GeoJSON."""
-    if not (
-        project.field_mapping_app == FieldMappingApp.ODK and project.external_project_id
-    ):
-        return None
-
-    try:
-        async with central_deps.get_odk_dataset(
-            _project_odk_credentials_from_settings()
-        ) as odk_central:
-            entity_data = await odk_central.getEntityData(
-                project.external_project_id,
-                "tasks",
-                include_metadata=False,
-            )
-    except Exception as e:
-        log.warning(
-            "Failed to fetch task boundaries from ODK for project %s: %s",
-            project.id,
-            e,
-        )
-        return None
-
-    if not isinstance(entity_data, list):
-        return None
-
-    features = []
-    for entity in entity_data:
-        if not entity.get("geometry"):
-            continue
-        geom = await javarosa_to_geojson_geom(entity["geometry"])
-        task_id = entity.get("task_id", entity.get("__id", ""))
-        features.append(
-            {
-                "type": "Feature",
-                "geometry": geom,
-                "properties": {"task_id": task_id, **(entity.get("properties", {}))},
-            }
-        )
-
-    if not features:
-        return None
-    return json.dumps({"type": "FeatureCollection", "features": features})
-
-
-async def _task_geometry_from_qfield(
-    db: AsyncConnection,
-    project_id: int,
-) -> str | None:
-    """Load task geometry from the temporary QField task boundary table."""
-    feature_collection = await _task_boundaries_from_qfield(db, project_id)
-    if not feature_collection:
-        return None
-    return json.dumps(feature_collection)
-
-
-async def get_task_geometry(db: AsyncConnection, project_id: int):
-    """Retrieves the geometry of tasks associated with a project.
-
-    Task boundaries are stored in the database as task_areas_geojson (for preview),
-    or in ODK Central as entities (dataset: "tasks") after finalization,
-    or in a temporary table for QField projects.
-
-    Args:
-        db (Connection): The database connection.
-        project_id (int): The ID of the project.
-
-    Returns:
-        str: A geojson of the task boundaries
-    """
-    # Get project to check if it has task areas stored in database
-    project = await project_deps.get_project_by_id(db, project_id)
-    stored_task_areas = _serialize_stored_task_areas(project.task_areas_geojson)
-    if stored_task_areas is not None:
-        return stored_task_areas
-
-    odk_task_geometry = await _task_geometry_from_odk(project)
-    if odk_task_geometry is not None:
-        return odk_task_geometry
-
-    if project.field_mapping_app == FieldMappingApp.QFIELD:
-        qfield_task_geometry = await _task_geometry_from_qfield(db, project_id)
-        if qfield_task_geometry is not None:
-            return qfield_task_geometry
-
-    return _empty_feature_collection_json()
-
-
 async def get_project_features_geojson(
     db: AsyncConnection,
     db_project: DbProject,
@@ -721,104 +640,6 @@ async def _task_filtered_feature_collection(
             {"type": "FeatureCollection", "features": []},
         )
     return split_extract_dict[task_id]
-
-
-async def get_pagination(page: int, count: int, results_per_page: int, total: int):
-    """Pagination result for splash page."""
-    total_pages = (total + results_per_page - 1) // results_per_page
-    has_next = (page * results_per_page) < total
-    has_prev = page > 1
-
-    pagination = PaginationInfo(
-        has_next=has_next,
-        has_prev=has_prev,
-        next_num=page + 1 if has_next else None,
-        page=page,
-        pages=total_pages,
-        prev_num=page - 1 if has_prev else None,
-        per_page=results_per_page,
-        total=total,
-    )
-
-    return pagination
-
-
-async def get_paginated_projects(  # noqa: PLR0913
-    db: AsyncConnection,
-    page: int,
-    results_per_page: int,
-    user_sub: Optional[str] = None,
-    hashtags: Optional[str] = None,
-    search: Optional[str] = None,
-    status: Optional[ProjectStatus] = None,
-    field_mapping_app: Optional[FieldMappingApp] = None,
-    country: Optional[str] = None,
-) -> dict:  # noqa: PLR0913
-    """Helper function to fetch paginated projects with optional filters."""
-    if hashtags:
-        hashtags = hashtags.split(",")
-
-    # Get subset of projects
-    projects = await DbProject.all(
-        db,
-        user_sub=user_sub,
-        hashtags=hashtags,
-        search=search,
-        status=status,
-        field_mapping_app=field_mapping_app,
-        country=country,
-    )
-    start_index = (page - 1) * results_per_page
-    end_index = start_index + results_per_page
-    paginated_projects = projects[start_index:end_index] if projects else []
-
-    pagination = await get_pagination(
-        page,
-        len(paginated_projects),
-        results_per_page,
-        len(projects) if projects else 0,
-    )
-
-    return PaginatedResponse[DbProject](
-        results=paginated_projects,
-        pagination=pagination,
-    )
-
-
-# FIXME work out how to use osm token from hotosm_auth pkg
-# async def send_project_manager_message(
-#     request: Request,
-#     project: DbProject,
-#     new_manager: DbUser,
-#     osm_auth: Auth,
-# ):
-#     """Send message to the new project manager after assigned."""
-#     log.info(f"Sending message to new project manager ({new_manager.username}).")
-
-#     osm_token = get_osm_token(request, osm_auth)
-#     project_url = f"{settings.FTM_DOMAIN}/project/{project.id}"
-#     if not project_url.startswith("http"):
-#         project_url = f"https://{project_url}"
-
-#     message_content = dedent(f"""
-#         You have been assigned to the project **{project.project_name}** as a
-#         manager. You can now manage the project and its tasks.
-
-#         [Click here to view the project]({project_url})
-
-#         Thank you for being a part of our platform!
-#     """)
-
-#     send_osm_message(
-#         osm_token=osm_token,
-#         osm_sub=new_manager.sub,
-#         title=(
-#             f"You have been assigned to project {project.project_name} as a "
-#             "manager"
-#         ),
-#         body=message_content,
-#     )
-#     log.info(f"Message sent to new project manager ({new_manager.username}).")
 
 
 def _project_odk_qr_credentials(project: DbProject) -> central_schemas.ODKCentral:

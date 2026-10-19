@@ -54,8 +54,9 @@ from app.monitoring import (
     set_otel_tracer,
     set_sentry_otel_tracer,
 )
-from app.projects import project_services
-from app.projects.project_crud import read_and_insert_xlsforms
+from app.projects.mapping_apps import get_mapping_app
+from app.projects.project_crud import fail_stale_jobs, read_and_insert_xlsforms
+from app.projects.task_plan_routes import task_plan_router
 from app.qfield.qfield_routes import qfield_router
 
 log = logging.getLogger(__name__)
@@ -76,20 +77,29 @@ async def server_init(server: Litestar) -> None:
 
     This sets up:
     - XLSForm templates in the db.
+    - Failing jobs left running by a restart.
     - Database entries for reverse geocoding.
     """
     log.debug("Starting up Litestar server")
+    if settings.AUTH_PROVIDER == AuthProvider.DISABLED:
+        log.warning(
+            "AUTH_PROVIDER=disabled: every request is treated as the local "
+            "admin. Never use this setting on a public server!"
+        )
 
     async with server.state.db_pool.connection() as conn:
         log.debug("Reading XLSForms from DB")
         await read_and_insert_xlsforms(conn, xlsforms_path)
+        await fail_stale_jobs(conn)
         log.debug("Initialising reverse geocoding database")
         async with AsyncNearestCity(conn):
             pass
 
 
 async def create_local_admin_user(server: Litestar) -> None:
-    """Init admin user on application startup."""
+    """Init the local admin user when auth is disabled."""
+    if settings.AUTH_PROVIDER != AuthProvider.DISABLED:
+        return
     local_admin = get_local_admin_auth_user()
     admin_user = DbUser(
         sub=local_admin.sub,
@@ -340,7 +350,7 @@ def _configure_template_engine(engine: JinjaTemplateEngine) -> None:
     engine.engine.globals["current_dir"] = get_current_dir
     engine.engine.globals["supported_locales"] = SUPPORTED_LOCALES
     engine.engine.globals["locale_labels"] = LOCALE_LABELS
-    engine.engine.globals["recommend_split"] = project_services.recommend_split
+    engine.engine.globals["mapping_app"] = get_mapping_app
 
     hanko_public_url = settings.HANKO_PUBLIC_URL or settings.HANKO_API_URL or ""
     engine.engine.globals["hanko_public_url"] = hanko_public_url
@@ -397,6 +407,7 @@ def create_app() -> Litestar:
         qfield_router,
         helper_router,
         central_router,
+        task_plan_router,
         htmx_router,
     ]
     if auth_lib_router is not None:

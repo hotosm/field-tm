@@ -533,7 +533,7 @@ class AreaSplitter:
                 small_polygon RECORD;
                 nearest_neighbor RECORD;
             BEGIN
-            DROP TABLE IF EXISTS small_polygons;
+            DROP TABLE IF EXISTS pg_temp.small_polygons;
             CREATE TEMP TABLE small_polygons As
                 SELECT id, geom, area
                 FROM temp_polygons
@@ -709,7 +709,7 @@ class AreaSplitter:
 
         with conn.cursor() as cur:
             # Drop the table if it exists
-            cur.execute("DROP TABLE IF EXISTS temp_polygons;")
+            cur.execute("DROP TABLE IF EXISTS pg_temp.temp_polygons;")
             # Create temporary table
             cur.execute("""
                 CREATE TEMP TABLE temp_polygons (
@@ -786,7 +786,7 @@ class AreaSplitter:
         # TEMP view - a regular view on temp tables would error.
         log.debug("Creating db view with intersecting polylines")
         cur.execute("""
-            DROP VIEW IF EXISTS lines_view;
+            DROP VIEW IF EXISTS pg_temp.lines_view;
 
             CREATE TEMP VIEW lines_view AS
             SELECT w.tags, w.geom

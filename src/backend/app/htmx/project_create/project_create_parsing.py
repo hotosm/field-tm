@@ -86,19 +86,15 @@ def parse_outline_payload(raw_value: object) -> dict:
 
 def normalize_field_mapping_app(value: object) -> str:
     """Normalize field-mapping app form values to canonical enum strings."""
-    if isinstance(value, FieldMappingApp):
-        return value.value
-    value_str = str(value or "").strip()
-    if not value_str:
-        return ""
-    if "." in value_str:
-        value_str = value_str.split(".")[-1]
-    normalized = value_str.upper()
-    if normalized == "QFIELD":
-        return FieldMappingApp.QFIELD.value
-    if normalized == "ODK":
-        return FieldMappingApp.ODK.value
-    return value_str
+    value_str = str(getattr(value, "value", value) or "").strip().split(".")[-1]
+    return next(
+        (
+            app.value
+            for app in FieldMappingApp
+            if app.value.upper() == value_str.upper()
+        ),
+        value_str,
+    )
 
 
 def project_form_error(message: str) -> str:
