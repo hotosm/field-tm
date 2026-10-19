@@ -52,7 +52,7 @@ repos:
     hooks:
       - id: codespell
         types: [text]
-        exclude: ^src/backend/app/(locales/.*\.po|i18n\.py)$
+        exclude: ^(src/backend/app/(locales/.*\.po|i18n\.py)|src/planner/pnpm-lock\.yaml)$
         args: [--toml, src/backend/pyproject.toml]
 
   # # Spelling: Checks for common misspellings in text files.
@@ -83,7 +83,6 @@ repos:
             "!src/backend/pyproject.toml",
             "!src/backend/packages/osm-fieldwork/tests/test_data/**",
             "!src/backend/packages/osm-fieldwork/pyproject.toml",
-            "!src/backend/packages/osm-fieldwork/osm_fieldwork/data_models/**",
             "!src/backend/packages/osm-fieldwork/osm_fieldwork/json_data_models/**",
             "!src/backend/packages/osm-fieldwork/osm_fieldwork/xlsforms/**",
             "!src/backend/packages/area-splitter/pyproject.toml",

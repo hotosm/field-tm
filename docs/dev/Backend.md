@@ -19,8 +19,12 @@ The easiest way to get up and running:
 # Generate the .env config file
 just config generate-dotenv
 
-# Start all services (auth disabled for local dev)
+# Start the core services: proxy, backend and database (auth disabled)
 just start dev
+# Add ODK Central, QFieldCloud, or both
+just start dev-odk
+just start dev-qfield
+just start dev-full
 ```
 
 If everything goes well you should now be able to
@@ -42,11 +46,8 @@ If everything goes well you should now be able to
 > Alternatively, you may provide credentials to an external Central server
 > in the `.env`.
 
-To run the local development setup without ODK Central (use external server):
-
-```bash
-just start without-central
-```
+`just start dev` runs without ODK Central. Use `just start dev-odk` for the
+bundled server, or set an external server in `.env`.
 
 ## 2. Start the backend without Docker
 

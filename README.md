@@ -52,16 +52,21 @@ the Field-TM aims to solve the problem of **coordinating** field mapping campaig
 
 ## How Field-TM Works
 
-1. Project is created in an area with three things:
-   - Data extract: the features you want to map, say building polygons.
-   - ODK XLSForm: the survey for mappers on the ground to fill out for each feature.
-   - Task areas divided by feature count and linear features (e.g. rivers, roads).
-2. Users assign a task area for themselves, then map using ODK Collect, ODK Web
-   Forms, or QField.
-3. User navigates to the feature and fills out the XLSForm survey, then submits.
-4. The submissions are collected by ODK Central (or QFieldCloud), which feeds the
-   data back into Field-TM, for cleaning, conflation with existing data, and
-   pushing back to OSM.
+Field-TM is a lightweight coordination layer on top of other mapping apps.
+
+1. **Split** a project area into tasks, using the in-browser
+   [Task Planner](src/planner/README.md). Split by grid, by roads, or by
+   number of buildings, then edit the tasks.
+2. **Assign** tasks to teams or people, with a label, name and comment.
+3. **Send** the tasks to a mapping app:
+   - ODK and QField: Field-TM creates the project and syncs tasks to ODK
+     Central or QFieldCloud.
+   - Every Door, StreetComplete, CoMapeo, CoMaps, Panoramax, SketchMap, ChatMap
+     or any other app: download each task as GeoJSON or GPX, or share it with
+     a link or QR code.
+
+Field-TM recommends a mapping app during project creation, based on what you
+are mapping and how well mapped the area already is.
 
 ## Usage of ODK
 
@@ -127,22 +132,22 @@ guide for details.
 | ✅ | 🖥️ project area splitting avoiding roads, rivers, railways | Since [v2024.4.0][1] |
 | ✅ | 🖥️ XLSForm survey generation in ODK Central | Since [v2024.4.0][1] |
 | ✅ | 📱 mapping of project via survey in ODK Collect mobile app | Since [v2024.4.0][1] |
-| ✅ | 📱 locking & unlocking of tasks to coordinate mapping | Since [v2024.4.0][1] |
+| ✅ | 📱 ~~locking & unlocking of tasks to coordinate mapping~~ | Since [v2024.4.0][1], removed in the 2025 overhaul |
 | ✅ | 📱 download base imagery & geolocation for in the field | Since [v2024.4.0][1] |
-| ✅ | 🖥️ view mapper submissions in the Field-TM dashboard | Since [v2024.4.0][1] |
+| ✅ | 🖥️ ~~view mapper submissions in the Field-TM dashboard~~ | Since [v2024.4.0][1], removed in the 2025 overhaul |
 | ✅ | 📢 Beta Release | Since [v2024.4.0][1] |
 | ✅ | 🖥️ & 📱 basic user tutorials and usage guides | Since [v2024.4.0][1] |
-| ✅ | 📱 open ODK Collect with feature already selected | Since [v2024.4.0][1] |
-| ✅ | 📱 live updates during mapping (if online) | Since [v2024.5.0][2] |
-| ✅ | 📱 features turn green once mapped | Since [v2024.5.0][2] |
-| ✅ | 📱 navigation and capability for routing to map features | Since [v2024.5.0][2] |
-| ✅ | 🖥️ organization creation and management | Since [v2024.5.0][2] |
+| ✅ | 📱 ~~open ODK Collect with feature already selected~~ | Since [v2024.4.0][1], removed in the 2025 overhaul |
+| ✅ | 📱 ~~live updates during mapping (if online)~~ | Since [v2024.5.0][2], removed in the 2025 overhaul |
+| ✅ | 📱 ~~features turn green once mapped~~ | Since [v2024.5.0][2], removed in the 2025 overhaul |
+| ✅ | 📱 ~~navigation and capability for routing to map features~~ | Since [v2024.5.0][2], removed in the 2025 overhaul |
+| ✅ | 🖥️ ~~organization creation and management~~ | Since [v2024.5.0][2], removed in the 2025 overhaul |
 | ✅ | 📱 better support for mapping **new** points, lines, polygons | Since [v2025.1.0][3] |
-| ✅ | 📱 seamless mapping in the same app (Web Forms, no ODK Collect) | Since [v2025.2.0][4] |
+| ✅ | 📱 ~~seamless mapping in the same app (Web Forms, no ODK Collect)~~ | Since [v2025.2.0][4], removed in the 2025 overhaul |
 | ✅ | 🖥️ user role management per project | Since [v2025.2.0][4] |
-| ✅ | 🖥️ inviting users to projects via invite link | Since [v2025.2.0][4] |
+| ✅ | 🖥️ ~~inviting users to projects via invite link~~ | Since [v2025.2.0][4], removed in the 2025 overhaul |
 | ✅ | 🖥️ optional private projects to restrict access | Since [v2025.2.0][4] |
-| ✅ | 📱 fully translated mapper UI and survey in any language | Since [v2025.2.0][4] |
+| ✅ | 📱 ~~fully translated mapper UI and survey in any language~~ | Since [v2025.2.0][4], removed in the 2025 overhaul |
 | ✅ | 📱 custom Field-TM deployments with updated branding | Since [v2025.2.0][4] |
 | ✅ | 📱 ~~fully offline field mapping (local-first design)~~ | [v2025.3.0][7], [removed][8] |
 | ✅ | 🖥️ integration with QField | [v2026.1.0][9] |
@@ -152,11 +157,11 @@ guide for details.
 | ✅ | 📱 simplified mapping in QField via a Field-TM plugin | [v2026.3.0][35] |
 | ✅ | 🖥️ export mapped data from QField projects | [v2026.4.0][36] |
 | ✅ | 🖥️ reuse a Tasking Manager project area | [v2026.4.1][37] |
-| 🔄 | 🖥️ assign tasks to specific mappers before fieldwork starts | – |
+| ✅ | 🖥️ task planner: split, edit and assign tasks | Unreleased |
 | 📅 | 📱 map points, lines and polygons in the same project | – |
 | 📅 | 🖥️ optional restriction of mapping to the assigned task area | – |
 | 🔄 | 🖥️ pre-defined OpenStreetMap forms for easy OSM mapping | – |
-| 📅 | 🖥️ integration with OSM mobile apps: EveryDoor, StreetComplete | – |
+| ✅ | 🖥️ tasks for Every Door, StreetComplete, etc. | Unreleased |
 | 📅 | 🖥️ integration with ChatMap | – |
 | 📅 | 🖥️ integration with HeiGIT Sketch Map Tool | – |
 | 📅 | 🖥️ integration with other ODK server types: Ona.io, Kobo | – |

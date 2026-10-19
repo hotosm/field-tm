@@ -88,6 +88,9 @@ envsubst
 # Complexipy
 .complexipy_cache
 
+# Ruff
+.ruff_cache/
+
 # Scripts
 **/openapi.json
 
@@ -103,3 +106,6 @@ config
 .claude
 .codex
 .openapi
+
+# Splitter debug output from package tests
+src/backend/area_splitter*.geojson

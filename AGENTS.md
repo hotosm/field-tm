@@ -25,6 +25,7 @@ Docker Compose (dev + prod) / Helm (k8s) / uv / Ruff / pre-commit
 src/backend/app/          # LiteStar application
 src/backend/app/htmx/     # HTMX routes (server-rendered UI)
 src/backend/app/templates/ # Jinja2 templates
+src/planner/              # Svelte task planner (pnpm; see its README)
 src/backend/app/static/   # Static assets (JS, CSS, images)
 src/backend/tests/        # Backend tests
 src/backend/packages/     # osm-fieldwork, area-splitter
@@ -45,7 +46,7 @@ chart/                   # Helm chart
 just test backend-routes                   # app tests
 just test backend                          # all tests (inc. packages)
 just lint                                  # pre-commit hooks
-just start dev                             # full docker stack
+just start dev                             # core docker stack (dev-full: + ODK, QField)
 just start backend-no-docker               # backend only (no docker)
 just test backend                          # docker test stack
 ```

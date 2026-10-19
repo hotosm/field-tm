@@ -1,5 +1,39 @@
 # Changelog
 
+## Unreleased
+
+### Feat
+
+- **planner**: new standalone Task Planner (`src/planner/`, Svelte 5 + MapLibre + PGlite/PostGIS). Splits an area by grid, roads or buildings in the browser; edit, merge and split tasks; assign by team, name and comment; download tasks as GeoJSON or GPX, or share with a link and QR code. Works on its own (files in, files out) or with a Field-TM project (`/planner/?project=<id>`)
+- **api**: `GET /api/v1/projects/{id}/planner-input` and `PUT /api/v1/projects/{id}/task-plan`, plus a task plan file upload on the project page (format: `docs/task-plan.md`)
+- **projects**: new Tasks step and read-only task map on the project page, replacing the split wizard step and the Leaflet assignment panel
+- **projects**: guided mapping app recommendation (#3135) with app logos
+- **projects**: Every Door, StreetComplete, CoMapeo, CoMaps, Panoramax, SketchMap, ChatMap and "Other app" projects. Tasks are shared as files and links, with no app sync
+- **odk**: task assignments (team, assignee, comment, colour) are sent to ODK task entities, with a "Re-sync tasks" button after publishing
+- **qfield**: task assignments are sent to the QField tasks layer. The plugin highlights your tasks, warns before entering someone else's task, shows team, assignee and comment, and Release now frees the task
+- **chart**: nightly database backup CronJob (S3 or PVC) and Sentry configuration
+
+### Fix
+
+- **security**: project setup routes are now manager-only (any logged-in user could edit public projects)
+- **security**: credential test endpoints require login, and the ODK password is no longer sent in the query string
+- **security**: removed the `DEBUG` auth bypass, the `svcftm` fallback account and the unused `create-entities-from-csv` helper route
+- **security**: mapper credentials are only shown to project members, and escaped
+- **auth**: manager checks failed for non-admins (role enum mismatch); project creators can now manage their own projects
+- **qfield**: LiveField location sharing is now opt-in
+- **backend**: stale background jobs are marked failed on startup, and old QGIS job rows are cleaned up
+- **splitter**: temp table drops can no longer touch non-temporary tables
+- **ui**: project list pagination, project cards are links, pinch-zoom enabled, shared footer, manager-only buttons hidden from other users
+- **chart**: removed the broken bundled Hanko setup; the default auth provider is now `hotosm`
+
+### Refactor
+
+- remove about 7k lines: the split wizard, Leaflet map helpers, the assignment panel, unused helper routes and dead code, `OdkCentral.py` and the osm-fieldwork data models
+- remove unused config (`OSM_SECRET_KEY`, `OSM_SCOPE`, etc.), the `osm-login-python` dependency and unused PostGIS extensions
+- compose: plain `just start dev` runs only the core services; ODK and QFieldCloud are opt-in profiles
+- ci: pre-commit lint and planner test workflows; removed dead workflows; Renovate now updates container images
+- docs: Helm is the supported production path; ADR 0007 for the planner/manager split
+
 ## 2026.4.4 (2026-09-18)
 
 ### Fix
