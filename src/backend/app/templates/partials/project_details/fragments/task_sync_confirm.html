@@ -12,9 +12,8 @@ project.field_mapping_app == 'ODK' %}
       {% if odk %} {{ _("The task entities in ODK Central will be replaced and every task status
       reset to ready. Mapping progress in ODK Collect will be lost. Submissions are kept in ODK
       Central.") }} {% else %} {{ _("The task layer of the QField project will be regenerated and
-      re-uploaded to QFieldCloud. Task status and assignments set in QField will be lost. Mappers
-      must sync or re-download the project, and unsynced local task edits may be lost. Survey data
-      already synced to QFieldCloud is kept.") }} {% endif %}
+      re-uploaded to QFieldCloud. Mappers must sync or re-download the project. Task progress and
+      survey data already synced to QFieldCloud are kept.") }} {% endif %}
     </p>
     <p>{{ _("Use with caution, after coordinating with your field mappers.") }}</p>
     <label>
