@@ -206,8 +206,9 @@ export class Planner {
     this.commit({ tasks: removeTasks(this.tasks, this.selected), algorithm: "MANUAL" }, []);
   }
 
+  /** Assign, then clear the selection so the next task can be picked straight away. */
   assignSelected(patch: Assignment) {
-    this.commit({ tasks: assign(this.tasks, this.selected, patch) });
+    this.commit({ tasks: assign(this.tasks, this.selected, patch) }, []);
   }
 
   toggleSelect(id: number, additive: boolean) {
