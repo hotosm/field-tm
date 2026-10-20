@@ -127,3 +127,33 @@ wa-button.cta {
   --wa-color-brand-border-loud: #d73f3f;
   --wa-color-brand-on-loud: #fff;
 }
+
+/* Task popup on the map: follow the theme instead of MapLibre's white box. */
+.task-popup .maplibregl-popup-content {
+  background: var(--wa-color-surface-raised);
+  color: var(--wa-color-text-normal);
+  border-radius: var(--wa-border-radius-m);
+  box-shadow: var(--wa-shadow-m);
+  padding: var(--wa-space-s);
+  font: inherit;
+}
+.task-popup .popup-head {
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+.task-popup.maplibregl-popup-anchor-top .maplibregl-popup-tip,
+.task-popup.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
+.task-popup.maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
+  border-bottom-color: var(--wa-color-surface-raised);
+}
+.task-popup.maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
+.task-popup.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
+.task-popup.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
+  border-top-color: var(--wa-color-surface-raised);
+}
+.task-popup.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--wa-color-surface-raised);
+}
+.task-popup.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--wa-color-surface-raised);
+}

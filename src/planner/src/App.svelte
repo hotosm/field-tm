@@ -8,11 +8,12 @@
   import TasksStep from './components/TasksStep.svelte';
   import ExportStep from './components/ExportStep.svelte';
   import TaskDetails from './components/TaskDetails.svelte';
+  import TaskActions from './components/TaskActions.svelte';
   import Legend from './components/Legend.svelte';
   import { Planner } from './lib/planner.svelte';
   import { parseMode } from './lib/urlParams';
   import { clearDraft, loadDraft, type Draft } from './lib/draft';
-  import { toArea, toFeatureCollection } from './lib/geo';
+  import { featurePoint, toArea, toFeatureCollection } from './lib/geo';
   import { fetchJson } from './lib/io/files';
   import { ApiError, getPlannerInput, loginUrl, projectUrl } from './lib/io/fieldtm';
   import { parse, type Task } from './lib/taskPlan';
@@ -32,6 +33,16 @@
   let pendingEdit = $state.raw<Polygon | null>(null);
 
   const viewed = $derived(planner.selectedTasks.length === 1 ? planner.selectedTasks[0] : undefined);
+  // Downloads and sharing for the selected task, shown on the map while not drawing.
+  let popupHiddenFor = $state<number | null>(null);
+  const popupTask = $derived(
+    !readonly && step === 3 && tool === 'none' && viewed && viewed.properties.task_id !== popupHiddenFor ? viewed : undefined,
+  );
+  const popupAt = $derived(popupTask ? featurePoint(popupTask.geometry) : null);
+  $effect(() => {
+    void planner.selected.join();
+    popupHiddenFor = null;
+  });
   const editing = $derived(
     tool !== 'edit' ? null : step === 0 ? planner.aoi : (planner.selectedTasks[0]?.geometry ?? null),
   );
@@ -127,7 +138,10 @@
 
   function onkeydown(e: KeyboardEvent) {
     if (readonly || (e.target as HTMLElement).closest('input, textarea, select')) return;
-    if (e.key === 'Escape') cancelTool();
+    if (e.key === 'Escape') {
+      if (popupTask && tool === 'none') popupHiddenFor = popupTask.properties.task_id;
+      cancelTool();
+    }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
       e.preventDefault();
       if (e.shiftKey) planner.redo();
@@ -167,6 +181,18 @@
 
 {#snippet details(task: Task)}
   <TaskDetails {task} readonly {map} title={project?.name} />
+{/snippet}
+
+{#snippet taskPopup()}
+  {#if popupTask}
+    <div class="stack">
+      <div class="row popup-head">
+        <strong>Task {popupTask.properties.task_id}</strong>
+        <wa-button size="s" appearance="plain" onclick={() => (popupHiddenFor = popupTask.properties.task_id)} aria-label="Close">✕</wa-button>
+      </div>
+      <TaskActions task={popupTask} {map} title={project?.name} compact />
+    </div>
+  {/if}
 {/snippet}
 
 <div class="app" class:viewer={readonly}>
@@ -228,7 +254,13 @@
           {:else if step === 2}
             <SplitStep {planner} ondone={() => (step = 3)} />
           {:else if step === 3}
-            <TasksStep {planner} bind:tool bind:multi {map} title={project?.name} onsplit={() => (step = 2)} />
+            <TasksStep
+              {planner}
+              bind:tool
+              bind:multi
+              onsplit={() => (step = 2)}
+              onactions={viewed && viewed.properties.task_id === popupHiddenFor ? () => (popupHiddenFor = null) : undefined}
+            />
           {:else}
             <ExportStep {planner} project={project ?? undefined} returnTo={mode.kind === 'standalone' ? mode.returnTo : undefined} />
           {/if}
@@ -253,6 +285,7 @@
         {onselect}
         {ondrawn}
         onedited={(g) => (pendingEdit = g)}
+        popup={popupTask && popupAt ? { key: popupTask.properties.task_id, at: popupAt, content: taskPopup } : null}
       />
       {#if tool === 'edit'}
         <div class="floating row">

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import type { Map } from 'maplibre-gl';
   import type { Planner } from '../lib/planner.svelte';
   import type { Tool } from './MapView.svelte';
   import { GROUP_PATTERN } from '../lib/taskPlan';
@@ -7,7 +6,15 @@
   import TaskDetails from './TaskDetails.svelte';
   import Legend from './Legend.svelte';
 
-  let { planner, tool = $bindable(), multi = $bindable(), map, title, onsplit }: { planner: Planner; tool: Tool; multi: boolean; map?: Map; title?: string; onsplit: () => void } = $props();
+  interface Props {
+    planner: Planner;
+    tool: Tool;
+    multi: boolean;
+    onsplit: () => void;
+    /** Reopens the task's downloads popup after it was closed. */
+    onactions?: () => void;
+  }
+  let { planner, tool = $bindable(), multi = $bindable(), onsplit, onactions }: Props = $props();
 
   const n = $derived(planner.selected.length);
   const single = $derived(n === 1 ? planner.selectedTasks[0] : undefined);
@@ -43,7 +50,8 @@
   {/if}
 
   {#if single}
-    <TaskDetails task={single} {map} {title} onassign={(patch) => planner.assignSelected(patch)} />
+    <TaskDetails task={single} onassign={(patch) => planner.assignSelected(patch)} />
+    {#if onactions}<div><wa-button size="s" appearance="outlined" onclick={onactions}>Downloads and sharing</wa-button></div>{/if}
   {:else if n > 1}
     <form onsubmit={bulk} class="stack">
       <h3>Assign {n} tasks</h3>

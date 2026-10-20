@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { untrack } from 'svelte';
-  import type { FeatureCollection, Geometry, LineString, Polygon } from 'geojson';
+  import { untrack, type Snippet } from 'svelte';
+  import type { FeatureCollection, Geometry, LineString, Polygon, Position } from 'geojson';
   import type { LngLatBoundsLike, Map, MapMouseEvent } from 'maplibre-gl';
   import 'maplibre-gl/dist/maplibre-gl.css';
-  import { MapLibre, GeoJSONSource, FillLayer, LineLayer, SymbolLayer, NavigationControl, ScaleControl, GeolocateControl } from 'svelte-maplibre-gl';
+  import { MapLibre, GeoJSONSource, FillLayer, LineLayer, SymbolLayer, Popup, NavigationControl, ScaleControl, GeolocateControl } from 'svelte-maplibre-gl';
   import { TerraDraw } from '@svelte-maplibre-gl/terradraw';
   import {
     TerraDraw as Draw,
@@ -34,11 +34,13 @@
     onselect?: (id: number | null, additive: boolean) => void;
     ondrawn?: (g: Polygon | LineString) => void;
     onedited?: (g: Polygon) => void;
+    /** Popup anchored on the map; `key` remounts it when the subject changes. */
+    popup?: { key: number; at: Position; content: Snippet } | null;
   }
 
   let {
     aoi = null, tasks = [], features = null, roads = null, selected = [], tool = 'none', editing = null,
-    fitKey = 0, map = $bindable(), onselect, ondrawn, onedited,
+    fitKey = 0, map = $bindable(), onselect, ondrawn, onedited, popup = null,
   }: Props = $props();
 
   const HOT_RED = '#d63f3f';
@@ -165,6 +167,14 @@
       paint={{ 'text-color': '#111', 'text-halo-color': '#fff', 'text-halo-width': 1.5 }}
     />
   </GeoJSONSource>
+
+  {#if popup}
+    {#key popup.key}
+      <Popup lnglat={popup.at as [number, number]} class="task-popup" maxWidth="16rem" closeButton={false} closeOnClick={false}>
+        {@render popup.content()}
+      </Popup>
+    {/key}
+  {/if}
 
   <TerraDraw mode={MODE[tool]} {modes} bind:draw {onfinish} {onchange} />
 </MapLibre>
