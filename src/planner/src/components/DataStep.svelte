@@ -43,11 +43,11 @@
   <a href="https://export.hotosm.org" target="_blank" rel="noopener">export.hotosm.org</a>.
 </p>
 <div class="row">
-  <wa-button size="small" appearance="outlined" onclick={() => featuresInput?.click()}>Upload features</wa-button>
+  <wa-button size="s" appearance="outlined" onclick={() => featuresInput?.click()}>Upload features</wa-button>
   <input bind:this={featuresInput} type="file" accept=".geojson,.json" onchange={(e) => upload(e, 'features')} hidden />
   {#if planner.features}
     <wa-badge variant="success">{featureCount} features</wa-badge>
-    <wa-button size="small" appearance="plain" onclick={() => planner.setData('features', null)}>Remove</wa-button>
+    <wa-button size="s" appearance="plain" onclick={() => planner.setData('features', null)}>Remove</wa-button>
   {/if}
 </div>
 <p class="hint"><strong>Enables splitting by number of features</strong>.</p>
@@ -58,12 +58,12 @@
   river or railway inside one task. They are not mapped.
 </p>
 <div class="row">
-  <wa-button size="small" variant="brand" onclick={fetchOsm} disabled={!planner.aoi || !!planner.busy}>Get them from OpenStreetMap</wa-button>
-  <wa-button size="small" appearance="outlined" onclick={() => roadsInput?.click()}>Upload a file</wa-button>
+  <wa-button size="s" variant="brand" onclick={fetchOsm} disabled={!planner.aoi || !!planner.busy}>Get them from OpenStreetMap</wa-button>
+  <wa-button size="s" appearance="outlined" onclick={() => roadsInput?.click()}>Upload a file</wa-button>
   <input bind:this={roadsInput} type="file" accept=".geojson,.json" onchange={(e) => upload(e, 'roads')} hidden />
   {#if planner.roads}
     <wa-badge variant="success">{planner.roads.features.length} lines</wa-badge>
-    <wa-button size="small" appearance="plain" onclick={() => planner.setData('roads', null)}>Remove</wa-button>
+    <wa-button size="s" appearance="plain" onclick={() => planner.setData('roads', null)}>Remove</wa-button>
   {/if}
 </div>
 {#if !planner.aoi}<p class="hint">Draw or upload the area in step 1 first.</p>{/if}

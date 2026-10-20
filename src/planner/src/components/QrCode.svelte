@@ -18,7 +18,7 @@
 {:else}
 <div class="stack">
   <wa-qr-code bind:this={qr} value={text} label="QR code for the task link" size="200" error-correction="L"></wa-qr-code>
-  <div><wa-button size="small" appearance="outlined" onclick={save}>Download PNG</wa-button></div>
+  <div><wa-button size="s" appearance="outlined" onclick={save}>Download PNG</wa-button></div>
 </div>
 {/if}
 

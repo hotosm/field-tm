@@ -39,16 +39,16 @@
 
 <p>Draw the area to map, upload it, or start with a square around the map centre.</p>
 <div class="row">
-  <wa-button size="small" variant={tool === 'polygon' ? 'brand' : 'neutral'} appearance={tool === 'polygon' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'polygon' ? 'none' : 'polygon')}>Draw polygon</wa-button>
-  <wa-button size="small" variant={tool === 'rectangle' ? 'brand' : 'neutral'} appearance={tool === 'rectangle' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'rectangle' ? 'none' : 'rectangle')}>Draw rectangle</wa-button>
-  <wa-button size="small" appearance="outlined" onclick={() => fileInput?.click()}>Upload GeoJSON</wa-button>
+  <wa-button size="s" variant={tool === 'polygon' ? 'brand' : 'neutral'} appearance={tool === 'polygon' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'polygon' ? 'none' : 'polygon')}>Draw polygon</wa-button>
+  <wa-button size="s" variant={tool === 'rectangle' ? 'brand' : 'neutral'} appearance={tool === 'rectangle' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'rectangle' ? 'none' : 'rectangle')}>Draw rectangle</wa-button>
+  <wa-button size="s" appearance="outlined" onclick={() => fileInput?.click()}>Upload GeoJSON</wa-button>
   <input bind:this={fileInput} type="file" accept=".geojson,.json,application/geo+json,application/json" onchange={upload} hidden />
 </div>
 {#if tool === 'polygon'}<p class="hint">Click to add points; click the first point to finish.</p>{/if}
 {#if tool === 'rectangle'}<p class="hint">Click two opposite corners.</p>{/if}
 <div class="row">
-  <wa-button size="small" appearance="outlined" onclick={square}>Square around map centre</wa-button>
-  <wa-select size="small" value={String(size)} onchange={(e: Event) => (size = Number((e.currentTarget as HTMLSelectElement).value))} aria-label="Square size" style="width: 7rem">
+  <wa-button size="s" appearance="outlined" onclick={square}>Square around map centre</wa-button>
+  <wa-select size="s" value={String(size)} onchange={(e: Event) => (size = Number((e.currentTarget as HTMLSelectElement).value))} aria-label="Square size" style="width: 7rem">
     <wa-option value="500">500 m</wa-option>
     <wa-option value="1000">1 km</wa-option>
     <wa-option value="2000">2 km</wa-option>
@@ -60,7 +60,7 @@
 {#if planner.aoi}
   <p><strong>Area:</strong> {km2 < 1 ? `${Math.round(km2 * 100) / 100}` : Math.round(km2 * 10) / 10} km²</p>
   <div class="row">
-    <wa-button size="small" appearance="outlined" disabled={planner.aoi.type !== 'Polygon'} onclick={() => (tool = 'edit')}>Edit shape</wa-button>
-    <wa-button size="small" variant="danger" appearance="outlined" onclick={() => planner.commit({ aoi: null, tasks: [] }, [])}>Clear area</wa-button>
+    <wa-button size="s" appearance="outlined" disabled={planner.aoi.type !== 'Polygon'} onclick={() => (tool = 'edit')}>Edit shape</wa-button>
+    <wa-button size="s" variant="danger" appearance="outlined" onclick={() => planner.commit({ aoi: null, tasks: [] }, [])}>Clear area</wa-button>
   </div>
 {/if}

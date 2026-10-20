@@ -58,20 +58,20 @@
   {:else}
     {#key task}
       <form onsubmit={save} class="stack">
-        <wa-input size="small" label="Group" name="assigned_group" value={p.assigned_group ?? ''} pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
-        <wa-input size="small" label="Assigned to" name="assigned_to" value={p.assigned_to ?? ''} placeholder="Name or username"></wa-input>
-        <wa-textarea size="small" label="Comment" name="comment" rows="2" value={p.comment ?? ''}></wa-textarea>
-        <wa-color-picker size="small" label="Colour" name="colour" value={shownColour}></wa-color-picker>
-        <div><wa-button size="small" type="submit" variant="brand">Save task</wa-button></div>
+        <wa-input size="s" label="Group" name="assigned_group" value={p.assigned_group ?? ''} pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
+        <wa-input size="s" label="Assigned to" name="assigned_to" value={p.assigned_to ?? ''} placeholder="Name or username"></wa-input>
+        <wa-textarea size="s" label="Comment" name="comment" rows="2" value={p.comment ?? ''}></wa-textarea>
+        <wa-color-picker size="s" label="Colour" name="colour" value={shownColour}></wa-color-picker>
+        <div><wa-button size="s" type="submit" variant="brand">Save task</wa-button></div>
       </form>
     {/key}
   {/if}
 
   <div class="row">
-    <wa-button size="small" appearance="outlined" onclick={() => download(`task-${p.task_id}.geojson`, taskGeoJSON(task))}>GeoJSON</wa-button>
-    <wa-button size="small" appearance="outlined" onclick={() => download(`task-${p.task_id}.gpx`, taskGPX(task), 'application/gpx+xml')}>GPX</wa-button>
-    <wa-button size="small" appearance="outlined" onclick={copy}>{copied ? 'Copied' : 'Copy link'}</wa-button>
-    <wa-button size="small" appearance="outlined" onclick={() => (showQr = !showQr)} aria-expanded={showQr}>QR code</wa-button>
+    <wa-button size="s" appearance="outlined" onclick={() => download(`task-${p.task_id}.geojson`, taskGeoJSON(task))}>GeoJSON</wa-button>
+    <wa-button size="s" appearance="outlined" onclick={() => download(`task-${p.task_id}.gpx`, taskGPX(task), 'application/gpx+xml')}>GPX</wa-button>
+    <wa-button size="s" appearance="outlined" onclick={copy}>{copied ? 'Copied' : 'Copy link'}</wa-button>
+    <wa-button size="s" appearance="outlined" onclick={() => (showQr = !showQr)} aria-expanded={showQr}>QR code</wa-button>
   </div>
   {#if showQr}<QrCode text={link} />{/if}
 </section>

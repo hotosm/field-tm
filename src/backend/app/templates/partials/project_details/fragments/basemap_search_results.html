@@ -23,7 +23,7 @@
       <wa-button
         variant="neutral"
         appearance="plain"
-        size="small"
+        size="s"
         href="{{ metadata_url_template | replace('{stac_item_id}', item.id) }}"
         target="_blank"
         rel="noopener"
@@ -41,7 +41,7 @@
         name="mbtiles_maxzoom"
         value="{{ item.maxzoom if item.maxzoom is not none else '' }}"
       />
-      <wa-button variant="neutral" appearance="outlined" size="small" type="submit">
+      <wa-button variant="neutral" appearance="outlined" size="s" type="submit">
         {{ _("Use this image") }}
       </wa-button>
     </form>

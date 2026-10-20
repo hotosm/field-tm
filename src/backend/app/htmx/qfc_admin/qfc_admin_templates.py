@@ -54,7 +54,7 @@ def render_management_area(
       {_("to")} <code>{html.escape(base_url)}</code>
     </p>
   </div>
-  <wa-button variant="neutral" appearance="outlined" size="small"
+  <wa-button variant="neutral" appearance="outlined" size="s"
     onclick="document.getElementById('qfc-management').innerHTML='';
              document.getElementById('qfc-login-panel').style.display='block';">
     {_("Log Out")}
@@ -85,7 +85,7 @@ def render_management_area(
     <form hx-get="/qfc-admin/projects/{pid}/collaborators"
           hx-target="#qfc-collabs-{pid}" hx-swap="innerHTML">
       {hidden}
-      <wa-button variant="neutral" appearance="outlined" size="small"
+      <wa-button variant="neutral" appearance="outlined" size="s"
         type="submit">{_("Manage")}</wa-button>
     </form>
   </td>
@@ -164,10 +164,10 @@ def render_collaborators_panel(
       <select name="role">
         {role_options}
       </select>
-      <wa-button variant="neutral" appearance="outlined" size="small"
+      <wa-button variant="neutral" appearance="outlined" size="s"
         type="submit">{_("Update")}</wa-button>
     </form>
-    <wa-button variant="danger" appearance="outlined" size="small"
+    <wa-button variant="danger" appearance="outlined" size="s"
       onclick="document.getElementById('{dialog_id}').show()">{_("Remove")}</wa-button>
   </td>
 </tr>""")
@@ -204,12 +204,12 @@ def render_collaborators_panel(
       hx-target="#{target_id}" hx-swap="innerHTML"
       class="wa-cluster wa-gap-xs">
     {hidden}
-    <wa-input name="new_username" placeholder="{_("Username")}" size="small"
+    <wa-input name="new_username" placeholder="{_("Username")}" size="s"
               required></wa-input>
     <select name="new_role">
       {role_options_add}
     </select>
-    <wa-button variant="brand" size="small" type="submit">
+    <wa-button variant="brand" size="s" type="submit">
       {_("Add Collaborator")}
     </wa-button>
 </form>"""
@@ -217,7 +217,7 @@ def render_collaborators_panel(
     close_btn = f"""
 <div class="wa-split">
   <h3 class="ftm-section-title">{_("Collaborators")}</h3>
-  <wa-button variant="neutral" appearance="plain" size="small"
+  <wa-button variant="neutral" appearance="plain" size="s"
     onclick="document.getElementById('{target_id}').innerHTML=''">{_("Close")}</wa-button>
 </div>"""
 

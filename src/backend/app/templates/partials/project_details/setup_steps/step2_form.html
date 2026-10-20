@@ -1,5 +1,5 @@
 {% if has_xlsform %}
-<wa-callout id="step-2-container" variant="success" size="small">
+<wa-callout id="step-2-container" variant="success" size="s">
   <wa-icon slot="icon" name="circle-check"></wa-icon>
   {{ _("Survey form ready") }}
 </wa-callout>
@@ -29,14 +29,14 @@
 
       <div class="wa-cluster wa-gap-xs">
         <span class="ftm-hint">{{ _("or") }}</span>
-        <wa-button id="upload-xlsform-btn" appearance="outlined" variant="neutral" size="small">
+        <wa-button id="upload-xlsform-btn" appearance="outlined" variant="neutral" size="s">
           <wa-icon slot="start" name="upload"></wa-icon>
           {{ _("upload your own survey file (.xls / .xlsx)") }}
         </wa-button>
         <small id="selected-xlsform-name" class="ftm-hint"></small>
       </div>
 
-      <wa-callout id="custom-form-disclaimer" variant="neutral" size="small" style="display: none">
+      <wa-callout id="custom-form-disclaimer" variant="neutral" size="s" style="display: none">
         {{ _("Heads up: Field-TM auto-adds fields for tasks and feature selection. Your form should
         only contain the survey questions you want to ask.") }}
       </wa-callout>

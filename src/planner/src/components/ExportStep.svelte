@@ -42,10 +42,10 @@
   {#if project}
     <div><wa-button class="cta" variant="brand" onclick={save} disabled={!!planner.busy}>Save to Field-TM</wa-button></div>
     {#if saved != null}
-      <wa-callout variant="success" size="small" role="status">Saved {saved} tasks. <a href={projectUrl(project.id)} target="_top">Return to project</a></wa-callout>
+      <wa-callout variant="success" size="s" role="status">Saved {saved} tasks. <a href={projectUrl(project.id)} target="_top">Return to project</a></wa-callout>
     {/if}
     {#if authError}
-      <wa-callout variant="warning" size="small"><a href={loginUrl(location.pathname + location.search)} target="_top">Log in to Field-TM</a>, then save again. Your work is kept in this browser.</wa-callout>
+      <wa-callout variant="warning" size="s"><a href={loginUrl(location.pathname + location.search)} target="_top">Log in to Field-TM</a>, then save again. Your work is kept in this browser.</wa-callout>
     {/if}
   {/if}
   <div>

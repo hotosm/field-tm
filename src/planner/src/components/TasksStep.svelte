@@ -24,18 +24,18 @@
 {:else}
   <p class="hint">Click tasks on the map to select them. Shift-click, or turn on multi-select, to select several.</p>
   <div class="row">
-    <wa-switch size="small" checked={multi} onchange={(e: Event) => (multi = (e.currentTarget as HTMLInputElement).checked)}>Multi-select</wa-switch>
-    <wa-button size="small" appearance="outlined" onclick={() => (planner.selected = planner.tasks.map((t) => t.properties.task_id))}>Select all</wa-button>
-    <wa-button size="small" appearance="outlined" onclick={() => (planner.selected = [])} disabled={!n}>Clear selection</wa-button>
+    <wa-switch size="s" checked={multi} onchange={(e: Event) => (multi = (e.currentTarget as HTMLInputElement).checked)}>Multi-select</wa-switch>
+    <wa-button size="s" appearance="outlined" onclick={() => (planner.selected = planner.tasks.map((t) => t.properties.task_id))}>Select all</wa-button>
+    <wa-button size="s" appearance="outlined" onclick={() => (planner.selected = [])} disabled={!n}>Clear selection</wa-button>
   </div>
 
   {#if n}
     <p><strong>{n} selected</strong></p>
     <div class="row">
-      <wa-button size="small" appearance="outlined" onclick={() => planner.mergeSelected()} disabled={n < 2 || !!planner.busy}>Merge</wa-button>
-      <wa-button size="small" variant={tool === 'line' ? 'brand' : 'neutral'} appearance={tool === 'line' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'line' ? 'none' : 'line')} disabled={n !== 1}>Split with line</wa-button>
-      <wa-button size="small" appearance="outlined" onclick={() => (tool = 'edit')} disabled={n !== 1}>Edit shape</wa-button>
-      <wa-button size="small" variant="danger" appearance="outlined" onclick={() => planner.deleteSelected()}>Delete</wa-button>
+      <wa-button size="s" appearance="outlined" onclick={() => planner.mergeSelected()} disabled={n < 2 || !!planner.busy}>Merge</wa-button>
+      <wa-button size="s" variant={tool === 'line' ? 'brand' : 'neutral'} appearance={tool === 'line' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'line' ? 'none' : 'line')} disabled={n !== 1}>Split with line</wa-button>
+      <wa-button size="s" appearance="outlined" onclick={() => (tool = 'edit')} disabled={n !== 1}>Edit shape</wa-button>
+      <wa-button size="s" variant="danger" appearance="outlined" onclick={() => planner.deleteSelected()}>Delete</wa-button>
     </div>
     {#if tool === 'line'}<p class="hint">Draw a line across the task; double-click (or click the last point again) to finish.</p>{/if}
   {/if}
@@ -46,12 +46,12 @@
     <form onsubmit={bulk} class="stack">
       <h3>Assign {n} tasks</h3>
       <p class="hint">Blank fields are left unchanged.</p>
-      <wa-input size="small" label="Group" name="assigned_group" pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
-      <wa-input size="small" label="Assigned to" name="assigned_to"></wa-input>
-      <wa-input size="small" label="Comment" name="comment"></wa-input>
+      <wa-input size="s" label="Group" name="assigned_group" pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
+      <wa-input size="s" label="Assigned to" name="assigned_to"></wa-input>
+      <wa-input size="s" label="Comment" name="comment"></wa-input>
       <div class="row">
-        <wa-button size="small" type="submit" variant="brand">Assign</wa-button>
-        <wa-button size="small" appearance="outlined" onclick={() => planner.assignSelected({ assigned_group: '', assigned_to: '', comment: '', colour: '' })}>Clear assignment</wa-button>
+        <wa-button size="s" type="submit" variant="brand">Assign</wa-button>
+        <wa-button size="s" appearance="outlined" onclick={() => planner.assignSelected({ assigned_group: '', assigned_to: '', comment: '', colour: '' })}>Clear assignment</wa-button>
       </div>
     </form>
   {/if}

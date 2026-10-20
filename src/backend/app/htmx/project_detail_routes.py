@@ -334,7 +334,7 @@ def _render_collaborator_result(
 
     add_more_label = escape(_("Add more collaborators"), quote=True)
     refresh_button = (
-        f'<wa-button variant="neutral" appearance="outlined" size="small" '
+        f'<wa-button variant="neutral" appearance="outlined" size="s" '
         f'hx-get="/projects/{project_id}/qfc-collaborator-form" '
         f'hx-target="#qfc-collaborator-section" hx-swap="outerHTML" '
         f">{add_more_label}</wa-button>"

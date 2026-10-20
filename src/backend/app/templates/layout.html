@@ -98,7 +98,7 @@
 
     {% macro lang_menu(slot) %}
     <wa-dropdown slot="{{ slot }}" class="ftm-header-lang-menu">
-      <wa-button slot="trigger" appearance="plain" size="small" with-caret>
+      <wa-button slot="trigger" appearance="plain" size="s" with-caret>
         {{ locale_labels.get(current_locale(), current_locale().upper()) }}
       </wa-button>
       {% for locale_code in supported_locales %}

@@ -176,7 +176,7 @@
         <nav aria-label="Steps" class="steps">
             {#each STEPS as label, i (label)}
               <wa-button
-                size="small"
+                size="s"
                 variant={step === i ? 'brand' : 'neutral'}
                 appearance={step === i ? 'accent' : 'outlined'}
                 aria-current={step === i ? 'step' : undefined}
@@ -185,9 +185,9 @@
             {/each}
         </nav>
         <div class="row">
-          <wa-button size="small" appearance="outlined" onclick={() => planner.undo()} disabled={!planner.canUndo} title="Undo (Ctrl+Z)">↶ Undo</wa-button>
-          <wa-button size="small" appearance="outlined" onclick={() => planner.redo()} disabled={!planner.canRedo} title="Redo (Ctrl+Shift+Z)">↷ Redo</wa-button>
-          {#if project}<wa-button size="small" appearance="plain" href={projectUrl(project.id)} target="_top">Back to project</wa-button>{/if}
+          <wa-button size="s" appearance="outlined" onclick={() => planner.undo()} disabled={!planner.canUndo} title="Undo (Ctrl+Z)">↶ Undo</wa-button>
+          <wa-button size="s" appearance="outlined" onclick={() => planner.redo()} disabled={!planner.canRedo} title="Redo (Ctrl+Shift+Z)">↷ Redo</wa-button>
+          {#if project}<wa-button size="s" appearance="plain" href={projectUrl(project.id)} target="_top">Back to project</wa-button>{/if}
         </div>
 
         {#if draft}
@@ -195,8 +195,8 @@
             <div class="stack">
               <p>You have an unsaved draft from {new Date(draft.savedAt).toLocaleString()}.</p>
               <div class="row">
-                <wa-button size="small" variant="brand" onclick={restoreDraft}>Restore</wa-button>
-                <wa-button size="small" appearance="outlined" onclick={discardDraft}>Discard</wa-button>
+                <wa-button size="s" variant="brand" onclick={restoreDraft}>Restore</wa-button>
+                <wa-button size="s" appearance="outlined" onclick={discardDraft}>Discard</wa-button>
               </div>
             </div>
           </wa-callout>
@@ -205,7 +205,7 @@
           <wa-callout variant="danger" role="alert">
             <div class="stack">
               <p>{planner.error}</p>
-              <div><wa-button size="small" appearance="outlined" onclick={() => (planner.error = null)}>Dismiss</wa-button></div>
+              <div><wa-button size="s" appearance="outlined" onclick={() => (planner.error = null)}>Dismiss</wa-button></div>
             </div>
           </wa-callout>
         {/if}
@@ -249,11 +249,11 @@
       {#if tool === 'edit'}
         <div class="floating row">
           <span>Drag points to reshape. Click a point to delete it.</span>
-          <wa-button size="small" variant="brand" onclick={applyEdit} disabled={!pendingEdit}>Apply</wa-button>
-          <wa-button size="small" appearance="outlined" onclick={cancelTool}>Cancel</wa-button>
+          <wa-button size="s" variant="brand" onclick={applyEdit} disabled={!pendingEdit}>Apply</wa-button>
+          <wa-button size="s" appearance="outlined" onclick={cancelTool}>Cancel</wa-button>
         </div>
       {:else if tool !== 'none'}
-        <div class="floating row"><wa-button size="small" appearance="outlined" onclick={cancelTool}>Cancel drawing</wa-button></div>
+        <div class="floating row"><wa-button size="s" appearance="outlined" onclick={cancelTool}>Cancel drawing</wa-button></div>
       {/if}
       {#if readonly}
         <div class="overlay stack">
