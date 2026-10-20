@@ -211,6 +211,8 @@ services:
 
   backend:
     image: "ghcr.io/hotosm/field-tm:${TAG_OVERRIDE:-debug}"
+    # The debug tag is never published: always build it locally
+    pull_policy: build
     build:
       context: src
       target: "${TARGET_OVERRIDE:-debug}"
@@ -366,6 +368,8 @@ services:
 
   migrations:
     image: "ghcr.io/hotosm/field-tm:${TAG_OVERRIDE:-debug}"
+    # Uses the image built by the backend service
+    pull_policy: never
     depends_on:
       fieldtm-db:
         condition: service_healthy

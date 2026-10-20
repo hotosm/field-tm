@@ -25,6 +25,7 @@
 ### Fix
 
 - **splitter**: a fixed number of tasks now always gives exactly that many tasks, merging across roads only when needed (#2992)
+- **dev**: `just start dev` builds the `debug` image instead of pulling it (#3128)
 - **security**: project setup routes are now manager-only (any logged-in user could edit public projects)
 - **security**: credential test endpoints require login, and the ODK password is no longer sent in the query string
 - **security**: removed the `DEBUG` auth bypass, the `svcftm` fallback account and the unused `create-entities-from-csv` helper route

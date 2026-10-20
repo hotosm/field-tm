@@ -129,7 +129,8 @@ just lint
 
 ## Notes
 
-- `just start dev` is the main local development entry point.
+- `just start dev` is the main local development entry point. It builds the
+  backend `debug` image locally rather than pulling it.
 - `just start backend-no-docker` is only for backend-focused work and assumes
   you manage the database yourself.
 - Local ODK credentials default to `admin@hotosm.org` / `Password1234`.
