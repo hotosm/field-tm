@@ -281,6 +281,21 @@ If you selected **ODK Collect** as the field app:
    or QR code so mappers can configure the app automatically.
 3. Submissions go to ODK Central and appear in the Field-TM dashboard.
 
+### Changing tasks after publishing
+
+Edit tasks in the task planner, then click **Re-sync tasks to ODK** or
+**Re-sync tasks to QField** in the project's Tasks section. Coordinate
+with your field mappers first:
+
+- **Only assignments, comments or colours changed:** these overwrite any
+  assignment changes mappers made in the app.
+- **Task areas changed:** you must tick **I understand** to continue.
+  - ODK: the task entities are replaced and every task status is reset.
+    Submissions are kept in ODK Central.
+  - QField: the task layer is regenerated and re-uploaded. Mappers must
+    sync or re-download the project, and unsynced local task edits may
+    be lost. Survey data already synced to QField Cloud is kept.
+
 ### Project Creation Tips
 
 #### Preparing Map Features
@@ -421,15 +436,15 @@ follow the guide [Here][5].
 
 ### Connecting The Data To External Applications
 
-Field-TM submission data is accessible via **OData** — a standardised
+Field-TM submission data is accessible via **OData** - a standardised
 feed format supported by many data analysis tools including Excel,
 PowerBI, Tableau, Redash, and Grafana.
 
 There are two OData endpoint types:
 
-- **Submission data** — all form submissions:
+- **Submission data** - all form submissions:
   `/v1/projects/{projectId}/forms/{xmlFormId}.svc`
-- **Entity data** — the features/entities dataset:
+- **Entity data** - the features/entities dataset:
   `/v1/projects/{projectId}/datasets/{name}.svc`
 
 For example:

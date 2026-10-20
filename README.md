@@ -42,7 +42,7 @@ While there are many excellent applications for tagging map features already,
 the Field-TM aims to solve the problem of **coordinating** field mapping campaigns.
 
 > [!NOTE]
-> More details can be found here:
+> Learn more:
 > [overview](https://field.hotosm.org/),
 > [timeline](https://docs.field.hotosm.org/timeline),
 > [docs](https://docs.field.hotosm.org) page, and the

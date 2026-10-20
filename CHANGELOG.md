@@ -11,7 +11,14 @@
 - **projects**: Every Door, StreetComplete, CoMapeo, CoMaps, Panoramax, SketchMap, ChatMap and "Other app" projects. Tasks are shared as files and links, with no app sync
 - **odk**: task assignments (team, assignee, comment, colour) are sent to ODK task entities, with a "Re-sync tasks" button after publishing
 - **qfield**: task assignments are sent to the QField tasks layer. The plugin highlights your tasks, warns before entering someone else's task, shows team, assignee and comment, and Release now frees the task
-- **chart**: nightly database backup CronJob (S3 or PVC) and Sentry configuration
+- **chart**: nightly database backup CronJob for the bundled Postgres (S3 or PVC) and Sentry configuration
+- **planner**: straight-skeleton splitting (CGAL compiled to wasm)
+- **planner**: split points and lines as well as buildings ("features to map"); tasks record `feature_count`
+- **planner**: optionally remove tasks with nothing to map after splitting
+- **planner**: feature counts are recalculated after manual edits (split by line, edit shape, merge)
+- **projects**: re-sync tasks to ODK and QField after publishing, with warnings: assignment-only changes overwrite mappers' updates; area changes reset the tasks in the app
+- **chart**: `bundled` and `custom` auth providers for standalone deployments with their own Hanko
+- **ui**: both UIs use @hotosm/ui 3.0 with the HOT header and tool menu, and WebAwesome components
 
 ### Fix
 
@@ -22,12 +29,17 @@
 - **auth**: manager checks failed for non-admins (role enum mismatch); project creators can now manage their own projects
 - **qfield**: LiveField location sharing is now opt-in
 - **backend**: stale background jobs are marked failed on startup, and old QGIS job rows are cleaned up
-- **splitter**: temp table drops can no longer touch non-temporary tables
+- **splitter**: temp table drops can no longer touch non-temporary tables, and SQL parameters only accept numbers and booleans
+- **config**: `AUTH_PROVIDER` must be set explicitly; there is no silent default
+- **planner**: Voronoi split with OSM roads produced no tasks and broke later splits (PGlite GEOS union); the engine now also resets after any error
+- **planner**: clearer Data step explaining that roads are only used as task boundaries
 - **ui**: project list pagination, project cards are links, pinch-zoom enabled, shared footer, manager-only buttons hidden from other users
 - **chart**: removed the broken bundled Hanko setup; the default auth provider is now `hotosm`
 
 ### Refactor
 
+- odk: all ODK Central calls use pyodk (1.3.0, which bumps pydantic to 2.13); `OdkCentralAsync.py` and aiohttp usage removed
+- qr codes are rendered in the browser with `<wa-qr-code>`; segno and qrcode-generator removed
 - remove about 7k lines: the split wizard, Leaflet map helpers, the assignment panel, unused helper routes and dead code, `OdkCentral.py` and the osm-fieldwork data models
 - remove unused config (`OSM_SECRET_KEY`, `OSM_SCOPE`, etc.), the `osm-login-python` dependency and unused PostGIS extensions
 - compose: plain `just start dev` runs only the core services; ODK and QFieldCloud are opt-in profiles

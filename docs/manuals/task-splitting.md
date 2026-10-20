@@ -71,12 +71,12 @@ Needs: AOI polygon, OSM extract, target number of tasks.
 > the splitting menu.
 
 Task boundaries are exactly the polygons enclosed by roads, rivers,
-railways, aeroways, and non-traversable barriers — no building
+railways, aeroways, and non-traversable barriers - no building
 clustering. Each task is bounded by the streets around it.
 
 Best for street-level data collection (e.g. imagery capture) where
 mappers walk or cycle roads rather than visiting individual buildings.
-Task size isn't controllable — it follows however dense the street
+Task size isn't controllable - it follows however dense the street
 network is.
 
 Needs: AOI polygon, OSM extract with roads.
