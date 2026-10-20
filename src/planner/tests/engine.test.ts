@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { FeatureCollection } from "geojson";
 import { createDb } from "../src/lib/engine/db";
 import { classify, merge, split, splitByLine, type Db } from "../src/lib/engine/splitter";
-import { featurePoint, toArea } from "../src/lib/geo";
+import { areaM2, featurePoint, toArea } from "../src/lib/geo";
 import { validate, makePlan, type Task } from "../src/lib/taskPlan";
 import { SKELETON_ANCHORS, VORONOI_UNION_ANCHOR } from "../src/lib/engine/sql";
 
@@ -184,6 +184,50 @@ describe("voronoi with OSM roads", () => {
     });
     expect(again.length).toBeGreaterThan(0);
   }, 120_000);
+
+  it("splits by every road, merging slivers", async () => {
+    const fresh = await createDb();
+    const main = await split(fresh, {
+      aoi,
+      algorithm: "SPLIT_BY_ROADS",
+      params: { include_minor_roads: false },
+      roads,
+    });
+    const all = await split(fresh, { aoi, algorithm: "SPLIT_BY_ROADS", params: {}, roads });
+    expect(all.length).toBeGreaterThan(main.length);
+    expect(all.every((t) => areaM2(t.geometry) >= 1000)).toBe(true);
+    expect(validate(makePlan(all, "SPLIT_BY_ROADS"))).toEqual([]);
+  }, 120_000);
+
+  it("makes exactly the requested number of tasks", async () => {
+    const fresh = await createDb();
+    for (const [algorithm, n] of [
+      ["AVG_BUILDING_VORONOI", 3],
+      ["AVG_BUILDING_VORONOI", 12],
+      // Fewer tasks than road-bounded blocks, so merges must cross roads.
+      ["AVG_BUILDING_SKELETON", 2],
+    ] as const) {
+      const tasks = await split(fresh, {
+        aoi,
+        algorithm,
+        params: { num_enumerators: n, drop_empty: true },
+        features: buildings,
+        roads,
+      });
+      expect(tasks).toHaveLength(n);
+    }
+  }, 300_000);
+
+  it("refuses more tasks than features", async () => {
+    await expect(
+      split(db, {
+        aoi,
+        algorithm: "AVG_BUILDING_VORONOI",
+        params: { num_enumerators: 10_000 },
+        features: buildings,
+      }),
+    ).rejects.toThrow(/at most the number of features/);
+  });
 });
 
 describe("straight skeleton", () => {

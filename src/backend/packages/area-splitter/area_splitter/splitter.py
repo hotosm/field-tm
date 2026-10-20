@@ -209,6 +209,11 @@ def _resolve_algorithm_params(
     params.setdefault("include_rivers", "TRUE")
     params.setdefault("include_railways", "TRUE")
     params.setdefault("include_aeroways", "TRUE")
+    # Split by roads uses every street; building splits only main roads.
+    params.setdefault(
+        "include_minor_roads",
+        "TRUE" if algorithm is SplittingAlgorithm.SPLIT_BY_ROADS else "FALSE",
+    )
     return params
 
 

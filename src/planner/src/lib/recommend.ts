@@ -37,7 +37,7 @@ export function recommend(
     return {
       algorithm: "SPLIT_BY_ROADS",
       params: {},
-      note: "Roads loaded: split into blocks between main roads, rivers and railways.",
+      note: "Roads loaded: split into blocks between streets, rivers and railways.",
     };
   }
   return {
@@ -62,10 +62,9 @@ export function estimateTasks(
 ): number | null {
   if (algorithm === "DIVIDE_BY_SQUARE" && params.cell_size)
     return Math.ceil(areaM2(aoi) / params.cell_size ** 2);
-  if (
-    (algorithm === "AVG_BUILDING_VORONOI" || algorithm === "AVG_BUILDING_SKELETON") &&
-    params.num_buildings
-  )
-    return Math.ceil(features / params.num_buildings);
+  if (algorithm === "AVG_BUILDING_VORONOI" || algorithm === "AVG_BUILDING_SKELETON") {
+    if (params.num_enumerators) return params.num_enumerators;
+    if (params.num_buildings) return Math.ceil(features / params.num_buildings);
+  }
   return null;
 }

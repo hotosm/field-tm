@@ -34,6 +34,7 @@ from area_splitter.db import (
 from area_splitter.splitter import (
     AreaSplitter,
     _is_linear_split_feature,
+    _resolve_algorithm_params,
     main,
     split_by_features,
     split_by_sql,
@@ -451,6 +452,24 @@ def test_split_by_sql_roads_requires_no_legacy_param(
     assert captured["algorithm"] == SplittingAlgorithm.SPLIT_BY_ROADS
     assert captured["algorithm_params"]["include_roads"] == "TRUE"
     assert isinstance(features, dict) and features.get("type") == "FeatureCollection"
+
+
+@pytest.mark.parametrize(
+    ("algorithm", "params", "expected"),
+    [
+        (SplittingAlgorithm.SPLIT_BY_ROADS, {}, "TRUE"),
+        (SplittingAlgorithm.AVG_BUILDING_SKELETON, {"num_buildings": 10}, "FALSE"),
+        (
+            SplittingAlgorithm.SPLIT_BY_ROADS,
+            {"include_minor_roads": "FALSE"},
+            "FALSE",
+        ),
+    ],
+)
+def test_resolve_algorithm_params_minor_roads(algorithm, params, expected):
+    """Only split by roads uses minor streets unless set explicitly."""
+    resolved = _resolve_algorithm_params(algorithm, None, None, params)
+    assert resolved["include_minor_roads"] == expected
 
 
 def test_split_by_sql_roads_with_extract(aoi_json, extract_json):

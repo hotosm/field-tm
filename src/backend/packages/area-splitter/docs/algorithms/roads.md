@@ -18,12 +18,15 @@ clustering buildings. The output comes directly from
    non-traversable barriers with the AOI boundary, then
    `ST_Polygonize` to get `polygonsnocount`, one polygon per
    road-enclosed area. Falls back to the whole AOI as a single polygon
-   if no linear features intersect it.
+   if no linear features intersect it. Minor streets (residential,
+   unclassified, pedestrian, track) are included by default
+   (`include_minor_roads`); pass `FALSE` for main roads only.
 
-2. `split_by_roads.sql`: return `polygonsnocount` directly as a
-   GeoJSON `FeatureCollection`, with `building_count` computed against
-   `ways_poly` for informational purposes only (it plays no part in
-   how the polygons are drawn).
+2. `split_by_roads.sql`: merge slivers (under 1000 m², or under ~15 m
+   wide, e.g. junction islands and dual carriageways) into the
+   neighbour with the longest shared edge, then return the polygons
+   as a GeoJSON `FeatureCollection`, with `building_count` computed
+   against `ways_poly` for information only.
 
 ## Tradeoffs
 

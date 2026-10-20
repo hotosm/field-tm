@@ -15,6 +15,8 @@
 - **planner**: straight-skeleton splitting (CGAL compiled to wasm)
 - **planner**: split points and lines as well as buildings ("features to map"); tasks record `feature_count`
 - **planner**: optionally remove tasks with nothing to map after splitting
+- **planner**: split by roads now uses every street (with a "Main roads only" option) and merges slivers (#3107)
+- **planner**: split into a set number of tasks, e.g. one per enumerator (#2992)
 - **planner**: feature counts are recalculated after manual edits (split by line, edit shape, merge)
 - **projects**: re-sync tasks to ODK and QField after publishing, with warnings: assignment-only changes overwrite mappers' updates; area changes reset the tasks in the app
 - **chart**: `bundled` and `custom` auth providers for standalone deployments with their own Hanko
@@ -22,6 +24,7 @@
 
 ### Fix
 
+- **splitter**: a fixed number of tasks now always gives exactly that many tasks, merging across roads only when needed (#2992)
 - **security**: project setup routes are now manager-only (any logged-in user could edit public projects)
 - **security**: credential test endpoints require login, and the ODK password is no longer sent in the query string
 - **security**: removed the `DEBUG` auth bypass, the `svcftm` fallback account and the unused `create-entities-from-csv` helper route

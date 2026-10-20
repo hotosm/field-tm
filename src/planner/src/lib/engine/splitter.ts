@@ -35,7 +35,11 @@ export const SKELETON_MAX_TASKS = 250;
 export interface SplitParams {
   cell_size?: number;
   num_buildings?: number;
+  /** Fixed number of tasks, e.g. one per enumerator or team; replaces num_buildings. */
+  num_enumerators?: number;
   include_roads?: boolean;
+  /** Also split along residential and other minor streets (default: only for SPLIT_BY_ROADS). */
+  include_minor_roads?: boolean;
   include_rivers?: boolean;
   include_railways?: boolean;
   include_aeroways?: boolean;
@@ -239,13 +243,19 @@ async function sqlSplit(
     include_rivers: bool(p.include_rivers),
     include_railways: bool(p.include_railways),
     include_aeroways: bool(p.include_aeroways),
+    include_minor_roads:
+      (p.include_minor_roads ?? algorithm === "SPLIT_BY_ROADS") ? "TRUE" : "FALSE",
   };
+  const numTasks =
+    algorithm !== "SPLIT_BY_ROADS" && p.num_enumerators
+      ? Math.round(posNum(p.num_enumerators, "Number of tasks", 10000))
+      : 0;
   const numFeatures =
-    algorithm !== "SPLIT_BY_ROADS"
+    algorithm !== "SPLIT_BY_ROADS" && !numTasks
       ? Math.round(posNum(p.num_buildings, "Features per task", 10000))
       : 0;
   await db.exec(
-    `SET area_splitter.num_buildings = ${numFeatures}; SET area_splitter.num_enumerators = 0;`,
+    `SET area_splitter.num_buildings = ${numFeatures}; SET area_splitter.num_enumerators = ${numTasks};`,
   );
   let last: { rows: Record<string, unknown>[] }[] = [];
   const skeletonStep = async () => {
@@ -307,6 +317,11 @@ async function normalise(db: Db, fc: FeatureCollection, countFeatures: boolean):
   }));
 }
 
+function checkNumTasks(p: SplitParams, features: number) {
+  if (p.num_enumerators && p.num_enumerators > features)
+    throw new Error(`Number of tasks can be at most the number of features (${features})`);
+}
+
 export async function split(
   db: Db,
   input: SplitInput,
@@ -323,6 +338,7 @@ export async function split(
     fc = await sqlSplit(db, "SPLIT_BY_ROADS", input.params, progress);
   } else if (input.algorithm === "AVG_BUILDING_VORONOI") {
     if (!counts.features) throw new Error("Add features to map in step 2 first");
+    checkNumTasks(input.params, counts.features);
     fc = await sqlSplit(db, "AVG_BUILDING_VORONOI", input.params, progress);
   } else if (input.algorithm === "AVG_BUILDING_SKELETON") {
     if (!counts.features) throw new Error("Add features to map in step 2 first");
@@ -330,10 +346,13 @@ export async function split(
       throw new Error(
         `Straight skeleton is limited to ${SKELETON_MAX_FEATURES} features (this area has ${counts.features}). Use Voronoi instead.`,
       );
-    const tasks = Math.ceil(counts.features / Number(input.params.num_buildings));
+    checkNumTasks(input.params, counts.features);
+    const tasks =
+      input.params.num_enumerators ||
+      Math.ceil(counts.features / Number(input.params.num_buildings));
     if (tasks > SKELETON_MAX_TASKS)
       throw new Error(
-        `Straight skeleton is limited to about ${SKELETON_MAX_TASKS} tasks (this would make ${tasks}). Use more features per task, or Voronoi.`,
+        `Straight skeleton is limited to about ${SKELETON_MAX_TASKS} tasks (this would make ${tasks}). Use fewer, larger tasks, or Voronoi.`,
       );
     fc = await sqlSplit(db, "AVG_BUILDING_SKELETON", input.params, progress);
   } else {
@@ -342,7 +361,8 @@ export async function split(
   progress("Tidying tasks");
   let tasks = await normalise(db, fc, counts.features > 0);
   await db.exec(DROP_TABLES);
-  if (counts.features > 0 && input.params.drop_empty)
+  // A fixed number of tasks keeps empty ones, so the count stays exact.
+  if (counts.features > 0 && input.params.drop_empty && !input.params.num_enumerators)
     tasks = renumber(tasks.filter((t) => (t.properties.feature_count ?? 0) > 0));
   if (!tasks.length) throw new Error("Splitting produced no tasks");
   return tasks;

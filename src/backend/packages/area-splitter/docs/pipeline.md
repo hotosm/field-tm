@@ -45,6 +45,10 @@ Polygonises the linear features intersecting the AOI and clips them
 to the AOI. Small polygons or polygons with too few buildings get
 merged into neighbours.
 
+Main roads only by default: residential, unclassified, pedestrian and
+track roads are skipped unless `include_minor_roads` is `TRUE` (the
+default for `SPLIT_BY_ROADS`). Service roads are always skipped.
+
 Output: a set of polygons covering the AOI, bounded by roads and
 rivers.
 
@@ -98,6 +102,12 @@ AOI with no gaps or overlaps.
 Task edges may have drifted off the linear features during step 4.
 Re-runs the split logic per cluster to nudge boundaries back onto
 roads and rivers.
+
+When `num_enumerators` is set, this step instead merges until the
+task count matches: uncovered parts of the AOI go to a neighbouring
+task first, then the task with the fewest buildings is merged into
+the neighbour with the longest shared edge. Merges across a road or
+river only happen when there are more road-bounded areas than tasks.
 
 Output: `taskpolygons` with edges better aligned to the input linear
 features.

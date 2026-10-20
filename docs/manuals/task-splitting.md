@@ -59,20 +59,23 @@ Needs: AOI polygon, OSM extract, target buildings per task.
 
 Same pipeline as v2, but you give the total number of tasks (usually
 matching your enumerator count) instead of buildings per task.
-Field-TM works out the split from the extract.
+Field-TM works out the split from the extract. In the planner, pick
+**Number of tasks** under either "Similar-sized tasks" method.
+
+You get exactly that many tasks. If there are more road-bounded
+blocks than tasks, some tasks will cross a road or river.
 
 Needs: AOI polygon, OSM extract, target number of tasks.
 
 [More details about how this algorithm works](https://github.com/hotosm/field-tm/blob/dev/src/backend/packages/area-splitter/docs/algorithms/straight-skeleton.md).
 
-### Split by Roads (not yet available)
+### Split by Roads
 
-> **Note:** this option is still being tested and is not yet shown in
-> the splitting menu.
-
-Task boundaries are exactly the polygons enclosed by roads, rivers,
-railways, aeroways, and non-traversable barriers - no building
-clustering. Each task is bounded by the streets around it.
+Task boundaries are the polygons enclosed by roads (including
+residential streets), rivers, railways, aeroways, and non-traversable
+barriers - no building clustering. Each task is bounded by the streets
+around it. Tick **Main roads only** for bigger blocks. Tiny or thin
+slivers, such as junction islands, are merged into a neighbour.
 
 Best for street-level data collection (e.g. imagery capture) where
 mappers walk or cycle roads rather than visiting individual buildings.
@@ -90,6 +93,7 @@ Needs: AOI polygon, OSM extract with roads.
 | Very small AOI, one mapper         | No Splitting             |
 | No OSM data, or a sparse area      | Split by Square          |
 | You know how many mappers you have | Specific Number of Tasks |
+| Street imagery or walking routes   | Split by Roads           |
 | Standard case, building-dense area | Average Buildings v2     |
 | Reproducing an older project       | Average Buildings v1     |
 

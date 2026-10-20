@@ -12,7 +12,11 @@ BEGIN
         (
             %(include_roads)s
             AND l.tags->>'highway' IS NOT NULL
-            AND l.tags->>'highway' NOT IN ('unclassified', 'residential', 'service', 'pedestrian', 'track', 'bus_guideway')
+            AND l.tags->>'highway' NOT IN ('service', 'bus_guideway')
+            AND (
+                %(include_minor_roads)s
+                OR l.tags->>'highway' NOT IN ('unclassified', 'residential', 'pedestrian', 'track')
+            )
         )
         OR (
             %(include_rivers)s
@@ -51,8 +55,12 @@ BEGIN
                 (
                     %(include_roads)s
                     AND l.tags->>'highway' IS NOT NULL
-                    AND l.tags->>'highway' NOT IN ('unclassified', 'residential', 'service', 'pedestrian', 'track', 'bus_guideway')
-                ) -- TODO: update(add/remove) this based on the requirements later
+                    AND l.tags->>'highway' NOT IN ('service', 'bus_guideway')
+                    AND (
+                        %(include_minor_roads)s
+                        OR l.tags->>'highway' NOT IN ('unclassified', 'residential', 'pedestrian', 'track')
+                    )
+                )
                 OR (
                     %(include_rivers)s
                     AND l.tags->>'waterway' IS NOT NULL

@@ -39,11 +39,11 @@ exchange. It is plain GeoJSON, so any GIS tool can read it.
 
 ## Top level
 
-| Key                 | Type   | Notes                                                                                                          |
-| ------------------- | ------ | -------------------------------------------------------------------------------------------------------------- |
-| `task_plan_version` | int    | Always `1`                                                                                                     |
-| `algorithm`         | string | `DIVIDE_BY_SQUARE`, `SPLIT_BY_ROADS`, `AVG_BUILDING_VORONOI`, `AVG_BUILDING_SKELETON`, or `MANUAL` after edits |
-| `params`            | object | Parameters used, e.g. `cell_size` (m), `num_buildings` (features per task) or `drop_empty`                     |
+| Key                 | Type   | Notes                                                                                                                                                  |
+| ------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `task_plan_version` | int    | Always `1`                                                                                                                                             |
+| `algorithm`         | string | `DIVIDE_BY_SQUARE`, `SPLIT_BY_ROADS`, `AVG_BUILDING_VORONOI`, `AVG_BUILDING_SKELETON`, or `MANUAL` after edits                                         |
+| `params`            | object | Parameters used, e.g. `cell_size` (m), `num_buildings` (features per task), `num_enumerators` (number of tasks), `include_minor_roads` or `drop_empty` |
 
 ## Each feature (one task)
 

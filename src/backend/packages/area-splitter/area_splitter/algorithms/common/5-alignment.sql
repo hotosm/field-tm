@@ -33,20 +33,95 @@ DECLARE
     min_buildings INTEGER; -- Set the minimum number of buildings threshold
     small_polygon RECORD; -- set small_polygon and nearest_neighbor as record 
     nearest_neighbor RECORD; -- in order to use them in the loop
-    merges_remaining INTEGER = NULL;
+    pair RECORD;
+    gap RECORD;
+    merged BOOLEAN;
 BEGIN
 
     DROP TABLE IF EXISTS pg_temp.leastfeaturepolygons;
     IF num_enumerators > 0 THEN
-      merges_remaining = (SELECT COUNT(*) FROM taskpolygons) - num_enumerators;
-      IF merges_remaining < 0 THEN
-        merges_remaining = 0; -- Skip merging
-      END IF;
-      CREATE TEMP TABLE leastfeaturepolygons AS
-        SELECT taskid, geom,
-        (SELECT COUNT(b.id) FROM buildings b
-          WHERE ST_Intersects(taskpolygons.geom, b.geom)) numbuildings
-        FROM taskpolygons ORDER BY numbuildings ASC LIMIT merges_remaining;
+      -- Fixed number of tasks: merge the task with the fewest buildings into
+      -- a neighbour until the count matches. Merges across a splitline only
+      -- happen once no other merge is possible (more partitions than
+      -- enumerators). Islands with no neighbour are left as they are.
+
+      -- First give uncovered parts of the AOI (e.g. partitions without
+      -- buildings, which the skeleton leaves out) to the neighbouring task
+      -- with the longest shared edge, so tasks around them can merge.
+      FOR gap IN
+        SELECT (ST_Dump(ST_CollectionExtract(
+          ST_Difference(a.geom, ST_Union(t.geom), 0.00000001), 3))).geom AS geom
+        FROM project_aoi a, taskpolygons t GROUP BY a.geom
+      LOOP
+        BEGIN
+          UPDATE taskpolygons SET geom = ST_MakeValid(ST_Union(geom, gap.geom))
+          WHERE taskid = (
+            SELECT t.taskid FROM taskpolygons t
+            WHERE t.geom && gap.geom AND ST_Intersects(t.geom, gap.geom)
+            ORDER BY ST_Length(ST_CollectionExtract(
+              ST_Intersection(t.geom, gap.geom, 0.00000001), 2)) DESC
+            LIMIT 1
+          );
+        EXCEPTION WHEN OTHERS THEN
+          RAISE NOTICE 'Skipping uncovered area: %', SQLERRM;
+        END;
+      END LOOP;
+
+      DROP TABLE IF EXISTS pg_temp.taskcounts;
+      CREATE TEMP TABLE taskcounts AS
+        SELECT t.taskid,
+          (SELECT COUNT(*) FROM buildings b
+            WHERE ST_Contains(t.geom, ST_PointOnSurface(b.geom))) AS n
+        FROM taskpolygons t;
+      DROP TABLE IF EXISTS pg_temp.splitline_buffer;
+      CREATE TEMP TABLE splitline_buffer AS
+        SELECT ST_SetSRID(ST_Buffer(geom, 0.0000001), 4326) AS geom FROM splitline_union;
+
+      WHILE (SELECT COUNT(*) FROM taskpolygons) > num_enumerators LOOP
+        merged := FALSE;
+        FOR pair IN
+          WITH pairs AS (
+            SELECT s.taskid AS small_id, n.taskid AS nb_id, sc.n,
+              ST_CollectionExtract(
+                ST_Intersection(ST_MakeValid(s.geom), ST_MakeValid(n.geom), 0.00000001), 2
+              ) AS shared
+            FROM taskpolygons s
+            JOIN taskcounts sc ON sc.taskid = s.taskid
+            JOIN taskpolygons n ON n.taskid != s.taskid AND s.geom && n.geom
+              AND ST_Intersects(s.geom, n.geom)
+          ),
+          scored AS (
+            SELECT small_id, nb_id, n,
+              ST_Length(shared) AS shared_len,
+              ST_Length(ST_Intersection(shared, b.geom)) AS on_splitline
+            FROM pairs, splitline_buffer b
+          )
+          SELECT small_id, nb_id FROM scored
+          WHERE shared_len > 0
+          ORDER BY (on_splitline / shared_len >= 0.5), n, shared_len DESC
+        LOOP
+          BEGIN
+            UPDATE taskpolygons
+            SET geom = ST_MakeValid(ST_Union(geom,
+              (SELECT geom FROM taskpolygons WHERE taskid = pair.small_id)))
+            WHERE taskid = pair.nb_id;
+            DELETE FROM taskpolygons WHERE taskid = pair.small_id;
+            UPDATE taskcounts SET n = n + (SELECT n FROM taskcounts WHERE taskid = pair.small_id)
+            WHERE taskid = pair.nb_id;
+            DELETE FROM taskcounts WHERE taskid = pair.small_id;
+            merged := TRUE;
+            EXIT;
+          EXCEPTION WHEN OTHERS THEN
+            RAISE NOTICE 'Skipping merge of task % into %: %',
+              pair.small_id, pair.nb_id, SQLERRM;
+          END;
+        END LOOP;
+        EXIT WHEN NOT merged;
+      END LOOP;
+
+      DROP TABLE IF EXISTS pg_temp.taskcounts;
+      DROP TABLE IF EXISTS pg_temp.splitline_buffer;
+      RETURN;
     ELSE
       -- Find the mean and standard deviation of the area
       SELECT
@@ -73,11 +148,6 @@ BEGIN
     FOR small_polygon IN
         SELECT * FROM leastfeaturepolygons
     LOOP
-        -- If the required # of polygons are merged, we are done.
-        IF merges_remaining = 0 THEN
-          EXIT;
-        END IF;
-
         -- Per-polygon block so a GEOS TopologyException on one neighbour
         -- pair skips this small polygon (leaves it unmerged) instead of
         -- aborting the entire alignment step.
@@ -127,10 +197,6 @@ BEGIN
                 WHERE taskid = nearest_neighbor.taskid;
 
                 DELETE FROM taskpolygons WHERE taskid = small_polygon.taskid;
-
-                IF merges_remaining IS NOT NULL THEN -- Fixed number of mappers
-                  merges_remaining = merges_remaining - 1;
-                END IF;
 
                 -- Exit the neighboring polygon loop after one successful merge
                 EXIT;
