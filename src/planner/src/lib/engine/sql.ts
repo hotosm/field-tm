@@ -9,7 +9,7 @@ import skeleton from "@algorithms/avg_building_straight_skeleton.sql?raw";
 import splitByRoads from "@algorithms/split_by_roads.sql?raw";
 
 // PGlite's GEOS can corrupt the engine on this union of task boundaries
-// (e.g. buildings plus Overpass roads); a 1e-9 degree grid size avoids it.
+// (e.g. buildings plus OSM roads); a 1e-9 degree grid size avoids it.
 export const VORONOI_UNION_ANCHOR = "SELECT ST_UNION(l.geom) AS geom FROM rawlines AS l";
 
 function voronoiSql(original: string) {

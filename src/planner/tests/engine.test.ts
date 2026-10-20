@@ -145,7 +145,7 @@ describe("points and lines as features", () => {
 });
 
 describe("voronoi with OSM roads", () => {
-  // Buildings plus Overpass roads used to break PGlite's GEOS in the task
+  // Buildings plus OSM roads used to break PGlite's GEOS in the task
   // boundary union, giving "no tasks" and then ERRORDATA_STACK_SIZE errors.
   const roads: FeatureCollection = JSON.parse(
     readFileSync(new URL("./fixtures/kathmandu_roads.geojson", import.meta.url), "utf8"),

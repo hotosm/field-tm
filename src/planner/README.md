@@ -49,9 +49,9 @@ both directories in the build context.
   SFCGAL. `sql.ts` runs the SQL in two passes around it. Limited to 5000
   features and ~250 tasks; see [SPIKE.md](SPIKE.md) for timings and workarounds.
 - `src/lib/exports.ts`, `share.ts`, `history.ts`, `planEdit.ts`, `draft.ts`
-  (localStorage autosave), `io/` (files, Field-TM API, Overpass).
+  (localStorage autosave), `io/` (files, Field-TM API, PostPass).
 - `src/lib/planner.svelte.ts` reactive state; `src/components/` UI only.
-- Basemap: OpenFreeMap. Roads: Overpass API. Features to map (buildings,
+- Basemap: OpenFreeMap. Roads: PostPass API (Geofabrik). Features to map (buildings,
   points or lines): upload, e.g. from [export.hotosm.org](https://export.hotosm.org).
   Points and lines become ~2 m squares so the shared building SQL splits them;
   the algorithm IDs keep their `AVG_BUILDING_*` names for backend parity.

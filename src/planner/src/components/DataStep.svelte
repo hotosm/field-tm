@@ -3,7 +3,7 @@
   import { bbox, toFeatureCollection } from '../lib/geo';
   import { classify } from '../lib/engine/splitter';
   import { readJsonFile } from '../lib/io/files';
-  import { fetchRoads } from '../lib/io/overpass';
+  import { fetchRoads } from '../lib/io/postpass';
 
   let { planner }: { planner: Planner } = $props();
 
@@ -73,6 +73,6 @@
 </p>
 {#if planner.roads}
   <p class="hint">
-    Road data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, via the Overpass API.
+    Road data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, via the <a href="https://postpass.geofabrik.de" target="_blank" rel="noopener">PostPass API</a>.
   </p>
 {/if}
