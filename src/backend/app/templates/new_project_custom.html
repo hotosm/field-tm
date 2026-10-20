@@ -17,6 +17,7 @@ endblock %} {% block content %}
     hx-swap="innerHTML"
     hx-indicator="#submit-indicator"
     data-require-outline="true"
+    novalidate
   >
     <div id="form-error-container">
       <div id="form-error" style="display: none">
@@ -376,6 +377,17 @@ endblock %} {% block content %}
       if (projectNameError) projectNameError.textContent = "";
       const descriptionError = document.getElementById("description-error");
       if (descriptionError) descriptionError.textContent = "";
+
+      // Validated here and on the server; native validation can't focus WebAwesome controls.
+      if (!projectNameInput || !(projectNameInput.value ?? "").trim()) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (projectNameError) {
+          renderCallout(projectNameError, "danger", {{ _("Project name is required.")|tojson }});
+        }
+        projectNameInput?.focus();
+        return false;
+      }
 
       if (!descriptionInput || !(descriptionInput.value ?? "").trim()) {
         e.preventDefault();
