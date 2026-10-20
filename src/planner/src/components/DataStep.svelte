@@ -50,7 +50,7 @@
     <wa-button size="small" appearance="plain" onclick={() => planner.setData('features', null)}>Remove</wa-button>
   {/if}
 </div>
-<p class="hint">Unlocks: <strong>By number of features</strong>.</p>
+<p class="hint"><strong>Enables splitting by number of features</strong>.</p>
 
 <h3>Roads, rivers and railways <small class="hint">(recommended)</small></h3>
 <p class="hint">

@@ -6,7 +6,8 @@ Field-TM supports QField as an alternative to ODK for field data collection.
 Creating a QField project requires converting an XLSForm + GeoJSON into a
 QGIS project file (`.qgz`), then uploading it to QFieldCloud.
 
-We built a lightweight HTTP wrapper around QGIS (`src/qfield/project_gen_svc.py`)
+We built a lightweight HTTP wrapper around QGIS (`src/qfield/`, served by
+`server.py`)
 running in a Docker container to handle this conversion. The question arose
 whether we could instead use QFieldCloud's built-in jobs system to defer this
 responsibility to the QField team and reduce our maintenance burden.
@@ -44,11 +45,11 @@ files are exchanged via the shared PostgreSQL database (see
 
 QGIS processing is not thread-safe. The service accepts concurrent requests,
 but each replica serializes QGIS work with a `threading.Lock`. Parallelism comes
-from replica count (`qfieldQgis.replicaCount`, default `2`).
+from replica count (`qfieldQgis.replicaCount`, default `1`).
 
 ## Consequences
 
-- Good, because the wrapper is minimal (single file, ~745 lines) on a
+- Good, because the wrapper is small (~2.8k lines in `src/qfield/`) on a
   stable base image (`ghcr.io/opengisch/qfieldcloud-qgis`).
 - Good, because QFieldCloud's auto-triggered jobs already handle validation
   and packaging after file upload, so we get that for free.

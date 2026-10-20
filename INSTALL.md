@@ -60,6 +60,5 @@ See [`chart/README.md`](chart/README.md) for details.
 
 ## Important notes
 
-- `install.sh` is deprecated and should not be used.
 - `.env` is generated from `.env.example`.
 - The Docker Compose production path uses the files under `deploy/`.

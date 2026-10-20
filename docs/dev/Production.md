@@ -243,8 +243,6 @@ The stack is:
 - optional self-hosted ODK overlay from `deploy/compose.odk.yaml`
 - optional self-hosted Hanko overlay from `deploy/compose.login.yaml`
 
-The `install.sh` flow is deprecated and should not be used.
-
 ### Recommended host
 
 - Ubuntu Linux
