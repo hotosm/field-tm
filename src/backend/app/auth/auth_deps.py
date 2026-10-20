@@ -24,7 +24,9 @@ from typing import Any
 from hotosm_auth_litestar import get_current_user, get_current_user_optional
 from litestar import Request
 from litestar import status_codes as status
+from litestar.connection import ASGIConnection
 from litestar.exceptions import HTTPException
+from litestar.handlers.base import BaseRouteHandler
 
 from app.config import AuthProvider, settings
 from app.i18n import _
@@ -117,6 +119,11 @@ async def login_required(request: Request) -> object:
     if auth_disabled():
         return get_local_admin_auth_user()
     return await get_current_user(request)
+
+
+async def login_guard(connection: ASGIConnection, _: BaseRouteHandler) -> None:
+    """Route guard: reject anonymous requests on handlers that don't use the user."""
+    await login_required(connection)  # type: ignore[arg-type]
 
 
 async def get_optional_auth_user(request: Request) -> object | None:

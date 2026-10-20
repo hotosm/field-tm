@@ -30,12 +30,17 @@ from typing import Optional
 
 from litestar import Response, delete, get, patch, post
 from litestar import status_codes as status
+from litestar.di import Provide
 from litestar.enums import RequestEncodingType
 from litestar.params import Body, Parameter
 from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Template
 from qfieldcloud_sdk.sdk import Client, ProjectCollaboratorRole
 
+from app.auth.auth_deps import get_optional_auth_user, login_guard
+from app.htmx.project_create.project_create_page_routes import (
+    redirect_to_login_if_needed,
+)
 from app.i18n import _
 from app.qfield.qfield_crud import add_qfc_project_collaborator
 from app.qfield.qfield_utils import resolve_backend_qfc_url, strip_qfc_api_suffix
@@ -76,12 +81,16 @@ def _friendly_add_collaborator_error(exc: Exception) -> str:
     return _("Failed to add collaborator: %(exc)s") % {"exc": exc}
 
 
-@get(path="/qfc-admin")
+@get(path="/qfc-admin", dependencies={"auth_user": Provide(get_optional_auth_user)})
 async def qfc_admin_page(
     request: HTMXRequest,
+    auth_user: object | None,
     url: Optional[str] = Parameter(query="url", default=None),
-) -> Template:
+) -> Template | Response:
     """Render the QFC admin page with login form."""
+    login_redirect = await redirect_to_login_if_needed(request, auth_user)
+    if login_redirect:
+        return login_redirect
     return HTMXTemplate(
         template_name="qfc_admin.html",
         context={"prefill_url": _strip_api_suffix(url) if url else ""},
@@ -91,7 +100,7 @@ async def qfc_admin_page(
 # ── Login & project listing ─────────────────────────────────────────────
 
 
-@post(path="/qfc-admin/login", status_code=status.HTTP_200_OK)
+@post(path="/qfc-admin/login", status_code=status.HTTP_200_OK, guards=[login_guard])
 async def qfc_admin_login(
     request: HTMXRequest,
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
@@ -153,7 +162,7 @@ async def qfc_admin_login(
 # ── Collaborator management ─────────────────────────────────────────────
 
 
-@get(path="/qfc-admin/projects/{project_id:str}/collaborators")
+@get(path="/qfc-admin/projects/{project_id:str}/collaborators", guards=[login_guard])
 async def list_collaborators(
     request: HTMXRequest,
     project_id: str,
@@ -196,6 +205,7 @@ async def list_collaborators(
 @post(
     path="/qfc-admin/projects/{project_id:str}/collaborators",
     status_code=status.HTTP_200_OK,
+    guards=[login_guard],
 )
 async def add_collaborator(
     request: HTMXRequest,
@@ -240,6 +250,7 @@ async def add_collaborator(
 @delete(
     path="/qfc-admin/projects/{project_id:str}/collaborators/{username:str}",
     status_code=200,
+    guards=[login_guard],
 )
 async def remove_collaborator(
     request: HTMXRequest,
@@ -275,7 +286,10 @@ async def remove_collaborator(
     )
 
 
-@patch(path="/qfc-admin/projects/{project_id:str}/collaborators/{username:str}")
+@patch(
+    path="/qfc-admin/projects/{project_id:str}/collaborators/{username:str}",
+    guards=[login_guard],
+)
 async def update_collaborator(
     request: HTMXRequest,
     project_id: str,

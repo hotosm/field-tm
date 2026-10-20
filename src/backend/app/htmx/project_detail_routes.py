@@ -184,7 +184,7 @@ async def project_details(
     path="/projects/{project_id:int}",
     dependencies={
         "db": Provide(db_conn),
-        "auth_user": Provide(get_optional_auth_user),
+        "auth_user": Provide(login_required),
     },
     status_code=status.HTTP_200_OK,
 )

@@ -18,7 +18,7 @@ from ..setup_steps.setup_step_responses import (
 from .project_create_parsing import login_prompt_path as _login_prompt_path
 
 
-async def _redirect_to_login_if_needed(
+async def redirect_to_login_if_needed(
     request: HTMXRequest, auth_user: object | None
 ) -> Response | None:
     if settings.AUTH_PROVIDER == AuthProvider.DISABLED or auth_user is not None:
@@ -43,7 +43,7 @@ async def new_project_chooser(
     request: HTMXRequest, auth_user: object | None
 ) -> Template | Response:
     """Render the workflow chooser (Quick OSM Buildings vs Custom)."""
-    login_redirect = await _redirect_to_login_if_needed(request, auth_user)
+    login_redirect = await redirect_to_login_if_needed(request, auth_user)
     if login_redirect:
         return login_redirect
     return HTMXTemplate(template_name="new_project_chooser.html")
@@ -59,7 +59,7 @@ async def new_project_custom(
     request: HTMXRequest, auth_user: object | None
 ) -> Template | Response:
     """Render the fully configurable project-create page."""
-    login_redirect = await _redirect_to_login_if_needed(request, auth_user)
+    login_redirect = await redirect_to_login_if_needed(request, auth_user)
     if login_redirect:
         return login_redirect
     return HTMXTemplate(
@@ -93,7 +93,7 @@ async def new_project_simple(
     request: HTMXRequest, auth_user: object | None
 ) -> Template | Response:
     """Render the quick OSM-Buildings project-create page."""
-    login_redirect = await _redirect_to_login_if_needed(request, auth_user)
+    login_redirect = await redirect_to_login_if_needed(request, auth_user)
     if login_redirect:
         return login_redirect
     return HTMXTemplate(template_name="new_project_simple.html")

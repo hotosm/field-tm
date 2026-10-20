@@ -120,6 +120,10 @@
       button-color="danger"
       display="{{ display }}"
     ></hotosm-auth>
+    {% else %}
+    <wa-badge variant="warning" title="AUTH_PROVIDER=disabled: everyone is a local admin">
+      {{ _("Login off (dev)") }}
+    </wa-badge>
     {% endif %} {% endmacro %}
 
     <hot-header

@@ -206,3 +206,73 @@ async def test_project_page_shows_failed_creation_status(client, db, project):
 
     assert "Project creation failed." in response.text
     assert "Boom &lt;b&gt;" in response.text
+
+
+async def test_delete_project_requires_login(client, project, login_as):
+    """Anonymous users can't delete projects."""
+    await login_as(None)
+    response = await client.delete(f"/projects/{project.id}")
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+async def test_delete_project_forbidden_for_non_owner(client, project, login_as):
+    """Only the project creator (or a global admin) can delete it."""
+    await login_as("someone-else")
+    response = await client.delete(f"/projects/{project.id}")
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+async def test_project_owner_can_delete(client, db, project, login_as):
+    """The creator sees the delete control and can delete the project."""
+    user = await login_as("owner")
+    async with db.cursor() as cur:
+        await cur.execute(
+            "UPDATE projects SET created_by_sub = %(sub)s WHERE id = %(id)s",
+            {"sub": user.sub, "id": project.id},
+        )
+    await db.commit()
+
+    page = await client.get(f"/projects/{project.id}")
+    assert f'hx-delete="/projects/{project.id}"' in page.text
+
+    with patch(
+        "app.htmx.project_detail_routes.delete_project_with_downstream",
+        new_callable=AsyncMock,
+    ) as mock_delete:
+        response = await client.delete(
+            f"/projects/{project.id}", headers={"HX-Request": "true"}
+        )
+    assert response.status_code == status.HTTP_200_OK
+    mock_delete.assert_awaited_once()
+
+
+async def test_non_owner_does_not_see_delete(client, project, login_as):
+    """The delete control is hidden from other users."""
+    await login_as("viewer")
+    page = await client.get(f"/projects/{project.id}")
+    assert f'hx-delete="/projects/{project.id}"' not in page.text
+
+
+@pytest.mark.parametrize(
+    ("method", "path"),
+    [
+        ("POST", "/qfc-admin/login"),
+        ("GET", "/qfc-admin/projects/abc/collaborators"),
+        ("POST", "/qfc-admin/projects/abc/collaborators"),
+        ("DELETE", "/qfc-admin/projects/abc/collaborators/someone"),
+        ("PATCH", "/qfc-admin/projects/abc/collaborators/someone"),
+    ],
+)
+async def test_qfc_admin_requires_login(client, login_as, method, path):
+    """The QFieldCloud admin tools are only for logged-in users."""
+    await login_as(None)
+    response = await client.request(method, path)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+async def test_qfc_admin_page_redirects_to_login(client, login_as):
+    """Anonymous visitors are sent to log in first."""
+    await login_as(None)
+    response = await client.get("/qfc-admin", follow_redirects=False)
+    assert response.status_code == status.HTTP_307_TEMPORARY_REDIRECT
+    assert "/login" in response.headers["location"]

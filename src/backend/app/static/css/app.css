@@ -393,3 +393,7 @@ wa-button.cta {
   --wa-color-brand-border-loud: #d73f3f;
   --wa-color-brand-on-loud: #fff;
 }
+
+.ftm-danger-zone {
+  margin-top: var(--wa-space-l);
+}
