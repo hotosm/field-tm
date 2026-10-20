@@ -119,13 +119,19 @@
     pendingEdit = null;
   }
 
+  // Undoing a split leaves Tasks empty: go back to Split to try again.
+  function undo() {
+    planner.undo();
+    if (step === 3 && !planner.tasks.length) step = planner.aoi ? 2 : 0;
+  }
+
   function onkeydown(e: KeyboardEvent) {
     if (readonly || (e.target as HTMLElement).closest('input, textarea, select')) return;
     if (e.key === 'Escape') cancelTool();
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
       e.preventDefault();
       if (e.shiftKey) planner.redo();
-      else planner.undo();
+      else undo();
     }
   }
 
@@ -186,7 +192,7 @@
             {/each}
         </nav>
         <div class="row">
-          <wa-button size="s" appearance="outlined" onclick={() => planner.undo()} disabled={!planner.canUndo} title="Undo (Ctrl+Z)">↶ Undo</wa-button>
+          <wa-button size="s" appearance="outlined" onclick={undo} disabled={!planner.canUndo} title="Undo (Ctrl+Z)">↶ Undo</wa-button>
           <wa-button size="s" appearance="outlined" onclick={() => planner.redo()} disabled={!planner.canRedo} title="Redo (Ctrl+Shift+Z)">↷ Redo</wa-button>
           {#if project}<wa-button size="s" appearance="plain" href={projectUrl(project.id)} target="_top">Back to project</wa-button>{/if}
           {#if mode.kind === 'standalone' && mode.returnTo}<wa-button size="s" appearance="plain" href={mode.returnTo} target="_top">Return to Field-TM project</wa-button>{/if}
@@ -222,7 +228,7 @@
           {:else if step === 2}
             <SplitStep {planner} ondone={() => (step = 3)} />
           {:else if step === 3}
-            <TasksStep {planner} bind:tool bind:multi {map} title={project?.name} />
+            <TasksStep {planner} bind:tool bind:multi {map} title={project?.name} onsplit={() => (step = 2)} />
           {:else}
             <ExportStep {planner} project={project ?? undefined} returnTo={mode.kind === 'standalone' ? mode.returnTo : undefined} />
           {/if}

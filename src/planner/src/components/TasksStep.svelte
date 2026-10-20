@@ -7,7 +7,7 @@
   import TaskDetails from './TaskDetails.svelte';
   import Legend from './Legend.svelte';
 
-  let { planner, tool = $bindable(), multi = $bindable(), map, title }: { planner: Planner; tool: Tool; multi: boolean; map?: Map; title?: string } = $props();
+  let { planner, tool = $bindable(), multi = $bindable(), map, title, onsplit }: { planner: Planner; tool: Tool; multi: boolean; map?: Map; title?: string; onsplit: () => void } = $props();
 
   const n = $derived(planner.selected.length);
   const single = $derived(n === 1 ? planner.selectedTasks[0] : undefined);
@@ -21,7 +21,8 @@
 </script>
 
 {#if !planner.tasks.length}
-  <p>Split the area first.</p>
+  <p>No tasks yet.</p>
+  <wa-button size="s" variant="brand" onclick={onsplit}>Split the area</wa-button>
 {:else}
   <p class="hint">Click tasks on the map to select them. Shift-click, or turn on multi-select, to select several.</p>
   <div class="row">
