@@ -1,67 +1,46 @@
-<div class="ftm-form-group">
-  <label class="ftm-form-label">
-    {{ _("Project Area") }} <span class="ftm-form-required">*</span>
-  </label>
-  <small class="ftm-form-help" style="margin-top: 0; margin-bottom: 8px">
-    {{ _("Draw the area you want to map on the map below.") }}
-  </small>
-  <div class="ftm-map-actions">
-    <wa-button
-      type="button"
-      id="draw-polygon-btn"
-      variant="brand"
-      style="flex: 1; min-width: 120px"
-    >
+<div class="wa-stack wa-gap-s">
+  <div class="wa-cluster wa-gap-s">
+    <wa-button id="draw-polygon-btn" variant="brand">
+      <wa-icon slot="start" name="draw-polygon"></wa-icon>
       {{ _("Draw Area") }}
     </wa-button>
-    <wa-button type="button" id="clear-map-btn" variant="default" style="flex: 1; min-width: 120px">
-      {{ _("Clear") }}
-    </wa-button>
-  </div>
-  <input type="file" id="geojson-file-input" accept=".geojson,.json" style="display: none" />
-  <div id="map" class="ftm-map-container"></div>
-  <div id="map-error" style="margin-top: 8px"></div>
-  <div id="area-info" style="margin-top: 8px"></div>
-
-  <div class="ftm-step__actions" style="margin-top: 10px; margin-bottom: 8px">
-    <button
-      type="button"
-      id="aoi-advanced-config-toggle"
-      class="wa-button wa-button--default ftm-advanced-toggle"
+    <wa-button id="clear-map-btn" variant="neutral" appearance="outlined"
+      >{{ _("Clear") }}</wa-button
     >
-      {{ _("More options") }}
-    </button>
+    <span class="ftm-hint">
+      {{ _("Project Area") }} <span class="ftm-required">*</span> - {{ _("Draw the area you want to
+      map on the map below.") }}
+    </span>
   </div>
-  <div id="aoi-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
-    <div class="ftm-advanced-config__content">
-      <div class="ftm-aoi-option">
-        <div class="ftm-aoi-option__title">{{ _("Upload a GeoJSON file") }}</div>
-        <small class="ftm-form-help" style="display: block; margin-bottom: 10px">
+  <input type="file" id="geojson-file-input" accept=".geojson,.json" hidden />
+  <div id="map" class="ftm-map-container"></div>
+  <div id="map-error"></div>
+  <div id="area-info"></div>
+
+  <wa-details id="aoi-advanced-config-panel" summary="{{ _('More options') }}">
+    <div class="wa-stack">
+      <div class="wa-stack wa-gap-xs">
+        <strong>{{ _("Upload a GeoJSON file") }}</strong>
+        <span class="ftm-hint">
           {{ _("If you already have a map file with your area boundary, upload it here instead of
           drawing.") }}
-        </small>
-        <div class="ftm-step__actions">
-          <wa-button
-            type="button"
-            id="upload-geojson-btn"
-            variant="default"
-            style="min-width: 200px"
-          >
+        </span>
+        <div>
+          <wa-button id="upload-geojson-btn" variant="neutral" appearance="outlined">
+            <wa-icon slot="start" name="upload"></wa-icon>
             {{ _("Upload your own map file (GeoJSON)") }}
           </wa-button>
         </div>
       </div>
 
-      <div class="ftm-aoi-divider" role="separator" aria-label="{{ _('or') }}">
-        <span class="ftm-aoi-divider__label">{{ _("or") }}</span>
-      </div>
+      <wa-divider></wa-divider>
 
-      <div class="ftm-aoi-option">
-        <div class="ftm-aoi-option__title">{{ _("Load from a HOT Tasking Manager project") }}</div>
-        <small class="ftm-form-help" style="display: block; margin-bottom: 10px">
+      <div class="wa-stack wa-gap-xs">
+        <strong>{{ _("Load from a HOT Tasking Manager project") }}</strong>
+        <span class="ftm-hint">
           {{ _("Enter a HOT Tasking Manager project ID to load its area of interest.") }}
-        </small>
-        <div style="display: flex; gap: 8px; align-items: stretch; flex-wrap: wrap">
+        </span>
+        <div class="wa-flank:end wa-gap-s">
           <wa-input
             type="number"
             id="tm-project-id-input"
@@ -69,27 +48,23 @@
             step="1"
             inputmode="numeric"
             placeholder="{{ _('Tasking Manager project ID') }}"
-            style="flex: 1; min-width: 180px"
           ></wa-input>
-          <wa-button type="button" id="load-tm-aoi-btn" variant="default" style="min-width: 160px">
+          <wa-button id="load-tm-aoi-btn" variant="neutral" appearance="outlined">
             {{ _("Load AOI") }}
           </wa-button>
         </div>
       </div>
 
       {% if not hide_advanced_config %}
-      <div class="ftm-checkbox-row" style="margin-top: 16px">
-        <input type="checkbox" id="merge-geometries-checkbox" style="margin: 0; cursor: pointer" />
-        <label for="merge-geometries-checkbox" class="ftm-checkbox-label">
-          {{ _("Combine multiple shapes into one") }}
-        </label>
-      </div>
+      <wa-checkbox id="merge-geometries-checkbox"
+        >{{ _("Combine multiple shapes into one") }}</wa-checkbox
+      >
       {% endif %}
-      <small class="ftm-form-help" style="display: block; margin-top: 10px">
+      <span class="ftm-hint">
         {{ _("Keep areas under 100 km² for best results. Very large areas (over 200 km²) may not
         download all map data automatically.") }}
-      </small>
+      </span>
     </div>
-  </div>
-  <textarea name="outline" id="outline-geojson" style="display: none"></textarea>
+  </wa-details>
+  <textarea name="outline" id="outline-geojson" hidden></textarea>
 </div>

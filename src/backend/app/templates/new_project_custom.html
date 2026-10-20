@@ -1,147 +1,155 @@
 {% extends "layout.html" %} {% block title %}{{ _("Create Custom Project") }} - Field Tasking
 Manager{% endblock %} {% block extra_head %}{% include "partials/new_project/leaflet_head.html" %}{%
 endblock %} {% block content %}
-<div class="ftm-page ftm-page--narrow">
-  <div style="margin-bottom: 16px">
-    <wa-button href="/new" variant="default" size="s">← {{ _("Back") }}</wa-button>
-  </div>
-  <h1 style="margin-bottom: 8px">{{ _("Set up your project") }}</h1>
-  <p class="ftm-chooser-intro" style="margin-bottom: 24px">
+<div class="ftm-page ftm-page--narrow wa-stack wa-gap-l">
+  <a href="/new" class="ftm-hint">← {{ _("Back") }}</a>
+  <h1>{{ _("Set up your project") }}</h1>
+  <p class="ftm-lead">
     {{ _("Just the basics on this page: what you're mapping, where, and which app mappers will use.
     You'll set up the survey, map data and tasks on the next page.") }}
   </p>
 
-  <wa-card>
-    <form
-      id="create-project-form"
-      style="padding: 20px"
-      hx-post="/projects/create"
-      hx-target="#form-error-container"
-      hx-swap="innerHTML"
-      hx-indicator="#submit-indicator"
-      data-require-outline="true"
-    >
-      <div id="form-error-container">
-        <div id="form-error" style="margin-bottom: 16px; display: none">
-          <wa-callout variant="danger">
-            <span id="form-error-message"></span>
-          </wa-callout>
-        </div>
+  <form
+    id="create-project-form"
+    class="wa-stack wa-gap-l"
+    hx-post="/projects/create"
+    hx-target="#form-error-container"
+    hx-swap="innerHTML"
+    hx-indicator="#submit-indicator"
+    data-require-outline="true"
+  >
+    <div id="form-error-container">
+      <div id="form-error" style="display: none">
+        <wa-callout variant="danger">
+          <span id="form-error-message"></span>
+        </wa-callout>
       </div>
+    </div>
 
-      <section class="ftm-custom-section">
-        <h2 class="ftm-custom-section__title">{{ _("About your project") }}</h2>
-        <p class="ftm-custom-section__hint">
+    <wa-card with-header>
+      <div slot="header">
+        <h2 class="ftm-section-title">{{ _("About your project") }}</h2>
+        <p class="ftm-hint">
           {{ _("Give your project a clear name and a short summary so mappers know what it's
           about.") }}
         </p>
-
-        <div class="ftm-form-group">
-          <label for="project_name_input" class="ftm-form-label">
-            {{ _("Project name") }} <span class="ftm-form-required">*</span>
-          </label>
+      </div>
+      <div class="wa-stack">
+        <div>
           <wa-input
             name="project_name"
             id="project_name_input"
+            label="{{ _('Project name') }}"
             placeholder="{{ _('e.g. Buildings in West Nairobi') }}"
-            style="width: 100%"
+            required
           ></wa-input>
-          <div id="project-name-error" style="margin-top: 8px"></div>
+          <div id="project-name-error"></div>
         </div>
-
-        <div class="ftm-form-group">
-          <label for="description_input" class="ftm-form-label">
-            {{ _("What are you mapping?") }} <span class="ftm-form-required">*</span>
-          </label>
+        <div>
           <wa-textarea
             name="description"
             id="description_input"
+            label="{{ _('What are you mapping?') }}"
             placeholder="{{ _('A short description. e.g. Mapping water points and toilets in informal settlements.') }}"
-            rows="4"
-            style="width: 100%"
+            rows="3"
+            required
           ></wa-textarea>
-          <div id="description-error" style="margin-top: 8px"></div>
+          <div id="description-error"></div>
         </div>
-      </section>
+      </div>
+    </wa-card>
 
-      <section class="ftm-custom-section">
-        <h2 class="ftm-custom-section__title">{{ _("Which app will mappers use?") }}</h2>
-        <p class="ftm-custom-section__hint">
+    <wa-card with-header>
+      <div slot="header">
+        <h2 class="ftm-section-title">{{ _("Which app will mappers use?") }}</h2>
+        <p class="ftm-hint">
           {{ _("Answer three quick questions for a recommendation, or pick any app below.") }}
         </p>
+      </div>
+      <section class="wa-stack">
         <div
-          class="ftm-app-questions"
+          class="ftm-panel ftm-panel--quiet wa-stack wa-gap-s"
           hx-get="/new/app-picker"
           hx-trigger="change"
-          hx-include="closest section"
+          hx-include="#q-mapping-type, #q-for-osm, #q-well-mapped, #app-picker"
           hx-target="#app-picker"
           hx-swap="outerHTML"
         >
-          <fieldset>
-            <legend>{{ _("What are you mapping?") }}</legend>
+          <wa-radio-group
+            id="q-mapping-type"
+            name="mapping_type"
+            label="{{ _('What are you mapping?') }}"
+            orientation="horizontal"
+          >
             {% for value, label in [("buildings", _("Buildings")), ("roads", _("Roads")), ("rivers",
             _("Rivers")), ("pois", _("Points of interest")), ("other", _("Other"))] %}
-            <label
-              ><input type="radio" name="mapping_type" value="{{ value }}" /> {{ label }}</label
-            >
+            <wa-radio value="{{ value }}">{{ label }}</wa-radio>
             {% endfor %}
-          </fieldset>
-          <fieldset>
-            <legend>{{ _("Will the data go into OpenStreetMap?") }}</legend>
-            <label><input type="radio" name="for_osm" value="yes" /> {{ _("Yes") }}</label>
-            <label><input type="radio" name="for_osm" value="no" /> {{ _("No") }}</label>
-          </fieldset>
-          <fieldset>
-            <legend>{{ _("Is it already well mapped in OpenStreetMap?") }}</legend>
-            <label><input type="radio" name="well_mapped" value="yes" /> {{ _("Yes") }}</label>
-            <label><input type="radio" name="well_mapped" value="no" /> {{ _("No") }}</label>
-            <label><input type="radio" name="well_mapped" value="" /> {{ _("Not sure") }}</label>
-          </fieldset>
+          </wa-radio-group>
+          <wa-radio-group
+            id="q-for-osm"
+            name="for_osm"
+            label="{{ _('Will the data go into OpenStreetMap?') }}"
+            orientation="horizontal"
+          >
+            <wa-radio value="yes">{{ _("Yes") }}</wa-radio>
+            <wa-radio value="no">{{ _("No") }}</wa-radio>
+          </wa-radio-group>
+          <wa-radio-group
+            id="q-well-mapped"
+            name="well_mapped"
+            label="{{ _('Is it already well mapped in OpenStreetMap?') }}"
+            orientation="horizontal"
+          >
+            <wa-radio value="yes">{{ _("Yes") }}</wa-radio>
+            <wa-radio value="no">{{ _("No") }}</wa-radio>
+            <wa-radio value="">{{ _("Not sure") }}</wa-radio>
+          </wa-radio-group>
         </div>
         {% include "partials/new_project/app_picker.html" %}
       </section>
+    </wa-card>
 
-      <section class="ftm-custom-section">
-        <h2 class="ftm-custom-section__title">{{ _("Where are you mapping?") }}</h2>
-        <p class="ftm-custom-section__hint">
+    <wa-card with-header>
+      <div slot="header">
+        <h2 class="ftm-section-title">{{ _("Where are you mapping?") }}</h2>
+        <p class="ftm-hint">
           {{ _("Draw the area mappers will cover. Smaller areas are easier to coordinate.") }}
         </p>
-        {% include "partials/new_project/map_section.html" %}
-      </section>
+      </div>
+      {% include "partials/new_project/map_section.html" %}
+    </wa-card>
 
-      <section class="ftm-custom-section">
-        <h2 class="ftm-custom-section__title">
-          {{ _("Tags") }}
-          <span style="font-weight: 400; color: var(--ftm-text-muted); font-size: 0.85em"
-            >({{ _("optional") }})</span
-          >
-        </h2>
-        <p class="ftm-custom-section__hint">
+    <wa-card with-header>
+      <div slot="header">
+        <h2 class="ftm-section-title">{{ _("Tags") }} ({{ _("optional") }})</h2>
+        <p class="ftm-hint">
           {{ _("Add tags so other people can find your project. Tags are like #buildings or
           #campaign-2026.") }}
         </p>
-        <div class="ftm-form-group" style="margin-bottom: 0">
-          <wa-input
-            id="hashtag-input"
-            placeholder='{{ _("Type a tag and press Enter") }}'
-            style="width: 100%"
-          ></wa-input>
-          <div id="hashtags-container" class="ftm-hashtags-container"></div>
-          <small class="ftm-form-help">
-            {{ _("Press Enter or comma after each tag. Click × on a tag to remove it.") }}
-          </small>
-        </div>
-      </section>
-
-      <div class="ftm-form-actions">
-        <wa-button type="submit" variant="brand" id="submit-btn">{{ _("Continue") }}</wa-button>
-        <span id="submit-indicator" style="display: none; margin-inline-start: 10px"
-          >{{ _("Creating...") }}</span
-        >
-        <wa-button href="/projects" variant="default">{{ _("Cancel") }}</wa-button>
       </div>
-    </form>
-  </wa-card>
+      <div class="wa-stack wa-gap-s">
+        <wa-input
+          id="hashtag-input"
+          placeholder="{{ _('Type a tag and press Enter') }}"
+          hint="{{ _('Press Enter or comma after each tag. Click × on a tag to remove it.') }}"
+        ></wa-input>
+        <div id="hashtags-container" class="wa-cluster wa-gap-xs"></div>
+      </div>
+    </wa-card>
+
+    <div class="wa-cluster">
+      <wa-button class="cta" type="submit" variant="brand" id="submit-btn"
+        >{{ _("Continue") }}</wa-button
+      >
+      <wa-button href="/projects" variant="neutral" appearance="outlined"
+        >{{ _("Cancel") }}</wa-button
+      >
+      <span id="submit-indicator" class="htmx-indicator ftm-hint">
+        <wa-spinner></wa-spinner> {{ _("Creating...") }}
+      </span>
+    </div>
+  </form>
 </div>
 
 <script type="module">

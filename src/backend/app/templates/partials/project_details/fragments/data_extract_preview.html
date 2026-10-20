@@ -1,36 +1,28 @@
-<div>
-  <wa-callout variant="{{ status_variant }}">
-    <span>{{ status_message }}</span>
-  </wa-callout>
-  <div id="geojson-preview-container" style="margin-top: 15px">
-    <div style="margin-bottom: 10px">
-      <wa-callout variant="info">
-        <span>{{ preview_message }}</span>
-      </wa-callout>
-    </div>
-    <div style="margin-top: 15px; display: flex; gap: 10px">
-      <button
+<div class="wa-stack">
+  <wa-callout variant="{{ status_variant }}">{{ status_message }}</wa-callout>
+  <div id="geojson-preview-container" class="wa-stack">
+    <wa-callout variant="neutral">{{ preview_message }}</wa-callout>
+    <div class="wa-cluster wa-gap-s">
+      <wa-button
         id="accept-data-extract-btn"
-        type="button"
+        variant="brand"
         hx-post="/accept-data-extract-htmx?project_id={{ project_id }}"
         hx-target="#osm-data-status"
         hx-swap="innerHTML"
-        class="wa-button wa-button--primary"
-        style="flex: 1"
       >
         {{ _("Accept Data Extract") }}
-      </button>
-      <button
+      </wa-button>
+      <wa-button
         id="discard-data-extract-btn"
-        type="button"
+        variant="neutral"
+        appearance="outlined"
         hx-post="/discard-data-extract-htmx?project_id={{ project_id }}"
         hx-target="#osm-data-status"
         hx-swap="innerHTML"
         hx-confirm="{{ _('Discard the downloaded data extract?') }}"
-        class="wa-button wa-button--default"
       >
         {{ _("Discard") }}
-      </button>
+      </wa-button>
     </div>
   </div>
 </div>

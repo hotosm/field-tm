@@ -1,29 +1,28 @@
-<div id="app-picker">
+<div id="app-picker" class="wa-stack wa-gap-s">
   {% if reason %}
-  <wa-callout variant="brand" style="margin-bottom: 12px"><span>{{ reason }}</span></wa-callout>
+  <wa-callout variant="brand" size="small">{{ reason }}</wa-callout>
   {% endif %}
-  <div class="ftm-app-grid">
+  <div class="wa-grid wa-gap-s ftm-app-grid">
     {% for app in apps %}
-    <label class="ftm-radio-card">
+    <label class="ftm-choice">
       <input
         type="radio"
         name="field_mapping_app"
         value="{{ app.key.value }}"
         required
-        style="margin: 4px 0 0"
         {{ "checked" if app.key.value == selected }}
       />
       {% include "partials/app_logo.html" %}
-      <span class="ftm-radio-card__text">
-        <span style="font-weight: 600">{{ app.name }}</span>
-        {% if app.key in recommended %}
-        <wa-badge variant="success" style="align-self: flex-start">{{ _("Recommended") }}</wa-badge>
-        {% endif %}
-        <small class="ftm-form-help" style="margin: 0">{{ app.description }}</small>
-        <small class="ftm-form-help" style="margin: 0"
-          >{{ _("Good for:") }} {{ app.good_for }}</small
-        >
-        <small class="ftm-form-help" style="margin: 0">
+      <span class="wa-stack wa-gap-2xs">
+        <span class="wa-cluster wa-gap-xs">
+          <strong>{{ app.name }}</strong>
+          {% if app.key in recommended %}
+          <wa-badge variant="success">{{ _("Recommended") }}</wa-badge>
+          {% endif %}
+        </span>
+        <small class="ftm-hint">{{ app.description }}</small>
+        <small class="ftm-hint">{{ _("Good for:") }} {{ app.good_for }}</small>
+        <small class="ftm-hint">
           {% if app.syncs %}{{ _("Tasks sync to the app.") }}{% else %}{{ _("Mappers download task
           files.") }}{% endif %}
         </small>

@@ -1,28 +1,28 @@
 {% if project and project.creation_status == 'failed' %}
-<div id="creating-fragment" style="text-align: center">
-  <wa-callout variant="danger" style="text-align: left">
+<div id="creating-fragment" class="wa-stack">
+  <wa-callout variant="danger">
     <strong>{{ _("Project creation failed.") }}</strong>
-    <div style="margin-top: 6px">
-      {{ project.creation_error or _("An unexpected error occurred.") }}
-    </div>
+    <div>{{ project.creation_error or _("An unexpected error occurred.") }}</div>
   </wa-callout>
-  <div style="margin-top: 16px; display: flex; gap: 10px; justify-content: center">
-    <wa-button href="/new/simple" variant="brand">{{ _("Try Again") }}</wa-button>
-    <wa-button href="/projects" variant="default">{{ _("Back to Projects") }}</wa-button>
+  <div class="wa-cluster wa-justify-content-center">
+    <wa-button class="cta" href="/new/simple" variant="brand">{{ _("Try Again") }}</wa-button>
+    <wa-button href="/projects" variant="neutral" appearance="outlined"
+      >{{ _("Back to Projects") }}</wa-button
+    >
   </div>
 </div>
 {% else %}
 <div
   id="creating-fragment"
+  class="wa-stack wa-align-items-center wa-text-center"
   hx-get="/projects/{{ project.id }}/creation-status"
   hx-trigger="every 10s"
   hx-swap="outerHTML"
   hx-on::before-swap="if (event.detail.xhr.status >= 400) { event.detail.shouldSwap = false; event.detail.isError = false; }"
-  style="text-align: center"
 >
-  <wa-spinner style="font-size: 32px"></wa-spinner>
-  <h2 style="margin-top: 16px">{{ _("Setting up your project...") }}</h2>
-  <p style="margin-top: 6px; color: var(--wa-color-neutral-fill-loud)">
+  <wa-spinner class="wa-font-size-3xl"></wa-spinner>
+  <h2 class="wa-heading-l">{{ _("Setting up your project...") }}</h2>
+  <p class="ftm-hint">
     {{ _("Downloading map data, splitting tasks, and preparing the QField project. This can take a
     minute or two - this page will redirect automatically when ready.") }}
   </p>

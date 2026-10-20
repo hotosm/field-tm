@@ -1,637 +1,244 @@
-/* ============================================================
-   Field-TM - Shared Application Styles
-   ============================================================
-   Reusable utility classes used across all server-rendered
-   templates. Keeps templates thin and style changes centralized.
+/* Field-TM manager site. Builds on @hotosm/ui (WebAwesome + HOT tokens):
+   prefer wa-* components and WebAwesome layout utilities (wa-stack,
+   wa-cluster, wa-grid, wa-split) over new classes here. */
 
-   Naming convention:  .ftm-<component>[-modifier]
-
-   Tokens: references HOT design system tokens from hot.css /
-   hot-wa.css which are loaded via @hotosm/ui style-core.css.
-   ============================================================ */
-
-/* --- Body typography -------------------------------------- */
-body {
-  color: var(--hot-color-neutral-900, #404248);
-}
-
-/* --- Design tokens (custom properties) -------------------- */
 :root {
-  --ftm-brand: var(--hot-color-primary-600, #d73f3f);
-  --ftm-text: var(--hot-color-neutral-900, #404248);
-  --ftm-text-muted: var(--hot-color-neutral-600, #716f73);
-  --ftm-text-light: var(--hot-color-neutral-500, #828085);
-  --ftm-border: var(--hot-color-neutral-200, #c4c3c5);
-  --ftm-bg-success: var(--hot-color-success-50, #e3f8f8);
-  --ftm-bg-muted: var(--hot-color-neutral-50, #f3f3f3);
-  --ftm-bg-info: var(--hot-color-cyan-50, #e3f8f8);
-  --ftm-color-success: var(--hot-color-success-500, #50c1cb);
-  --ftm-radius: var(--hot-border-radius-large, 0.5rem);
-  --ftm-radius-sm: var(--hot-border-radius-medium, 0.25rem);
+  --ftm-border: var(--wa-color-surface-border);
+  --ftm-muted: var(--wa-color-text-quiet);
+  --ftm-radius: var(--wa-border-radius-m);
 }
 
-/* --- Auth: login button (hotosm-auth web component) ------- */
-/* Theme the logged-out login button to match the previous brand
-   button. Custom properties pierce the component's shadow DOM.
-   Uses the HOT brand red as a literal value: nesting var(--ftm-brand)
-   -> var(--hot-color-primary-600) resolves inconsistently once inherited
-   into the component's shadow DOM (it fell back to gray-600), so we set
-   the colour directly. Only affects the login button; the profile
-   dropdown keeps its own defaults. */
-hotosm-auth {
-  --login-btn-bg-color: #d73f3f;
-  --login-btn-hover-bg-color: #b93636;
-  --login-btn-text-color: #ffffff;
-  --login-btn-border-radius: 0.25rem;
-  --login-btn-padding: 0.5rem 1rem;
+[hidden] {
+  display: none !important;
 }
 
-/* --- Page layouts ----------------------------------------- */
+body {
+  margin: 0;
+  background: var(--wa-color-surface-default);
+}
+
+.ftm-main {
+  min-height: calc(100dvh - 8rem);
+}
+
+/* --- Page shell ------------------------------------------------- */
 .ftm-page {
-  padding: 24px;
+  box-sizing: border-box;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--wa-space-xl) var(--wa-space-m);
 }
 
 .ftm-page--narrow {
-  max-width: 800px;
-  margin: 0 auto;
+  max-width: 52rem;
 }
 
-.ftm-page--wide {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* Muted background - used only on list/index pages where cards need to pop */
-.ftm-page--muted {
-  background-color: var(--hot-color-neutral-100, #e8e8e8);
-  min-height: calc(100vh - 60px);
-}
-
-.ftm-page--projects {
-  background-color: white;
-  min-height: calc(100vh - 60px);
-  padding-top: 0;
-  padding-inline: 0;
-}
-
-/* --- Page header ------------------------------------------ */
-.ftm-page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-}
-
-.ftm-page-title {
+.ftm-page h1 {
   margin: 0;
-  font-size: var(--hot-font-size-x-large);
-  color: var(--ftm-text);
+  font-size: var(--wa-font-size-2xl);
 }
 
-.ftm-projects-shell {
-  border-bottom: 1px solid var(--ftm-border);
+.ftm-lead {
+  margin: 0;
+  color: var(--ftm-muted);
 }
 
-/* --- Projects toolbar (desktop: single row) ------------------ */
+.ftm-hint {
+  margin: 0;
+  color: var(--ftm-muted);
+  font-size: var(--wa-font-size-s);
+}
+
+.ftm-required {
+  color: var(--wa-color-danger-fill-loud);
+}
+
+.ftm-panel {
+  padding: var(--wa-space-l);
+  border: 1px solid var(--ftm-border);
+  border-radius: var(--ftm-radius);
+  background: var(--wa-color-surface-raised);
+}
+
+.ftm-panel--quiet {
+  background: var(--wa-color-neutral-fill-quiet);
+  border-color: transparent;
+}
+
+.ftm-section-title {
+  margin: 0;
+  font-size: var(--wa-font-size-l);
+}
+
+/* --- Header (same controls as OpenAerialMap) --------------------- */
+.ftm-header-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-xs);
+}
+
+.ftm-header-lang-menu wa-button,
+.ftm-header-controls hot-tool-menu {
+  --wa-form-control-height: 2rem;
+  --wa-form-control-padding-inline: 0.375rem;
+}
+
+/* --- Footer ---------------------------------------------------- */
+.ftm-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--wa-space-s) var(--wa-space-l);
+  margin-top: var(--wa-space-3xl);
+  padding: var(--wa-space-l) max(var(--wa-space-m), calc((100% - 72rem) / 2));
+  border-top: 1px solid var(--ftm-border);
+  color: var(--ftm-muted);
+  font-size: var(--wa-font-size-s);
+}
+
+.ftm-footer__social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--wa-space-m);
+}
+
+/* --- Project list ---------------------------------------------- */
 .ftm-projects-toolbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: end;
-  gap: 0.75rem;
-  padding: 1rem 1.5rem;
-  max-width: 100%;
-  box-sizing: border-box;
+  gap: var(--wa-space-s);
 }
 
-.ftm-projects-filters {
-  display: flex;
-  align-items: end;
-  gap: 0.75rem;
-  flex: 1 1 0;
-  min-width: 0;
+.ftm-projects-toolbar wa-select {
+  flex: 1 1 9rem;
+  max-width: 12rem;
 }
 
-.ftm-projects-filter {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-  flex: 0 0 auto;
-  min-width: 0;
-  width: 11.25rem;
-}
-
-.ftm-projects-filter--search {
+.ftm-projects-toolbar wa-input {
   flex: 1 1 14rem;
-  min-width: 10rem;
-  max-width: 25vw;
-  width: auto;
 }
 
-.ftm-projects-filter--search wa-input {
-  width: 100%;
-  min-width: 0;
-}
-
-.ftm-projects-filter__label {
-  font-size: var(--hot-font-size-x-small);
-  font-weight: var(--hot-font-weight-semibold);
-  color: var(--ftm-text-light);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.ftm-projects-filter__select {
-  display: block;
-  width: 100%;
-  padding: 0.5rem 0.5rem;
-  border: 1px solid var(--ftm-border);
-  border-radius: var(--ftm-radius-sm);
-  background-color: white;
-  color: var(--ftm-text);
-  font: inherit;
-  font-size: var(--hot-font-size-small);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ftm-projects-toolbar > .ftm-create-btn {
-  flex: 0 0 auto;
-  margin-inline-start: 1rem;
-  white-space: nowrap;
-}
-
-.ftm-projects-results {
-  margin: 0;
-  padding: 0.5rem 1.5rem 0.75rem;
-  font-size: var(--hot-font-size-small);
-  color: var(--ftm-text-light);
-}
-
-/* Desktop: collapsible wrapper is transparent, toggle is hidden */
-.ftm-filters-collapsible {
-  display: contents;
-}
-
-.ftm-filters-toggle {
-  display: none;
-}
-
-/* Short label for create button hidden on desktop */
-.ftm-create-btn__short {
-  display: none;
-}
-
-.ftm-create-btn__full {
-  display: inline;
-}
-
-/* --- Card grid (project listing) -------------------------- */
 .ftm-card-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(17.5rem, 1fr));
-  gap: 1rem;
-  padding: 1.5rem;
-  align-items: stretch;
+  --min-column-size: 17rem;
 }
 
-/* --- Project card ----------------------------------------- */
-/* wa-card has no "base" part - style the host element directly.           */
-/* External styles win over shadow-DOM :host styles per CSS Scoping spec.  */
-.ftm-project-card {
-  display: block;
-  height: 100%;
-  cursor: pointer;
-  background-color: white;
-  border: 1px solid color-mix(in oklab, var(--hot-color-neutral-300, #b3b1b4) 80%, white);
-  border-radius: 0.75rem;
-  box-shadow:
-    0 0.0625rem 0.125rem color-mix(in oklab, var(--hot-color-neutral-950) 4%, transparent),
-    0 0.375rem 1rem color-mix(in oklab, var(--hot-color-neutral-950) 3%, transparent);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    border-color 0.2s ease;
+.ftm-app-grid {
+  --min-column-size: 18rem;
 }
 
 .ftm-project-card-link {
-  display: block;
-  height: 100%;
   color: inherit;
   text-decoration: none;
 }
 
-.ftm-project-card-link:focus-visible {
-  outline: 2px solid var(--ftm-brand);
-  outline-offset: 2px;
-  border-radius: 0.75rem;
+.ftm-project-card {
+  height: 100%;
+  transition: box-shadow 0.15s;
 }
 
-.ftm-project-card:hover,
-.ftm-project-card-link:focus-visible .ftm-project-card,
-.ftm-project-card:focus-within {
-  transform: translateY(-0.125rem);
-  border-color: color-mix(in oklab, var(--ftm-brand) 28%, white);
-  box-shadow:
-    0 0.5rem 1.5rem color-mix(in oklab, var(--hot-color-neutral-950) 8%, transparent),
-    0 0 0 0.1875rem color-mix(in oklab, var(--ftm-brand) 10%, transparent);
-}
-
-.ftm-project-card__id {
-  font-size: var(--hot-font-size-x-small);
-  color: var(--ftm-text-light);
-  font-weight: var(--hot-font-weight-semibold);
-}
-
-.ftm-project-card__header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-height: 6.5rem;
-}
-
-.ftm-project-card__header-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.ftm-project-card-link:hover .ftm-project-card,
+.ftm-project-card-link:focus-visible .ftm-project-card {
+  box-shadow: var(--wa-shadow-m);
 }
 
 .ftm-project-card__name {
   display: -webkit-box;
-  font-weight: var(--hot-font-weight-bold);
-  font-size: var(--hot-font-size-large);
-  line-height: 1.25;
-  min-height: calc(1.25em * 3);
   overflow: hidden;
-  text-overflow: ellipsis;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-}
-
-.ftm-project-card__badges {
-  display: flex;
-  align-items: center;
-  gap: var(--hot-spacing-x-small);
-}
-
-.ftm-project-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 0.625rem 0;
-  height: 13rem;
-}
-
-.ftm-project-card__content-top {
-  min-height: 2.75rem;
-}
-
-.ftm-project-card__location {
-  margin: 0;
-  font-size: var(--hot-font-size-small);
-  color: var(--hot-color-neutral-700);
-}
-
-.ftm-project-card__location-inner {
-  display: flex;
-  align-items: center;
-  gap: var(--hot-spacing-2x-small);
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-weight: var(--wa-font-weight-semibold);
+  font-size: var(--wa-font-size-l);
 }
 
 .ftm-project-card__description {
-  margin: 0;
-  color: var(--ftm-text-muted);
-  line-height: 1.4;
-  font-size: var(--hot-font-size-small);
-  min-height: calc(1.4em * 3);
-  max-height: calc(1.4em * 3);
   display: -webkit-box;
   overflow: hidden;
-  text-overflow: ellipsis;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
   line-clamp: 3;
 }
 
-.ftm-project-card__meta {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: auto;
+/* --- App logos and pickers ------------------------------------- */
+.ftm-app-logo {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  object-fit: contain;
 }
 
-.ftm-project-card__tags {
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--hot-spacing-x-small);
+.ftm-app-logo--lg .ftm-app-logo {
+  width: 2.25rem;
+  height: 2.25rem;
 }
 
-.ftm-project-card__footer {
-  margin-top: 0;
-  padding-top: 10px;
-  border-top: 1px solid var(--ftm-border);
-  font-size: var(--hot-font-size-x-small);
-  color: var(--ftm-text-light);
-}
-
-.ftm-empty-state {
-  text-align: center;
-  color: var(--ftm-text-muted);
-  margin: 2.5rem 1.5rem 0;
-}
-
-/* --- Detail page ------------------------------------------ */
-.ftm-detail-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  margin-bottom: 30px;
-}
-
-.ftm-detail-label {
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-small);
-  margin-bottom: 5px;
-  font-weight: var(--hot-font-weight-bold);
-}
-
-.ftm-detail-value {
-  color: var(--ftm-text);
-  font-size: var(--hot-font-size-large);
-}
-
-.ftm-section-title {
-  color: var(--ftm-brand);
-  margin-bottom: 10px;
-}
-
-.ftm-section {
-  margin-bottom: 30px;
-}
-
-.ftm-external-info {
-  margin-bottom: 30px;
-  padding: 15px;
-  background-color: var(--ftm-bg-muted);
-  border-radius: var(--ftm-radius-sm);
-}
-
-.ftm-manager-section {
-  margin: 40px 0 20px;
-  padding-top: 24px;
-  border-top: 1px solid var(--ftm-border);
-}
-
-.ftm-manager-section__title {
-  margin: 0 0 8px;
-  color: var(--ftm-text);
-  font-size: var(--hot-font-size-large);
-}
-
-.ftm-manager-section__subtitle {
-  margin: 0;
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-small);
-}
-
-.ftm-project-title-wrap {
-  display: flex;
+.ftm-app-logo--initial {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  border-radius: var(--wa-border-radius-s);
+  background: var(--wa-color-neutral-fill-normal);
+  font-weight: var(--wa-font-weight-bold);
+}
+
+.ftm-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--wa-space-s);
+  padding: var(--wa-space-m);
+  border: 1px solid var(--ftm-border);
+  border-radius: var(--ftm-radius);
+  cursor: pointer;
+}
+
+.ftm-choice:hover,
+.ftm-choice:has(input:checked) {
+  border-color: var(--wa-color-brand-fill-loud);
+  box-shadow: inset 0 0 0 1px var(--wa-color-brand-fill-loud);
+}
+
+.ftm-choice > :last-child {
+  flex: 1;
   min-width: 0;
 }
 
-.ftm-project-title-wrap h1 {
-  overflow: hidden;
-  text-overflow: ellipsis;
+.ftm-choice .ftm-app-logo {
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
-.ftm-project-location-line {
-  margin: 0 0 12px;
-  color: #666;
-  font-size: 0.95rem;
+.ftm-choice input {
+  margin-top: 0.25rem;
 }
 
-.ftm-manager-summary-section {
-  margin-top: 10px;
+/* --- Create project chooser ------------------------------------- */
+.ftm-chooser-card ul {
+  margin: 0;
+  padding-inline-start: 1.25rem;
 }
 
-/* --- Mobile layout (<=720px) --------------------------------- */
-@media (max-width: 720px) {
-  .ftm-projects-toolbar,
-  .ftm-card-grid {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  .ftm-projects-toolbar {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .ftm-projects-filters {
-    flex-wrap: wrap;
-    flex-basis: 100%;
-    gap: 0.5rem;
-    position: relative;
-  }
-
-  .ftm-projects-results {
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
-
-  /* Show the mobile filters toggle button */
-  .ftm-filters-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--ftm-border);
-    border-radius: var(--ftm-radius-sm);
-    background-color: white;
-    color: var(--ftm-text);
-    font: inherit;
-    font-size: var(--hot-font-size-small);
-    cursor: pointer;
-    white-space: nowrap;
-    flex: 0 0 auto;
-  }
-
-  .ftm-filters-toggle:hover {
-    background-color: var(--ftm-bg-muted);
-  }
-
-  /* Hide inline status filter, show via dropdown */
-  .ftm-filters-collapsible {
-    display: none;
-    position: absolute;
-    top: calc(100% + 0.25rem);
-    inset-inline-start: 0;
-    z-index: 20;
-    background: white;
-    border: 1px solid var(--ftm-border);
-    border-radius: var(--ftm-radius-sm);
-    padding: 0.75rem;
-    box-shadow: 0 4px 12px color-mix(in oklab, var(--hot-color-neutral-950) 10%, transparent);
-    min-width: 12rem;
-  }
-
-  .ftm-filters--open .ftm-filters-collapsible {
-    display: block;
-  }
-
-  .ftm-filters-collapsible .ftm-projects-filter {
-    flex: 1 1 auto;
-    width: 100%;
-  }
-
-  /* Sort stays in the first row */
-  .ftm-projects-filter[for="projects-sort-filter"] {
-    flex: 1 1 auto;
-  }
-
-  /* Search takes full width on second row */
-  .ftm-projects-filter--search {
-    flex-basis: 100%;
-    min-width: 0;
-  }
-
-  /* Compact create button on mobile */
-  .ftm-create-btn__full {
-    display: none;
-  }
-
-  .ftm-create-btn__short {
-    display: inline;
-  }
-
-  .ftm-projects-toolbar > .ftm-create-btn {
-    margin-inline-start: 0;
-  }
-}
-
-/* --- Flex/layout utilities -------------------------------- */
-.ftm-flex-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.ftm-flex-center {
-  display: flex;
-  align-items: center;
-  gap: var(--hot-spacing-x-small);
-}
-
-.ftm-flex-wrap {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--hot-spacing-x-small);
-}
-
-.ftm-flex-gap {
-  display: flex;
-  gap: 10px;
-}
-
-.ftm-flex-end {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-}
-
-/* --- Form styles ------------------------------------------ */
-.ftm-form-group {
-  margin-bottom: 20px;
-}
-
-.ftm-form-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: var(--hot-font-weight-bold);
-  line-height: var(--hot-line-height-dense);
-}
-
-.ftm-form-required {
-  color: var(--hot-color-danger-500);
-  display: inline;
-}
-
-.ftm-form-help {
-  display: block;
-  margin-top: 8px;
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-small);
-}
-
-.ftm-form-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 30px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.ftm-radio-group {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.ftm-radio-card {
-  display: flex;
-  align-items: center;
-  gap: var(--hot-spacing-x-small);
-  cursor: pointer;
-  padding: 12px;
-  border: 2px solid var(--ftm-border);
-  border-radius: var(--ftm-radius);
+.ftm-chooser-card::part(body) {
   flex: 1;
-  min-width: 150px;
-  transition:
-    border-color 0.2s,
-    background-color 0.2s;
 }
 
-/* On narrow screens give each radio card its own row - they hold a logo,
-   title, platform chips and description, so side-by-side gets too cramped. */
-@media (max-width: 720px) {
-  .ftm-radio-card {
-    flex: 1 1 100%;
-    min-width: 0;
-  }
+.ftm-chooser-card [slot="footer"] {
+  width: 100%;
 }
 
-.ftm-radio-card:hover,
-.ftm-radio-card:has(input:checked) {
-  border-color: var(--hot-color-primary-600);
-  background-color: var(--hot-color-primary-50);
-}
-
-.ftm-map-container {
+/* --- Maps -------------------------------------------------------- */
+.ftm-map-container,
+.ftm-task-map {
+  display: block;
   width: 100%;
   height: 50vh;
-  min-height: 280px;
-  max-height: 600px;
+  min-height: 18rem;
+  max-height: 32rem;
   border: 1px solid var(--ftm-border);
-  border-radius: var(--ftm-radius-sm);
-  margin-top: 10px;
+  border-radius: var(--ftm-radius);
 }
 
-.ftm-map-actions {
-  margin-bottom: 10px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* Custom Leaflet map controls (undo vertex, locate) */
+/* Custom Leaflet controls (undo vertex, locate) */
 .ftm-map-ctrl-btn {
   display: flex !important;
   align-items: center;
@@ -643,666 +250,136 @@ hotosm-auth {
   cursor: pointer;
 }
 
-.ftm-map-ctrl-btn:hover {
-  background-color: #f4f4f4;
-}
-
 .ftm-map-ctrl-btn--loading {
   animation: ftm-pulse 1s ease-in-out infinite;
 }
 
 @keyframes ftm-pulse {
-  0%,
-  100% {
-    opacity: 1;
-  }
   50% {
     opacity: 0.4;
   }
 }
 
-.ftm-checkbox-row {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  gap: var(--hot-spacing-x-small);
-}
-
-.ftm-checkbox-label {
-  cursor: pointer;
-  font-size: var(--hot-font-size-small);
-  color: var(--ftm-text);
-  user-select: none;
-}
-
-.ftm-hashtags-container {
+/* --- Project page -------------------------------------------- */
+.ftm-project-title {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--hot-spacing-x-small);
-  margin-top: 12px;
-  min-height: 32px;
-}
-
-/* --- Setup steps ------------------------------------------ */
-.ftm-setup-header {
-  color: var(--ftm-brand);
-  margin-bottom: 20px;
-  font-size: var(--hot-font-size-x-large);
-}
-
-.ftm-step {
-  margin-bottom: 30px;
-  padding: 20px;
-  border-radius: var(--ftm-radius);
-}
-
-.ftm-step--pending {
-  background-color: var(--ftm-bg-muted);
-  border-inline-start: 4px solid var(--ftm-brand);
-}
-
-.ftm-step--complete {
-  background-color: var(--ftm-bg-success);
-  border-inline-start: 4px solid var(--ftm-color-success);
-}
-
-.ftm-step__header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
-}
-
-.ftm-step__title {
-  color: var(--ftm-text);
-  margin: 0;
-  font-size: var(--hot-font-size-large);
-}
-
-.ftm-step__check {
-  color: var(--ftm-color-success);
-  margin-inline-start: 8px;
-}
-
-.ftm-step__description {
-  color: var(--ftm-text-muted);
-  margin-bottom: 15px;
-  font-size: var(--hot-font-size-small);
-}
-
-.ftm-step__actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 15px;
-}
-
-/* Native buttons and links styled like wa-button */
-.wa-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 0 16px;
-  border: 1px solid var(--wa-color-neutral-border-normal, #c9c9c9);
-  border-radius: var(--ftm-radius-sm, 6px);
-  background: var(--wa-color-neutral-fill-quiet, #f3f3f3);
-  color: var(--wa-color-neutral-on-quiet, #2c2c2c);
-  font: inherit;
-  font-weight: var(--hot-font-weight-semibold, 600);
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.wa-button:hover {
-  filter: brightness(0.95);
-}
-
-.wa-button:focus-visible {
-  outline: 2px solid var(--ftm-brand);
-  outline-offset: 2px;
-}
-
-.wa-button--brand,
-.wa-button--primary {
-  border-color: var(--ftm-brand);
-  background: var(--ftm-brand);
-  color: #fff;
-}
-
-.wa-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.ftm-step__actions > button.wa-button {
-  min-width: 180px;
-}
-
-.ftm-step__success {
-  padding: 10px;
-  background-color: white;
-  border-radius: var(--ftm-radius-sm);
-  color: var(--ftm-color-success);
-  font-weight: var(--hot-font-weight-semibold);
-}
-
-.ftm-step__status {
-  margin-top: 10px;
-}
-
-/* --- Split form ------------------------------------------- */
-.ftm-split-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 15px;
-}
-
-.ftm-split-grid--advanced {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 8px;
-}
-
-.ftm-split-grid--advanced > div:last-child {
-  grid-column: 1 / -1;
-}
-
-.ftm-split-label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: var(--hot-font-weight-semibold);
-  color: var(--ftm-text);
-}
-
-.ftm-split-select,
-.ftm-split-input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid var(--ftm-border);
-  border-radius: var(--ftm-radius-sm);
-}
-
-/* --- Form config ------------------------------------------ */
-.ftm-form-config {
-  display: none;
-  margin-top: 20px;
-  padding: 15px;
-  background-color: white;
-  border-radius: var(--ftm-radius-sm);
-  border: 1px solid var(--ftm-border);
-}
-
-.ftm-form-config--visible {
-  display: block;
-}
-
-.ftm-advanced-config {
-  margin-top: 8px;
-  border: 1px solid var(--ftm-border);
-  border-radius: var(--ftm-radius-sm);
-  background-color: var(--hot-color-neutral-50);
-  padding: 10px 12px;
-}
-
-.ftm-advanced-toggle {
-  background-color: var(--hot-color-neutral-50);
-  border-color: var(--hot-color-neutral-200);
-  color: var(--hot-color-neutral-700);
-}
-
-.ftm-advanced-toggle:hover {
-  background-color: var(--hot-color-neutral-100);
-}
-
-.ftm-advanced-config--hidden {
-  display: none;
-}
-
-.ftm-advanced-config__summary {
-  cursor: pointer;
-  font-weight: var(--hot-font-weight-semibold);
-  color: var(--ftm-text);
-}
-
-.ftm-advanced-config__content {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
-}
-
-.ftm-aoi-option {
-  padding: 12px;
-  background-color: white;
-  border: 1px solid var(--ftm-border);
-  border-radius: var(--ftm-radius-sm);
-}
-
-.ftm-aoi-option__title {
-  font-weight: var(--hot-font-weight-semibold);
-  color: var(--ftm-text);
-  margin-bottom: 6px;
-}
-
-.ftm-aoi-divider {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 12px 0;
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-small);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.ftm-aoi-divider::before,
-.ftm-aoi-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background-color: var(--ftm-border);
-}
-
-.ftm-aoi-divider__label {
-  flex: 0 0 auto;
-}
-
-.ftm-config-note {
-  padding: 8px;
-  border-radius: var(--ftm-radius-sm);
-  font-size: var(--hot-font-size-small);
-  color: var(--ftm-text-muted);
-}
-
-.ftm-config-note--info {
-  background-color: var(--ftm-bg-info);
-}
-
-.ftm-config-note--muted {
-  background-color: var(--hot-color-neutral-100);
-}
-
-@media (max-width: 900px) {
-  .ftm-split-grid,
-  .ftm-split-grid--advanced {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* --- Published project ------------------------------------ */
-.ftm-published-header {
-  color: var(--ftm-color-success);
-  margin-bottom: 10px;
-  font-size: var(--hot-font-size-x-large);
-}
-
-.ftm-published-divider {
-  margin-top: 40px;
-  padding-top: 30px;
-  border-top: 2px solid var(--ftm-border);
-}
-
-.ftm-published-divider--top {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: 0;
-}
-
-.ftm-qr-hero {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.ftm-qr-hero__container {
-  width: 100%;
-  max-width: 560px;
-}
-
-.ftm-qr-hero__loading {
-  text-align: center;
-  padding: 20px;
-  border: 1px dashed var(--ftm-border);
-  border-radius: var(--ftm-radius);
-  background-color: var(--ftm-bg-muted);
-}
-
-.ftm-setup-summary {
-  margin-top: 0;
-  padding: 0 16px;
-  border: 1px solid var(--ftm-border);
-  border-radius: var(--ftm-radius);
-  background-color: white;
-}
-
-.ftm-setup-summary__summary {
-  cursor: pointer;
-  font-weight: var(--hot-font-weight-semibold);
-  color: var(--ftm-text);
-  margin: 0;
-  padding: 12px 0;
-}
-
-.ftm-setup-summary[open] .ftm-setup-summary__summary {
-  margin-bottom: 0;
-  border-bottom: 1px solid var(--ftm-border);
-}
-
-.ftm-setup-summary__content {
-  padding: 12px 0 16px;
-}
-
-.ftm-setup-summary__description {
-  margin: 0 0 12px;
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-small);
-}
-
-.ftm-qr-panel {
-  text-align: center;
-  padding: 24px;
-  background-color: var(--hot-color-neutral-50);
-  border: 1px solid var(--hot-color-neutral-100);
-  border-radius: var(--ftm-radius);
-}
-
-.ftm-qr-panel__title {
-  color: var(--ftm-text);
-  margin: 0 0 12px;
-  font-size: var(--hot-font-size-large);
-}
-
-.ftm-qr-panel__description {
-  color: var(--ftm-text-muted);
-  margin: 0 0 16px;
-}
-
-.ftm-qr-panel__image-wrap {
-  display: inline-flex;
-  padding: 16px;
-  background-color: white;
-  border: 1px solid var(--ftm-border);
-  border-radius: var(--ftm-radius-sm);
-  margin-bottom: 16px;
-}
-
-.ftm-qr-panel__image {
-  width: min(360px, 100%);
-  height: auto;
-}
-
-@media (max-width: 640px) {
-  .ftm-published-header {
-    font-size: var(--hot-font-size-large);
-  }
-
-  .ftm-qr-panel {
-    padding: 16px;
-  }
-
-  .ftm-qr-panel__image {
-    width: min(280px, 100%);
-  }
-}
-
-.ftm-qfc-collab {
-  display: flex;
-  justify-content: center;
-  margin-top: 8px;
-  margin-bottom: 20px;
-}
-
-.ftm-qfc-collab__panel {
-  width: 100%;
-  max-width: 560px;
-  padding: 20px 24px;
-  background-color: var(--hot-color-neutral-50);
-  border: 1px solid var(--hot-color-neutral-100);
-  border-radius: var(--ftm-radius);
-}
-
-.ftm-qfc-collab__title {
-  margin: 0 0 10px;
-  color: var(--ftm-text);
-  font-size: var(--hot-font-size-large);
-}
-
-.ftm-qfc-collab__steps {
-  margin: 0 0 14px;
-  padding-left: 20px;
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-small);
-  line-height: 1.5;
-}
-
-.ftm-qfc-collab__steps li + li {
-  margin-top: 4px;
-}
-
-.ftm-qfc-collab__form {
-  display: flex;
-  gap: 8px;
-  align-items: flex-end;
-  flex-wrap: wrap;
-}
-
-.ftm-qfc-collab__input {
-  flex: 1 1 240px;
+  gap: var(--wa-space-s);
   min-width: 0;
 }
 
-.ftm-qfc-collab__loading {
-  text-align: center;
-  padding: 12px;
+.ftm-project-title h1 {
+  overflow-wrap: anywhere;
 }
 
-/* --- Loading / spinner ------------------------------------ */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.ftm-spinner {
-  width: 16px;
-  height: 16px;
-  display: inline-block;
-  vertical-align: middle;
-  animation: spin 1s linear infinite;
-}
-
-.ftm-spinner--lg {
-  width: 32px;
-  height: 32px;
-  color: var(--ftm-brand);
-}
-
-.ftm-loading {
-  display: none;
-  text-align: center;
-  padding: 20px;
-}
-
-.htmx-indicator {
-  opacity: 1;
-  transition: opacity 200ms ease-in;
-}
-
-.htmx-request .htmx-indicator {
-  opacity: 1;
-}
-
-.htmx-request.htmx-indicator {
-  opacity: 1;
-}
-
-/* --- Credentials modal ------------------------------------ */
-.ftm-modal-backdrop {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--wa-color-overlay-modal);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-}
-
-.ftm-modal-backdrop--visible {
-  display: flex;
-}
-
-.ftm-modal {
-  background: white;
-  padding: 30px;
-  border-radius: var(--ftm-radius);
-  max-width: 500px;
-  width: 90%;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.ftm-modal__title {
-  margin-top: 0;
-  margin-bottom: 20px;
-}
-
-.ftm-modal__footer {
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-  margin-top: 10px;
-}
-
-/* --- App logo -------------------------------------------- */
-.ftm-app-logo {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
-
-.ftm-app-logo--lg {
-  width: 32px;
-  height: 32px;
-}
-
-.ftm-app-logo--header .ftm-app-logo {
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-}
-
-.ftm-app-logo--initial {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  background: var(--ftm-border);
-  font-weight: 700;
-}
-
-/* --- Mapping app picker and task map ----------------------- */
-.ftm-app-option {
-  display: flex;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.ftm-app-option .ftm-app-logo {
-  width: 40px;
-  height: 40px;
-}
-
-.ftm-app-grid {
+.ftm-meta {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: var(--wa-space-m);
+  margin: 0;
 }
 
-.ftm-app-grid .ftm-radio-card {
-  align-items: flex-start;
+.ftm-meta dt {
+  color: var(--ftm-muted);
+  font-size: var(--wa-font-size-s);
 }
 
-.ftm-app-questions {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 16px;
-  padding: 12px;
-  border-radius: var(--ftm-radius);
-  background: var(--hot-color-neutral-50, #f6f8fa);
+.ftm-meta dd {
+  margin: 0;
+  font-weight: var(--wa-font-weight-semibold);
 }
 
-.ftm-app-questions fieldset {
-  border: 0;
+/* --- Setup stepper ---------------------------------------------- */
+.ftm-stepper {
+  display: flex;
   margin: 0;
   padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.ftm-stepper li {
+  position: relative;
+  flex: 1 1 0;
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wa-space-2xs);
+  color: var(--ftm-muted);
+  font-size: var(--wa-font-size-xs);
+  text-align: center;
 }
 
-.ftm-app-questions legend {
-  font-weight: 600;
-  margin-bottom: 4px;
+.ftm-stepper li::before {
+  content: counter(step);
+  counter-increment: step;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--ftm-border);
+  border-radius: 50%;
+  background: var(--wa-color-surface-default);
+  font-weight: var(--wa-font-weight-bold);
 }
 
-.ftm-task-map {
+.ftm-stepper li:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 1rem;
+  inset-inline-start: 50%;
   width: 100%;
-  height: 480px;
+  height: 2px;
+  background: var(--ftm-border);
+}
+
+.ftm-stepper .is-done::before {
+  content: "✓";
+  border-color: var(--wa-color-success-fill-loud);
+  background: var(--wa-color-success-fill-loud);
+  color: var(--wa-color-success-on-loud);
+}
+
+.ftm-stepper .is-done::after {
+  background: var(--wa-color-success-fill-loud);
+}
+
+.ftm-stepper .is-current {
+  color: var(--wa-color-text-normal);
+  font-weight: var(--wa-font-weight-semibold);
+}
+
+.ftm-stepper .is-current::before {
+  border-color: var(--wa-color-brand-fill-loud);
+  background: var(--wa-color-brand-fill-loud);
+  color: var(--wa-color-brand-on-loud);
+}
+
+/* --- Login --------------------------------------------------------- */
+.ftm-login {
+  max-width: 26rem;
+  margin: var(--wa-space-3xl) auto;
+  padding: 0 var(--wa-space-m);
+  text-align: center;
+}
+
+/* --- QR code ------------------------------------------------------ */
+.ftm-qr {
+  text-align: center;
+}
+
+.ftm-qr wa-qr-code {
+  padding: var(--wa-space-m);
   border: 1px solid var(--ftm-border);
-  border-radius: var(--ftm-radius-sm);
+  border-radius: var(--ftm-radius);
+  background: #fff;
 }
 
-/* --- Private badge ---------------------------------------- */
-.ftm-private-icon {
-  color: var(--ftm-brand);
-  margin-inline-start: 4px;
-}
-
-/* --- Link styles ----------------------------------------- */
-.ftm-link--brand {
-  color: var(--ftm-brand);
-  text-decoration: none;
-  font-weight: var(--hot-font-weight-semibold);
-}
-
-.ftm-link--brand:hover {
-  text-decoration: underline;
-}
-
-/* --- QFC Admin ------------------------------------------- */
-.ftm-qfc-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--hot-font-size-small);
-}
-
-.ftm-qfc-table th {
-  text-align: start;
-  padding: 0.625rem 0.75rem;
-  font-weight: var(--hot-font-weight-semibold);
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-x-small);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  border-bottom: 2px solid var(--ftm-border);
-}
-
-.ftm-qfc-table td {
-  padding: 0.625rem 0.75rem;
-  border-bottom: 1px solid var(--ftm-border);
-  vertical-align: middle;
-}
-
-.ftm-qfc-project-row:hover td {
-  background-color: var(--ftm-bg-muted);
+/* --- QFieldCloud admin -------------------------------------------- */
+.ftm-table-scroll {
+  overflow-x: auto;
 }
 
 .ftm-qfc-collabs-cell:empty {
@@ -1310,655 +387,9 @@ hotosm-auth {
   border: none;
 }
 
-.ftm-qfc-table--nested {
-  margin-bottom: 1rem;
-}
-
-.ftm-qfc-table--nested th {
-  border-bottom-width: 1px;
-}
-
-.ftm-qfc-collab-panel {
-  padding: 1rem;
-  background-color: var(--ftm-bg-muted);
-  border-radius: var(--ftm-radius-sm);
-}
-
-.ftm-qfc-collab-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.ftm-qfc-add-collab {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--ftm-border);
-}
-
-.ftm-qfc-add-collab-form {
-  display: flex;
-  align-items: flex-end;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-@media (max-width: 720px) {
-  .ftm-qfc-add-collab-form {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-/* ============================================================
-   Login page
-   ============================================================ */
-
-.ftm-login-page {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: calc(100dvh - 4rem);
-  padding: 2rem 1rem;
-}
-
-.ftm-login-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 420px;
-}
-
-.ftm-login-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
-  text-align: center;
-}
-
-.ftm-login-back {
-  font-size: 0.875rem;
-  color: var(--hot-color-neutral-900, #404248);
-  text-decoration: none;
-}
-
-.ftm-login-back:hover {
-  text-decoration: underline;
-}
-
-/* --- Header language selector ----------------------------- */
-.ftm-header-lang-trigger::part(base) {
-  background: white;
-  border: 0;
-  color: var(--hot-color-neutral-900, #404248);
-  box-shadow: none;
-}
-
-.ftm-header-lang-trigger:hover::part(base),
-.ftm-header-lang-trigger:focus-visible::part(base) {
-  background: white;
-}
-
-.ftm-header-lang-trigger::part(label) {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.85rem;
-  letter-spacing: 0.02em;
-}
-
-.ftm-header-lang-trigger__icon {
-  color: var(--hot-color-neutral-700, #62646a);
-  font-size: 0.7rem;
-}
-
-.ftm-header-lang-menu {
-  min-width: 12rem;
-  max-height: 70vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 6px;
-  background: white;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-}
-
-.ftm-header-lang-option {
-  display: block;
-  width: 100%;
-  padding: 8px 10px;
-  border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--hot-color-neutral-900, #404248);
-  font: inherit;
-  font-size: 0.9rem;
-  text-align: start;
-  cursor: pointer;
-}
-
-.ftm-header-lang-option:hover,
-.ftm-header-lang-option:focus-visible {
-  background: var(--hot-color-neutral-100, #e8e8e8);
-  outline: none;
-}
-
-.ftm-header-lang-option--active {
-  background: color-mix(in oklab, var(--wa-color-brand-fill-loud, #d43f3f) 12%, white);
-  font-weight: var(--hot-font-weight-semibold, 600);
-}
-
-/* ============================================================
-   Create-project chooser (/new)
-   ============================================================ */
-.ftm-chooser-intro {
-  margin: 0 0 28px;
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-medium);
-  line-height: 1.55;
-}
-
-.ftm-chooser-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-.ftm-chooser-card {
-  display: flex;
-  flex-direction: column;
-  padding: 24px;
-  background: white;
-  border: 2px solid var(--ftm-border);
-  border-radius: var(--ftm-radius);
-  text-decoration: none;
-  color: inherit;
-  cursor: pointer;
-  transition:
-    border-color 0.15s,
-    box-shadow 0.15s,
-    transform 0.15s;
-}
-
-.ftm-chooser-card-wrapper {
-  position: relative;
-  display: flex;
-}
-
-.ftm-chooser-card-wrapper > .ftm-chooser-card {
-  flex: 1;
-}
-
-.ftm-chooser-card__info {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--ftm-text-muted);
-  cursor: pointer;
-  font-size: 18px;
-}
-
-.ftm-chooser-card__info:hover,
-.ftm-chooser-card__info:focus-visible {
-  background: color-mix(in oklab, var(--ftm-brand) 12%, white);
-  color: var(--ftm-brand);
-  outline: none;
-}
-
-.ftm-chooser-info-popover {
-  max-width: 320px;
-  font-size: var(--hot-font-size-small);
-  line-height: 1.4;
-}
-
-.ftm-chooser-info-popover ul {
-  margin: 8px 0 0;
-  padding-left: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.ftm-chooser-info-popover a {
-  color: var(--ftm-brand);
-  text-decoration: underline;
-  font-weight: var(--hot-font-weight-semibold);
-}
-
-.ftm-chooser-card:hover,
-.ftm-chooser-card:focus-visible {
-  border-color: var(--ftm-brand);
-  box-shadow: 0 8px 24px color-mix(in oklab, var(--ftm-brand) 18%, transparent);
-  transform: translateY(-2px);
-  outline: none;
-}
-
-.ftm-chooser-card__head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.ftm-chooser-card__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: color-mix(in oklab, var(--ftm-brand) 14%, white);
-  color: var(--ftm-brand);
-  font-size: 22px;
-  flex-shrink: 0;
-}
-
-.ftm-chooser-card__title {
-  margin: 0;
-  font-size: var(--hot-font-size-large);
-  color: var(--ftm-text);
-  line-height: 1.2;
-}
-
-.ftm-chooser-card__tagline {
-  margin: 0 0 14px;
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-small);
-  line-height: 1.5;
-}
-
-.ftm-chooser-card__list {
-  list-style: none;
-  margin: 0 0 18px;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.ftm-chooser-card__list li {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  font-size: var(--hot-font-size-small);
-  color: var(--ftm-text);
-  line-height: 1.4;
-}
-
-.ftm-chooser-card__list li::before {
-  content: "✓";
-  color: var(--ftm-color-success);
-  font-weight: 700;
-  flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.ftm-chooser-card__list--limits li::before {
-  content: "✗";
-  color: var(--ftm-text-light);
-}
-
-.ftm-chooser-card__cta {
-  margin-top: auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 14px;
-  border-radius: var(--ftm-radius-sm);
-  background: var(--ftm-brand);
-  color: white;
-  font-weight: var(--hot-font-weight-semibold);
-  font-size: var(--hot-font-size-medium);
-}
-
-.ftm-chooser-card--secondary .ftm-chooser-card__cta {
-  background: white;
-  color: var(--ftm-brand);
-  border: 1.5px solid var(--ftm-brand);
-}
-
-.ftm-chooser-card--secondary .ftm-chooser-card__icon {
-  background: var(--ftm-bg-muted);
-  color: var(--ftm-text);
-}
-
-/* Custom-project sections - give the long form clearer rhythm */
-.ftm-custom-section {
-  padding-bottom: 20px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--ftm-border);
-}
-
-.ftm-custom-section:last-of-type {
-  border-bottom: 0;
-  margin-bottom: 0;
-}
-
-.ftm-custom-section__title {
-  margin: 0 0 4px;
-  font-size: var(--hot-font-size-medium);
-  color: var(--ftm-text);
-}
-
-.ftm-custom-section__hint {
-  margin: 0 0 14px;
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-small);
-  line-height: 1.5;
-}
-
-/* Stack icon + label + description in the field-app radio cards */
-.ftm-radio-card__text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.ftm-platform-chips {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  margin: 2px 0 4px;
-}
-
-.ftm-platform-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 1px 8px;
-  border-radius: 999px;
-  background: var(--ftm-bg-muted);
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-x-small);
-  font-weight: var(--hot-font-weight-semibold, 600);
-  line-height: 1.6;
-  white-space: nowrap;
-}
-
-.ftm-platform-chip wa-icon {
-  font-size: 11px;
-}
-
-/* ============================================================
-   Setup stepper (project_details)
-   ============================================================ */
-.ftm-stepper {
-  display: flex;
-  align-items: stretch;
-  gap: 0;
-  margin: 0 0 28px;
-  padding: 16px 12px;
-  background: var(--ftm-bg-muted);
-  border-radius: var(--ftm-radius);
-  overflow-x: auto;
-}
-
-.ftm-stepper__node {
-  flex: 1 1 0;
-  min-width: 110px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  position: relative;
-  padding: 0 8px;
-}
-
-.ftm-stepper__node:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  top: 16px;
-  inset-inline-start: 50%;
-  width: 100%;
-  height: 2px;
-  background: var(--ftm-border);
-  z-index: 0;
-}
-
-.ftm-stepper__node--complete:not(:last-child)::after {
-  background: var(--ftm-color-success);
-}
-
-.ftm-stepper__bubble {
-  position: relative;
-  z-index: 1;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  border: 2px solid var(--ftm-border);
-  color: var(--ftm-text-muted);
-  font-weight: var(--hot-font-weight-bold);
-  font-size: 0.9rem;
-  margin-bottom: 6px;
-}
-
-.ftm-stepper__node--current .ftm-stepper__bubble {
-  background: var(--ftm-brand);
-  border-color: var(--ftm-brand);
-  color: white;
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--ftm-brand) 18%, transparent);
-}
-
-.ftm-stepper__node--complete .ftm-stepper__bubble {
-  background: var(--ftm-color-success);
-  border-color: var(--ftm-color-success);
-  color: white;
-}
-
-.ftm-stepper__label {
-  font-size: var(--hot-font-size-x-small);
-  color: var(--ftm-text-muted);
-  font-weight: var(--hot-font-weight-semibold);
-  line-height: 1.25;
-  max-width: 110px;
-}
-
-.ftm-stepper__node--current .ftm-stepper__label {
-  color: var(--ftm-text);
-}
-
-.ftm-stepper__node--complete .ftm-stepper__label {
-  color: var(--ftm-color-success);
-}
-
-/* Setup-step layout helpers - keep partials free of inline styles */
-.ftm-step-intro {
-  margin: 0 0 18px;
-  color: var(--ftm-text);
-  line-height: 1.55;
-}
-
-.ftm-step-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 16px;
-}
-
-.ftm-step-field__label {
-  font-weight: var(--hot-font-weight-semibold);
-  color: var(--ftm-text);
-}
-
-.ftm-step-field__hint {
-  margin: 0;
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-x-small);
-}
-
-.ftm-step-secondary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  font-size: var(--hot-font-size-small);
-  color: var(--ftm-text-muted);
-  margin: 0 0 16px;
-}
-
-.ftm-step-secondary__divider {
-  flex: 1;
-  height: 1px;
-  background: var(--ftm-border);
-}
-
-.ftm-soft-link {
-  background: none;
-  border: 0;
-  padding: 0;
-  color: var(--ftm-brand);
-  text-decoration: underline;
-  font: inherit;
-  cursor: pointer;
-}
-
-.ftm-soft-link:hover {
-  text-decoration: none;
-}
-
-.ftm-soft-link[disabled] {
-  color: var(--ftm-text-light);
-  cursor: not-allowed;
-  text-decoration: none;
-}
-
-.ftm-step-options {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 10px 16px;
-  margin: 6px 0 0;
-}
-
-.ftm-step-option {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  cursor: pointer;
-}
-
-.ftm-step-option input[type="checkbox"] {
-  margin: 3px 0 0;
-  cursor: pointer;
-}
-
-.ftm-step-option__text {
-  display: flex;
-  flex-direction: column;
-}
-
-.ftm-step-option__title {
-  font-weight: var(--hot-font-weight-semibold);
-  color: var(--ftm-text);
-  font-size: var(--hot-font-size-small);
-}
-
-.ftm-step-option__hint {
-  color: var(--ftm-text-muted);
-  font-size: var(--hot-font-size-x-small);
-  line-height: 1.4;
-}
-
-.ftm-step-option--child {
-  margin-inline-start: 24px;
-}
-
-/* Compact completed-step summary (replaces large card once done) */
-.ftm-step--complete-compact {
-  padding: 12px 16px;
-  background: white;
-  border: 1px solid var(--ftm-color-success);
-  border-inline-start: 4px solid var(--ftm-color-success);
-  border-radius: var(--ftm-radius-sm);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.ftm-step--complete-compact .ftm-step__check {
-  font-size: 1.05rem;
-  margin: 0;
-}
-
-.ftm-step--complete-compact-title {
-  margin: 0;
-  font-size: var(--hot-font-size-small);
-  font-weight: var(--hot-font-weight-semibold);
-  color: var(--ftm-text);
-}
-
-@media (max-width: 720px) {
-  .ftm-stepper {
-    padding: 12px 6px;
-  }
-
-  .ftm-stepper__node {
-    min-width: 78px;
-  }
-
-  .ftm-stepper__label {
-    font-size: 0.7rem;
-  }
-}
-
-/* Shared site footer */
-.ftm-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 14px;
-  margin-top: 48px;
-  padding: 28px max(16px, calc((100% - 1200px) / 2));
-  background-color: var(--hot-color-primary-900, #2c3038);
-  color: rgba(255, 255, 255, 0.85);
-  line-height: 1.55;
-}
-
-.ftm-footer a {
-  color: #ffffff;
-  text-decoration: none;
-}
-
-.ftm-footer__social {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.ftm-footer__social a {
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.36);
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
-}
-
-.ftm-pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  padding: 0 1.5rem 1.5rem;
+/* The main call to action on a page: HOT red instead of the black primary. */
+wa-button.cta {
+  --wa-color-brand-fill-loud: #d73f3f;
+  --wa-color-brand-border-loud: #d73f3f;
+  --wa-color-brand-on-loud: #fff;
 }

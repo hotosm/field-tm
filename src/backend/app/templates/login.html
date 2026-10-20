@@ -1,32 +1,36 @@
 {% extends "layout.html" %} {% block title %}{{ _("Login") }} - Field Tasking Manager{% endblock %}
-{% block content %}
-<main class="ftm-login-page">
-  <div class="ftm-login-panel">
-    <h1 class="ftm-login-title">{{ _("Sign in to Field-TM") }}</h1>
+{% block content %} {# Embed the login form when this page is the login app (bundled Hanko, or a
+custom LOGIN_URL pointing back here), otherwise redirect to the external login app. #} {% set
+login_is_self = login_url in ("/login", frontend_url ~ "/login") or login_url.startswith("/login?")
+or login_url.startswith(frontend_url ~ "/login?") %}
+<div class="ftm-login wa-stack wa-gap-l">
+  <h1 class="wa-heading-xl">{{ _("Sign in to Field-TM") }}</h1>
 
-    {% if auth_enabled and auth_provider == "bundled" %}
-    <!-- Self-hosted Hanko has no separate login web app, so render the Hanko
-         login form here; hotosm-auth redirects back to return_to afterwards. -->
-    <hotosm-auth
-      hanko-url="{{ hanko_public_url }}"
-      redirect-after-login="{{ return_to or '/' }}"
-      lang="{{ current_locale() }}"
-      show-profile
-    ></hotosm-auth>
-    {% elif auth_enabled %}
-    <p>{{ _("Redirecting to the centralized login service.") }}</p>
-    <p><a href="{{ login_url }}">{{ _("Continue to login") }}</a></p>
-    <script>
-      const returnToPath = {{ (return_to or "/")|tojson }};
-      const returnTo = encodeURIComponent(window.location.origin + returnToPath);
-      const separator = "{{ login_url }}".includes("?") ? "&" : "?";
-      window.location.replace(`{{ login_url }}${separator}return_to=${returnTo}`);
-    </script>
-    {% else %}
-    <p>{{ _("Authentication is disabled on this deployment.") }}</p>
-    {% endif %}
+  {% if auth_enabled and (auth_provider == "bundled" or login_is_self) %}
+  <!-- Self-hosted Hanko login form; hotosm-auth redirects back to return_to afterwards. -->
+  <hotosm-auth
+    hanko-url="{{ hanko_public_url }}"
+    redirect-after-login="{{ return_to or '/' }}"
+    lang="{{ current_locale() }}"
+    show-profile
+  ></hotosm-auth>
+  {% elif auth_enabled %}
+  <p>{{ _("Redirecting to the centralized login service.") }}</p>
+  <wa-button class="cta" href="{{ login_url }}" variant="brand"
+    >{{ _("Continue to login") }}</wa-button
+  >
+  <script>
+    const returnToPath = {{ (return_to or "/")|tojson }};
+    const returnTo = encodeURIComponent(window.location.origin + returnToPath);
+    const separator = "{{ login_url }}".includes("?") ? "&" : "?";
+    window.location.replace(`{{ login_url }}${separator}return_to=${returnTo}`);
+  </script>
+  {% else %}
+  <wa-callout variant="neutral"
+    >{{ _("Authentication is disabled on this deployment.") }}</wa-callout
+  >
+  {% endif %}
 
-    <a href="/" class="ftm-login-back">← {{ _("Back to home") }}</a>
-  </div>
-</main>
+  <a href="/">← {{ _("Back to home") }}</a>
+</div>
 {% endblock %}

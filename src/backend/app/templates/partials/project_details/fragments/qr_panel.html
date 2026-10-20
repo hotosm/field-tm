@@ -1,47 +1,53 @@
-<div class="ftm-qr-panel">
-  <h3 class="ftm-qr-panel__title">{{ _("Scan QR Code") }}</h3>
-  <p class="ftm-qr-panel__description">
-    {{ _("Use %(app_name)s to scan this QR code and load the project.") % {"app_name": app_name} }}
-  </p>
-  <div class="ftm-qr-panel__image-wrap">
-    <img
-      src="{{ qr_code_data_url }}"
-      alt="{{ _('Project QR Code') }}"
-      class="ftm-qr-panel__image"
-    />
-  </div>
-  <div>
+<wa-card class="ftm-qr">
+  <div class="wa-stack wa-align-items-center">
+    <h3 class="ftm-section-title">{{ _("Scan QR Code") }}</h3>
+    <p class="ftm-hint">
+      {{ _("Use %(app_name)s to scan this QR code and load the project.") % {"app_name": app_name}
+      }}
+    </p>
+    <wa-qr-code
+      value="{{ qr_data }}"
+      label="{{ _('Project QR Code') }}"
+      size="240"
+      error-correction="M"
+    ></wa-qr-code>
+    <div class="wa-cluster wa-justify-content-center wa-gap-s">
+      {% if open_app_url %}
+      <wa-button class="cta" href="{{ open_app_url }}" variant="brand">
+        {{ _("Open in %(app_name)s") % {"app_name": app_name} }}
+      </wa-button>
+      {% endif %}
+      <wa-button
+        variant="neutral"
+        appearance="outlined"
+        data-filename="{{ qr_download_name }}.png"
+        onclick="
+          const a = document.createElement('a');
+          a.href = this.closest('.ftm-qr')
+            .querySelector('wa-qr-code')
+            .shadowRoot.querySelector('canvas')
+            .toDataURL();
+          a.download = this.dataset.filename;
+          a.click();
+        "
+      >
+        <wa-icon slot="start" name="download"></wa-icon>
+        {{ _("Download QR Code") }}
+      </wa-button>
+    </div>
     {% if open_app_url %}
-    <wa-button href="{{ open_app_url }}" variant="brand">
-      {{ _("Open in %(app_name)s") % {"app_name": app_name} }}
-    </wa-button>
-    <p style="margin: 6px 0 12px 0; font-size: 0.8em; color: #666">
+    <p class="ftm-hint">
       {{ _("If %(app_name)s is installed on this device.") % {"app_name": app_name} }}
     </p>
+    {% endif %} {% if mapper_username and mapper_password %}
+    <div class="ftm-panel ftm-panel--quiet wa-stack wa-gap-2xs">
+      <strong>{{ _("Mapper Login (QFieldCloud)") }}</strong>
+      <span>{{ _("Username:") }} <code>{{ mapper_username }}</code></span>
+      <span>{{ _("Password:") }} <code>{{ mapper_password }}</code></span>
+      <span class="ftm-hint"
+        >{{ _("Scan the QR code, then enter these credentials in QField.") }}</span
+      >
+    </div>
     {% endif %}
-    <wa-button
-      href="{{ qr_code_data_url }}"
-      download="{{ qr_download_name }}.png"
-      variant="default"
-    >
-      {{ _("Download QR Code") }}
-    </wa-button>
   </div>
-  {% if mapper_username and mapper_password %}
-  <div
-    class="ftm-qr-panel__mapper-creds"
-    style="margin-top: 16px; padding: 12px 16px; background: #f5f5f5; border-radius: 8px"
-  >
-    <h4 style="margin: 0 0 8px 0; font-size: 0.95em">{{ _("Mapper Login (QFieldCloud)") }}</h4>
-    <p style="margin: 0; font-size: 0.9em">
-      <strong>{{ _("Username:") }}</strong> <code>{{ mapper_username }}</code>
-    </p>
-    <p style="margin: 4px 0 0 0; font-size: 0.9em">
-      <strong>{{ _("Password:") }}</strong> <code>{{ mapper_password }}</code>
-    </p>
-    <p style="margin: 8px 0 0 0; font-size: 0.8em; color: #666">
-      {{ _("Scan the QR code, then enter these credentials in QField.") }}
-    </p>
-  </div>
-  {% endif %}
-</div>
+</wa-card>

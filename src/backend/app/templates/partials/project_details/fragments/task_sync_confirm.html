@@ -1,0 +1,40 @@
+{# Re-sync warning. Changed task areas need an explicit "I understand". #} {% set odk =
+project.field_mapping_app == 'ODK' %}
+<form
+  class="wa-stack"
+  hx-post="/projects/{{ project.id }}/task-plan/sync"
+  hx-target="#tasks-status"
+>
+  {% if geometry_changed %}
+  <wa-callout variant="danger">
+    <strong>{{ _("Task areas have changed since the last sync.") }}</strong>
+    <p>
+      {% if odk %} {{ _("The task entities in ODK Central will be replaced and every task status
+      reset to ready. Mapping progress in ODK Collect will be lost. Submissions are kept in ODK
+      Central.") }} {% else %} {{ _("The task layer of the QField project will be regenerated and
+      re-uploaded to QFieldCloud. Task status and assignments set in QField will be lost. Mappers
+      must sync or re-download the project, and unsynced local task edits may be lost. Survey data
+      already synced to QFieldCloud is kept.") }} {% endif %}
+    </p>
+    <p>{{ _("Use with caution, after coordinating with your field mappers.") }}</p>
+    <label>
+      <input type="checkbox" name="reset" value="1" required />
+      {{ _("I understand that task progress in the app will be reset.") }}
+    </label>
+  </wa-callout>
+  {% else %}
+  <wa-callout variant="warning">
+    {{ _("This will overwrite any assignment updates made by mappers in the app. Use with caution
+    after coordinating with your field mappers.") }} {% if not odk %} {{ _("Mappers must sync the
+    QField project to get the changes.") }} {% endif %}
+  </wa-callout>
+  {% endif %}
+  <div class="wa-cluster wa-gap-s">
+    <wa-button type="submit" variant="{{ 'danger' if geometry_changed else 'brand' }}">
+      {{ _("Re-sync tasks to %(app)s") % {"app": "ODK" if odk else "QField"} }}
+    </wa-button>
+    <wa-button variant="neutral" appearance="outlined" onclick="this.closest('form').remove()">
+      {{ _("Cancel") }}
+    </wa-button>
+  </div>
+</form>

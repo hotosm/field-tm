@@ -3,7 +3,7 @@ extra_head %}
 <style>
   .landing-page {
     --landing-shell-width: min(1150px, 92vw);
-    --landing-brand-red: var(--hot-color-primary-600);
+    --landing-brand-red: var(--hot-color-red-600);
     --landing-navy: var(--hot-color-blue-900);
     --landing-surface: var(--hot-color-neutral-50);
     --landing-text: var(--hot-color-blue-900);
@@ -180,8 +180,8 @@ extra_head %}
   }
 
   .landing-feature-card {
-    background: linear-gradient(165deg, var(--hot-color-primary-50) 0%, white 100%);
-    border: 1px solid var(--hot-color-primary-100);
+    background: linear-gradient(165deg, var(--hot-color-red-50) 0%, white 100%);
+    border: 1px solid var(--hot-color-red-100);
     border-radius: 18px;
     padding: 24px 22px;
     box-shadow: 0 10px 24px rgba(214, 63, 63, 0.11);
@@ -189,7 +189,7 @@ extra_head %}
 
   .landing-feature-card h3 {
     margin: 0 0 9px 0;
-    color: var(--hot-color-primary-800);
+    color: var(--hot-color-red-800);
     font-size: var(--hot-font-size-medium);
   }
 
@@ -225,8 +225,8 @@ extra_head %}
   }
 
   .landing-user-role--manager {
-    background-color: var(--hot-color-primary-50);
-    color: var(--hot-color-primary-800);
+    background-color: var(--hot-color-red-50);
+    color: var(--hot-color-red-800);
   }
 
   .landing-user-role--mapper {
@@ -427,7 +427,7 @@ extra_head %}
   }
 </style>
 {% endblock %} {% block content %}
-<main class="landing-page">
+<div class="landing-page">
   <section class="landing-hero">
     <div class="landing-shell landing-hero-content">
       <p class="landing-eyebrow">{{ _("Coordinate field campaigns") }}</p>
@@ -436,8 +436,14 @@ extra_head %}
         {{ _("Enhancing field mapping efficiency and accuracy through seamless coordination.") }}
       </p>
       <div class="landing-hero-actions">
-        <wa-button href="/projects" variant="brand" size="l">{{ _("Explore Projects") }}</wa-button>
-        <wa-button href="{{ create_project_href or '/new' }}" variant="default" size="l"
+        <wa-button class="cta" href="/projects" variant="brand" size="l"
+          >{{ _("Explore Projects") }}</wa-button
+        >
+        <wa-button
+          href="{{ create_project_href or '/new' }}"
+          variant="neutral"
+          appearance="filled"
+          size="l"
           >{{ _("Create Project") }}</wa-button
         >
       </div>
@@ -611,5 +617,5 @@ extra_head %}
       </a>
     </div>
   </section>
-</main>
+</div>
 {% endblock %}

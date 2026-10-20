@@ -7,7 +7,6 @@ export function initProjectSetupFinalizeCredentials({
   credentialsModal,
   credentialsForm,
   credentialsError,
-  credentialsModalTitle,
   odkCredentialsFields,
   qfieldCredentialsFields,
   cancelCredsBtn,
@@ -57,7 +56,7 @@ export function initProjectSetupFinalizeCredentials({
   }
 
   function resetModal() {
-    if (credentialsModal) credentialsModal.classList.remove("ftm-modal-backdrop--visible");
+    if (credentialsModal) credentialsModal.open = false;
     if (credentialsForm) credentialsForm.reset();
     if (credentialsError) credentialsError.innerHTML = "";
     customCreds = null;
@@ -70,29 +69,28 @@ export function initProjectSetupFinalizeCredentials({
 
       if (!isOdk && !isQField) {
         showError(i18nStrings.projectTypeNotSet, "warning");
-        credentialsModal.classList.add("ftm-modal-backdrop--visible");
+        credentialsModal.open = true;
         return;
       }
 
       if (isOdk) {
-        credentialsModalTitle.textContent = i18nStrings.customOdkCredentials;
-        if (odkCredentialsFields) odkCredentialsFields.style.display = "block";
-        if (qfieldCredentialsFields) qfieldCredentialsFields.style.display = "none";
+        credentialsModal.label = i18nStrings.customOdkCredentials;
+        odkCredentialsFields.hidden = false;
+        qfieldCredentialsFields.hidden = true;
       } else if (isQField) {
-        credentialsModalTitle.textContent = i18nStrings.customQFieldCredentials;
-        if (odkCredentialsFields) odkCredentialsFields.style.display = "none";
-        if (qfieldCredentialsFields) qfieldCredentialsFields.style.display = "block";
+        credentialsModal.label = i18nStrings.customQFieldCredentials;
+        odkCredentialsFields.hidden = true;
+        qfieldCredentialsFields.hidden = false;
         updateQFieldUrlVisibility();
       }
 
-      credentialsModal.classList.add("ftm-modal-backdrop--visible");
+      credentialsModal.open = true;
     });
   }
 
   function updateQFieldUrlVisibility() {
-    const urlRow = document.getElementById("qfield-url-row");
-    if (!urlRow) return;
-    urlRow.style.display = getQFieldMode() === "custom" ? "block" : "none";
+    const urlInput = document.getElementById("qfield-url-input");
+    if (urlInput) urlInput.hidden = getQFieldMode() !== "custom";
   }
 
   if (isQField) {
@@ -105,14 +103,6 @@ export function initProjectSetupFinalizeCredentials({
         if (credentialsError) credentialsError.innerHTML = "";
       });
     }
-  }
-
-  if (credentialsModal) {
-    credentialsModal.addEventListener("click", function (e) {
-      if (e.target === credentialsModal) {
-        resetModal();
-      }
-    });
   }
 
   if (cancelCredsBtn) {
@@ -129,8 +119,7 @@ export function initProjectSetupFinalizeCredentials({
       }
 
       try {
-        testCredsBtn.disabled = true;
-        testCredsBtn.textContent = i18nStrings.testing;
+        testCredsBtn.loading = true;
         showError(i18nStrings.testingCredentials, "info");
 
         let response;
@@ -173,25 +162,23 @@ export function initProjectSetupFinalizeCredentials({
         );
         customCreds = null;
       } finally {
-        testCredsBtn.disabled = false;
-        testCredsBtn.textContent = i18nStrings.testCredentials;
+        testCredsBtn.loading = false;
       }
     });
   }
 
-  if (saveCredsBtn && credentialsForm) {
-    credentialsForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      if (!customCreds) {
-        showError(i18nStrings.pleaseTestCredentialsFirst, "warning");
-        return;
-      }
-
-      credentialsModal.classList.remove("ftm-modal-backdrop--visible");
-      showFinaliseConfirmDialog();
-    });
+  function saveCredentials(e) {
+    e.preventDefault();
+    if (!customCreds) {
+      showError(i18nStrings.pleaseTestCredentialsFirst, "warning");
+      return;
+    }
+    credentialsModal.open = false;
+    showFinaliseConfirmDialog();
   }
+
+  if (saveCredsBtn) saveCredsBtn.addEventListener("click", saveCredentials);
+  if (credentialsForm) credentialsForm.addEventListener("submit", saveCredentials);
 
   return {
     getCustomCreds() {

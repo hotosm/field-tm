@@ -1,8 +1,9 @@
 <!doctype html>
+<!-- wa-cloak hides the page until every custom element is defined (2s max) -->
 <html
-  lang="{{ current_locale() }}"
+  lang="{{ current_locale()|replace('_', '-') }}"
   dir="{{ current_dir() }}"
-  class="hot-theme-light wa-theme-default wa-palette-hotosm"
+  class="hot-theme-light wa-theme-default wa-palette-hotosm wa-cloak"
 >
   <head>
     <title>{% block title %}Field Tasking Manager{% endblock %}</title>
@@ -15,9 +16,8 @@
     <meta name="author" content="Humanitarian OpenStreetMap Team" />
     <meta name="format-detection" content="telephone=no, email=no, address=no" />
     <meta name="viewport" content="initial-scale=1, width=device-width" />
-    <meta name="theme-color" content="#d63f3f" />
+    <meta name="theme-color" content="#d73f3f" />
 
-    <!-- Resource hints to reduce first-paint theme/font flash -->
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
     <link rel="preconnect" href="https://unpkg.com" crossorigin />
 
@@ -25,47 +25,26 @@
     <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
 
-    <!-- Critical tokens inlined so the page looks correct before any CDN CSS arrives. -->
-    <!-- Also hides undefined web-component elements until they upgrade (avoids FOUC  -->
-    <!-- without blanking the whole page - each element pops in individually).        -->
+    <!-- HOT UI: WebAwesome base styles, HOT theme and fonts, self-contained -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hotosm/ui@3.0.0/dist/style.css" />
+
+    <!-- Stops hanko-auth injecting hot.css@latest and Archivo over the theme. -->
+    <style id="hot-design-system"></style>
+    <style id="google-font-archivo"></style>
+    <!-- Critical tokens for first paint. Primary buttons are black (ui-design);
+         the page's main call to action uses class="cta" for HOT red. -->
     <style>
       :root {
-        /* HOT brand red - set before theme CSS loads so buttons never flash blue/grey */
-        --wa-color-brand-fill-loud: #d43f3f;
-        --wa-color-brand-border-loud: #ed5c5e;
-        --wa-color-brand-on-loud: #ffffff;
-        /* Core neutrals so body text and backgrounds look right immediately */
-        --hot-color-neutral-900: #404248;
-        --hot-color-neutral-50: #f3f3f3;
-        --hot-color-neutral-100: #e8e8e8;
-      }
-
-      /* Hide only web-component elements until they are defined/upgraded.
-         visibility:hidden (not display:none) preserves layout so the page
-         doesn't jump as each component registers. */
-      wa-button:not(:defined),
-      wa-card:not(:defined),
-      wa-badge:not(:defined),
-      wa-callout:not(:defined),
-      wa-input:not(:defined),
-      wa-textarea:not(:defined),
-      wa-option:not(:defined),
-      wa-select:not(:defined),
-      wa-tag:not(:defined),
-      wa-dialog:not(:defined),
-      hot-header:not(:defined),
-      hot-announcement:not(:defined),
-      hotosm-auth:not(:defined) {
-        visibility: hidden;
+        --wa-color-brand-fill-loud: #000;
+        --wa-color-brand-border-loud: #000;
+        --wa-color-brand-on-loud: #fff;
+        --hot-color-neutral-900: #182642;
+        --hot-color-neutral-50: #e6e9ee;
       }
     </style>
 
-    <!-- HOT UI theme, self-contained (fonts loaded separately above) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.1.0/dist/style.css" />
-
-    <!-- webawesome-all.js is a barrel of bare `@awesome.me/webawesome/...` imports, so the
-         browser needs this map to resolve them. dist-cdn is the pre-bundled build; the pin
-         must match the @awesome.me/webawesome version @hotosm/ui 1.0.1 was built against. -->
+    <!-- webawesome-all.js imports bare `@awesome.me/webawesome/...` specifiers; the pin
+         must match the WebAwesome version @hotosm/ui was built against. -->
     <script type="importmap">
       {
         "imports": {
@@ -74,23 +53,22 @@
       }
     </script>
 
-    <!-- HOT UI components: raw dist files, NOT jsDelivr's /+esm (it duplicates wa-*
-         registrations and most elements never register). -->
+    <!-- Raw dist files, NOT jsDelivr's /+esm (it duplicates wa-* registrations). -->
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.1.0/dist/webawesome-all.js"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@3.0.0/dist/webawesome-all.js"
     />
     <link
       rel="modulepreload"
-      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.1.0/dist/hotosm-ui.js"
+      href="https://cdn.jsdelivr.net/npm/@hotosm/ui@3.0.0/dist/hotosm-ui.js"
     />
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.1.0/dist/webawesome-all.js"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@3.0.0/dist/webawesome-all.js"
     ></script>
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@2.1.0/dist/hotosm-ui.js"
+      src="https://cdn.jsdelivr.net/npm/@hotosm/ui@3.0.0/dist/hotosm-ui.js"
     ></script>
     {% if auth_enabled %}
     <link
@@ -103,11 +81,9 @@
     ></script>
     {% endif %}
 
-    <!-- App styles -->
     <link rel="stylesheet" href="/static/css/app.css" />
 
-    <!-- HTMX -->
-    <!-- Config required to swap 4xx server responses, so error messages are displayed in UI -->
+    <!-- Swap 4xx/5xx responses too, so error callouts are shown in the UI. -->
     <meta
       name="htmx-config"
       content='{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"[45]..","swap":true,"error":true}]}'
@@ -120,59 +96,73 @@
   <body>
     <hot-announcement src="https://d33erh71igmru9.cloudfront.net/field-tm.json"></hot-announcement>
 
-    <hot-header id="app-header" title="FieldTM" size="m">
-      <wa-dropdown slot="lang">
-        <wa-button slot="trigger" variant="text" class="ftm-header-lang-trigger">
-          {{ locale_labels.get(current_locale(), current_locale().upper()) }}
-          <wa-icon
-            name="chevron-down"
-            class="ftm-header-lang-trigger__icon"
-            aria-hidden="true"
-          ></wa-icon>
-        </wa-button>
-        <div class="ftm-header-lang-menu">
-          {% for locale_code in supported_locales %}
-          <button
-            type="button"
-            class="ftm-header-lang-option{% if current_locale() == locale_code %} ftm-header-lang-option--active{% endif %}"
-            data-locale-switch="{{ locale_code }}"
-          >
-            {{ locale_labels.get(locale_code, locale_code.upper()) }}
-          </button>
-          {% endfor %}
-        </div>
-      </wa-dropdown>
-      {% if auth_enabled %}
-      <!-- Shared Hanko web component: renders the login button when logged out
-           (redirects to the central login page) and the user profile dropdown
-           with logout when logged in. Same pattern as the other HOT apps. -->
-      <hotosm-auth
-        slot="auth"
-        hanko-url="{{ hanko_public_url }}"
-        login-url="{{ login_url }}"
-        lang="{{ current_locale() }}"
-        button-variant="filled"
-        button-color="danger"
-      ></hotosm-auth>
-      {% endif %}
+    {% macro lang_menu(slot) %}
+    <wa-dropdown slot="{{ slot }}" class="ftm-header-lang-menu">
+      <wa-button slot="trigger" appearance="plain" size="small" with-caret>
+        {{ locale_labels.get(current_locale(), current_locale().upper()) }}
+      </wa-button>
+      {% for locale_code in supported_locales %}
+      <wa-dropdown-item
+        type="checkbox"
+        data-locale-switch="{{ locale_code }}"
+        {{ "checked" if current_locale() == locale_code }}
+        >{{ locale_labels.get(locale_code, locale_code.upper()) }}</wa-dropdown-item
+      >
+      {% endfor %}
+    </wa-dropdown>
+    {% endmacro %} {% macro auth_button(display="default") %} {% if auth_enabled %}
+    <!-- Shared Hanko component: login button (to login_url) or profile menu. -->
+    <hotosm-auth
+      hanko-url="{{ hanko_public_url }}"
+      login-url="{{ login_url }}"
+      lang="{{ current_locale() }}"
+      button-variant="filled"
+      button-color="danger"
+      display="{{ display }}"
+    ></hotosm-auth>
+    {% endif %} {% endmacro %}
+
+    <hot-header
+      id="app-header"
+      title="Field-TM"
+      logo="/static/images/field-tm-logo.svg"
+      size="s"
+    >
+      {{ lang_menu("lang") }}
+      <div slot="auth" class="ftm-header-controls">
+        <hot-tool-menu></hot-tool-menu>
+        {{ auth_button() }}
+      </div>
+      {{ lang_menu("drawer-lang") }}
+      <div slot="drawer-auth" class="ftm-header-controls">
+        <hot-tool-menu></hot-tool-menu>
+        {{ auth_button("bar") }}
+      </div>
     </hot-header>
 
-    <hot-tracking
-      style="position: fixed; bottom: 0"
-      site-id="28"
-      domain="field.hotosm.org"
-    ></hot-tracking>
+    <hot-tracking site-id="28" domain="field.hotosm.org"></hot-tracking>
 
-    {% block content %}{% endblock %}
+    <main class="ftm-main">{% block content %}{% endblock %}</main>
+
+    <wa-dialog id="ftm-confirm" label="{{ _('Please confirm') }}">
+      <p></p>
+      <wa-button slot="footer" variant="neutral" appearance="outlined" data-dialog="close"
+        >{{ _("Cancel") }}</wa-button
+      >
+      <wa-button slot="footer" variant="brand" data-confirm>{{ _("Confirm") }}</wa-button>
+    </wa-dialog>
 
     <footer class="ftm-footer">
-      <div class="ftm-footer__help">
+      <div>
         {{ _("Need help or have a request?") }}
         <a href="https://roadmap.hotosm.org/#tech-request" target="_blank" rel="noopener"
           >{{ _("Submit a tech request") }}</a
         >
       </div>
-      <div class="ftm-footer__social">
+      <nav class="ftm-footer__social">
+        <a href="https://docs.field.hotosm.org" target="_blank" rel="noopener">{{ _("Docs") }}</a>
+        <a href="/qfc-admin">{{ _("QFieldCloud admin") }}</a>
+        <a href="https://github.com/hotosm/field-tm" target="_blank" rel="noopener">GitHub</a>
         <a href="https://bsky.app/profile/hotosm.org" target="_blank" rel="noopener">Bluesky</a>
         <a
           href="https://www.linkedin.com/company/humanitarian-openstreetmap-team"
@@ -180,11 +170,7 @@
           rel="noopener"
           >LinkedIn</a
         >
-        <a href="https://www.facebook.com/hotosm" target="_blank" rel="noopener">Facebook</a>
-        <a href="https://www.instagram.com/_hotosm/" target="_blank" rel="noopener">Instagram</a>
-        <a href="https://www.youtube.com/user/hotosm" target="_blank" rel="noopener">YouTube</a>
-        <a href="https://github.com/hotosm/field-tm" target="_blank" rel="noopener">GitHub</a>
-      </div>
+      </nav>
     </footer>
 
     <script>
@@ -197,9 +183,22 @@
         window.history.replaceState({}, "", cleanUrl.toString());
       }
 
-      document.querySelectorAll("[data-locale-switch]").forEach((item) => {
-        item.addEventListener("click", () => {
-          const nextLocale = item.dataset.localeSwitch;
+      // hx-confirm questions open a wa-dialog instead of window.confirm().
+      document.addEventListener("htmx:confirm", (event) => {
+        if (!event.detail.question) return;
+        event.preventDefault();
+        const dialog = document.getElementById("ftm-confirm");
+        dialog.querySelector("p").textContent = event.detail.question;
+        dialog.querySelector("[data-confirm]").onclick = () => {
+          dialog.open = false;
+          event.detail.issueRequest(true);
+        };
+        dialog.open = true;
+      });
+
+      document.querySelectorAll(".ftm-header-lang-menu").forEach((menu) => {
+        menu.addEventListener("wa-select", (event) => {
+          const nextLocale = event.detail.item.dataset.localeSwitch;
           const nextUrl = new URL(window.location.href);
           nextUrl.searchParams.set("lang", nextLocale);
           window.location.assign(nextUrl.toString());
@@ -275,34 +274,21 @@
       }
       {% endif %}
 
-      // hot-header tabs must be set as a JS property (not an HTML attribute)
-      // because tab objects contain clickEvent functions that can't be serialised.
+      // Tabs hold functions, so they are set as a JS property. Same-origin hrefs
+      // let the header highlight the current tab.
       const appHeader = document.getElementById("app-header");
-      if (appHeader) {
-        appHeader.tabs = [
-          {
-            label: {{ _("Projects")|tojson }},
-            href: "/projects",
-            clickEvent: () => {
-              window.location.href = "/projects";
-            },
-          },
-          {
-            label: {{ _("Create Project")|tojson }},
-            href: "/new",
-            clickEvent: () => {
-              window.location.href = "/new";
-            },
-          },
-          {
-            label: {{ _("QField Admin")|tojson }},
-            href: "/qfc-admin",
-            clickEvent: () => {
-              window.location.href = "/qfc-admin";
-            },
-          },
-        ];
-      }
+      const go = (href) => () => window.location.assign(href);
+      const open = (href) => () => window.open(href, "_blank", "noopener");
+      appHeader.tabs = [
+        { label: {{ _("Projects")|tojson }}, href: "/projects", clickEvent: go("/projects") },
+        { label: {{ _("Create project")|tojson }}, href: "/new", clickEvent: go("/new") },
+        { label: {{ _("Task planner")|tojson }}, href: "/planner/", clickEvent: go("/planner/") },
+        { label: {{ _("Docs")|tojson }}, clickEvent: open("https://docs.field.hotosm.org") },
+        {
+          label: {{ _("Report a bug")|tojson }},
+          clickEvent: open("https://roadmap.hotosm.org/#tech-request"),
+        },
+      ];
     </script>
   </body>
 </html>

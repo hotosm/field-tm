@@ -67,7 +67,7 @@
     clearContainer(container);
 
     const info = document.createElement("small");
-    info.style.color = "#666";
+    info.className = "ftm-hint";
     info.textContent = `${areaLabel}: ${areaKm2Text} km²`;
     container.appendChild(info);
   }
@@ -478,14 +478,6 @@
       setMapError("");
     }
   });
-
-  const aoiAdvancedConfigToggle = document.getElementById("aoi-advanced-config-toggle");
-  const aoiAdvancedConfigPanel = document.getElementById("aoi-advanced-config-panel");
-  if (aoiAdvancedConfigToggle && aoiAdvancedConfigPanel) {
-    aoiAdvancedConfigToggle.addEventListener("click", () => {
-      aoiAdvancedConfigPanel.classList.toggle("ftm-advanced-config--hidden");
-    });
-  }
 
   document.body.addEventListener("missingOutline", function (event) {
     let errorMsg = "";

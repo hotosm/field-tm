@@ -1,326 +1,189 @@
 {% extends "layout.html" %} {% block title %} {% if project %}{{ project.project_name }} - {% endif
 %}Field Tasking Manager {% endblock %} {% block content %}
-<div class="ftm-page ftm-page--wide">
-  <div style="margin-bottom: 20px">
-    <wa-button href="/projects" variant="default" style="margin-bottom: 20px">
-      ← {{ _("Back to Projects") }}
+<div class="ftm-page wa-stack wa-gap-l">
+  <a href="/projects" class="ftm-hint">← {{ _("Back to Projects") }}</a>
+
+  {% if project %} {% set status_value = project.status.value if project.status and
+  project.status.value else (project.status if project.status is string else 'DRAFT') %} {% set
+  field_mapping_app_value = ( project.field_mapping_app.value if project.field_mapping_app and
+  (project.field_mapping_app is not string) and project.field_mapping_app.value else
+  (project.field_mapping_app if project.field_mapping_app else none) ) %} {% set
+  field_mapping_app_upper = field_mapping_app_value.upper() if field_mapping_app_value else none %}
+  {% set app = mapping_app(project.field_mapping_app) %} {% set has_xlsform =
+  project.xlsform_content is not none and project.xlsform_content %} {% set can_export = is_manager
+  and field_mapping_app_upper == 'QFIELD' and project.external_project_id %}
+  <div class="wa-split wa-gap-m">
+    <div class="ftm-project-title">
+      {% if app %}
+      <span class="ftm-app-logo--lg" title="{{ app.name }}"
+        >{% include "partials/app_logo.html" %}</span
+      >
+      {% endif %}
+      <h1>{{ project.project_name or _('Unnamed Project') }}</h1>
+      <wa-badge
+        variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value in ('PUBLISHED', 'COMPLETED') %}success{% else %}danger{% endif %}"
+        appearance="outlined"
+        >{{ status_value }}</wa-badge
+      >
+    </div>
+    {% if can_export %}
+    <wa-button
+      id="ftm-export-geojson-link"
+      variant="neutral"
+      appearance="outlined"
+      title="{{ _('Trigger a fresh QFieldCloud package and download the project data as a single GeoJSON file.') }}"
+      onclick="window.exportProjectGeoJSON({{ project.id }})"
+    >
+      <wa-icon slot="start" name="download"></wa-icon>
+      {{ _("Export Data") }}
     </wa-button>
+    {% endif %}
   </div>
 
-  {% if project %}
+  {% if project.creation_status == 'in_progress' %}
+  <wa-callout variant="brand">
+    {{ _("This project is still being created. Refresh the page in a minute or two.") }}
+  </wa-callout>
+  {% elif project.creation_status == 'failed' %}
+  <wa-callout variant="danger">
+    <strong>{{ _("Project creation failed.") }}</strong>
+    <div>{{ project.creation_error or _("An unexpected error occurred.") }}</div>
+    <div>{{ _("Create the project again, or contact an admin if this keeps happening.") }}</div>
+  </wa-callout>
+  {% endif %} {% if can_export %}
+  <wa-callout id="ftm-export-geojson-status" role="status" aria-live="polite" hidden>
+    <wa-spinner slot="icon"></wa-spinner>
+    <span id="ftm-export-geojson-message"></span>
+  </wa-callout>
+  <script>
+    (function () {
+      const I18N = {
+        packaging: {{ _("Packaging project on QFieldCloud - this may take a minute, please be patient...")|tojson }},
+        downloadStarted: {{ _("✓ Download started.")|tojson }},
+        failed: {{ _("Export failed:")|tojson }},
+        networkError: {{ _("Network error while exporting. Please try again.")|tojson }},
+      };
+      const statusEl = document.getElementById("ftm-export-geojson-status");
+      const messageEl = document.getElementById("ftm-export-geojson-message");
+      const linkEl = document.getElementById("ftm-export-geojson-link");
+      function show(variant, message, busy) {
+        statusEl.hidden = false;
+        statusEl.variant = variant;
+        statusEl.querySelector("wa-spinner").hidden = !busy;
+        messageEl.textContent = message;
+      }
+      window.exportProjectGeoJSON = async function (projectId) {
+        linkEl.loading = true;
+        show("neutral", I18N.packaging, true);
+        try {
+          const resp = await fetch(`/projects/${projectId}/export/geojson`, {
+            credentials: "same-origin",
+            headers: { Accept: "application/geo+json" },
+          });
+          if (!resp.ok) {
+            const tmp = document.createElement("div");
+            tmp.innerHTML = await resp.text();
+            const detail = (tmp.textContent || "").trim() || resp.statusText;
+            show("danger", `${I18N.failed} ${detail}`, false);
+            return;
+          }
+          const blob = await resp.blob();
+          let filename = `project-${projectId}_export.geojson`;
+          const disposition = resp.headers.get("Content-Disposition") || "";
+          const match = disposition.match(/filename="?([^";]+)"?/i);
+          if (match) filename = match[1];
+          const objUrl = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = objUrl;
+          a.download = filename;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(objUrl), 1000);
+          show("success", I18N.downloadStarted, false);
+          setTimeout(() => (statusEl.hidden = true), 4000);
+        } catch (err) {
+          show("danger", `${I18N.networkError} (${err && err.message ? err.message : err})`, false);
+        } finally {
+          linkEl.loading = false;
+        }
+      };
+    })();
+  </script>
+  {% endif %} {% if status_value == 'PUBLISHED' %} {% include
+  "partials/project_details/setup_steps.html" %} {% endif %}
+
   <wa-card>
-    <div slot="header" class="ftm-flex-between">
-      {% set status_value = project.status.value if project.status and project.status.value else
-      (project.status if project.status is string else 'DRAFT') %} {% set field_mapping_app_value =
-      ( project.field_mapping_app.value if project.field_mapping_app and (project.field_mapping_app
-      is not string) and project.field_mapping_app.value else (project.field_mapping_app if
-      project.field_mapping_app else none) ) %} {% set field_mapping_app_upper =
-      field_mapping_app_value.upper() if field_mapping_app_value else none %} {% set app =
-      mapping_app(project.field_mapping_app) %} {% set has_xlsform = project.xlsform_content is not
-      none and project.xlsform_content %} {% set has_data_extract = project.data_extract_geojson is
-      not none and project.data_extract_geojson %} {% set is_empty_data_extract =
-      project.data_extract_geojson == {} %} {% set has_task_areas = project.task_areas_geojson is
-      not none %} {% set is_no_splitting = project.task_areas_geojson == {} %}
-      <div class="ftm-project-title-wrap">
-        {% if app %}
-        <span class="ftm-app-logo--header" title="{{ app.name }}"
-          >{% include "partials/app_logo.html" %}</span
-        >
-        {% endif %}
-        <h1 style="margin: 0">{{ project.project_name or _('Unnamed Project') }}</h1>
-        <wa-badge
-          variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'PUBLISHED' %}info{% elif status_value == 'COMPLETED' %}success{% else %}error{% endif %}"
-        >
-          {{ status_value }}
-        </wa-badge>
-      </div>
-      {% if is_manager and field_mapping_app_upper == 'QFIELD' and project.external_project_id %}
-      <wa-button
-        id="ftm-export-geojson-link"
-        variant="brand"
-        size="s"
-        title="{{ _('Trigger a fresh QFieldCloud package and download the project data as a single GeoJSON file.') }}"
-        onclick="window.exportProjectGeoJSON && window.exportProjectGeoJSON({{ project.id }});"
-      >
-        ↓ {{ _("Export Data") }}
-      </wa-button>
+    <div class="wa-stack">
+      {% if project.location_str %}
+      <p class="ftm-hint">📍 {{ project.location_str }}</p>
+      {% endif %} {% if project.description %}
+      <p class="ftm-lead">{{ project.description }}</p>
       {% endif %}
-    </div>
-
-    <div style="padding: 20px">
-      {% if project.creation_status == 'in_progress' %}
-      <wa-callout variant="brand" style="margin-bottom: 16px">
-        <span
-          >{{ _("This project is still being created. Refresh the page in a minute or two.")
-          }}</span
-        >
-      </wa-callout>
-      {% elif project.creation_status == 'failed' %}
-      <wa-callout variant="danger" style="margin-bottom: 16px">
-        <strong>{{ _("Project creation failed.") }}</strong>
-        <div>{{ project.creation_error or _("An unexpected error occurred.") }}</div>
-        <div>{{ _("Create the project again, or contact an admin if this keeps happening.") }}</div>
-      </wa-callout>
-      {% endif %} {% if is_manager and field_mapping_app_upper == 'QFIELD' and
-      project.external_project_id %}
-      <div
-        id="ftm-export-geojson-status"
-        role="status"
-        aria-live="polite"
-        style="
-          display: none;
-          margin-bottom: 16px;
-          padding: 10px 14px;
-          border: 1px solid #d0d7de;
-          border-radius: 6px;
-          background: #f6f8fa;
-          font-size: 0.9em;
-          color: #333;
-        "
-      >
-        <span
-          id="ftm-export-geojson-spinner"
-          style="display: inline-block; vertical-align: middle; margin-inline-end: 8px"
-        >
-          <svg
-            class="ftm-spinner"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M21 12a9 9 0 11-6.219-8.56" />
-          </svg>
-        </span>
-        <span id="ftm-export-geojson-message"
-          >{{ _("Packaging project on QFieldCloud - this may take a minute, please be patient...")
-          }}</span
-        >
-      </div>
-      <script>
-        (function () {
-          if (window.exportProjectGeoJSON) return;
-          const I18N = {
-            packaging: {{ _("Packaging project on QFieldCloud - this may take a minute, please be patient...")|tojson }},
-            downloadStarted: {{ _("✓ Download started.")|tojson }},
-            failed: {{ _("Export failed:")|tojson }},
-            networkError: {{ _("Network error while exporting. Please try again.")|tojson }},
-          };
-          window.exportProjectGeoJSON = async function (projectId) {
-            const statusEl = document.getElementById("ftm-export-geojson-status");
-            const spinnerEl = document.getElementById("ftm-export-geojson-spinner");
-            const messageEl = document.getElementById("ftm-export-geojson-message");
-            const linkEl = document.getElementById("ftm-export-geojson-link");
-            if (!statusEl || !messageEl || !linkEl) return;
-
-            linkEl.setAttribute("aria-disabled", "true");
-            linkEl.style.pointerEvents = "none";
-            linkEl.style.opacity = "0.6";
-            spinnerEl.style.display = "inline-block";
-            statusEl.style.display = "block";
-            statusEl.style.borderColor = "#d0d7de";
-            statusEl.style.background = "#f6f8fa";
-            statusEl.style.color = "#333";
-            messageEl.textContent = I18N.packaging;
-
-            try {
-              const resp = await fetch(`/projects/${projectId}/export/geojson`, {
-                credentials: "same-origin",
-                headers: { Accept: "application/geo+json" },
-              });
-
-              if (!resp.ok) {
-                const errBody = await resp.text();
-                const tmp = document.createElement("div");
-                tmp.innerHTML = errBody;
-                const detail = (tmp.textContent || "").trim() || resp.statusText;
-                spinnerEl.style.display = "none";
-                statusEl.style.borderColor = "#f5c2c7";
-                statusEl.style.background = "#fff5f5";
-                statusEl.style.color = "#842029";
-                messageEl.textContent = `${I18N.failed} ${detail}`;
-                return;
-              }
-
-              const blob = await resp.blob();
-              let filename = `project-${projectId}_export.geojson`;
-              const disposition = resp.headers.get("Content-Disposition") || "";
-              const match = disposition.match(/filename="?([^";]+)"?/i);
-              if (match) filename = match[1];
-
-              const objUrl = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = objUrl;
-              a.download = filename;
-              document.body.appendChild(a);
-              a.click();
-              a.remove();
-              setTimeout(() => URL.revokeObjectURL(objUrl), 1000);
-
-              spinnerEl.style.display = "none";
-              statusEl.style.borderColor = "#badbcc";
-              statusEl.style.background = "#f0fff4";
-              statusEl.style.color = "#0a3622";
-              messageEl.textContent = I18N.downloadStarted;
-              setTimeout(() => { statusEl.style.display = "none"; }, 4000);
-            } catch (err) {
-              spinnerEl.style.display = "none";
-              statusEl.style.borderColor = "#f5c2c7";
-              statusEl.style.background = "#fff5f5";
-              statusEl.style.color = "#842029";
-              messageEl.textContent = `${I18N.networkError} (${err && err.message ? err.message : err})`;
-            } finally {
-              linkEl.removeAttribute("aria-disabled");
-              linkEl.style.pointerEvents = "";
-              linkEl.style.opacity = "";
-            }
-          };
-        })();
-      </script>
-      {% endif %} {% if status_value == 'PUBLISHED' %} {% include
-      "partials/project_details/setup_steps.html" %} {% if is_manager %}
-
-      <div class="ftm-manager-section">
-        <h2 class="ftm-manager-section__title">{{ _("Project Metadata") }}</h2>
-        <p class="ftm-manager-section__subtitle">
-          {{ _("Project metadata and setup information for managers.") }}
-        </p>
-      </div>
-      {% endif %} {% endif %} {% if project.location_str %}
-      <p class="ftm-project-location-line">📍 {{ project.location_str }}</p>
-      {% endif %}
-
-      <!-- Description -->
-      {% if project.description %}
-      <div class="ftm-section">
-        <h3 class="ftm-section-title">{{ _("Description") }}</h3>
-        <p style="color: #333; line-height: 1.6">{{ project.description }}</p>
-      </div>
-      {% endif %}
-
-      <!-- Project Details Grid -->
-      <div class="ftm-detail-grid">
+      <dl class="ftm-meta">
         <div>
-          <h4 class="ftm-detail-label">{{ _("Project ID") }}</h4>
-          <p class="ftm-detail-value">#{{ project.id }}</p>
+          <dt>{{ _("Project ID") }}</dt>
+          <dd>#{{ project.id }}</dd>
         </div>
-
         {% if project.manager_username %}
         <div>
-          <h4 class="ftm-detail-label">{{ _("Manager") }}</h4>
-          <p class="ftm-detail-value">{{ project.manager_username }}</p>
+          <dt>{{ _("Manager") }}</dt>
+          <dd>{{ project.manager_username }}</dd>
         </div>
         {% endif %} {% if project.created_at %}
         <div>
-          <h4 class="ftm-detail-label">{{ _("Created") }}</h4>
-          <p class="ftm-detail-value">
-            {{ project.created_at.strftime('%Y-%m-%d %H:%M') if project.created_at else 'N/A' }}
-          </p>
+          <dt>{{ _("Created") }}</dt>
+          <dd>{{ project.created_at.strftime('%Y-%m-%d %H:%M') }}</dd>
         </div>
         {% endif %} {% if project.updated_at %}
         <div>
-          <h4 class="ftm-detail-label">{{ _("Last Updated") }}</h4>
-          <p class="ftm-detail-value">
-            {{ project.updated_at.strftime('%Y-%m-%d %H:%M') if project.updated_at else 'N/A' }}
-          </p>
+          <dt>{{ _("Last Updated") }}</dt>
+          <dd>{{ project.updated_at.strftime('%Y-%m-%d %H:%M') }}</dd>
+        </div>
+        {% endif %} {% if project.external_project_instance_url %}
+        <div>
+          <dt>{{ _("External Project") }}</dt>
+          <dd>
+            {% if field_mapping_app_upper == 'ODK' and project.external_project_id %} {% set odk_url
+            = project.external_project_instance_url if '/projects/' in
+            project.external_project_instance_url else
+            project.external_project_instance_url.rstrip('/') ~ '/#/projects/' ~
+            project.external_project_id %}
+            <a href="{{ odk_url }}" target="_blank">{{ _("View Project in ODK Central →") }}</a>
+            {% elif field_mapping_app_upper == 'QFIELD' %} {% set qfc_base_url =
+            project.external_project_instance_url.split('/api/v1')[0].rstrip('/') if '/api/v1' in
+            (project.external_project_instance_url or '') else
+            (project.external_project_instance_url or '').rstrip('/') %}
+            <a href="/qfc-admin?url={{ qfc_base_url }}">{{ _("Manage QFieldCloud Project →") }}</a>
+            {% else %}
+            <a href="{{ project.external_project_instance_url }}" target="_blank"
+              >{{ _("View Project Externally →") }}</a
+            >
+            {% endif %}
+          </dd>
         </div>
         {% endif %}
-      </div>
-
-      <!-- Hashtags -->
+      </dl>
       {% if project.hashtags %}
-      <div class="ftm-section">
-        <h4 class="ftm-detail-label">{{ _("Hashtags") }}</h4>
-        <div class="ftm-flex-wrap">
-          {% for tag in project.hashtags %}
-          <wa-badge variant="neutral">{{ tag }}</wa-badge>
-          {% endfor %}
-        </div>
+      <div class="wa-cluster wa-gap-2xs">
+        {% for tag in project.hashtags %}
+        <wa-badge variant="neutral" appearance="filled">{{ tag }}</wa-badge>
+        {% endfor %}
       </div>
       {% endif %}
-
-      <!-- External Project Info -->
-      {% if project.external_project_instance_url %}
-      <div class="ftm-external-info">
-        <h4 class="ftm-detail-label">{{ _("External Project") }}</h4>
-        <p style="color: #333; font-size: 0.9em">
-          <strong>{{ _("Instance:") }}</strong> {{ project.external_project_instance_url }}<br />
-          {% if project.external_project_id %}
-          <strong>{{ _("Project ID:") }}</strong> {{ project.external_project_id }} {% endif %}
-        </p>
-        <p style="margin: 0">
-          {% if field_mapping_app_upper == 'ODK' and project.external_project_id %} {% if
-          '/projects/' in project.external_project_instance_url %}
-          <a
-            href="{{ project.external_project_instance_url }}"
-            target="_blank"
-            class="ftm-link--brand"
-          >
-            {{ _("View Project in ODK Central →") }}
-          </a>
-          {% else %}
-          <a
-            href="{{ project.external_project_instance_url.rstrip('/') }}/#/projects/{{ project.external_project_id }}"
-            target="_blank"
-            class="ftm-link--brand"
-          >
-            {{ _("View Project in ODK Central →") }}
-          </a>
-          {% endif %} {% elif field_mapping_app_upper == 'QFIELD' %} {% set qfc_base_url =
-          project.external_project_instance_url.split('/api/v1')[0].rstrip('/') if '/api/v1' in
-          (project.external_project_instance_url or '') else (project.external_project_instance_url
-          or '').rstrip('/') %}
-          <a href="/qfc-admin?url={{ qfc_base_url }}" class="ftm-link--brand">
-            {{ _("Manage QFieldCloud Project →") }}
-          </a>
-          {% else %}
-          <a
-            href="{{ project.external_project_instance_url }}"
-            target="_blank"
-            class="ftm-link--brand"
-          >
-            {{ _("View Project Externally →") }}
-          </a>
-          {% endif %}
-        </p>
-      </div>
-      {% endif %} {% if not is_manager %} {% if status_value != 'PUBLISHED' %}
-      <wa-callout variant="neutral" style="margin-top: 16px">
-        <span>{{ _("This project is not ready for mapping yet.") }}</span>
-      </wa-callout>
-      {% endif %} {% elif status_value == 'PUBLISHED' %} {% if app and app.syncs %} {% include
-      "partials/project_details/manager_setup_summary.html" %} {% include
-      "partials/project_details/basemap_section.html" %} {% endif %} {% else %} {% include
-      "partials/project_details/setup_steps.html" %} {% endif %}
-    </div>
-
-    <div slot="footer" class="ftm-flex-end">
-      {# Delete button temporarily disabled until project-level access control is in place via the
-      HOT login system. The DELETE /projects/{id} route and `can_delete_project` context are kept so
-      this can be restored. {% if can_delete_project %}
-      <wa-button
-        variant="brand"
-        hx-delete="/projects/{{ project.id }}"
-        hx-confirm="{{ _('Delete this project in downstream and Field-TM? This cannot be undone.') }}"
-        hx-swap="none"
-      >
-        {{ _("Delete Project") }}
-      </wa-button>
-      {% endif %} #}
-      <wa-button href="/projects" variant="default">{{ _("Back to Projects") }}</wa-button>
     </div>
   </wa-card>
-  {% else %}
-  <wa-card>
-    <div style="padding: 40px; text-align: center">
-      <h2 class="ftm-section-title">{{ _("Project not found.") }}</h2>
-      <p style="color: #666; margin: 20px 0">
-        {{ _("The project you're looking for doesn't exist or you don't have permission to view
-        it.") }}
-      </p>
-      <wa-button href="/projects" variant="brand">{{ _("Back to Projects") }}</wa-button>
-    </div>
-  </wa-card>
+
+  {% if not is_manager %} {% if status_value != 'PUBLISHED' %}
+  <wa-callout variant="neutral">{{ _("This project is not ready for mapping yet.") }}</wa-callout>
+  {% endif %} {% elif status_value == 'PUBLISHED' %} {% if app and app.syncs %} {% include
+  "partials/project_details/manager_setup_summary.html" %} {% include
+  "partials/project_details/basemap_section.html" %} {% endif %} {% else %} {% include
+  "partials/project_details/setup_steps.html" %} {% endif %} {# Delete button temporarily disabled
+  until project-level access control is in place via the HOT login system. The DELETE /projects/{id}
+  route and `can_delete_project` context are kept so this can be restored. #} {% else %}
+  <wa-callout variant="warning">
+    <strong>{{ _("Project not found.") }}</strong>
+    {{ _("The project you're looking for doesn't exist or you don't have permission to view it.") }}
+  </wa-callout>
   {% endif %}
 </div>
 

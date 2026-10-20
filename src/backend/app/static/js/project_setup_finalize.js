@@ -17,7 +17,6 @@ export function initProjectSetupFinalize({ i18nStrings, projectId, projectType }
   const saveCredsBtn = document.getElementById("save-creds-btn");
   const credentialsForm = document.getElementById("credentials-form");
   const credentialsError = document.getElementById("credentials-error");
-  const credentialsModalTitle = document.getElementById("credentials-modal-title");
   const odkCredentialsFields = document.getElementById("odk-credentials-fields");
   const qfieldCredentialsFields = document.getElementById("qfield-credentials-fields");
   const finaliseForm = document.getElementById("finalise-project-form");
@@ -122,7 +121,6 @@ export function initProjectSetupFinalize({ i18nStrings, projectId, projectType }
     credentialsModal,
     credentialsForm,
     credentialsError,
-    credentialsModalTitle,
     odkCredentialsFields,
     qfieldCredentialsFields,
     cancelCredsBtn,

@@ -1,5 +1,4 @@
 import {
-  bindAdvancedToggle,
   defaultDownloadPreset,
   parseSetupPreference,
   renderCallout,
@@ -19,17 +18,11 @@ export function initProjectSetupDataExtract({
   const geojsonFileInput = document.getElementById("geojson-file-input");
   const osmDataStatus = document.getElementById("osm-data-status");
   const downloadLoading = document.getElementById("download-loading");
-  const downloadBtnText = document.getElementById("download-btn-text");
-  const downloadSpinner = document.getElementById("download-spinner");
-  const dataAdvancedConfigToggle = document.getElementById("data-advanced-config-toggle");
-  const dataAdvancedConfigPanel = document.getElementById("data-advanced-config-panel");
   const recommendedDataNoteText = document.getElementById("recommended-data-note-text");
   const osmCategorySelect = document.getElementById("osm-category-select");
   const osmGeomTypeSelect = document.getElementById("osm-geom-type-select");
   const osmCentroidCheckbox = document.getElementById("osm-centroid-checkbox");
   const uploadGeojsonForm = document.getElementById("upload-geojson-form");
-
-  bindAdvancedToggle(dataAdvancedConfigToggle, dataAdvancedConfigPanel);
 
   function formatGeomType(geomType) {
     if (geomType === "POLYGON") return i18nStrings.polygons;
@@ -110,16 +103,12 @@ export function initProjectSetupDataExtract({
 
     downloadOsmDataBtn.addEventListener("htmx:beforeRequest", function () {
       if (downloadLoading) downloadLoading.style.display = "block";
-      if (downloadBtnText) downloadBtnText.textContent = i18nStrings.downloading;
-      if (downloadSpinner) downloadSpinner.style.display = "inline-block";
-      downloadOsmDataBtn.disabled = true;
+      downloadOsmDataBtn.loading = true;
     });
 
     downloadOsmDataBtn.addEventListener("htmx:afterRequest", function () {
       if (downloadLoading) downloadLoading.style.display = "none";
-      if (downloadBtnText) downloadBtnText.textContent = i18nStrings.downloadOsmData;
-      if (downloadSpinner) downloadSpinner.style.display = "none";
-      downloadOsmDataBtn.disabled = false;
+      downloadOsmDataBtn.loading = false;
     });
   }
 

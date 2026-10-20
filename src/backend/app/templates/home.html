@@ -1,206 +1,156 @@
 {% extends "layout.html" %} {% block content %}
-<div class="ftm-page ftm-page--projects">
-  <div class="ftm-projects-shell">
-    <div class="ftm-projects-toolbar">
-      <form class="ftm-projects-filters" method="get" action="/projects">
-        <!-- Mobile-only filters toggle -->
-        <button
-          type="button"
-          class="ftm-filters-toggle"
-          onclick="this.closest('.ftm-projects-filters').classList.toggle('ftm-filters--open')"
-        >
-          <wa-icon name="filter"></wa-icon>
-          {{ _("Filters") }}
-        </button>
-
-        <!-- Status filter: inline on desktop, collapsible on mobile -->
-        {% set status_options = [ ('', _('All projects')), ('DRAFT', _('Draft')), ('PUBLISHED',
-        _('Published')), ('COMPLETED', _('Completed')), ('ARCHIVED', _('Archived')), ] %}
-        <div class="ftm-filters-collapsible">
-          <div class="ftm-projects-filter">
-            <span class="ftm-projects-filter__label">{{ _("Project Status") }}</span>
-            <wa-select
-              id="projects-status-filter"
-              name="status"
-              size="s"
-              value="{{ selected_status or '' }}"
-            >
-              {% for val, label in status_options %}
-              <wa-option value="{{ val }}">{{ label }}</wa-option>
-              {% endfor %}
-            </wa-select>
-          </div>
-        </div>
-
-        {% set sort_options = [ ('newest', _('Newest first')), ('oldest', _('Oldest first')),
-        ('name_asc', _('Name (A-Z)')), ('name_desc', _('Name (Z-A)')), ] %}
-        <div class="ftm-projects-filter">
-          <span class="ftm-projects-filter__label">{{ _("Sort By") }}</span>
-          <wa-select
-            id="projects-sort-filter"
-            name="sort"
-            size="s"
-            value="{{ selected_sort or 'newest' }}"
-          >
-            {% for val, label in sort_options %}
-            <wa-option value="{{ val }}">{{ label }}</wa-option>
-            {% endfor %}
-          </wa-select>
-        </div>
-
-        <div class="ftm-projects-filter ftm-projects-filter--search">
-          <span class="ftm-projects-filter__label">{{ _("Search") }}</span>
-          <wa-input
-            id="projects-search"
-            type="search"
-            name="search"
-            size="s"
-            placeholder='{{ _("Search projects…") }}'
-            value="{{ search_query or '' }}"
-            with-clear
-          >
-            <wa-icon name="magnifying-glass" slot="start"></wa-icon>
-          </wa-input>
-        </div>
-      </form>
-
-      <wa-button href="{{ create_project_href or '/new' }}" variant="brand" class="ftm-create-btn">
-        <span class="ftm-create-btn__full">{{ _("Create Project") }}</span>
-        <span class="ftm-create-btn__short">{{ _("+ New") }}</span>
-      </wa-button>
-    </div>
-
-    <p class="ftm-projects-results">
-      {% set count = projects|length %} {% trans count %}Showing {{ count }} project{% pluralize
-      %}Showing {{ count }} projects{% endtrans %}{% if selected_status %} {{ _("in %(status)s") %
-      {"status": selected_status|lower|title} }}{% endif %}{% if search_query %} {{ _('matching
-      "%(query)s"') % {"query": search_query} }}{% endif %}
-    </p>
+<div class="ftm-page wa-stack wa-gap-l">
+  <div class="wa-split wa-gap-m">
+    <h1>{{ _("Projects") }}</h1>
+    <wa-button class="cta" href="{{ create_project_href or '/new' }}" variant="brand">
+      <wa-icon slot="start" name="plus"></wa-icon>
+      {{ _("Create Project") }}
+    </wa-button>
   </div>
 
+  {% set status_options = [ ('', _('All projects')), ('DRAFT', _('Draft')), ('PUBLISHED',
+  _('Published')), ('COMPLETED', _('Completed')), ('ARCHIVED', _('Archived')), ] %} {% set
+  sort_options = [ ('newest', _('Newest first')), ('oldest', _('Oldest first')), ('name_asc',
+  _('Name (A-Z)')), ('name_desc', _('Name (Z-A)')), ] %}
+  <form class="ftm-projects-toolbar" method="get" action="/projects">
+    <wa-select
+      id="projects-status-filter"
+      name="status"
+      size="small"
+      label="{{ _('Project Status') }}"
+      value="{{ selected_status or '' }}"
+    >
+      {% for val, label in status_options %}
+      <wa-option value="{{ val }}">{{ label }}</wa-option>
+      {% endfor %}
+    </wa-select>
+    <wa-select
+      id="projects-sort-filter"
+      name="sort"
+      size="small"
+      label="{{ _('Sort By') }}"
+      value="{{ selected_sort or 'newest' }}"
+    >
+      {% for val, label in sort_options %}
+      <wa-option value="{{ val }}">{{ label }}</wa-option>
+      {% endfor %}
+    </wa-select>
+    <wa-input
+      id="projects-search"
+      type="search"
+      name="search"
+      size="small"
+      label="{{ _('Search') }}"
+      placeholder="{{ _('Search projects…') }}"
+      value="{{ search_query or '' }}"
+      with-clear
+    >
+      <wa-icon name="magnifying-glass" slot="start"></wa-icon>
+    </wa-input>
+  </form>
+
+  <p class="ftm-hint">
+    {% set count = projects|length %} {% trans count %}Showing {{ count }} project{% pluralize
+    %}Showing {{ count }} projects{% endtrans %}{% if selected_status %} {{ _("in %(status)s") %
+    {"status": selected_status|lower|title} }}{% endif %}{% if search_query %} {{ _('matching
+    "%(query)s"') % {"query": search_query} }}{% endif %}
+  </p>
+
   {% if projects %}
-  <div class="ftm-card-grid">
-    {% for project in projects %}
+  <div class="wa-grid ftm-card-grid">
+    {% for project in projects %} {% set status_value = project.status.value if project.status and
+    project.status.value else (project.status if project.status is string else 'DRAFT') %} {% set
+    app = mapping_app(project.field_mapping_app) %}
     <a class="ftm-project-card-link" href="/projects/{{ project.id }}">
-      <wa-card class="ftm-project-card" with-header>
-        <div slot="header" class="ftm-project-card__header">
-          <div class="ftm-project-card__header-meta">
-            <span class="ftm-project-card__id">
+      <wa-card class="ftm-project-card">
+        <div class="wa-stack wa-gap-s">
+          <div class="wa-split wa-gap-xs">
+            <span class="ftm-hint">
               #{{ project.id }}{% if project.visibility and project.visibility.value == 'PRIVATE' %}
-              <span class="ftm-private-icon" title='{{ _("Private Project") }}'>🔒</span>{% endif %}
+              <wa-icon name="lock" label="{{ _('Private Project') }}"></wa-icon>{% endif %}
             </span>
-            <div class="ftm-project-card__badges">
-              {% if project.status %} {% set status_value = project.status.value if
-              project.status.value else (project.status if project.status is string else 'DRAFT') %}
+            <span class="wa-cluster wa-gap-xs">
               {% if status_value != 'PUBLISHED' %}
               <wa-badge
-                variant="{% if status_value == 'DRAFT' %}neutral{% elif status_value == 'COMPLETED' %}success{% elif status_value == 'ARCHIVED' %}error{% else %}neutral{% endif %}"
+                variant="{% if status_value == 'COMPLETED' %}success{% elif status_value == 'ARCHIVED' %}danger{% else %}neutral{% endif %}"
+                appearance="outlined"
+                >{{ status_value }}</wa-badge
               >
-                {{ status_value }}
-              </wa-badge>
-              {% endif %} {% endif %} {% set app = mapping_app(project.field_mapping_app) %} {% if
-              app %}<span title="{{ app.name }}">{% include "partials/app_logo.html" %}</span>{%
-              endif %}
-            </div>
+              {% endif %} {% if app %}<span title="{{ app.name }}"
+                >{% include "partials/app_logo.html" %}</span
+              >{% endif %}
+            </span>
           </div>
           <span class="ftm-project-card__name"
             >{{ project.project_name or _('Unnamed Project') }}</span
           >
-        </div>
-        <div class="ftm-project-card__body">
-          <div class="ftm-project-card__content-top">
-            {% if project.location_str %}
-            <div class="ftm-project-card__location">
-              <span class="ftm-project-card__location-inner">
-                <span style="color: #888">📍</span>
-                <span style="line-height: 1.4"
-                  >{{ _("Location:") }} {{ project.location_str }}</span
-                >
-              </span>
-            </div>
+          {% if project.location_str %}
+          <span class="ftm-hint">
+            <wa-icon name="location-dot"></wa-icon>
+            {{ _("Location:") }} {{ project.location_str }}
+          </span>
+          {% endif %} {% if project.description %}
+          <p class="ftm-hint ftm-project-card__description">{{ project.description }}</p>
+          {% endif %} {% if project.hashtags %}
+          <div class="wa-cluster wa-gap-2xs">
+            {% for tag in project.hashtags[:4] %}
+            <wa-badge variant="neutral" appearance="filled">{{ tag }}</wa-badge>
+            {% endfor %} {% if project.hashtags|length > 4 %}
+            <wa-badge variant="neutral" appearance="filled"
+              >+{{ project.hashtags|length - 4 }}</wa-badge
+            >
             {% endif %}
           </div>
-          <p class="ftm-project-card__description">{{ project.description or '' }}</p>
-          <div class="ftm-project-card__meta">
-            {% if project.hashtags %}
-            <div class="ftm-project-card__tags">
-              {% for tag in project.hashtags[:4] %}
-              <wa-badge variant="neutral" style="font-size: 0.8em">{{ tag }}</wa-badge>
-              {% endfor %} {% if project.hashtags|length > 4 %}
-              <wa-badge variant="neutral" style="font-size: 0.8em"
-                >+{{ project.hashtags|length - 4 }}</wa-badge
-              >
-              {% endif %}
-            </div>
-            {% endif %} {% if project.created_at %}
-            <div class="ftm-project-card__footer">
-              {{ _("Created:") }} {{ project.created_at.strftime('%Y-%m-%d') if project.created_at
-              else _('N/A') }}
-            </div>
-            {% endif %}
-          </div>
+          {% endif %} {% if project.created_at %}
+          <span class="ftm-hint"
+            >{{ _("Created:") }} {{ project.created_at.strftime('%Y-%m-%d') }}</span
+          >
+          {% endif %}
         </div>
       </wa-card>
     </a>
     {% endfor %}
   </div>
   {% if prev_href or next_href %}
-  <nav class="ftm-pagination" aria-label="{{ _('Project pages') }}">
+  <nav
+    class="wa-cluster wa-justify-content-center wa-align-items-center"
+    aria-label="{{ _('Project pages') }}"
+  >
     {% if prev_href %}
-    <wa-button href="{{ prev_href }}" variant="default">← {{ _("Previous") }}</wa-button>
+    <wa-button href="{{ prev_href }}" variant="neutral" appearance="outlined"
+      >← {{ _("Previous") }}</wa-button
+    >
     {% endif %}
     <span>{{ _("Page %(page)s") % {"page": page} }}</span>
     {% if next_href %}
-    <wa-button href="{{ next_href }}" variant="default">{{ _("Next") }} →</wa-button>
+    <wa-button href="{{ next_href }}" variant="neutral" appearance="outlined"
+      >{{ _("Next") }} →</wa-button
+    >
     {% endif %}
   </nav>
   {% endif %} {% else %}
-  <p class="ftm-empty-state">
+  <wa-callout variant="neutral">
     {{ _("No projects found. Create your first project to get started!") }}
-  </p>
+  </wa-callout>
   {% endif %}
 </div>
 
 <script>
   (function () {
     const waInput = document.getElementById("projects-search");
-    if (!waInput) return;
     const form = waInput.closest("form");
-
-    // Submit on Enter
-    waInput.addEventListener("keydown", function (e) {
+    waInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
         e.preventDefault();
         form.submit();
       }
     });
-
-    // Clear and re-submit when the built-in clear button is clicked
-    waInput.addEventListener("wa-clear", function () {
+    waInput.addEventListener("wa-clear", () => {
       waInput.value = "";
       form.submit();
     });
-
-    // Submit when wa-select filters change (event is "change", not "wa-change")
-    document.getElementById("projects-status-filter").addEventListener("change", function () {
-      form.submit();
-    });
-    document.getElementById("projects-sort-filter").addEventListener("change", function () {
-      form.submit();
-    });
-
-    // Close mobile filter dropdown when clicking outside
-    document.addEventListener("click", function (e) {
-      var form = document.querySelector(".ftm-projects-filters");
-      if (!form) return;
-      var toggle = form.querySelector(".ftm-filters-toggle");
-      if (
-        form.classList.contains("ftm-filters--open") &&
-        !e.target.closest(".ftm-filters-collapsible") &&
-        !e.target.closest(".ftm-filters-toggle")
-      ) {
-        form.classList.remove("ftm-filters--open");
-      }
+    form.querySelectorAll("wa-select").forEach((select) => {
+      select.addEventListener("change", () => form.submit());
     });
   })();
 </script>

@@ -1,76 +1,21 @@
-<div class="ftm-manager-summary-section">
-  <details class="ftm-setup-summary">
-    <summary class="ftm-setup-summary__summary">{{ _("Manager Setup Summary") }}</summary>
-    <div class="ftm-setup-summary__content">
-      <p class="ftm-setup-summary__description">
-        {{ _("The project setup flow is complete and shown below for reference.") }}
-      </p>
-      {% if project.location_str %}
-      <div
-        class="ftm-step ftm-step--complete"
-        style="margin-bottom: 20px; padding: 15px; background: #f7f9fb"
-      >
-        <div class="ftm-step__header" style="margin-bottom: 0">
-          <h3 class="ftm-step__title" style="font-size: 1.05em">{{ _("Project Location") }}</h3>
-        </div>
-        <p style="margin: 8px 0 0; color: #444">📍 {{ project.location_str }}</p>
-      </div>
-      {% endif %}
-
-      <div class="ftm-section">
-        <!-- Survey form -->
-        <div class="ftm-step ftm-step--complete" style="margin-bottom: 20px; padding: 15px">
-          <div class="ftm-step__header" style="margin-bottom: 0">
-            <h3 class="ftm-step__title" style="font-size: 1.1em">
-              {{ _("Survey Form") }}
-              <span class="ftm-step__check">✓</span>
-            </h3>
-            <wa-badge variant="success">{{ _("Complete") }}</wa-badge>
-          </div>
-        </div>
-
-        <!-- Map data -->
-        <div class="ftm-step ftm-step--complete" style="margin-bottom: 20px; padding: 15px">
-          <div class="ftm-step__header" style="margin-bottom: 0">
-            <h3 class="ftm-step__title" style="font-size: 1.1em">
-              {{ _("Map Data") }}
-              <span class="ftm-step__check">✓</span>
-            </h3>
-            <wa-badge variant="success">{{ _("Complete") }}</wa-badge>
-          </div>
-        </div>
-
-        <!-- Task split -->
-        <div class="ftm-step ftm-step--complete" style="margin-bottom: 20px; padding: 15px">
-          <div class="ftm-step__header" style="margin-bottom: 0">
-            <h3 class="ftm-step__title" style="font-size: 1.1em">
-              {{ _("Tasks") }}
-              <span class="ftm-step__check">✓</span>
-            </h3>
-            <wa-badge variant="success">{{ _("Complete") }}</wa-badge>
-          </div>
-        </div>
-
-        <!-- Finalise -->
-        <div class="ftm-step ftm-step--complete" style="margin-bottom: 20px; padding: 15px">
-          <div class="ftm-step__header" style="margin-bottom: 0">
-            <h3 class="ftm-step__title" style="font-size: 1.1em">
-              {{ _("Project Created") }}
-              <span class="ftm-step__check">✓</span>
-            </h3>
-            <wa-badge variant="success">{{ _("Complete") }}</wa-badge>
-          </div>
-        </div>
-      </div>
-
-      {% if field_mapping_app_upper == 'ODK' %}
-      <wa-callout variant="warning">
-        <span>
-          {{ _("If you need to upload additional media files to this project, such as images and
-          videos, log into ODK Central and upload them in the form settings.") }}
-        </span>
-      </wa-callout>
-      {% endif %}
-    </div>
-  </details>
-</div>
+<wa-details summary="{{ _('Manager Setup Summary') }}">
+  <div class="wa-stack">
+    <p class="ftm-hint">
+      {{ _("The project setup flow is complete and shown below for reference.") }}
+    </p>
+    <ul class="wa-list-plain wa-stack wa-gap-xs">
+      {% for label in [_("Survey Form"), _("Map Data"), _("Tasks"), _("Project Created")] %}
+      <li class="wa-split">
+        <span><wa-icon name="circle-check" class="wa-color-text-quiet"></wa-icon> {{ label }}</span>
+        <wa-badge variant="success" appearance="outlined">{{ _("Complete") }}</wa-badge>
+      </li>
+      {% endfor %}
+    </ul>
+    {% if field_mapping_app_upper == 'ODK' %}
+    <wa-callout variant="warning">
+      {{ _("If you need to upload additional media files to this project, such as images and videos,
+      log into ODK Central and upload them in the form settings.") }}
+    </wa-callout>
+    {% endif %}
+  </div>
+</wa-details>

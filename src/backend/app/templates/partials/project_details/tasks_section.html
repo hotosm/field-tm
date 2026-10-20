@@ -3,82 +3,90 @@ task_features = (project.task_areas_geojson or {}).get('features') or [] %} {% s
 task_features | selectattr('properties.assigned_to') | list | length + task_features |
 rejectattr('properties.assigned_to') | selectattr('properties.assigned_group') | list | length %} {%
 set published = project.status == 'PUBLISHED' %}
-<div id="tasks-section" class="ftm-step">
-  <div class="ftm-step__header">
-    <h3 class="ftm-step__title">{{ _("Tasks") }}</h3>
+<wa-card id="tasks-section" with-header>
+  <div slot="header" class="wa-split">
+    <h3 class="ftm-section-title">{{ _("Tasks") }}</h3>
     {% if task_features %}
     <wa-badge variant="success"
       >{{ _("%(count)s tasks") % {"count": task_features | length} }}</wa-badge
     >
     {% endif %}
   </div>
-  <p class="ftm-step-intro">
-    {% if task_features %} {{ _("%(count)s tasks, %(assigned)s assigned.") % {"count": task_features
-    | length, "assigned": assigned} }} {% elif project.task_areas_geojson == {} %} {{ _("The whole
-    area is one task.") }} {% elif is_manager %} {{ _("Split the area into tasks and assign them to
-    teams or people in the task planner. Or use the whole area as one task.") }} {% else %} {{ _("No
-    tasks yet.") }} {% endif %}
-  </p>
+  <div class="wa-stack">
+    <p>
+      {% if task_features %} {{ _("%(count)s tasks, %(assigned)s assigned.") % {"count":
+      task_features | length, "assigned": assigned} }} {% elif project.task_areas_geojson == {} %}
+      {{ _("The whole area is one task.") }} {% elif is_manager %} {{ _("Split the area into tasks
+      and assign them to teams or people in the task planner. Or use the whole area as one task.")
+      }} {% else %} {{ _("No tasks yet.") }} {% endif %}
+    </p>
 
-  <iframe
-    class="ftm-task-map"
-    src="/planner/?project={{ project.id }}&view=1"
-    title="{{ _('Task map') }}"
-    loading="lazy"
-  ></iframe>
+    <iframe
+      class="ftm-task-map"
+      src="/planner/?project={{ project.id }}&view=1"
+      title="{{ _('Task map') }}"
+      loading="lazy"
+    ></iframe>
 
-  {% if not syncs %}
-  <p style="margin: 8px 0 0">
-    <a href="/planner/?project={{ project.id }}&view=1" target="_blank" class="ftm-link--brand"
+    {% if not syncs %}
+    <a href="/planner/?project={{ project.id }}&view=1" target="_blank"
       >{{ _("Open tasks for download and sharing (GPX, GeoJSON, QR codes)") }} →</a
     >
-  </p>
-  {% endif %} {% if is_manager %}
-  <div class="ftm-step__actions">
-    <a href="/planner/?project={{ project.id }}" class="wa-button wa-button--brand">
-      {% if task_features %}{{ _("Edit tasks") }}{% else %}{{ _("Split & assign tasks") }}{% endif
-      %}
-    </a>
-    <button
-      type="button"
-      class="wa-button wa-button--default"
-      hx-post="/projects/{{ project.id }}/task-plan/whole-area"
+    {% endif %} {% if is_manager %}
+    <div class="wa-cluster wa-gap-s">
+      <wa-button
+        href="/planner/?project={{ project.id }}"
+        variant="brand"
+        {%
+        if
+        not
+        task_features
+        %}class="cta"
+        {%
+        endif
+        %}
+      >
+        <wa-icon slot="start" name="pen-to-square"></wa-icon>
+        {% if task_features %}{{ _("Edit tasks") }}{% else %}{{ _("Split & assign tasks") }}{% endif
+        %}
+      </wa-button>
+      <wa-button
+        variant="neutral"
+        appearance="outlined"
+        hx-post="/projects/{{ project.id }}/task-plan/whole-area"
+        hx-target="#tasks-status"
+      >
+        {{ _("Use whole area as one task") }}
+      </wa-button>
+      {% if published and project.field_mapping_app in ('ODK', 'QField') %}
+      <wa-button
+        variant="neutral"
+        appearance="outlined"
+        hx-get="/projects/{{ project.id }}/task-plan/sync"
+        hx-target="#tasks-status"
+      >
+        {{ _("Re-sync tasks to %(app)s") % {"app": project.field_mapping_app} }}
+      </wa-button>
+      {% endif %}
+    </div>
+    <form
+      hx-post="/projects/{{ project.id }}/task-plan/upload"
+      hx-encoding="multipart/form-data"
+      hx-trigger="change"
       hx-target="#tasks-status"
     >
-      {{ _("Use whole area as one task") }}
-    </button>
-    {% if published and project.field_mapping_app == 'ODK' %}
-    <button
-      type="button"
-      class="wa-button wa-button--default"
-      hx-post="/projects/{{ project.id }}/task-plan/sync"
-      hx-target="#tasks-status"
-    >
-      {{ _("Re-sync tasks to ODK") }}
-    </button>
+      <label class="ftm-hint wa-stack wa-gap-2xs">
+        {{ _("Or upload a task plan file (GeoJSON):") }}
+        <input type="file" name="data" accept=".geojson,.json,application/geo+json" />
+      </label>
+    </form>
+    {% if published and project.field_mapping_app in ('ODK', 'QField') %}
+    <p class="ftm-hint">
+      {{ _("After editing tasks, re-sync to update them in the mapping app. Changing task areas
+      resets task progress in the app.") }}
+    </p>
+    {% endif %}
+    <div id="tasks-status"></div>
     {% endif %}
   </div>
-  <form
-    hx-post="/projects/{{ project.id }}/task-plan/upload"
-    hx-encoding="multipart/form-data"
-    hx-trigger="change"
-    hx-target="#tasks-status"
-  >
-    <label class="ftm-step-field__hint">
-      {{ _("Or upload a task plan file (GeoJSON):") }}
-      <input type="file" name="data" accept=".geojson,.json,application/geo+json" />
-    </label>
-  </form>
-  {% if published and project.field_mapping_app == 'QField' %}
-  <p class="ftm-step-field__hint">
-    {{ _("Task changes after publishing are not sent to QField. They apply to new projects only.")
-    }}
-  </p>
-  {% elif published and project.field_mapping_app == 'ODK' %}
-  <p class="ftm-step-field__hint">
-    {{ _("After editing tasks, re-sync to update them in ODK Central. Mapping status is kept.") }}
-  </p>
-  {% endif %}
-  <div id="tasks-status" class="ftm-step__status"></div>
-  {% endif %}
-</div>
+</wa-card>

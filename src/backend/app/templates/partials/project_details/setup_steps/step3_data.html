@@ -1,162 +1,101 @@
 {% if has_xlsform %} {% if has_data_extract %}
-<div id="step-3-container" class="ftm-step--complete-compact">
-  <span class="ftm-step__check" aria-hidden="true">✓</span>
-  <p class="ftm-step--complete-compact-title">{{ _("Data extract ready") }}</p>
-</div>
+<wa-callout id="step-3-container" variant="success" size="small">
+  <wa-icon slot="icon" name="circle-check"></wa-icon>
+  {{ _("Data extract ready") }}
+</wa-callout>
 {% else %}
-<div id="step-3-container" class="ftm-step ftm-step--pending">
-  <div class="ftm-step__header">
-    <h3 class="ftm-step__title">{{ _("Add Your Data") }}</h3>
-  </div>
-  <p class="ftm-step-intro">
-    {{ _("Pull existing features from OpenStreetMap for your project area, or start with an empty
-    map so mappers can collect everything from scratch.") }}
-    <span id="recommended-data-note-text"></span>
-  </p>
+<wa-card id="step-3-container" with-header>
+  <h3 slot="header" class="ftm-section-title">{{ _("Add Your Data") }}</h3>
+  <div class="wa-stack">
+    <p>
+      {{ _("Pull existing features from OpenStreetMap for your project area, or start with an empty
+      map so mappers can collect everything from scratch.") }}
+      <span id="recommended-data-note-text"></span>
+    </p>
 
-  <div class="ftm-step__actions">
-    <button
-      id="download-osm-data-btn"
-      hx-post="/download-osm-data-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
-      hx-include="#osm-category-select, #osm-geom-type-select, #osm-centroid-checkbox"
-      hx-target="#osm-data-status"
-      hx-swap="innerHTML"
-      hx-indicator="#download-spinner"
-      class="wa-button wa-button--brand"
-      style="min-width: 200px; position: relative"
-    >
-      <span id="download-btn-text">{{ _("Use OSM data") }}</span>
-      <span
-        id="download-spinner"
-        class="htmx-indicator"
-        style="display: none; margin-inline-start: 8px"
+    <div class="wa-cluster wa-gap-s">
+      <wa-button
+        class="cta"
+        id="download-osm-data-btn"
+        variant="brand"
+        hx-post="/download-osm-data-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+        hx-include="#osm-category-select, #osm-geom-type-select, #osm-centroid-checkbox"
+        hx-target="#osm-data-status"
+        hx-swap="innerHTML"
       >
-        <svg
-          class="ftm-spinner"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M21 12a9 9 0 11-6.219-8.56" />
-        </svg>
-      </span>
-    </button>
-    <button
-      id="collect-new-data-btn"
-      type="button"
-      hx-post="/collect-new-data-only-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
-      hx-target="#osm-data-status"
-      hx-swap="innerHTML"
-      class="wa-button wa-button--default"
-      style="min-width: 200px"
-    >
-      {{ _("Start with empty map") }}
-    </button>
-  </div>
+        {{ _("Use OSM data") }}
+      </wa-button>
+      <wa-button
+        id="collect-new-data-btn"
+        variant="neutral"
+        appearance="outlined"
+        hx-post="/collect-new-data-only-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+        hx-target="#osm-data-status"
+        hx-swap="innerHTML"
+      >
+        {{ _("Start with empty map") }}
+      </wa-button>
+      <wa-button id="upload-geojson-btn" variant="neutral" appearance="plain">
+        <wa-icon slot="start" name="upload"></wa-icon>
+        {{ _("upload your own map file (GeoJSON)") }}
+      </wa-button>
+    </div>
 
-  <p class="ftm-step-secondary" style="margin-top: 14px">
-    <span class="ftm-step-secondary__divider" aria-hidden="true"></span>
-    <span>{{ _("or") }}</span>
-    <button id="upload-geojson-btn" type="button" class="ftm-soft-link">
-      {{ _("upload your own map file (GeoJSON)") }}
-    </button>
-    <span class="ftm-step-secondary__divider" aria-hidden="true"></span>
-  </p>
-
-  <div class="ftm-step__actions" style="margin-top: 6px; margin-bottom: 8px">
-    <button
-      id="data-advanced-config-toggle"
-      type="button"
-      class="wa-button wa-button--default ftm-advanced-toggle"
-    >
-      {{ _("More options") }}
-    </button>
-  </div>
-
-  <div id="data-advanced-config-panel" class="ftm-advanced-config ftm-advanced-config--hidden">
-    <div class="ftm-advanced-config__content">
-      <p class="ftm-step-field__hint" style="margin-bottom: 10px">
-        {{ _("Override the default OSM source for this project.") }}
-      </p>
-
-      <div class="ftm-split-grid ftm-split-grid--advanced">
-        <div class="ftm-step-field">
-          <label for="osm-category-select" class="ftm-step-field__label"
-            >{{ _("What to download") }}</label
-          >
-          <select id="osm-category-select" name="osm_category" class="ftm-split-select">
-            <option value="buildings">{{ _("OSM Buildings") }}</option>
-            <option value="highways">{{ _("OSM Highways") }}</option>
-            <option value="health">{{ _("OSM Healthcare") }}</option>
-            <option value="toilets">{{ _("OSM Toilets") }}</option>
-            <option value="religious">{{ _("OSM Religious") }}</option>
-            <option value="landusage">{{ _("OSM Landuse") }}</option>
-            <option value="waterways">{{ _("OSM Waterways") }}</option>
-            <option value="waterpoints">{{ _("OSM Water Points") }}</option>
-            <option value="wastedisposal">{{ _("OSM Waste Disposal") }}</option>
-            <option value="education">{{ _("OSM Education") }}</option>
-            <option value="cemeteries">{{ _("OSM Cemeteries") }}</option>
-            <option value="amenities">{{ _("OSM Amenities") }}</option>
-          </select>
-        </div>
-        <div class="ftm-step-field">
-          <label for="osm-geom-type-select" class="ftm-step-field__label"
-            >{{ _("Feature shape") }}</label
-          >
-          <select id="osm-geom-type-select" name="geom_type" class="ftm-split-select">
-            <option value="POLYGON">{{ _("Polygon (area)") }}</option>
-            <option value="POLYLINE">{{ _("Line") }}</option>
-            <option value="POINT">{{ _("Point") }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="ftm-step-option" style="margin-top: 28px">
-            <input type="checkbox" id="osm-centroid-checkbox" name="centroid" value="true" />
-            <span class="ftm-step-option__text">
-              <span class="ftm-step-option__title"
-                >{{ _("Use Centroids (For OSM Data Download)") }}</span
-              >
-              <span class="ftm-step-option__hint"
-                >{{ _("Convert polygons to single points.") }}</span
-              >
-            </span>
+    <wa-details id="data-advanced-config-panel" summary="{{ _('More options') }}">
+      <div class="wa-stack">
+        <p class="ftm-hint">{{ _("Override the default OSM source for this project.") }}</p>
+        <div class="wa-grid wa-gap-s">
+          <label class="wa-stack wa-gap-2xs">
+            <span>{{ _("What to download") }}</span>
+            <select id="osm-category-select" name="osm_category">
+              <option value="buildings">{{ _("OSM Buildings") }}</option>
+              <option value="highways">{{ _("OSM Highways") }}</option>
+              <option value="health">{{ _("OSM Healthcare") }}</option>
+              <option value="toilets">{{ _("OSM Toilets") }}</option>
+              <option value="religious">{{ _("OSM Religious") }}</option>
+              <option value="landusage">{{ _("OSM Landuse") }}</option>
+              <option value="waterways">{{ _("OSM Waterways") }}</option>
+              <option value="waterpoints">{{ _("OSM Water Points") }}</option>
+              <option value="wastedisposal">{{ _("OSM Waste Disposal") }}</option>
+              <option value="education">{{ _("OSM Education") }}</option>
+              <option value="cemeteries">{{ _("OSM Cemeteries") }}</option>
+              <option value="amenities">{{ _("OSM Amenities") }}</option>
+            </select>
+          </label>
+          <label class="wa-stack wa-gap-2xs">
+            <span>{{ _("Feature shape") }}</span>
+            <select id="osm-geom-type-select" name="geom_type">
+              <option value="POLYGON">{{ _("Polygon (area)") }}</option>
+              <option value="POLYLINE">{{ _("Line") }}</option>
+              <option value="POINT">{{ _("Point") }}</option>
+            </select>
           </label>
         </div>
+        <label>
+          <input type="checkbox" id="osm-centroid-checkbox" name="centroid" value="true" />
+          {{ _("Use Centroids (For OSM Data Download)") }}
+          <span class="ftm-hint">{{ _("Convert polygons to single points.") }}</span>
+        </label>
       </div>
-    </div>
-  </div>
+    </wa-details>
 
-  <div id="osm-data-status" class="ftm-step__status">
-    <div id="download-loading" class="htmx-indicator ftm-loading">
-      <div style="display: inline-block">
-        <svg
-          class="ftm-spinner ftm-spinner--lg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path d="M21 12a9 9 0 11-6.219-8.56" />
-        </svg>
-        <p style="margin-top: 10px; color: #666">
-          {{ _("Generating OSM data extract... This may take a moment.") }}
-        </p>
+    <div id="osm-data-status">
+      <div id="download-loading" style="display: none">
+        <wa-spinner></wa-spinner>
+        {{ _("Generating OSM data extract... This may take a moment.") }}
       </div>
     </div>
+    <form
+      id="upload-geojson-form"
+      hx-post="/upload-geojson-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
+      hx-target="#osm-data-status"
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data"
+      hidden
+    >
+      <input type="file" name="data" id="geojson-file-input" accept=".geojson,.json" required />
+    </form>
+    <div id="geojson-preview-container"></div>
   </div>
-  <form
-    id="upload-geojson-form"
-    method="POST"
-    enctype="multipart/form-data"
-    hx-post="/upload-geojson-htmx?project_id={% if project %}{{ project.id }}{% endif %}"
-    hx-target="#osm-data-status"
-    hx-swap="innerHTML"
-    hx-encoding="multipart/form-data"
-    style="display: none"
-  >
-    <input type="file" name="data" id="geojson-file-input" accept=".geojson,.json" required />
-  </form>
-  <div id="geojson-preview-container" style="margin-top: 15px"></div>
-</div>
+</wa-card>
 {% endif %} {% endif %}

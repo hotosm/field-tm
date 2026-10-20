@@ -38,13 +38,6 @@ export function saveSetupPreference(setupPreferenceKey, preference) {
   }
 }
 
-export function bindAdvancedToggle(toggleElement, panelElement) {
-  if (!toggleElement || !panelElement) return;
-  toggleElement.addEventListener("click", function () {
-    panelElement.classList.toggle("ftm-advanced-config--hidden");
-  });
-}
-
 export function clearContainer(container) {
   if (!container) return;
   container.textContent = "";

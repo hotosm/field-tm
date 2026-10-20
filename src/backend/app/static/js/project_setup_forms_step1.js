@@ -1,6 +1,5 @@
 import {
   OSM_FORM_TITLE_TO_PRESET,
-  bindAdvancedToggle,
   parseSetupPreference,
   presetForFormTitle,
   renderCallout,
@@ -14,8 +13,6 @@ export function initProjectSetupFormSelection({
   initialFormTemplates,
 }) {
   const uploadXlsformBtn = document.getElementById("upload-xlsform-btn");
-  const formAdvancedConfigToggle = document.getElementById("form-advanced-config-toggle");
-  const formAdvancedConfigPanel = document.getElementById("form-advanced-config-panel");
   const uploadXlsformForm = document.getElementById("upload-xlsform-form");
   const uploadXlsformSubmitBtn = document.getElementById("upload-xlsform-submit-btn");
   const selectedXlsformName = document.getElementById("selected-xlsform-name");
@@ -25,21 +22,17 @@ export function initProjectSetupFormSelection({
   const templateFormIdInput = document.getElementById("template-form-id");
   const formTemplatesById = new Map();
 
-  bindAdvancedToggle(formAdvancedConfigToggle, formAdvancedConfigPanel);
-
   const includePhotoCheckbox = document.getElementById("include-photo-upload-checkbox");
   const mandatoryPhotoCheckbox = document.getElementById("mandatory-photo-checkbox");
-  const mandatoryPhotoLabel = document.getElementById("mandatory-photo-label");
   const includePhotoHidden = document.getElementById("include-photo-upload-hidden");
   const verificationFieldsCheckbox = document.getElementById("verification-fields-checkbox");
   const needVerificationHidden = document.getElementById("need-verification-fields-hidden");
   const customFormDisclaimer = document.getElementById("custom-form-disclaimer");
 
-  if (includePhotoCheckbox && mandatoryPhotoCheckbox && mandatoryPhotoLabel) {
+  if (includePhotoCheckbox && mandatoryPhotoCheckbox) {
     includePhotoCheckbox.addEventListener("change", function () {
       const enabled = includePhotoCheckbox.checked;
       mandatoryPhotoCheckbox.disabled = !enabled;
-      mandatoryPhotoLabel.style.opacity = enabled ? "1" : "0.4";
       if (!enabled) mandatoryPhotoCheckbox.checked = false;
       if (includePhotoHidden) includePhotoHidden.value = enabled ? "true" : "false";
     });
