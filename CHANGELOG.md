@@ -28,6 +28,7 @@
 - **dev**: `just start dev` builds the `debug` image instead of pulling it (#3128)
 - **projects**: a new data extract warns if tasks were already planned; `DbProject.update` can now clear columns (#3130)
 - **planner**: empty tasks are kept by default for split by square and split by roads (#3045)
+- **projects**: polygon centroids for OSM downloads are computed in Field-TM (#2730)
 - **security**: project setup routes are now manager-only (any logged-in user could edit public projects)
 - **security**: credential test endpoints require login, and the ODK password is no longer sent in the query string
 - **security**: removed the `DEBUG` auth bypass, the `svcftm` fallback account and the unused `create-entities-from-csv` helper route

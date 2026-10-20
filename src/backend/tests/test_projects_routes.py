@@ -34,7 +34,7 @@ from litestar.exceptions import HTTPException
 from app.central.central_crud import create_odk_project
 from app.central.central_schemas import ODKCentral
 from app.db.enums import FieldMappingApp, ProjectStatus
-from app.helpers.geometry_utils import check_crs
+from app.helpers.geometry_utils import check_crs, featcol_polygons_to_centroids
 from app.projects import project_crud, project_services
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_crud import QFieldProjectResult
@@ -369,14 +369,25 @@ async def test_download_osm_data_maps_extract_generation_failure(monkeypatch):
         )
 
 
-async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
-    """Checking 'Use centroids' should pass centroid=True downstream."""
+async def test_download_osm_data_computes_centroids_locally(monkeypatch):
+    """'Use centroids' requests polygons and converts them to points here."""
     downloaded_geojson = {
         "type": "FeatureCollection",
         "features": [
             {
                 "type": "Feature",
-                "geometry": {"type": "Point", "coordinates": [85.305, 27.705]},
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [
+                        [
+                            [85.30, 27.70],
+                            [85.31, 27.70],
+                            [85.31, 27.71],
+                            [85.30, 27.71],
+                            [85.30, 27.70],
+                        ]
+                    ],
+                },
                 "properties": {"osm_id": 1},
             }
         ],
@@ -415,9 +426,6 @@ async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
     def fake_parse_aoi(_db_url, input_geojson, merge=True):
         return input_geojson
 
-    def fake_featcol_keep_single_geom_type(featcol, geom_type=None):
-        return featcol
-
     async def fake_check_crs(_featcol):
         return None
 
@@ -433,11 +441,6 @@ async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
     )
     monkeypatch.setattr(project_services, "_download_extract_geojson", fake_download)
     monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
-    monkeypatch.setattr(
-        project_services,
-        "featcol_keep_single_geom_type",
-        fake_featcol_keep_single_geom_type,
-    )
     monkeypatch.setattr(project_services, "check_crs", fake_check_crs)
 
     result = await project_services.download_osm_data(
@@ -448,11 +451,38 @@ async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
         centroid=True,
     )
 
-    assert captured["centroid"] is True
+    assert captured["centroid"] is False
     assert captured["geom_types"] == ["polygon"]
     # POLYGON + centroid must resolve to ways_poly, not None
     assert captured["config_from"] == ["ways_poly"]
-    assert result["features"][0]["geometry"]["type"] == "Point"
+    [feature] = result["features"]
+    assert feature["geometry"]["type"] == "Point"
+    assert feature["geometry"]["coordinates"] == pytest.approx([85.305, 27.705])
+    assert feature["properties"] == {"osm_id": 1}
+
+
+async def test_featcol_polygons_to_centroids_keeps_points():
+    """Point mode with centroids mixes OSM nodes and polygon centroids."""
+    square = [[[0, 0], [2, 0], [2, 2], [0, 2], [0, 0]]]
+    featcol = {
+        "type": "FeatureCollection",
+        "features": [
+            {"type": "Feature", "geometry": {"type": "Point", "coordinates": [5, 5]}},
+            {"type": "Feature", "geometry": {"type": "Polygon", "coordinates": square}},
+            {
+                "type": "Feature",
+                "geometry": {"type": "MultiPolygon", "coordinates": [square]},
+            },
+        ],
+    }
+
+    result = await featcol_polygons_to_centroids(featcol)
+
+    assert [f["geometry"] for f in result["features"]] == [
+        {"type": "Point", "coordinates": [5, 5]},
+        {"type": "Point", "coordinates": [1.0, 1.0]},
+        {"type": "Point", "coordinates": [1.0, 1.0]},
+    ]
 
 
 def test_configure_extract_sources_polygon_centroid_maps_to_ways_poly():

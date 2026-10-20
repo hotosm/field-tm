@@ -126,6 +126,23 @@ async def polygon_to_centroid(
     return types.SimpleNamespace(x=cx, y=cy)
 
 
+async def featcol_polygons_to_centroids(featcol: dict) -> dict:
+    """Replace Polygon and MultiPolygon geometries with their centroid."""
+    features = []
+    for feature in featcol.get("features", []):
+        geom = feature.get("geometry") or {}
+        if geom.get("type") == "MultiPolygon" and geom.get("coordinates"):
+            geom = {"type": "Polygon", "coordinates": geom["coordinates"][0]}
+        if geom.get("type") == "Polygon":
+            point = await polygon_to_centroid(geom)
+            feature = {
+                **feature,
+                "geometry": {"type": "Point", "coordinates": [point.x, point.y]},
+            }
+        features.append(feature)
+    return {**featcol, "features": features}
+
+
 def featcol_keep_single_geom_type(
     featcol: dict,
     geom_type: Optional[str] = None,

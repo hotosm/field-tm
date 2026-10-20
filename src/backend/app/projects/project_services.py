@@ -49,6 +49,7 @@ from app.helpers.geometry_utils import (
     AREA_LIMIT_KM2,
     check_crs,
     featcol_keep_single_geom_type,
+    featcol_polygons_to_centroids,
     geojson_area_km2,
     merge_featcol_polygons_sync,
     polygon_to_centroid,
@@ -650,8 +651,8 @@ def _validate_downloaded_geojson(geojson_data: dict) -> dict:
 
 def _expected_extract_output_geom(geometry_types: list[str], centroid: bool) -> str:
     """Return the GeoJSON geometry type expected from raw-data-api."""
-    # raw-data-api emits Points when centroid=True (ST_Centroid) or when the
-    # only source is `point`; `line` stays as LineString; otherwise Polygon.
+    # Points when centroid=True (computed after download) or when the only
+    # source is `point`; `line` stays as LineString; otherwise Polygon.
     if centroid or geometry_types == ["point"]:
         return "Point"
     if geometry_types == ["line"]:
@@ -664,7 +665,6 @@ async def _request_osm_data_extract(
     aoi_featcol: dict,
     geometry_types: list[str],
     config_data: dict,
-    centroid: bool,
 ):
     """Request a raw-data-api extract and map common failures to service errors."""
     try:
@@ -673,8 +673,8 @@ async def _request_osm_data_extract(
             aoi_featcol,
             geometry_types,
             config_data,
-            centroid,
-            True,
+            centroid=False,
+            use_st_within=True,
         )
     except HTTPException as exc:
         if (
@@ -762,7 +762,6 @@ async def download_osm_data(
         aoi_featcol,
         geometry_types,
         config_data,
-        centroid,
     )
 
     download_url = result.data.get("download_url")
@@ -771,6 +770,9 @@ async def download_osm_data(
 
     geojson_data = await _download_extract_geojson(download_url)
     geojson_data = _validate_downloaded_geojson(geojson_data)
+    # Centroids are computed here: raw-data-api's centroid mode was unreliable.
+    if centroid:
+        geojson_data = await featcol_polygons_to_centroids(geojson_data)
     featcol_single_geom_type = _normalize_downloaded_extract(
         geojson_data,
         expected_output_geom,
