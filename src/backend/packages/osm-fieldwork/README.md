@@ -29,8 +29,7 @@
 
 ## What's in it
 
-Since the 2025-26 Field-TM overhaul, this package only contains what Field-TM
-uses. The old ODK client, data models and command-line utilities were removed.
+XLSForm templates and helpers for Field-TM. For ODK Central clients, use pyodk.
 
 - `xlsforms/`: XLSForm templates for common OSM surveys (buildings,
   health facilities, water points, etc.).
@@ -39,8 +38,6 @@ uses. The old ODK client, data models and command-line utilities were removed.
 - `conversion_to_xlsform.py`: converts YAML form definitions to XLSForm.
 - `form_components/`: the shared mandatory fields and choices.
 - `json_data_models/`: raw-data-api query configs for each form category.
-- `OdkCentralAsync.py`: `OdkDataset`, a small async client for ODK Central
-  entity lists.
 
 ## Installation
 

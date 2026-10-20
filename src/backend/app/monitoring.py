@@ -15,7 +15,7 @@
 #     You should have received a copy of the GNU General Public License
 #     along with Field-TM.  If not, see <https:#www.gnu.org/licenses/>.
 #
-"""Module to configure different monitoring configs."""
+"""Request profiling and OpenTelemetry configuration."""
 
 import html
 import logging
@@ -30,23 +30,17 @@ log = logging.getLogger(__name__)
 
 
 def add_endpoint_profiler(app: Litestar) -> None:
-    """Add a simple per-request profiler middleware when DEBUG is enabled.
-
-    Wraps the request in a PyInstrument profiler and returns the profiler
-    HTML instead of the normal response.
-    """
+    """Return PyInstrument HTML instead of the response when ?profile=1 is set."""
     from urllib.parse import parse_qs
 
     from pyinstrument import Profiler
 
     def profiler_middleware(next_app: ASGIApp) -> ASGIApp:
         async def middleware(scope: Scope, receive: Receive, send: Send) -> None:
-            # Only act on HTTP requests
             if scope["type"] != "http":
                 await next_app(scope, receive, send)
                 return
 
-            # Parse query string manually from ASGI scope
             raw_qs = scope.get("query_string", b"").decode()
             params = parse_qs(raw_qs)
             raw_profile = (params.get("profile") or [""])[0].lower()
@@ -63,19 +57,15 @@ def add_endpoint_profiler(app: Litestar) -> None:
 
             async def send_wrapper(message: dict[str, Any]) -> None:
                 nonlocal status_code
-                # Capture original status code but drop the original body –
-                # we'll return the profiler HTML instead.
+                # Preserve the status code and replace the body with profiler HTML.
                 if message["type"] == "http.response.start":
                     status_code = message.get("status", status_code)
-                # We intentionally do not forward the original response to `send`.
 
-            # Run the downstream app once just to exercise the code path
             await next_app(scope, receive, send_wrapper)
             profiler.stop()
 
             html = profiler.output_html()
 
-            # Return profiler HTML as the final response
             await send(
                 {
                     "type": "http.response.start",
@@ -95,7 +85,6 @@ def add_endpoint_profiler(app: Litestar) -> None:
 
         return middleware
 
-    # Register middleware with the Litestar app
     app.middleware.append(profiler_middleware)
 
 
@@ -127,8 +116,6 @@ def set_otel_tracer(app: Litestar, endpoint: str):
     """Add OpenTelemetry tracing only if environment variables configured."""
     from opentelemetry import trace
     from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-
-    # from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
     from opentelemetry.sdk.resources import Resource
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import BatchSpanProcessor
@@ -141,23 +128,6 @@ def set_otel_tracer(app: Litestar, endpoint: str):
         ),
     )
 
-    # from opentelemetry.context import (
-    #     Context,
-    # )
-    # from opentelemetry.sdk.trace import Span
-    # class CustomBatchSpanProcessor(BatchSpanProcessor):
-    #     def on_start(self, span: Span, parent_context: Optional[Context] = None):
-    #         """Startup for Span, override to reduce verbosity of attributes."""
-    #         span.set_attributes({
-    #             "http.host": "",
-    #             "net.host.port": "",
-    #             "http.flavor": "",
-    #             "http.url": "",
-    #             "http.server_name": "",
-    #         })
-
-    # Console log processor (for debugging)
-    # SimpleSpanProcessor(ConsoleSpanExporter()),
     span_processor = BatchSpanProcessor(
         OTLPSpanExporter(
             endpoint=endpoint,
@@ -167,23 +137,18 @@ def set_otel_tracer(app: Litestar, endpoint: str):
         span_processor,
     )
 
-    # Ensure the HTTPException text is included in attributes
     async def http_exception_handler(request: Request, exc: HTTPException) -> Response:
         current_span = trace.get_current_span()
         current_span.set_attributes(
             {
-                # "span_status": "ERROR",
                 "http.status_text": str(exc.detail),
-                # "otel.status_description": f"{exc.status_code} / {str(exc.detail)}",
-                # "otel.status_code": "ERROR"
             }
         )
         current_span.record_exception(exc)
 
-        # Check if HTMX request - return 200 to avoid bunkerweb
+        # Use 200 for HTMX errors so BunkerWeb allows the error fragment.
         is_htmx = request.headers.get("HX-Request") == "true"
         if is_htmx:
-            # Return 200 with error component to avoid bunkerweb
             escaped_msg = html.escape(
                 str(exc.detail) if exc.detail else "An unexpected error occurred"
             )
@@ -196,13 +161,11 @@ def set_otel_tracer(app: Litestar, endpoint: str):
                 status_code=status.HTTP_200_OK,
             )
 
-        # For non-HTMX requests, return standard error response
         return Response(
             content={"detail": str(exc.detail)},
             status_code=exc.status_code,
         )
 
-    # Register handler with Litestar
     app.exception_handlers[HTTPException] = http_exception_handler
 
 
@@ -231,9 +194,7 @@ def set_otel_logger(endpoint: str):
 
     otel_log_handler = FormattedLoggingHandler(logger_provider=logger_provider)
 
-    # This has to be called first before log.getLogger().addHandler()
-    # so that it can call logging.basicConfig first to set the logging format
-    # based on the environment variable OTEL_PYTHON_LOG_FORMAT
+    # Instrument before adding handlers so OTEL_PYTHON_LOG_FORMAT takes effect.
     LoggingInstrumentor().instrument()
     log_formatter = logging.Formatter(
         "%(asctime)s.%(msecs)03d [%(levelname)s] %(name)s | "

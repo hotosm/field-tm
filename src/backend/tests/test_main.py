@@ -1,10 +1,13 @@
 """Tests for app bootstrap helpers."""
 
+import base64
 import os
 from types import SimpleNamespace
 
+import pytest
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
+from pydantic import ValidationError
 
 from app import main
 from app.auth.auth_routes import auth_router
@@ -62,6 +65,17 @@ def test_settings_disabled_provider_keeps_auth_urls_optional():
 
     assert settings.HANKO_API_URL is None
     assert settings.LOGIN_URL is None
+
+
+def test_settings_require_auth_provider(monkeypatch):
+    """AUTH_PROVIDER has no default, so a deploy can't silently pick a login."""
+    monkeypatch.delenv("AUTH_PROVIDER", raising=False)
+    with pytest.raises(ValidationError, match="AUTH_PROVIDER"):
+        Settings(
+            _env_file=None,
+            FTM_DOMAIN="localhost",
+            ENCRYPTION_KEY=base64.b64encode(b"0" * 32).decode(),
+        )
 
 
 def test_otel_settings_exclude_static_urls(monkeypatch):

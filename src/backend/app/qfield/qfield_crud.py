@@ -27,6 +27,7 @@ import shutil
 import tempfile
 import zipfile
 from asyncio import get_running_loop
+from contextlib import asynccontextmanager
 from copy import deepcopy
 from dataclasses import dataclass
 from functools import partial
@@ -37,7 +38,7 @@ from secrets import token_urlsafe
 from typing import Optional
 from uuid import uuid4
 
-from aiohttp import ClientSession, ClientTimeout
+import httpx
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from osm_fieldwork.enums import DbGeomType
@@ -64,7 +65,7 @@ log = logging.getLogger(__name__)
 
 # Slightly longer than the wrapper's QGIS_DISPATCH_TIMEOUT_SECONDS so the
 # server-side timeout fires first with its descriptive error message.
-QGIS_REQUEST_TIMEOUT = ClientTimeout(total=660)
+QGIS_REQUEST_TIMEOUT = httpx.Timeout(660)
 QFC_NAME_SANITIZE_PATTERN = re.compile(r"[^A-Za-z0-9_.-]+")
 
 # Field-TM QField plugin: bundled and sent to the QGIS wrapper on every
@@ -131,9 +132,7 @@ class QFieldProjectResult:
     mapper_password: Optional[str]
 
 
-# ---------------------------------------------------------------------------
 # Geometry helpers
-# ---------------------------------------------------------------------------
 
 
 _COORD_NESTING = {
@@ -195,7 +194,6 @@ def _extract_geometry(geojson_obj: dict) -> Optional[dict]:
         return None
     if obj_type == "Feature":
         return geojson_obj.get("geometry")
-    # Assume it is already a geometry object (has "coordinates")
     if "coordinates" in geojson_obj:
         return geojson_obj
     return None
@@ -244,19 +242,15 @@ def _build_qfc_service_account_email(username: str) -> str:
     return f"{local_part}@fieldtm.org"
 
 
-# ---------------------------------------------------------------------------
 # Data preparation helpers
-# ---------------------------------------------------------------------------
 
 
 def clean_tags_for_qgis(
     geojson_data: dict,
 ) -> dict:
-    """Clean GeoJSON properties to be compatible with QGIS.
+    """Flatten tags to key=value;... and stringify other non-scalar properties.
 
-    QGIS cannot write nested JSON/list property values back out to GeoJSON.
-    Flatten ``tags`` to ``key=value;...`` and stringify any other non-scalar
-    property values before the wrapper touches the file.
+    QGIS cannot write nested JSON or lists back to GeoJSON.
     """
     if not geojson_data or "features" not in geojson_data:
         return geojson_data
@@ -311,11 +305,9 @@ TASK_PLAN_FIELDS = ("assigned_group", "assigned_to", "comment", "colour")
 
 
 def _build_tasks_geojson(project: DbProject) -> dict:
-    """Build the tasks layer FeatureCollection for the QField plugin.
+    """Build available tasks from the task plan, falling back to the outline.
 
-    Uses the task plan (``task_areas_geojson``) if it has features, else one
-    task from the outline. Every task starts ``available``; the plugin owns
-    status from then on.
+    The QField plugin manages subsequent status changes.
     """
     task_areas = project.task_areas_geojson
     if task_areas and isinstance(task_areas, dict) and task_areas.get("features"):
@@ -388,23 +380,12 @@ def _should_open_in_edit_mode(data_extract: Optional[dict]) -> bool:
 
 
 def _resolve_backend_qfc_url(url: str) -> str:
-    """Prefer the internal QFieldCloud URL for local public hostnames.
-
-    In local Docker-based development, backend services cannot resolve browser-facing
-    `*.localhost` hostnames routed via the dev proxy. When that happens, we keep the
-    public URL for user-facing links but route backend API calls through the internal
-    QFieldCloud URL configured in `QFIELDCLOUD_URL`.
-    """
+    """Use the internal QFieldCloud URL for browser-facing *.localhost hosts."""
     return resolve_backend_qfc_url(url)
 
 
 def _resolve_project_qfield_credentials(project: DbProject) -> QFieldCloud | None:
-    """Resolve per-project QField credentials for follow-up operations.
-
-    Uses stored project credentials when all required fields are present.
-    Returns ``None`` when project-level credentials are unavailable so callers
-    can fall back to deployment defaults.
-    """
+    """Return stored project credentials, or None to use deployment defaults."""
     if not all(
         [
             project.external_project_instance_url,
@@ -456,9 +437,63 @@ def get_missing_basemap_attach_config(project: DbProject | None = None) -> list[
     return missing
 
 
-# ---------------------------------------------------------------------------
 # Core: create QField project
-# ---------------------------------------------------------------------------
+
+
+@asynccontextmanager
+async def _generate_qgis_project(
+    db: AsyncConnection,
+    project: DbProject,
+    xlsform_bytes: bytes,
+    form_language: str = "",
+):
+    """Generate the QGIS project via the wrapper; yield a dir with its files."""
+    features_geojson = _build_features_geojson(project)
+    features_geojson = _strip_feature_properties_for_qfield(features_geojson)
+    features_geojson = clean_tags_for_qgis(features_geojson)
+    tasks_geojson = clean_tags_for_qgis(_build_tasks_geojson(project))
+
+    job_id = uuid4()
+    await _insert_qgis_job(db, job_id, xlsform_bytes, features_geojson, tasks_geojson)
+    await db.commit()
+
+    tmp_dir = tempfile.mkdtemp(prefix="qfield_upload_")
+    try:
+        await _call_qgis_wrapper(
+            job_id=str(job_id),
+            title=project.project_name or f"project-{project.id}",
+            description=project.description or "Created by the Field Tasking Manager",
+            author=project.created_by_sub or "Field Tasking Manager",
+            language=form_language,
+            extent=_outline_to_bbox_str(project.outline),
+            open_in_edit_mode=_should_open_in_edit_mode(project.data_extract_geojson),
+        )
+
+        output_files = await _read_qgis_job_outputs(db, job_id)
+        await db.commit()
+        if not output_files:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=_("QGIS wrapper completed but wrote no output files."),
+            )
+
+        for filename, b64_content in output_files.items():
+            target = Path(tmp_dir) / filename
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(base64.b64decode(b64_content))
+
+        qgz_files = list(Path(tmp_dir).glob("*.qgz"))
+        if not qgz_files:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=_("QGIS wrapper completed but no .qgz file in output."),
+            )
+        log.info("QGIS project generated: %s", qgz_files[0].name)
+        yield tmp_dir
+    finally:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        await _delete_qgis_job(db, job_id)
+        await db.commit()
 
 
 async def create_qfield_project(
@@ -467,21 +502,10 @@ async def create_qfield_project(
     custom_qfield_creds: QFieldCloud | None = None,
     default_language: str | None = None,
 ) -> QFieldProjectResult:
-    """Create QField project in QFieldCloud via the QGIS wrapper service.
+    """Generate a QGIS project, upload it, and provision manager/mapper accounts.
 
-    Steps:
-        1. Prepare local files (XLSForm, features, tasks).
-        2. Call the QGIS wrapper HTTP service to generate a ``.qgz`` project.
-        3. Create a project on QFieldCloud and upload the generated files.
-        4. Provision manager and mapper service accounts.
-
-    Returns:
-        QFieldProjectResult with URL and credentials.
-
-    Raises:
-        HTTPException: On validation or processing errors.
+    Returns the project URL and credentials. Raises HTTPException on failure.
     """
-    # ── Validate prerequisites ──────────────────────────────────────────
     if not project.outline:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -493,14 +517,9 @@ async def create_qfield_project(
             detail=_("XLSForm is required for QField project creation."),
         )
 
-    # ── Compute derived values ──────────────────────────────────────────
-    bbox_str = _outline_to_bbox_str(project.outline)
-    geom_type = _dominant_geom_type(project.data_extract_geojson)
-
-    # ── Modify XLSForm for QField ──────────────────────────────────────
     form_language, final_form = await modify_form_for_qfield(
         BytesIO(project.xlsform_content),
-        geom_layer_type=geom_type,
+        geom_layer_type=_dominant_geom_type(project.data_extract_geojson),
         default_language=default_language,
     )
     xlsform_bytes = final_form.getvalue()
@@ -510,16 +529,6 @@ async def create_qfield_project(
             detail=_("Failed to modify XLSForm for QField."),
         )
 
-    # ── Prepare local data ──────────────────────────────────────────────
-    open_in_edit_mode = _should_open_in_edit_mode(project.data_extract_geojson)
-    features_geojson = _build_features_geojson(project)
-    features_geojson = _strip_feature_properties_for_qfield(features_geojson)
-    features_geojson = clean_tags_for_qgis(features_geojson)
-
-    tasks_geojson = _build_tasks_geojson(project)
-    tasks_geojson = clean_tags_for_qgis(tasks_geojson)
-
-    # Persist the QField-modified XLSForm back to DB
     log.debug("Saving QField XLSForm to DB for project %s", project.id)
     await DbProject.update(
         db,
@@ -528,67 +537,54 @@ async def create_qfield_project(
     )
     await db.commit()
 
-    # ── Step 1: Write job inputs to DB and call QGIS wrapper ─────────
-    qgis_project_title = project.project_name or f"project-{project.id}"
-    qgis_project_description = (
-        project.description or "Created by the Field Tasking Manager"
-    )
-    qgis_project_author = project.created_by_sub or "Field Tasking Manager"
-
-    job_id = uuid4()
-    await _insert_qgis_job(db, job_id, xlsform_bytes, features_geojson, tasks_geojson)
-    await db.commit()
-
-    try:
-        await _call_qgis_wrapper(
-            job_id=str(job_id),
-            title=qgis_project_title,
-            description=qgis_project_description,
-            author=qgis_project_author,
-            language=form_language or "",
-            extent=bbox_str,
-            open_in_edit_mode=open_in_edit_mode,
+    async with _generate_qgis_project(
+        db, project, xlsform_bytes, form_language or ""
+    ) as tmp_dir:
+        title = project.project_name or f"project-{project.id}"
+        qfc_project_name = _sanitize_qfc_project_name(
+            f"FieldTM-{title}-{getrandbits(32)}"
+        )
+        return await _upload_to_qfieldcloud(
+            project=project,
+            description=project.description or "Created by the Field Tasking Manager",
+            qfc_project_name=qfc_project_name,
+            final_project_dir=tmp_dir,
+            custom_qfield_creds=custom_qfield_creds,
+            db=db,
         )
 
-        # ── Step 2: Read outputs from DB, upload to QFieldCloud ──────
-        output_files = await _read_qgis_job_outputs(db, job_id)
-        await db.commit()
-        if not output_files:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=_("QGIS wrapper completed but wrote no output files."),
+
+# Re-sync replaces only the task layers: re-uploading the survey or features
+# GeoPackages would overwrite data mappers already synced to QFieldCloud.
+QFIELD_TASK_LAYER_FILES = frozenset({"tasks.gpkg", "project-area.gpkg"})
+
+
+async def resync_qfield_tasks(db: AsyncConnection, project: DbProject) -> None:
+    """Regenerate the QGIS project and re-upload its task layers to QFieldCloud."""
+    async with _generate_qgis_project(db, project, project.xlsform_content) as tmp_dir:
+        for path in Path(tmp_dir).iterdir():
+            if path.name in QFIELD_TASK_LAYER_FILES:
+                continue
+            if path.is_dir():
+                shutil.rmtree(path)
+            else:
+                path.unlink()
+
+        loop = get_running_loop()
+        creds = _resolve_project_qfield_credentials(project)
+        async with qfield_client(creds) as client:
+            await loop.run_in_executor(
+                None,
+                partial(
+                    client.upload_files,
+                    project_id=project.external_project_id,
+                    upload_type=FileTransferType.PROJECT,
+                    project_path=tmp_dir,
+                    filter_glob="*",
+                    throw_on_error=True,
+                    force=True,
+                ),
             )
-
-        tmp_dir = tempfile.mkdtemp(prefix="qfield_upload_")
-        try:
-            for filename, b64_content in output_files.items():
-                target = Path(tmp_dir) / filename
-                target.parent.mkdir(parents=True, exist_ok=True)
-                target.write_bytes(base64.b64decode(b64_content))
-
-            qgz_files = list(Path(tmp_dir).glob("*.qgz"))
-            if not qgz_files:
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=_("QGIS wrapper completed but no .qgz file in output."),
-                )
-            log.info("QGIS project generated: %s", qgz_files[0].name)
-
-            raw_qfc_project_name = f"FieldTM-{qgis_project_title}-{getrandbits(32)}"
-            qfc_project_name = _sanitize_qfc_project_name(raw_qfc_project_name)
-            return await _upload_to_qfieldcloud(
-                project=project,
-                description=qgis_project_description,
-                qfc_project_name=qfc_project_name,
-                final_project_dir=tmp_dir,
-                custom_qfield_creds=custom_qfield_creds,
-                db=db,
-            )
-        finally:
-            shutil.rmtree(tmp_dir, ignore_errors=True)
-    finally:
-        await _delete_qgis_job(db, job_id)
-        await db.commit()
 
 
 async def attach_basemap_to_qfield_project(
@@ -754,13 +750,10 @@ async def _wait_for_projectfile_processing(
     poll_interval: float = 2.0,
     poll_timeout: float = 180.0,
 ) -> None:
-    """Trigger process_projectfile, poll until it finishes, retry on failure.
+    """Trigger projectfile processing, poll for completion, and retry failures.
 
-    QFieldCloud auto-enqueues a process_projectfile job when the .qgz is
-    uploaded, but the qfield-app gunicorn worker can drop in-flight requests
-    when it rotates on max-requests. That leaves the job seeing an incomplete
-    project (e.g. missing .qgz) and silently no-oping. We explicitly trigger
-    with force=True and poll, retrying if the job ends in ``failed``.
+    Gunicorn worker rotation can interrupt uploads or auto-enqueued jobs,
+    leaving an incomplete project. Force processing after all files are uploaded.
     """
     last_status: Optional[str] = None
     for attempt in range(1, attempts + 1):
@@ -844,11 +837,9 @@ async def _call_qgis_wrapper(  # noqa: PLR0913
     endpoint: str = "/",
     qfield_cloud: QFieldCloud | None = None,
 ) -> None:
-    """POST to the QGIS wrapper to trigger project generation.
+    """Request project generation using a job_id and processing parameters.
 
-    The wrapper reads input files from and writes output files to the
-    ``qgis_jobs`` table in the shared database.  Only the job_id and
-    processing parameters are sent via HTTP.
+    Input and output files are exchanged through the shared qgis_jobs table.
     """
     qgis_url = settings.QFIELDCLOUD_QGIS_URL
     payload = {
@@ -874,31 +865,29 @@ async def _call_qgis_wrapper(  # noqa: PLR0913
 
     log.info("Calling QGIS wrapper at %s for project '%s'", qgis_url, title)
 
-    async with (
-        ClientSession(timeout=QGIS_REQUEST_TIMEOUT) as session,
-        session.post(f"{qgis_url}{endpoint}", json=payload) as response,
-    ):
-        body = await response.text()
-        if response.status != status.HTTP_200_OK:
-            log.error("QGIS wrapper returned %s: %s", response.status, body)
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=_("QGIS project generation failed: %(error)s") % {"error": body},
-            )
-        try:
-            result = json.loads(body)
-        except json.JSONDecodeError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=_("QGIS wrapper returned invalid JSON."),
-            ) from exc
-        if result.get("status") != "success":
-            msg = result.get("message", "Unknown error")
-            log.error("QGIS wrapper reported failure: %s", msg)
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=_("QGIS project generation failed: %(error)s") % {"error": msg},
-            )
+    async with httpx.AsyncClient(timeout=QGIS_REQUEST_TIMEOUT) as client:
+        response = await client.post(f"{qgis_url}{endpoint}", json=payload)
+    body = response.text
+    if response.status_code != status.HTTP_200_OK:
+        log.error("QGIS wrapper returned %s: %s", response.status_code, body)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_("QGIS project generation failed: %(error)s") % {"error": body},
+        )
+    try:
+        result = json.loads(body)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_("QGIS wrapper returned invalid JSON."),
+        ) from exc
+    if result.get("status") != "success":
+        msg = result.get("message", "Unknown error")
+        log.error("QGIS wrapper reported failure: %s", msg)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_("QGIS project generation failed: %(error)s") % {"error": msg},
+        )
 
     log.debug("QGIS wrapper call succeeded for job %s", job_id)
 
@@ -906,10 +895,10 @@ async def _call_qgis_wrapper(  # noqa: PLR0913
 async def _download_file_for_qfield_upload(url: str, destination: Path) -> None:
     """Download a remote file directly to disk for QFieldCloud upload."""
     async with (
-        ClientSession(timeout=ClientTimeout(total=600)) as session,
-        session.get(url) as response,
+        httpx.AsyncClient(timeout=600, follow_redirects=True) as client,
+        client.stream("GET", url) as response,
     ):
-        if response.status != status.HTTP_200_OK:
+        if response.status_code != status.HTTP_200_OK:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=(
@@ -917,12 +906,12 @@ async def _download_file_for_qfield_upload(url: str, destination: Path) -> None:
                         "Failed to download basemap MBTiles for upload "
                         "(HTTP %(status)s)."
                     )
-                    % {"status": response.status}
+                    % {"status": response.status_code}
                 ),
             )
 
         with destination.open("wb") as output:
-            async for chunk in response.content.iter_chunked(1024 * 1024):
+            async for chunk in response.aiter_bytes(1024 * 1024):
                 if chunk:
                     output.write(chunk)
 
@@ -934,12 +923,10 @@ async def _download_file_for_qfield_upload(url: str, destination: Path) -> None:
 
 
 async def _create_qfc_user(username: str, password: str, client) -> bool:
-    """Create a QFieldCloud user via the SDK (POST /api/v1/users/).
+    """Create a QFieldCloud user; return True if created or already present.
 
-    Returns True when the user is created (201) or already exists (409).
-    Returns False and logs a warning when the endpoint is unavailable (404/405)
-    or the service account lacks staff permission (403).  Both cases are soft
-    failures: caller skips collaborator provisioning but continues.
+    Returns False for unavailable endpoints (404/405) or missing staff permission
+    (403), allowing callers to continue without collaborator provisioning.
     """
     loop = get_running_loop()
     email = _build_qfc_service_account_email(username)
@@ -996,10 +983,8 @@ async def _upload_to_qfieldcloud(
 
     log.info("Creating QFieldCloud project: %s", qfc_project_name)
     async with qfield_client(custom_qfield_creds) as client:
-        # Determine the owner (the authenticated user, or a configured org)
         qfc_owner = _resolve_qfc_owner(client, custom_qfield_creds)
 
-        # Create project (sync SDK call --> run in executor)
         qfield_project = await loop.run_in_executor(
             None,
             partial(
@@ -1016,7 +1001,6 @@ async def _upload_to_qfieldcloud(
         api_project_owner = qfield_project.get("owner") or qfc_owner
 
         try:
-            # Upload files (sync SDK call --> run in executor)
             log.info(f"Uploading files to QFieldCloud project {qfc_project_name}")
             upload_info = await loop.run_in_executor(
                 None,
@@ -1032,11 +1016,7 @@ async def _upload_to_qfieldcloud(
             )
             log.debug("Upload complete: %s", upload_info)
 
-            # The qfield-app's gunicorn worker can rotate on max-requests
-            # mid-upload, dropping the in-flight .qgz upload or the
-            # auto-enqueued process_projectfile job. Re-trigger explicitly
-            # and poll, retrying on failure, so we don't end up with a
-            # half-processed project the user cannot open in QField.
+            # Retry processing after uploads in case worker rotation interrupted it.
             await _wait_for_projectfile_processing(
                 loop=loop,
                 client=client,
@@ -1060,10 +1040,7 @@ async def _upload_to_qfieldcloud(
                 % {"error": e},
             ) from e
 
-        # Provision per-project service accounts via the QFC admin API.
-        # _create_qfc_user returns False (and logs a warning) when the API is
-        # unavailable or the service account lacks staff permission, so these
-        # calls degrade gracefully on older QFieldCloud instances.
+        # Skip account provisioning if the instance lacks the API or permission.
         manager_username, manager_password = await _provision_project_user(
             loop=loop,
             client=client,
@@ -1096,7 +1073,6 @@ async def _upload_to_qfieldcloud(
     # the instance root instead of guessing an internal route.
     qfield_url = _resolve_qfield_project_url(qfield_project, custom_qfield_creds)
 
-    # Store QField project details and mapper credentials in the DB
     update_payload = ProjectUpdate(
         external_project_id=api_project_id,
         external_project_instance_url=qfield_url,
@@ -1253,15 +1229,10 @@ async def _project_has_collaborator(
 
 
 def _resolve_qfc_owner(client, custom_creds: QFieldCloud | None) -> str:
-    """Resolve the QFieldCloud project owner.
+    """Choose the project owner.
 
-    With custom creds (user-supplied account on the official or a self-hosted
-    instance) we IGNORE the deployment's QFIELDCLOUD_PROJECT_OWNER setting,
-    since it points at our own org (e.g. "hotosm"). Prefer the org name the
-    user provided, otherwise fall back to their authenticated username.
-
-    Without custom creds (the default deployment flow), keep the existing
-    behaviour: prefer QFIELDCLOUD_PROJECT_OWNER, then the authenticated user.
+    Custom credentials use their organisation or username; deployment
+    credentials use QFIELDCLOUD_PROJECT_OWNER or the authenticated user.
     """
     client_username = getattr(client, "username", None)
 
@@ -1283,7 +1254,6 @@ def _resolve_qfc_owner(client, custom_creds: QFieldCloud | None) -> str:
 def _qfield_base_url(custom_creds: QFieldCloud | None) -> str:
     """Build the external QFieldCloud base UI URL."""
     if custom_creds and custom_creds.qfield_cloud_url:
-        # Strip the /api/v1/ suffix and trailing slashes
         base = custom_creds.qfield_cloud_url.rstrip("/")
         if base.endswith("/api/v1"):
             base = base[: -len("/api/v1")]
@@ -1325,9 +1295,7 @@ def _resolve_qfield_project_url(
     return base
 
 
-# ---------------------------------------------------------------------------
 # Collaborator management
-# ---------------------------------------------------------------------------
 
 
 async def add_qfc_project_collaborator(
@@ -1416,9 +1384,7 @@ async def add_qfc_project_collaborator(
     )
 
 
-# ---------------------------------------------------------------------------
 # Credential testing
-# ---------------------------------------------------------------------------
 
 
 async def qfc_credentials_test(qfc_creds: QFieldCloud):
@@ -1444,14 +1410,7 @@ async def qfc_credentials_test(qfc_creds: QFieldCloud):
         ) from e
 
 
-# ---------------------------------------------------------------------------
-# Delete QFieldCloud project
-# ---------------------------------------------------------------------------
-
-
-# ---------------------------------------------------------------------------
 # Export project data as GeoJSON
-# ---------------------------------------------------------------------------
 
 
 # Polling cadence for the QFieldCloud ``package`` job.  Packaging usually
@@ -1460,7 +1419,7 @@ async def qfc_credentials_test(qfc_creds: QFieldCloud):
 _EXPORT_POLL_INTERVAL = 2.0
 _EXPORT_POLL_TIMEOUT = 300.0
 # Timeout for the GPKG→GeoJSON wrapper call (large gpkgs can take a while).
-_GPKG_CONVERT_TIMEOUT = ClientTimeout(total=600)
+_GPKG_CONVERT_TIMEOUT = httpx.Timeout(600)
 # Name of the QGIS layer that holds the survey submissions in every FTM
 # project file (see src/qfield/field_project.py).
 SURVEY_LAYER_NAME = "survey"
@@ -1470,17 +1429,10 @@ async def export_qfield_project_geojson(
     db: AsyncConnection,
     project: DbProject,
 ) -> dict:
-    """Export a QFieldCloud project's data as a GeoJSON FeatureCollection.
+    """Package the latest QFieldCloud data and convert its GeoPackages to GeoJSON.
 
-    Steps:
-        1. Trigger a ``package`` job on QFieldCloud (force=True so the latest
-           submissions are picked up).
-        2. Poll until the job finishes.
-        3. Download every ``*.gpkg`` from the resulting package.
-        4. POST each .gpkg to the QGIS wrapper's ``/export`` endpoint, which
-           returns one FeatureCollection per layer (reprojected to EPSG:4326).
-        5. Merge all features into a single FeatureCollection, tagging each
-           feature with a ``_layer`` property so downstream tools can split it.
+    The QGIS wrapper reprojects to EPSG:4326. Features are merged into one
+    FeatureCollection with a _layer property identifying each source layer.
     """
     if not project.external_project_id:
         raise HTTPException(
@@ -1529,10 +1481,7 @@ async def export_qfield_project_geojson(
             survey_features: list[dict] = []
             for gpkg_path in gpkg_paths:
                 layers = await _convert_gpkg_via_wrapper(qgis_url, gpkg_path)
-                # FTM consistently names the survey-submission layer "survey"
-                # (see src/qfield/field_project.py).  Everything else - task
-                # areas, XLSForm choice lists, per-task offline data files -
-                # is noise from a "give me my survey data" perspective.
+                # Export only submissions; omit task areas and form choice layers.
                 survey_fc = layers.get(SURVEY_LAYER_NAME)
                 if not survey_fc:
                     continue
@@ -1601,26 +1550,22 @@ async def _convert_gpkg_via_wrapper(qgis_url: str, gpkg_path: Path) -> dict:
     """POST a .gpkg to the QGIS wrapper's /export endpoint, return its layers dict."""
     gpkg_bytes = gpkg_path.read_bytes()
     headers = {"Content-Type": "application/octet-stream"}
-    async with (
-        ClientSession(timeout=_GPKG_CONVERT_TIMEOUT) as session,
-        session.post(
-            f"{qgis_url.rstrip('/')}/export",
-            data=gpkg_bytes,
-            headers=headers,
-        ) as response,
-    ):
-        body = await response.text()
-        if response.status != status.HTTP_200_OK:
-            log.error("QGIS wrapper /export returned %s: %s", response.status, body)
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=_("GeoPackage conversion failed: %(error)s") % {"error": body},
-            )
-        try:
-            payload = json.loads(body)
-        except json.JSONDecodeError as exc:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=_("QGIS wrapper returned invalid JSON for /export."),
-            ) from exc
+    async with httpx.AsyncClient(timeout=_GPKG_CONVERT_TIMEOUT) as client:
+        response = await client.post(
+            f"{qgis_url.rstrip('/')}/export", content=gpkg_bytes, headers=headers
+        )
+    body = response.text
+    if response.status_code != status.HTTP_200_OK:
+        log.error("QGIS wrapper /export returned %s: %s", response.status_code, body)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_("GeoPackage conversion failed: %(error)s") % {"error": body},
+        )
+    try:
+        payload = json.loads(body)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=_("QGIS wrapper returned invalid JSON for /export."),
+        ) from exc
     return payload.get("layers", {}) or {}

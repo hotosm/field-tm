@@ -10,7 +10,11 @@ from app.config import settings
 from app.db.models import DbProject
 from app.projects import task_plan
 from app.projects.mapping_apps import FieldMappingApp, recommend_apps
-from app.projects.project_services import ValidationError
+from app.projects.project_services import (
+    ValidationError,
+    tasks_geometry_changed,
+    tasks_geometry_hash,
+)
 
 SQUARE = [
     [
@@ -253,20 +257,142 @@ async def test_use_whole_area_clears_plan(client, db, project):
     assert (await DbProject.one(db, project.id)).task_areas_geojson == {}
 
 
-async def test_sync_task_plan_pushes_to_published_odk(client, db, project):
-    """Re-sync updates the ODK tasks entity list for published projects."""
+async def _published_with_synced_plan(db, project, app="ODK"):
+    """Publish the project with a plan whose geometry hash is the synced one."""
+    plan = _plan({"task_id": 1})
+    await _set_project(
+        db,
+        project.id,
+        status="PUBLISHED",
+        field_mapping_app=app,
+        task_areas_geojson=json.dumps(plan),
+        tasks_synced_hash=tasks_geometry_hash(DbProject(task_areas_geojson=plan)),
+    )
+    return plan
+
+
+def test_tasks_geometry_change_detection():
+    """Property edits keep the hash; geometry or task changes alter it."""
+    plan = _plan({"task_id": 1}, {"task_id": 2})
+    synced = tasks_geometry_hash(DbProject(task_areas_geojson=plan))
+
+    plan["features"][0]["properties"]["assigned_to"] = "Bo"
+    project = DbProject(task_areas_geojson=plan, tasks_synced_hash=synced)
+    assert not tasks_geometry_changed(project)
+
+    plan["features"][0]["geometry"]["coordinates"][0][0] = [85.29, 27.71]
+    plan["features"][0]["geometry"]["coordinates"][0][-1] = [85.29, 27.71]
+    assert tasks_geometry_changed(project)
+
+    removed = DbProject(task_areas_geojson=_plan({"task_id": 1}))
+    removed.tasks_synced_hash = synced
+    assert tasks_geometry_changed(removed)
+    assert tasks_geometry_changed(DbProject(task_areas_geojson=plan))
+
+
+async def test_sync_confirm_requires_published_sync_app(client, db, project):
+    """Only published ODK and QField projects offer a re-sync."""
     url = f"/projects/{project.id}/task-plan/sync"
+    assert (await client.get(url)).status_code == status.HTTP_400_BAD_REQUEST
     assert (await client.post(url)).status_code == status.HTTP_400_BAD_REQUEST
 
-    await _set_project(db, project.id, status="PUBLISHED")
-    with patch(
-        "app.htmx.task_plan_routes.sync_odk_tasks", new_callable=AsyncMock
-    ) as mock_sync:
-        response = await client.post(url)
+    await _set_project(db, project.id, status="PUBLISHED", field_mapping_app="Other")
+    assert (await client.get(url)).status_code == status.HTTP_400_BAD_REQUEST
+
+
+@pytest.mark.parametrize("app", ["ODK", "QField"])
+async def test_sync_confirm_warns_about_assignment_overwrite(client, db, project, app):
+    """Property-only changes get the lighter warning."""
+    await _published_with_synced_plan(db, project, app)
+
+    response = await client.get(f"/projects/{project.id}/task-plan/sync")
 
     assert response.status_code == status.HTTP_200_OK
-    assert "Tasks updated" in response.text
+    assert "overwrite any assignment updates" in response.text
+    assert 'name="reset"' not in response.text
+
+
+@pytest.mark.parametrize(
+    ("app", "detail"),
+    [("ODK", "Submissions are kept"), ("QField", "re-uploaded to QFieldCloud")],
+)
+async def test_sync_confirm_warns_strongly_on_geometry_change(
+    client, db, project, app, detail
+):
+    """Changed task areas need an explicit 'I understand'."""
+    await _published_with_synced_plan(db, project, app)
+    await _set_project(db, project.id, tasks_synced_hash="old")
+
+    response = await client.get(f"/projects/{project.id}/task-plan/sync")
+
+    assert "Task areas have changed" in response.text
+    assert detail in response.text
+    assert 'name="reset"' in response.text
+
+
+async def test_sync_task_plan_updates_odk_properties(client, db, project):
+    """Property-only re-sync keeps ODK task status and stores the hash."""
+    await _published_with_synced_plan(db, project)
+    with patch(
+        "app.projects.project_services.sync_odk_tasks", new_callable=AsyncMock
+    ) as mock_sync:
+        response = await client.post(f"/projects/{project.id}/task-plan/sync")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "Tasks updated in ODK Central" in response.text
     assert mock_sync.await_args.args[2] == project.external_project_id
+    assert mock_sync.await_args.kwargs["reset"] is False
+
+
+async def test_sync_task_plan_geometry_change_needs_confirmation(client, db, project):
+    """Changed areas are refused unless confirmed, then reset ODK tasks."""
+    await _published_with_synced_plan(db, project)
+    await _set_project(db, project.id, tasks_synced_hash="old")
+    url = f"/projects/{project.id}/task-plan/sync"
+
+    with patch(
+        "app.projects.project_services.sync_odk_tasks", new_callable=AsyncMock
+    ) as mock_sync:
+        refused = await client.post(url)
+        assert refused.status_code == status.HTTP_400_BAD_REQUEST
+        mock_sync.assert_not_awaited()
+
+        response = await client.post(url, data={"reset": "1"})
+
+    assert response.status_code == status.HTTP_200_OK
+    assert mock_sync.await_args.kwargs["reset"] is True
+    synced = await DbProject.one(db, project.id)
+    assert not tasks_geometry_changed(synced)
+
+
+async def test_sync_task_plan_regenerates_qfield_project(client, db, project):
+    """QField re-sync goes through the project regeneration path."""
+    await _published_with_synced_plan(db, project, "QField")
+    with patch(
+        "app.projects.project_services.resync_qfield_tasks", new_callable=AsyncMock
+    ) as mock_resync:
+        response = await client.post(f"/projects/{project.id}/task-plan/sync")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "Tasks updated in QFieldCloud" in response.text
+    assert mock_resync.await_args.args[1].id == project.id
+
+
+async def test_sync_task_plan_reports_app_failure(client, db, project):
+    """A downstream failure is a 502, and the synced hash is unchanged."""
+    await _published_with_synced_plan(db, project)
+    await _set_project(db, project.id, tasks_synced_hash="old")
+    with patch(
+        "app.projects.project_services.sync_odk_tasks",
+        new_callable=AsyncMock,
+        side_effect=RuntimeError("down"),
+    ):
+        response = await client.post(
+            f"/projects/{project.id}/task-plan/sync", data={"reset": "1"}
+        )
+
+    assert response.status_code == status.HTTP_502_BAD_GATEWAY
+    assert (await DbProject.one(db, project.id)).tasks_synced_hash == "old"
 
 
 # --- Planner static files --------------------------------------------------

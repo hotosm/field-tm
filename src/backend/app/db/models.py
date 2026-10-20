@@ -431,6 +431,7 @@ class DbProject:
     data_extract_geojson: Optional[dict] = None
     # GeoJSON task areas/boundaries stored directly in database
     task_areas_geojson: Optional[dict] = None
+    tasks_synced_hash: Optional[str] = None
 
     # Computed
     manager_username: Optional[str] = None

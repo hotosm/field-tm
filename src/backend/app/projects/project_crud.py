@@ -21,6 +21,7 @@ import ast
 import json
 import logging
 import zlib
+from asyncio import to_thread
 from base64 import b64encode
 from datetime import datetime, timedelta, timezone
 from io import BytesIO
@@ -28,7 +29,6 @@ from pathlib import Path
 from traceback import format_exc
 from typing import Optional
 
-import segno
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from osm_data_client import (
@@ -68,27 +68,11 @@ async def generate_data_extract(
     centroid: bool = False,
     use_st_within: bool = True,
 ) -> RawDataResult:  # noqa: PLR0913
-    """Request a new data extract in GeoJSON format.
+    """Request an OSM extract and return its download URL.
 
-    Args:
-        project_id (int): Id (primary key) of the project.
-        aoi (dict):
-            Area of interest for data extraction.
-        geom_types (list[str]): Raw-data-api ``geometryType`` values to query
-            (any combination of ``point``/``line``/``polygon``). Multiple
-            entries UNION across the matching OSM tables.
-        config_json (Optional[json], optional):
-            Configuration for data extraction. Defaults to None.
-        centroid (bool): Generate centroid of polygons.
-        use_st_within (bool): Include features within the AOI.
-
-    Raises:
-        HTTPException:
-            When necessary parameters are missing or data extraction fails.
-
-    Returns:
-        str:
-            URL for the geojson data extract.
+    geom_types selects raw-data-api tables via point, line, and polygon;
+    multiple types union their results. Raises HTTPException on invalid
+    parameters or extraction failure.
     """
     if not config_json:
         raise HTTPException(
@@ -128,7 +112,6 @@ async def generate_data_extract(
         log.error("Raw data API request failed")
         if "status 406" in str(e) and "Area" in str(e):
             try:
-                # Extract the error dict part
                 error_str = str(e).split("status 406:")[-1].strip()
                 error_dict = ast.literal_eval(error_str)
                 msg = error_dict["detail"][0]["msg"]
@@ -149,9 +132,7 @@ async def generate_data_extract(
         ) from e
 
 
-# ---------------------------
 # ---- SUPPORT FUNCTIONS ----
-# ---------------------------
 
 
 async def read_and_insert_xlsforms(db: AsyncConnection, directory: str) -> None:
@@ -159,14 +140,12 @@ async def read_and_insert_xlsforms(db: AsyncConnection, directory: str) -> None:
     async with db.cursor() as cur:
         existing_db_forms = set()
 
-        # Collect all existing XLSForm titles from the database
         select_existing_query = """
             SELECT title FROM template_xlsforms;
         """
         await cur.execute(select_existing_query)
         existing_db_forms = {row[0] for row in await cur.fetchall()}
 
-        # Insert or update new XLSForms from disk
         for yaml_type in XLSFormType:
             file_name = yaml_type.name
             form_type = yaml_type.value
@@ -335,10 +314,8 @@ async def generate_odk_central_project_content(
         entities_list=entities_list,
     )
 
-    # Do final check of XLSForm validity + return parsed XForm
     xform = await central_crud.read_and_test_xform(xlsform)
 
-    # Upload survey XForm
     log.info("Uploading survey XForm to ODK Central")
     await central_crud.create_odk_xform(
         project_odk_id,
@@ -386,12 +363,13 @@ async def _task_boundaries_from_odk(
         return None
 
     try:
-        async with central_deps.get_odk_dataset(odk_credentials) as odk_central:
-            entity_data = await odk_central.getEntityData(
-                project.external_project_id,
-                "tasks",
-                include_metadata=False,
+        async with central_deps.pyodk_client(odk_credentials) as client:
+            table = await to_thread(
+                client.entities.get_table,
+                entity_list_name="tasks",
+                project_id=project.external_project_id,
             )
+        entity_data = table.get("value")
     except Exception as e:
         log.warning(
             "Could not fetch task boundaries from ODK for project %s: %s",
@@ -530,17 +508,9 @@ async def generate_project_files(
     project_id: int,
     odk_credentials: Optional[central_schemas.ODKCentral] = None,
 ) -> bool:
-    """Generate the files for a project.
+    """Generate the project's ODK appuser, QR code, XForm, and entities.
 
-    QR code (appuser), ODK XForm, ODK Entities from OSM data extract.
-
-    Args:
-        project_id(int): id of the Field-TM project.
-        db (Connection): The database connection, newly generated.
-        odk_credentials: Optional custom ODK credentials (None uses env vars).
-
-    Returns:
-        bool: True if success.
+    odk_credentials=None uses deployment credentials. Returns True on success.
     """
     try:
         project = await project_deps.get_project_by_id(db, project_id)
@@ -688,13 +658,13 @@ async def _get_or_create_appuser_token(
         return (created_user.json() or {}).get("token")
 
 
-def _odk_qrcode_data_url(
+def _odk_qr_data(
     project: DbProject,
     odk_central: central_schemas.ODKCentral,
     appuser_token: str,
     username: str,
 ) -> str:
-    """Generate the ODK QR code data URL."""
+    """Build the ODK Collect settings QR payload."""
     odk_base_url = (odk_central.external_project_instance_url or "").rstrip("/")
     settings_payload = {
         "general": {
@@ -711,44 +681,29 @@ def _odk_qrcode_data_url(
         "project": {"name": f"{project.project_name}"},
         "admin": {},
     }
-    qr_data = b64encode(zlib.compress(json.dumps(settings_payload).encode("utf-8")))
-    qrcode = segno.make(qr_data, micro=False)
-    return qrcode.png_data_uri(scale=5)
+    return b64encode(zlib.compress(json.dumps(settings_payload).encode())).decode()
 
 
-def _qfield_qrcode_data_url(project: DbProject) -> str:
-    """Generate the QField QR code data URL."""
+def _qfield_qr_data(project: DbProject) -> str:
+    """Build the QField project QR payload."""
     if not project.external_project_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=_("QField project ID not found."),
         )
 
-    qfield_url = f"qfield://cloud?project={project.external_project_id}"
-    qrcode = segno.make(qfield_url, micro=False)
-    return qrcode.png_data_uri(scale=6)
+    return f"qfield://cloud?project={project.external_project_id}"
 
 
-async def get_project_qrcode(
+async def get_project_qr_data(
     db: AsyncConnection,
     project_id: int,
     username: str = "fieldtm_user",
 ) -> str:
-    """Generate and return QR code for a published project.
+    """Return the published project's QR payload for the browser to render.
 
-    Args:
-        db (AsyncConnection): Database connection.
-        project_id (int): Project ID.
-        username (str, optional): OSM username for ODK metadata.
-            Defaults to "fieldtm_user".
-
-    Returns:
-        str: Base64 data URL of the QR code image.
-
-    Raises:
-        HTTPException: If project or required data is missing.
+    Raises HTTPException if the project or required data is missing.
     """
-    # Get fresh project data
     project = await project_deps.get_project_by_id(db, project_id)
 
     if not project.project_name:
@@ -773,21 +728,21 @@ async def get_project_qrcode(
                 detail=_("Appuser token not found."),
             )
 
-        qr_code_data_url = _odk_qrcode_data_url(
+        qr_data = _odk_qr_data(
             project,
             odk_central,
             appuser_token,
             username,
         )
     elif project.field_mapping_app == FieldMappingApp.QFIELD:
-        qr_code_data_url = _qfield_qrcode_data_url(project)
+        qr_data = _qfield_qr_data(project)
     else:
-        qr_code_data_url = None
+        qr_data = None
 
-    if not qr_code_data_url:
+    if not qr_data:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=_("Failed to generate QR code."),
         )
 
-    return qr_code_data_url
+    return qr_data

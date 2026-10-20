@@ -936,3 +936,14 @@ def test_split_by_sql_cli_no_extract():
         assert len(output_geojson.get("features")) >= 40
     finally:
         Path(outfile).unlink()
+
+
+def test_sql_literal_only_allows_numbers_and_booleans():
+    """Algorithm SQL params are substituted as text, so reject other values."""
+    from area_splitter.splitter import _sql_literal
+
+    assert _sql_literal(5) == "5"
+    assert _sql_literal(True) == "TRUE"
+    assert _sql_literal("false") == "FALSE"
+    with pytest.raises(ValueError):
+        _sql_literal("1; DROP TABLE projects")

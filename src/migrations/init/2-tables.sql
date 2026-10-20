@@ -54,6 +54,7 @@ CREATE TABLE projects (
     xlsform_content bytea,
     data_extract_geojson JSONB,
     task_areas_geojson JSONB,
+    tasks_synced_hash character varying,
     hashtags character varying[],
     custom_tms_url character varying,
     basemap_stac_item_id character varying,

@@ -50,10 +50,10 @@ HttpUrlStr = Annotated[
 class AuthProvider(str, Enum):
     """Authentication provider options."""
 
-    BUNDLED = "bundled"  # self-hosted Hanko via contrib/login (default)
+    HOTOSM = "hotosm"  # shared HOT login at login.hotosm.org
+    BUNDLED = "bundled"  # self-hosted Hanko, Field-TM serves the /login page
+    CUSTOM = "custom"  # self-hosted Hanko plus your own login app (LOGIN_URL)
     DISABLED = "disabled"  # no login, every request is the local admin (dev only)
-    HOTOSM = "hotosm"  # centralised HOT login at login.hotosm.org
-    CUSTOM = "custom"  # user-supplied HANKO_API_URL / LOGIN_URL
 
 
 class MonitoringTypes(str, Enum):
@@ -162,15 +162,10 @@ class Settings(BaseSettings):
     FTM_DOMAIN: str
     FTM_DEV_PORT: Optional[str] = None
     DEBUG: bool = False
-    # Auth provider - controls which Hanko instance and login page are used.
-    #   bundled  - self-hosted Hanko via `just start login` (default)
-    #   disabled - no login; every request acts as the local admin (dev only!)
-    #   hotosm   - centralised HOT login (auto-configures HANKO_API_URL + LOGIN_URL)
-    #   custom   - bring your own Hanko; set HANKO_API_URL + LOGIN_URL explicitly
-    AUTH_PROVIDER: AuthProvider = AuthProvider.BUNDLED
-    # Only used directly for AUTH_PROVIDER=custom. For bundled/hotosm these are
-    # auto-configured by the model validator below.
-    # contrib/login/compose.yaml injects HANKO_PUBLIC_URL for bundled local dev.
+    # Required, so a deploy never silently falls back to a login it can't use.
+    # See AuthProvider. HANKO_API_URL is backend -> Hanko; HANKO_PUBLIC_URL is
+    # browser -> Hanko (defaults to HANKO_API_URL).
+    AUTH_PROVIDER: AuthProvider
     HANKO_API_URL: Optional[str] = None
     HANKO_PUBLIC_URL: Optional[str] = None
     LOGIN_URL: Optional[str] = None

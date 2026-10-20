@@ -29,20 +29,13 @@ from app.qfield.qfield_utils import normalise_qfc_url
 log = logging.getLogger(__name__)
 
 
-# NOTE: This remains as a Pydantic model (not a DTO) because it:
-# 1. Has complex validation logic (URL normalization, credential validation)
-# 2. Is used as an input validation model, not output serialization
-# 3. Is used directly as a route parameter (Litestar handles Pydantic models natively)
-
-
 class QFieldCloud(BaseModel):
     """QField Cloud credentials for API input validation."""
 
     qfield_cloud_url: Optional[HttpUrlStr] = None
     qfield_cloud_user: Optional[str] = None
     qfield_cloud_password: Optional[str] = None
-    # Optional org name. When set, the project is created under this org;
-    # when unset, the project is created under qfield_cloud_user.
+    # Defaults to qfield_cloud_user when unset.
     qfield_cloud_org: Optional[str] = None
 
     @field_validator("qfield_cloud_url", mode="after")

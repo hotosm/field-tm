@@ -38,7 +38,7 @@ from app.projects.project_services import ValidationError as SvcValidationError
 
 # We patch where project_crud is used/defined.
 # htmx_routes imports `from app.projects import project_crud`
-# so we patch `app.projects.project_crud.get_project_qrcode`
+# so we patch `app.projects.project_crud.get_project_qr_data`
 
 
 async def test_create_project_htmx(client, stub_project_data):

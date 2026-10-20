@@ -94,10 +94,10 @@ def test_basemap_progress_fragment_uses_manual_status_check_only():
     assert html.count('hx-get="/projects/55/basemap/status"') == 1
     assert 'hx-disabled-elt="this"' in html
     compact_html = " ".join(html.split())
-    assert 'class="js-basemap-check-text"' in compact_html
-    assert "Checking..." in compact_html
-    # The spinner is hidden on initial render; only the click handler reveals it.
-    assert 'js-basemap-spinner" style="display: none;' in compact_html
+    # The button only shows its loading state while a status request runs.
+    assert 'hx-on::before-request="this.loading = true"' in compact_html
+    assert 'hx-on::after-request="this.loading = false"' in compact_html
+    assert " loading>" not in compact_html
 
 
 def test_basemap_attach_progress_fragment_shows_initial_processing_state():
@@ -115,10 +115,10 @@ def test_basemap_attach_progress_fragment_shows_initial_processing_state():
     assert 'hx-trigger="load' not in html
     assert html.count('hx-get="/projects/56/basemap/attach-status"') == 1
     compact_html = " ".join(html.split())
-    assert 'class="js-basemap-check-text"' in compact_html
-    assert "Checking..." in compact_html
-    # The spinner stays hidden until the user actually clicks Check Status.
-    assert 'js-basemap-spinner" style="display: none;' in compact_html
+    # The button only shows its loading state while a status request runs.
+    assert 'hx-on::before-request="this.loading = true"' in compact_html
+    assert 'hx-on::after-request="this.loading = false"' in compact_html
+    assert " loading>" not in compact_html
 
 
 def test_basemap_attach_progress_fragment_shows_warning_and_retry_on_failed_attach():
@@ -257,7 +257,7 @@ def test_basemap_ready_fragment_shows_attach_in_progress_message_when_disabled()
     compact_html = " ".join(html.split())
     assert "Basemap is ready. Attaching to QField project in progress." in compact_html
     assert "Attach to QField Project" in html
-    assert 'disabled="disabled"' in html
+    assert " disabled >" in compact_html
 
 
 def test_basemap_ready_fragment_shows_download_only_when_attached():

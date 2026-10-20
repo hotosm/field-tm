@@ -29,7 +29,7 @@ def role_badge_variant(role: str) -> str:
     return {
         "admin": "danger",
         "manager": "warning",
-        "editor": "primary",
+        "editor": "brand",
         "reporter": "neutral",
         "reader": "neutral",
     }.get(role, "neutral")
@@ -46,18 +46,15 @@ def render_management_area(
     hidden = hidden_fields_html(qfc_url, token, username)
 
     header = f"""
-<div class="ftm-flex-between" style="margin-bottom:1.5rem">
+<div class="wa-split wa-gap-m">
   <div>
-    <h2 class="ftm-section-title" style="margin:0">{_("QFieldCloud Projects")}</h2>
-    <p
-      style="margin:4px 0 0;color:var(--ftm-text-muted);
-             font-size:var(--hot-font-size-small)"
-    >
+    <h2 class="ftm-section-title">{_("QFieldCloud Projects")}</h2>
+    <p class="ftm-hint">
       {_("Connected as")} <strong>{html.escape(username)}</strong>
       {_("to")} <code>{html.escape(base_url)}</code>
     </p>
   </div>
-  <wa-button variant="default" size="s"
+  <wa-button variant="neutral" appearance="outlined" size="small"
     onclick="document.getElementById('qfc-management').innerHTML='';
              document.getElementById('qfc-login-panel').style.display='block';">
     {_("Log Out")}
@@ -65,7 +62,7 @@ def render_management_area(
 </div>"""
 
     if not projects:
-        table = f'<p style="color:var(--ftm-text-muted)">{_("No projects found.")}</p>'
+        table = f'<p class="ftm-hint">{_("No projects found.")}</p>'
     else:
         rows = []
         for p in projects:
@@ -79,26 +76,25 @@ def render_management_area(
                 else f'<wa-badge variant="neutral">{_("Private")}</wa-badge>'
             )
             rows.append(f"""
-<tr class="ftm-qfc-project-row" id="qfc-project-row-{pid}">
-  <td style="font-weight:var(--hot-font-weight-semibold)">{name}</td>
-  <td><code style="font-size:0.8em">{owner}</code></td>
+<tr id="qfc-project-row-{pid}">
+  <td><strong>{name}</strong></td>
+  <td><code>{owner}</code></td>
   <td>{visibility}</td>
-  <td
-    style="color:var(--ftm-text-muted);font-size:var(--hot-font-size-small)"
-  >{desc}</td>
+  <td class="ftm-hint">{desc}</td>
   <td>
     <form hx-get="/qfc-admin/projects/{pid}/collaborators"
           hx-target="#qfc-collabs-{pid}" hx-swap="innerHTML">
       {hidden}
-      <wa-button variant="default" size="s" type="submit">{_("Manage")}</wa-button>
+      <wa-button variant="neutral" appearance="outlined" size="small"
+        type="submit">{_("Manage")}</wa-button>
     </form>
   </td>
 </tr>
 <tr><td colspan="5" id="qfc-collabs-{pid}" class="ftm-qfc-collabs-cell"></td></tr>""")
 
         table = f"""
-<div style="overflow-x:auto">
-  <table class="ftm-qfc-table">
+<div class="ftm-table-scroll">
+  <table class="wa-hover-rows">
     <thead>
       <tr><th>{_("Project")}</th><th>{_("Owner")}</th><th>{_("Visibility")}</th><th>{_("Description")}</th><th></th></tr>
     </thead>
@@ -154,38 +150,35 @@ def render_collaborators_panel(
 
             collab_rows.append(f"""
 <tr id="qfc-collab-{pid_e}-{uname}">
-  <td style="font-weight:var(--hot-font-weight-semibold)">{uname}</td>
+  <td><strong>{uname}</strong></td>
   <td>
     <wa-badge variant="{role_badge_variant(role)}">
       {html.escape(role.title())}
     </wa-badge>
   </td>
-  <td class="ftm-qfc-collab-actions">
+  <td class="wa-cluster wa-gap-xs">
     <form hx-patch="/qfc-admin/projects/{pid_e}/collaborators/{uname}"
           hx-target="#{target_id}" hx-swap="innerHTML"
-          style="display:inline-flex;gap:0.5rem;align-items:center">
+          class="wa-cluster wa-gap-xs">
       {hidden}
-      <select
-        name="role"
-        class="ftm-projects-filter__select"
-        style="width:auto;min-width:6rem"
-      >
+      <select name="role">
         {role_options}
       </select>
-      <wa-button variant="default" size="s" type="submit">{_("Update")}</wa-button>
+      <wa-button variant="neutral" appearance="outlined" size="small"
+        type="submit">{_("Update")}</wa-button>
     </form>
-    <wa-button variant="danger" size="s" outline
+    <wa-button variant="danger" appearance="outlined" size="small"
       onclick="document.getElementById('{dialog_id}').show()">{_("Remove")}</wa-button>
   </td>
 </tr>""")
 
             dialogs.append(f"""
 <wa-dialog id="{dialog_id}" label="{_("Remove Collaborator")}" with-header>
-  <p style="margin:0;line-height:1.6">
+  <p>
     {_("Remove")} <strong>{uname}</strong> {_("from this project?")}
   </p>
-  <div slot="footer" class="ftm-flex-end">
-    <wa-button variant="default"
+  <div slot="footer" class="wa-cluster">
+    <wa-button variant="neutral" appearance="outlined"
       onclick="document.getElementById('{dialog_id}').hide()">{_("Cancel")}</wa-button>
     <wa-button variant="danger"
       hx-delete="/qfc-admin/projects/{pid_e}/collaborators/{uname}"
@@ -195,52 +188,41 @@ def render_collaborators_panel(
 </wa-dialog>""")
 
         collab_table = f"""
-<table class="ftm-qfc-table ftm-qfc-table--nested">
+<table>
   <thead><tr><th>{_("User")}</th><th>{_("Role")}</th><th>{_("Actions")}</th></tr></thead>
   <tbody>{"".join(collab_rows)}</tbody>
 </table>"""
     else:
-        collab_table = (
-            '<p style="color:var(--ftm-text-muted);'
-            f'font-size:var(--hot-font-size-small)">{_("No collaborators yet.")}</p>'
-        )
+        collab_table = f'<p class="ftm-hint">{_("No collaborators yet.")}</p>'
 
     role_options_add = "".join(
         f'<option value="{r}"{"selected" if r == "editor" else ""}>{label}</option>'
         for r, label in COLLABORATOR_ROLES
     )
     add_form = f"""
-<div class="ftm-qfc-add-collab">
-  <form hx-post="/qfc-admin/projects/{pid_e}/collaborators"
-        hx-target="#{target_id}" hx-swap="innerHTML"
-        class="ftm-qfc-add-collab-form">
+<form hx-post="/qfc-admin/projects/{pid_e}/collaborators"
+      hx-target="#{target_id}" hx-swap="innerHTML"
+      class="wa-cluster wa-gap-xs">
     {hidden}
-    <wa-input name="new_username" placeholder="{_("Username")}" size="s"
-              required style="flex:1;min-width:8rem"></wa-input>
-    <select
-      name="new_role"
-      class="ftm-projects-filter__select"
-      style="width:auto;min-width:6rem"
-    >
+    <wa-input name="new_username" placeholder="{_("Username")}" size="small"
+              required></wa-input>
+    <select name="new_role">
       {role_options_add}
     </select>
-    <wa-button variant="primary" size="s" type="submit">
+    <wa-button variant="brand" size="small" type="submit">
       {_("Add Collaborator")}
     </wa-button>
-  </form>
-</div>"""
+</form>"""
 
     close_btn = f"""
-<div style="text-align:right;margin-bottom:0.5rem">
-  <wa-button variant="default" size="s"
+<div class="wa-split">
+  <h3 class="ftm-section-title">{_("Collaborators")}</h3>
+  <wa-button variant="neutral" appearance="plain" size="small"
     onclick="document.getElementById('{target_id}').innerHTML=''">{_("Close")}</wa-button>
 </div>"""
 
-    return f"""<div class="ftm-qfc-collab-panel">
+    return f"""<div class="ftm-panel ftm-panel--quiet wa-stack">
   {close_btn}
-  <h4
-    style="margin:0 0 0.75rem"
-  >{_("Collaborators")}</h4>
   {collab_table}
   {add_form}
 </div>{"".join(dialogs)}"""

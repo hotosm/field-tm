@@ -35,17 +35,7 @@ SPLITTER_SERIALIZATION_LOCK_KEY = 7_341_109_241_762_310_001
 
 
 def create_connection(db: Union[str, psycopg.Connection]) -> psycopg.Connection:
-    """Get db connection from existing psycopg connection, or URL string.
-
-    Args:
-        db (str, psycopg.Connection):
-            string or existing db connection.
-            If `db` is a string, a new connection is generated.
-            If `db` is a psycopg connection, the connection is reused.
-
-    Returns:
-        conn: DBAPI connection object to generate cursors from.
-    """
+    """Reuse a psycopg connection or open one from a database URL."""
     if isinstance(db, psycopg.Connection):
         conn = db
     elif isinstance(db, str):
@@ -77,13 +67,7 @@ def configure_lock_timeout(
     cur: psycopg.Cursor,
     timeout_ms: int = DEFAULT_LOCK_TIMEOUT_MS,
 ) -> None:
-    """Apply a transaction-local Postgres lock_timeout.
-
-    Without this, a blocked CREATE/DROP TABLE waits the full statement
-    timeout (minutes) before cancelling with a confusing "statement
-    timeout" mid-DDL; with it, blocked statements fail fast with a
-    clear LockNotAvailable.
-    """
+    """Set a transaction-local lock timeout so blocked DDL fails promptly."""
     if timeout_ms <= 0:
         return
 
@@ -115,13 +99,7 @@ def close_connection(conn: psycopg.Connection):
 
 
 def create_tables(conn: psycopg.Connection):
-    """Create session-scoped temp tables required for splitting.
-
-    TEMP so each session lives in its own pg_temp_<N> namespace -
-    concurrent splits can't collide on (typname, public) in pg_type, and
-    orphans from a crashed run can't block future splits.
-    """
-    # First drop tables if they exist
+    """Create session-local temp tables to isolate concurrent splits."""
     drop_tables(conn)
 
     create_cmd = """
@@ -179,17 +157,7 @@ def drop_tables(conn: psycopg.Connection):
 
 
 def aoi_to_postgis(conn: psycopg.Connection, geom: dict) -> None:
-    """Export a GeoJSON geometry dict to the project_aoi table in PostGIS.
-
-    Uses a new cursor on existing connection, but not committed directly.
-
-    Args:
-        geom (dict): The GeoJSON geometry dict to insert.
-        conn (psycopg.Connection): The PostgreSQL connection.
-
-    Returns:
-        None
-    """
+    """Insert a GeoJSON geometry into project_aoi without committing."""
     log.debug("Adding AOI to project_aoi table")
 
     sql_insert = """
@@ -214,17 +182,10 @@ def insert_geoms_batch(
     table_name: str,
     rows: list[dict],
 ) -> None:
-    """Batch-insert OSM geometries into one of the splitter temp tables.
+    """Batch-insert geometries into ways_poly or ways_line.
 
-    Uses ``executemany`` (which psycopg3 pipelines when supported) so an
-    extract with thousands of features costs a single round-trip block
-    instead of one per feature.
-
-    Args:
-        cur: PostgreSQL cursor.
-        table_name: Target table, must be ``ways_poly`` or ``ways_line``.
-        rows: List of dicts with keys ``osm_id``, ``geom`` (GeoJSON str),
-            and ``tags`` (dict).
+    Each row contains osm_id, geom (GeoJSON string), and tags (dict).
+    executemany pipelines inserts where supported to reduce round-trips.
     """
     if not rows:
         return

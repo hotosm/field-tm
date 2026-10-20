@@ -29,14 +29,8 @@
 
 <!-- markdownlint-enable -->
 
-This is a program to split polygons into tasks using a variety of
-algorithms. It is a class that can be used by other projects, but also
-a standalone program. It was originally developed for the
-[Field-TM](https://github.com/hotosm/field-tm/wiki) project, but then
-converted so it can be used by multiple projects.
-
-The class takes GeoJson Polygon as an input, and returns a GeoJson
-file Multipolygon of all the task boundaries.
+Split an area into mapping tasks using the Python API or CLI. The input is
+a GeoJSON area; the output is a FeatureCollection of task boundaries.
 
 ## Installation
 
@@ -44,7 +38,7 @@ file Multipolygon of all the task boundaries.
 pip install area-splitter
 ```
 
-> Note Postgis should have SFCGAL enabled:
+> Enable SFCGAL for straight skeleton splitting:
 >
 > ```sql
 > CREATE EXTENSION IF NOT EXISTS postgis_sfcgal WITH SCHEMA public;
@@ -77,8 +71,7 @@ the [Task Splitting manual](../../../docs/manuals/task-splitting.md).
 
 ## Usage In Code
 
-- Either the AreaSplitter class can be used directly, or the wrapper/
-  helper functions can be used for splitting.
+Use `AreaSplitter` directly or the helper functions below.
 
 By square:
 
@@ -114,12 +107,7 @@ split_features = split_by_sql(
 
 ### Database Connections
 
-- The db parameter can be a connection string to start a new connection.
-- Or an existing database connection can be reused.
-- To do this, either the psycopg connection, or a DBAPI connection string
-  must be passed:
-
-psycopg example:
+The `db` parameter accepts a database URL or an existing psycopg connection:
 
 ```python
 import psycopg
@@ -149,18 +137,14 @@ Options:
 -c CUSTOM, --custom CUSTOM       Custom SQL query for database
 ```
 
-This program splits a Polygon (the Area Of Interest)
-The data source for existing data can'be either the data extract
-used by the XLSForm, or a postgresql database.
+Source features can come from a GeoJSON extract or PostgreSQL database.
 
-Examples:
+The default split is a 50 m grid. `AOI` is the project boundary; output defaults
+to `field-tm.geojson`.
 
 ```bash
 area-splitter -b AOI
 area-splitter -v -b AOI -s data.geojson
 area-splitter -v -b AOI -s PG:colorado
 
-# Where AOI is the boundary of the project as a polygon
-# And OUTFILE is a MultiPolygon output file,which defaults to field-tm.geojson
-# The task splitting defaults to squares, 50 meters across
 ```

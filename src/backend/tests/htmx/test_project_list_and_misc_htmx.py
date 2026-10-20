@@ -15,7 +15,7 @@ from app.htmx.project_list_routes import project_listing
 
 # We patch where project_crud is used/defined.
 # htmx_routes imports `from app.projects import project_crud`
-# so we patch `app.projects.project_crud.get_project_qrcode`
+# so we patch `app.projects.project_crud.get_project_qr_data`
 
 
 async def test_project_details_shows_odk_media_upload_guidance(client, db, project):
@@ -46,11 +46,11 @@ async def test_project_details_shows_odk_media_upload_guidance(client, db, proje
 
 async def test_project_qrcode_htmx(client, project):
     """Test QR code generation via HTMX."""
-    # Mock get_project_qrcode to avoid calling ODK/QField
+    # Mock get_project_qr_data to avoid calling ODK/QField
     with patch(
-        "app.projects.project_crud.get_project_qrcode", new_callable=AsyncMock
+        "app.projects.project_crud.get_project_qr_data", new_callable=AsyncMock
     ) as mock_get_qrcode:
-        mock_get_qrcode.return_value = "data:image/png;base64,mocked_qr_code"
+        mock_get_qrcode.return_value = "qfield://cloud?project=mocked"
 
         response = await client.get(
             f"/project-qrcode-htmx?project_id={project.id}",
@@ -58,7 +58,8 @@ async def test_project_qrcode_htmx(client, project):
         )
 
         assert response.status_code == status.HTTP_200_OK
-        assert "data:image/png;base64,mocked_qr_code" in response.text
+        assert "<wa-qr-code" in response.text
+        assert 'value="qfield://cloud?project=mocked"' in response.text
         assert "Scan QR Code" in response.text
 
         mock_get_qrcode.assert_called_once()
@@ -187,14 +188,14 @@ async def test_project_listing_renders_cards_and_component_bootstrap(
     assert "Project Status" in response.text
     assert "Sort By" in response.text
     assert 'id="projects-search"' in response.text
-    # No webfonts: the design system is system-sans.
+    # No Google Fonts: @hotosm/ui bundles the HOT fonts.
     assert "fonts.googleapis.com/css2" not in response.text
     assert "fonts.gstatic.com" not in response.text
     # The import map resolves webawesome-all.js's bare specifiers; without it every
     # wa-* element renders as bare markup. Raw dist URLs, never jsDelivr's /+esm -
     # see the comment in layout.html.
     assert '"@awesome.me/webawesome/dist/components/"' in response.text
-    assert "@hotosm/ui@2.1.0/dist/webawesome-all.js" in response.text
+    assert "@hotosm/ui@3.0.0/dist/webawesome-all.js" in response.text
     assert "webawesome-all.js/+esm" not in response.text
 
 
@@ -367,7 +368,9 @@ def test_safe_return_path_only_allows_same_origin_paths(return_to, expected):
     assert _safe_return_path(return_to, "field.test") == expected
 
 
-def _render_login_page(auth_provider: str) -> str:
+def _render_login_page(
+    auth_provider: str, login_url: str = "https://login.hotosm.org/app"
+) -> str:
     """Render login.html with the globals the app installs."""
     templates_dir = Path(__file__).resolve().parents[2] / "app" / "templates"
     env = Environment(
@@ -386,7 +389,8 @@ def _render_login_page(auth_provider: str) -> str:
         auth_enabled=True,
         auth_provider=auth_provider,
         hanko_public_url="https://login.field.test",
-        login_url="https://login.hotosm.org/app",
+        login_url=login_url,
+        frontend_url="https://field.test",
     )
     return env.get_template("login.html").render(return_to="/new")
 
@@ -397,6 +401,15 @@ def test_login_page_embeds_hanko_form_for_bundled_auth():
 
     assert "show-profile" in rendered
     assert 'redirect-after-login="/new"' in rendered
+    assert "window.location.replace" not in rendered
+
+
+@pytest.mark.parametrize("login_url", ["/login", "https://field.test/login"])
+def test_login_page_embeds_form_when_custom_login_url_is_this_page(login_url):
+    """A custom LOGIN_URL pointing at this /login must not redirect to itself."""
+    rendered = _render_login_page("custom", login_url)
+
+    assert "show-profile" in rendered
     assert "window.location.replace" not in rendered
 
 
@@ -460,4 +473,5 @@ async def test_landing_page_has_single_footer(client):
     """The landing page uses the shared layout footer only."""
     response = await client.get("/")
 
-    assert response.text.count("https://roadmap.hotosm.org/#tech-request") == 1
+    assert response.text.count("<footer") == 1
+    assert response.text.count("Submit a tech request") == 1

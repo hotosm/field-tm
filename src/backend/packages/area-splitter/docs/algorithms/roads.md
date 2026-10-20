@@ -7,18 +7,14 @@ SQL: `algorithms/split_by_roads.sql`.
 
 ## Idea
 
-Some projects collect street-level data (imagery, road condition
-surveys) rather than per-building data. Mappers walk or cycle roads,
-so task boundaries should follow the street layout, not building
-density. There's no need to cluster buildings or run Voronoi/Straight
-Skeleton at all — the road-bounded polygons that
-`common/1-linear-features.sql` already produces as an intermediate
-step are the final output.
+For street-level surveys, use road-bounded polygons as tasks without
+clustering buildings. The output comes directly from
+`common/1-linear-features.sql`.
 
 ## Steps
 
 1. `common/1-linear-features.sql`: same as for the building-based
-   algorithms — union roads, rivers, railways, aeroways and
+   algorithms - union roads, rivers, railways, aeroways and
    non-traversable barriers with the AOI boundary, then
    `ST_Polygonize` to get `polygonsnocount`, one polygon per
    road-enclosed area. Falls back to the whole AOI as a single polygon
@@ -29,13 +25,10 @@ step are the final output.
    `ways_poly` for informational purposes only (it plays no part in
    how the polygons are drawn).
 
-## Downsides
+## Tradeoffs
 
-- No control over task size — a polygon between two motorway
-  junctions can be much larger or smaller than one between two
-  residential streets.
-- No SFCGAL dependency; runs on any PostGIS install with the standard
-  extensions.
+- Task size follows the street layout and cannot be controlled.
+- Runs on standard PostGIS without SFCGAL.
 
 Prefer one of the [Voronoi](voronoi.md) or
 [straight skeleton](straight-skeleton.md) algorithms when the goal is

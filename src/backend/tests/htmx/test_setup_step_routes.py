@@ -33,7 +33,7 @@ from app.projects.project_services import ValidationError as SvcValidationError
 
 # We patch where project_crud is used/defined.
 # htmx_routes imports `from app.projects import project_crud`
-# so we patch `app.projects.project_crud.get_project_qrcode`
+# so we patch `app.projects.project_crud.get_project_qr_data`
 
 
 def test_step5_dispatch_route_is_registered():
@@ -85,7 +85,7 @@ async def test_project_setup_shows_step2_advanced_config_options(client, db, pro
     assert 'id="osm-category-select" name="osm_category"' in response.text
     assert 'id="osm-geom-type-select" name="geom_type"' in response.text
     assert 'id="osm-centroid-checkbox" name="centroid" value="true"' in response.text
-    assert response.text.index("data-advanced-config-toggle") < response.text.index(
+    assert response.text.index("data-advanced-config-panel") < response.text.index(
         'id="osm-data-status"'
     )
 

@@ -122,9 +122,9 @@ async def _make_qfield_project_with_creds(db, project_id):
 
 async def _get_qr_panel(client, project_id):
     with patch(
-        "app.projects.project_crud.get_project_qrcode", new_callable=AsyncMock
+        "app.projects.project_crud.get_project_qr_data", new_callable=AsyncMock
     ) as mock_qr:
-        mock_qr.return_value = "data:image/png;base64,abc"
+        mock_qr.return_value = "qfield://cloud?project=abc"
         return await client.get(
             f"/project-qrcode-htmx?project_id={project_id}",
             headers={"HX-Request": "true"},

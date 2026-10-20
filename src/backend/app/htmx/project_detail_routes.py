@@ -259,10 +259,7 @@ async def project_qrcode_htmx(
     await ensure_project_viewable(db, project, auth_user)
 
     try:
-        # Use CRUD function to generate QR code
-        qr_code_data_url = await project_crud.get_project_qrcode(
-            db, project_id, username
-        )
+        qr_data = await project_crud.get_project_qr_data(db, project_id, username)
         app_name = _app_name(project)
         qr_download_name = f"{project.project_name}_{app_name}_{project_id}"
         open_app_url = None
@@ -277,7 +274,7 @@ async def project_qrcode_htmx(
         return HTMXTemplate(
             template_name="partials/project_details/fragments/qr_panel.html",
             context={
-                "qr_code_data_url": qr_code_data_url,
+                "qr_data": qr_data,
                 "qr_download_name": qr_download_name,
                 "app_name": app_name,
                 "open_app_url": open_app_url,
@@ -337,13 +334,13 @@ def _render_collaborator_result(
 
     add_more_label = escape(_("Add more collaborators"), quote=True)
     refresh_button = (
-        f'<wa-button type="button" variant="default" size="s" '
+        f'<wa-button variant="neutral" appearance="outlined" size="small" '
         f'hx-get="/projects/{project_id}/qfc-collaborator-form" '
         f'hx-target="#qfc-collaborator-section" hx-swap="outerHTML" '
-        f'style="margin-top:8px">{add_more_label}</wa-button>'
+        f">{add_more_label}</wa-button>"
     )
-    inner = "".join(blocks) + refresh_button
-    return f'<div id="qfc-collaborator-section">{inner}</div>'
+    inner = "".join(blocks) + f"<div>{refresh_button}</div>"
+    return f'<div id="qfc-collaborator-section" class="wa-stack">{inner}</div>'
 
 
 def _render_collaborator_form(project_id: int, *, error_msg: str | None = None) -> str:
@@ -372,17 +369,13 @@ def _render_collaborator_form(project_id: int, *, error_msg: str | None = None) 
     placeholder = escape(_("e.g. alice, bob, charlie"), quote=True)
     submit_label = escape(_("Add collaborators"), quote=True)
 
-    error_html = (
-        f'<div style="margin-bottom:8px">{_callout("danger", error_msg)}</div>'
-        if error_msg
-        else ""
-    )
+    error_html = _callout("danger", error_msg) if error_msg else ""
 
     return (
-        f'<div id="qfc-collaborator-section" class="ftm-qfc-collab">'
-        f'<div class="ftm-qfc-collab__panel">'
-        f'<h3 class="ftm-qfc-collab__title">{heading}</h3>'
-        f'<ol class="ftm-qfc-collab__steps">'
+        f'<wa-card id="qfc-collaborator-section" with-header>'
+        f'<h3 slot="header" class="ftm-section-title">{heading}</h3>'
+        f'<div class="wa-stack">'
+        f'<ol class="ftm-hint">'
         f"<li>{step_intro}</li>"
         f"<li>{step_create}</li>"
         f"<li>{step_enter}</li>"
@@ -390,13 +383,13 @@ def _render_collaborator_form(project_id: int, *, error_msg: str | None = None) 
         f"{error_html}"
         f'<form hx-post="/projects/{project_id}/qfc-collaborators" '
         f'hx-target="#qfc-collaborator-section" hx-swap="outerHTML" '
-        f'class="ftm-qfc-collab__form">'
-        f'<wa-input name="qfc_usernames" placeholder="{placeholder}" required '
-        f'class="ftm-qfc-collab__input"></wa-input>'
+        f'class="wa-flank:end wa-gap-s">'
+        f'<wa-input name="qfc_usernames" placeholder="{placeholder}" required>'
+        f"</wa-input>"
         f'<wa-button type="submit" variant="brand">{submit_label}</wa-button>'
         f"</form>"
         f"</div>"
-        f"</div>"
+        f"</wa-card>"
     )
 
 

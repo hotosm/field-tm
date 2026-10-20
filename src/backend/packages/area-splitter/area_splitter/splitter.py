@@ -286,6 +286,21 @@ def _parse_feature_split_input(
     raise ValueError(msg)
 
 
+def _sql_literal(value) -> str:
+    """Render a numeric or boolean SQL parameter; reject anything else.
+
+    The algorithm SQL files use %(name)s placeholders that are substituted as
+    text, so only plain numbers and booleans are allowed.
+    """
+    if isinstance(value, bool):
+        return "TRUE" if value else "FALSE"
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, str) and value.upper() in {"TRUE", "FALSE"}:
+        return value.upper()
+    raise ValueError(f"Unsupported SQL parameter value: {value!r}")
+
+
 class AreaSplitter:
     """A class to split polygons."""
 
@@ -293,21 +308,11 @@ class AreaSplitter:
         self,
         aoi_obj: Optional[Union[str, dict]] = None,
     ):
-        """This class splits a polygon into tasks using a variety of algorithms.
-
-        Args:
-            aoi_obj (str, FeatureCollection): Input AOI, either a file path,
-                or GeoJSON string.
-
-        Returns:
-            instance (AreaSplitter): An instance of this class
-        """
-        # Parse AOI, extract geometry dict
+        """Initialize the splitter from an AOI file path or GeoJSON string."""
         if aoi_obj:
             geojson_data = self.input_to_geojson(aoi_obj)
             self.aoi = self._extract_aoi_geometry(geojson_data)
 
-        # Init split features
         self.split_features = None
 
     @staticmethod
@@ -354,13 +359,10 @@ class AreaSplitter:
             isinstance(geojson_data, dict)
             and geojson_data.get("type") == "FeatureCollection"
         ):
-            # Handle FeatureCollection nesting
             features = geojson_data.get("features", [])
         elif isinstance(geojson_data, dict) and geojson_data.get("type") == "Feature":
-            # Must be a list
             features = [geojson_data]
         else:
-            # A standard geometry type. Has coordinates, no properties
             features = [{"type": "Feature", "geometry": geojson_data, "properties": {}}]
         return {"type": "FeatureCollection", "features": features}
 
@@ -405,29 +407,13 @@ class AreaSplitter:
     def meters_to_degrees(
         self, meters: float, reference_lat: float
     ) -> Tuple[float, float]:
-        """Converts meters to degrees at a given latitude.
-
-        Using WGS84 ellipsoidal calculations.
-
-        Args:
-            meters (float): The distance in meters to convert.
-            reference_lat (float): The latitude at which to ,
-            perform the conversion (in degrees).
-
-        Returns:
-            Tuple[float, float]: Degree values for latitude and longitude.
-        """
-        # INFO:
-        # The geodesic distance is the shortest distance on the surface
-        # of an ellipsoidal model of the earth
-
+        """Return WGS84 latitude/longitude degree offsets at reference_lat."""
         lat_rad = math.radians(reference_lat)
 
         # Using WGS84 parameters
         a = 6378137.0  # Semi-major axis in meters
         f = 1 / 298.257223563  # Flattening factor
 
-        # Applying formula
         e2 = (2 * f) - (f**2)  # Eccentricity squared
         n = a / math.sqrt(
             1 - e2 * math.sin(lat_rad) ** 2
@@ -436,10 +422,9 @@ class AreaSplitter:
             a * (1 - e2) / (1 - e2 * math.sin(lat_rad) ** 2) ** (3 / 2)
         )  # Radius of curvature in the meridian
 
-        lat_deg_change = meters / m  # Latitude change in degrees
-        lon_deg_change = meters / (n * math.cos(lat_rad))  # Longitude change in degrees
+        lat_deg_change = meters / m  # Latitude offset in radians
+        lon_deg_change = meters / (n * math.cos(lat_rad))  # Longitude offset in radians
 
-        # Convert changes to degrees by dividing by radians to degrees
         lat_deg_change = math.degrees(lat_deg_change)
         lon_deg_change = math.degrees(lon_deg_change)
 
@@ -621,14 +606,7 @@ class AreaSplitter:
             raise ValueError(msg)
 
     def _insert_split_sql_extract(self, cur, osm_extract: dict) -> None:
-        """Insert the OSM extract into the temporary split tables.
-
-        Buckets each feature into ways_poly (building polygons) or ways_line
-        (linear features) then issues a single batched insert per table.
-        Single-row inserts on a large extract dominated the split runtime -
-        executemany pipelines the round-trips so we go from O(N) request
-        latencies to roughly one.
-        """
+        """Batch-insert polygons into ways_poly and lines into ways_line."""
         polys: list[dict] = []
         lines: list[dict] = []
         for feature in osm_extract["features"]:
@@ -676,7 +654,9 @@ class AreaSplitter:
                 sql_content = raw_sql.read()
                 for param_name, param_value in params.items():
                     placeholder = f"%({param_name})s"
-                    sql_content = sql_content.replace(placeholder, str(param_value))
+                    sql_content = sql_content.replace(
+                        placeholder, _sql_literal(param_value)
+                    )
                 splitter_cursor.execute(sql_content)
         return splitter_cursor.fetchall()[0][0]["features"]
 
@@ -686,20 +666,10 @@ class AreaSplitter:
         db: Union[str, Connection],
         extract_geojson: Optional[dict] = None,
     ) -> dict:
-        """Split the polygon into squares.
+        """Return a clipped square grid as a FeatureCollection.
 
-        Args:
-            meters (int):  The size of each task square in meters.
-            db (str, psycopg.Connection): The db url, format:
-                postgresql://myusername:mypassword@myhost:5432/mydatabase
-                OR an psycopg connection object object that is reused.
-                Passing an connection object prevents requiring additional
-                database connections to be spawned.
-            extract_geojson (dict, FeatureCollection): an OSM extract geojson,
-                containing building polygons, or linestrings.
-
-        Returns:
-            data (FeatureCollection): A multipolygon of all the task boundaries.
+        meters sets the cell size. db accepts a URL or reusable psycopg connection;
+        extract_geojson supplies building polygons or lines.
         """
         log.debug("Splitting the AOI by squares")
         cols, rows = self._square_grid_axes(meters)
@@ -731,27 +701,11 @@ class AreaSplitter:
         osm_extract: Optional[dict] = None,
         statement_timeout_ms: Optional[int] = None,
     ) -> dict:
-        """Split the polygon by features in the database using an SQL query.
+        """Split with the selected SQL algorithm and return a FeatureCollection.
 
-        Args:
-            db (str, psycopg.Connection): The db url, format:
-                postgresql://myusername:mypassword@myhost:5432/mydatabase
-                OR an psycopg connection object object that is reused.
-                Passing an connection object prevents requiring additional
-                database connections to be spawned.
-            algorithm (SplittingAlgorithm): The algorithm to use.
-            algorithm_params (dict): Dictionary of parameters for the algorithm.
-                For building-based algorithms, should include 'num_buildings'
-                or 'num_enumerators', depending on the selected algorithm.
-            osm_extract (dict, FeatureCollection): an OSM extract geojson,
-                containing building polygons, or linestrings.
-            statement_timeout_ms (int, optional): Override the per-transaction
-                statement_timeout. ``None`` uses the package default; ``0``
-                disables the cap entirely (e.g. when the caller runs in a
-                background task and is not subject to a reverse-proxy budget).
-
-        Returns:
-            data (FeatureCollection): A multipolygon of all the task boundaries.
+        db accepts a URL or psycopg connection. algorithm_params supplies the
+        selected algorithm's required parameters; osm_extract supplies features.
+        statement_timeout_ms=None uses the package default; 0 disables the timeout.
         """
         params = algorithm_params or {}
         self._validate_split_sql_inputs(algorithm, params, osm_extract)
@@ -828,16 +782,7 @@ class AreaSplitter:
         features: dict,
         db: Union[str, Connection],
     ) -> dict:
-        """Split the polygon by features using PostGIS.
-
-        Args:
-            features(FeatureCollection): FeatureCollection of features
-                to polygonise and return.
-            db (str, psycopg.Connection): The db url or connection object.
-
-        Returns:
-            data (FeatureCollection): A multipolygon of all the task boundaries.
-        """
+        """Polygonize features with PostGIS and return a FeatureCollection."""
         log.debug("Polygonising the FeatureCollection features via PostGIS")
         conn = create_connection(db)
         geom_dicts = self._feature_split_geometries(features)
@@ -910,27 +855,11 @@ def split_by_square(
     osm_extract: Union[str, dict] = None,
     outfile: Optional[str] = None,
 ) -> dict:
-    """Split an AOI by square, dividing into an even grid.
+    """Split an AOI into a clipped square grid and return a FeatureCollection.
 
-    Args:
-        aoi(str, FeatureCollection): Input AOI, either a file path,
-            GeoJSON string, or FeatureCollection object.
-        db (str, psycopg.Connection): The db url, format:
-            postgresql://myusername:mypassword@myhost:5432/mydatabase
-            OR an psycopg connection object object that is reused.
-            Passing an connection object prevents requiring additional
-            database connections to be spawned.
-        meters(str, optional): Specify the square size for the grid.
-            Defaults to 100m grid.
-        osm_extract (str, FeatureCollection): an OSM extract geojson,
-            containing building polygons, or linestrings.
-            Optional param, if not included an extract is generated for you.
-            It is recommended to leave this param as default, unless you know
-            what you are doing.
-        outfile(str): Output to a GeoJSON file on disk.
-
-    Returns:
-        features (FeatureCollection): A multipolygon of all the task boundaries.
+    aoi accepts a file path, GeoJSON string, or FeatureCollection. db accepts
+    a database URL or reusable psycopg connection. meters sets the cell size;
+    outfile optionally writes the result. Missing osm_extract is fetched.
     """
     aoi_featcol = _parse_aoi_feature_collection(aoi)
     extract_geojson = _parse_optional_geojson_input(osm_extract)
@@ -968,53 +897,15 @@ def split_by_sql(
     algorithm_params: Optional[dict] = None,
     statement_timeout_ms: Optional[int] = None,
 ) -> dict:
-    """Split an AOI with a field-tm algorithm.
+    """Split an AOI along linear features, targeting buildings per task or task count.
 
-    The query will optimise on the following:
-    - Attempt to divide the aoi into tasks that contain approximately the
-        number of buildings from `num_buildings` (or algorithm_params).
-    - Or divide the AOI into a target number of tasks using
-        `num_enumerators`.
-    - Split the task areas on major features such as roads an rivers, to
-      avoid traversal of these features across task areas.
-    Also has handling for multiple geometries within FeatureCollection object.
+    aoi and osm_extract accept file paths, GeoJSON strings, or FeatureCollections.
+    A missing extract is fetched. db accepts a URL or reusable psycopg connection;
+    outfile optionally writes the resulting FeatureCollection.
 
-    Args:
-        aoi(str, FeatureCollection): Input AOI, either a file path,
-            GeoJSON string, or FeatureCollection object.
-        db (str, psycopg.Connection): The db url, format:
-            postgresql://myusername:mypassword@myhost:5432/mydatabase
-            OR an psycopg connection object that is reused.
-            Passing an connection object prevents requiring additional
-            database connections to be spawned.
-        num_buildings(int, optional): The number of buildings to optimise the Field-TM
-            splitting algorithm with (approx buildings per generated feature).
-            Deprecated: Use algorithm_params instead. If algorithm_params is provided,
-            this parameter is ignored.
-        num_enumerators(int, optional): The target number of task areas to
-            generate. Deprecated: Use algorithm_params instead. If
-            algorithm_params is provided, this parameter is ignored.
-        outfile(str): Output to a GeoJSON file on disk.
-        osm_extract (str, FeatureCollection): an OSM extract geojson,
-            containing building polygons, or linestrings.
-            Optional param, if not included an extract is generated for you.
-            It is recommended to leave this param as default, unless you know
-            what you are doing.
-        algorithm (SplittingAlgorithm, optional): The algorithm to use.
-            Must be a building-based algorithm
-            (AVG_BUILDING_VORONOI, AVG_BUILDING_SKELETON, or TOTAL_TASKS).
-            Defaults to AVG_BUILDING_SKELETON.
-        algorithm_params (dict, optional): Dictionary of parameters for the algorithm.
-            Should include all parameters required by the algorithm
-            (see algorithm.required_params).
-            If not provided, it will be constructed from num_buildings or
-            num_enumerators for backward compatibility.
-        statement_timeout_ms (int, optional): Override the per-transaction
-            statement_timeout. ``None`` uses the package default; ``0``
-            disables the cap entirely.
-
-    Returns:
-        features (FeatureCollection): A multipolygon of all the task boundaries.
+    algorithm_params must include the selected algorithm's required parameters.
+    It supersedes the deprecated num_buildings and num_enumerators arguments.
+    statement_timeout_ms=None uses the package default; 0 disables the timeout.
     """
     algorithm = algorithm or SplittingAlgorithm.AVG_BUILDING_SKELETON
     _validate_algorithm_selection(algorithm)
@@ -1070,27 +961,11 @@ def split_by_features(
     geojson_input: Optional[Union[str, dict]] = None,
     outfile: Optional[str] = None,
 ) -> dict:
-    """Split an AOI by geojson features or database features.
+    """Split an AOI using db_table or geojson_input; one must be provided.
 
-    Note: either db_table, or geojson_input must be passed.
-
-    - By PG features: split by map features in a Postgres database table.
-    - By GeoJSON features: split by map features from a GeoJSON file.
-
-    Args:
-        aoi(str, FeatureCollection): Input AOI, either a file path,
-            GeoJSON string, or FeatureCollection object.
-        db (str, psycopg.Connection): The db url, format:
-            postgresql://myusername:mypassword@myhost:5432/mydatabase
-            OR an psycopg connection object that is reused.
-        geojson_input(str, FeatureCollection): Path to input GeoJSON file,
-            a valid FeatureCollection, or GeoJSON string.
-        db_table(str): A database table containing features to split by.
-        outfile(str): Output to a GeoJSON file on disk.
-
-    Returns:
-        features (FeatureCollection): A multipolygon of all the task boundaries.
-
+    aoi and geojson_input accept file paths, GeoJSON strings, or FeatureCollections.
+    db accepts a URL or psycopg connection. Returns a FeatureCollection, optionally
+    written to outfile.
     """
     aoi_featcol = _parse_aoi_feature_collection(aoi)
     input_featcol = _parse_feature_split_input(geojson_input, db_table)

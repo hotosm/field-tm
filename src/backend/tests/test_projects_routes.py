@@ -26,6 +26,7 @@ from io import BytesIO
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
+import httpx
 import pytest
 from litestar import status_codes as status
 from litestar.exceptions import HTTPException
@@ -140,30 +141,8 @@ async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
     async def fake_generate_data_extract(*_args, **_kwargs):
         return Mock(data={"download_url": "https://example.test/extract.geojson"})
 
-    class FakeResponse:
-        ok = True
-
-        async def text(self):
-            return json.dumps(downloaded_geojson)
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc, tb):
-            return False
-
-    class FakeSession:
-        def __init__(self, **_kwargs):
-            pass
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc, tb):
-            return False
-
-        def get(self, _url):
-            return FakeResponse()
+    async def fake_download(_url):
+        return downloaded_geojson
 
     captured_input: dict = {}
 
@@ -187,7 +166,7 @@ async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
         "generate_data_extract",
         fake_generate_data_extract,
     )
-    monkeypatch.setattr(project_services.aiohttp, "ClientSession", FakeSession)
+    monkeypatch.setattr(project_services, "_download_extract_geojson", fake_download)
     monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
     monkeypatch.setattr(
         project_services,
@@ -232,30 +211,8 @@ async def test_download_osm_data_handles_null_features_as_no_matches(monkeypatch
     async def fake_generate_data_extract(*_args, **_kwargs):
         return Mock(data={"download_url": "https://example.test/extract.geojson"})
 
-    class FakeResponse:
-        ok = True
-
-        async def text(self):
-            return json.dumps(downloaded_geojson)
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc, tb):
-            return False
-
-    class FakeSession:
-        def __init__(self, **_kwargs):
-            pass
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc, tb):
-            return False
-
-        def get(self, _url):
-            return FakeResponse()
+    async def fake_download(_url):
+        return downloaded_geojson
 
     def parse_aoi_should_not_run(*_args, **_kwargs):
         raise AssertionError("parse_aoi should not be called for empty extract results")
@@ -270,7 +227,7 @@ async def test_download_osm_data_handles_null_features_as_no_matches(monkeypatch
         "generate_data_extract",
         fake_generate_data_extract,
     )
-    monkeypatch.setattr(project_services.aiohttp, "ClientSession", FakeSession)
+    monkeypatch.setattr(project_services, "_download_extract_geojson", fake_download)
     monkeypatch.setattr(project_services, "parse_aoi", parse_aoi_should_not_run)
 
     with pytest.raises(
@@ -324,30 +281,8 @@ async def test_download_osm_data_maps_invalid_geometry_parse_to_validation_error
     async def fake_generate_data_extract(*_args, **_kwargs):
         return Mock(data={"download_url": "https://example.test/extract.geojson"})
 
-    class FakeResponse:
-        ok = True
-
-        async def text(self):
-            return json.dumps(downloaded_geojson)
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc, tb):
-            return False
-
-    class FakeSession:
-        def __init__(self, **_kwargs):
-            pass
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc, tb):
-            return False
-
-        def get(self, _url):
-            return FakeResponse()
+    async def fake_download(_url):
+        return downloaded_geojson
 
     def fake_parse_aoi(*_args, **_kwargs):
         raise TypeError("'NoneType' object is not iterable")
@@ -362,7 +297,7 @@ async def test_download_osm_data_maps_invalid_geometry_parse_to_validation_error
         "generate_data_extract",
         fake_generate_data_extract,
     )
-    monkeypatch.setattr(project_services.aiohttp, "ClientSession", FakeSession)
+    monkeypatch.setattr(project_services, "_download_extract_geojson", fake_download)
     monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
 
     with pytest.raises(
@@ -474,30 +409,8 @@ async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
         captured["config_from"] = config_data.get("from")
         return Mock(data={"download_url": "https://example.test/extract.geojson"})
 
-    class FakeResponse:
-        ok = True
-
-        async def text(self):
-            return json.dumps(downloaded_geojson)
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc, tb):
-            return False
-
-    class FakeSession:
-        def __init__(self, **_kwargs):
-            pass
-
-        async def __aenter__(self):
-            return self
-
-        async def __aexit__(self, exc_type, exc, tb):
-            return False
-
-        def get(self, _url):
-            return FakeResponse()
+    async def fake_download(_url):
+        return downloaded_geojson
 
     def fake_parse_aoi(_db_url, input_geojson, merge=True):
         return input_geojson
@@ -518,7 +431,7 @@ async def test_download_osm_data_forwards_centroid_to_raw_data_api(monkeypatch):
         "generate_data_extract",
         fake_generate_data_extract,
     )
-    monkeypatch.setattr(project_services.aiohttp, "ClientSession", FakeSession)
+    monkeypatch.setattr(project_services, "_download_extract_geojson", fake_download)
     monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
     monkeypatch.setattr(
         project_services,
@@ -758,14 +671,6 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
     async def fake_create_project_manager_user(**_kwargs):
         return ("field-tm-manager-17@fieldtm.org", "StrongPass123")
 
-    class FakeDatasetClient:
-        async def listDatasets(self, _project_odk_id):  # noqa: N802
-            return []
-
-    @asynccontextmanager
-    async def fake_get_odk_dataset(_creds):
-        yield FakeDatasetClient()
-
     db = Mock()
     db.commit = fake_commit
 
@@ -806,11 +711,6 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
         "generate_project_files",
         fake_generate_project_files,
     )
-    monkeypatch.setattr(
-        project_services.central_deps,
-        "get_odk_dataset",
-        fake_get_odk_dataset,
-    )
 
     result = await project_services.finalize_odk_project(
         db=db,
@@ -842,6 +742,7 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
         id=1,
         xlsform_content=b"xlsform-bytes",
         data_extract_geojson={"type": "FeatureCollection", "features": []},
+        task_areas_geojson=None,
     )
 
     async def fake_project_one(_db, _project_id):
@@ -886,7 +787,7 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
     fake_commit.assert_awaited_once()
 
 
-async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
+async def test_get_project_qr_data_prefers_project_external_url(monkeypatch):
     """QR payload should use project external URL, not internal docker URL."""
     project = Mock(
         id=2,
@@ -929,20 +830,10 @@ async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
         captured["resolved_url"] = odk_creds.external_project_instance_url
         yield DummyClient()
 
-    class DummyQRCode:
-        def png_data_uri(self, scale=5):
-            return "data:image/png;base64,fake"
-
-    def fake_segno_make(qr_data, micro=False):
-        captured["qr_settings"] = json.loads(zlib.decompress(base64.b64decode(qr_data)))
-        captured["qr_micro"] = micro
-        return DummyQRCode()
-
     monkeypatch.setattr(
         project_crud.project_deps, "get_project_by_id", fake_get_project_by_id
     )
     monkeypatch.setattr(project_crud.central_deps, "pyodk_client", fake_pyodk_client)
-    monkeypatch.setattr(project_crud.segno, "make", fake_segno_make)
     monkeypatch.setattr(project_crud.settings, "ODK_CENTRAL_PUBLIC_URL", "")
     monkeypatch.setattr(project_crud.settings, "ODK_CENTRAL_URL", "http://central:8383")
     monkeypatch.setattr(project_crud.settings, "ODK_CENTRAL_USER", "admin@example.org")
@@ -952,18 +843,14 @@ async def test_get_project_qrcode_prefers_project_external_url(monkeypatch):
         Mock(get_secret_value=Mock(return_value="env-pass")),
     )
 
-    qr_data_url = await project_crud.get_project_qrcode(
-        db=Mock(),
-        project_id=2,
-    )
+    qr_data = await project_crud.get_project_qr_data(db=Mock(), project_id=2)
 
-    assert qr_data_url == "data:image/png;base64,fake"
+    qr_settings = json.loads(zlib.decompress(base64.b64decode(qr_data)))
     assert captured["resolved_url"] == "https://example-odk.trycloudflare.com"
     assert (
-        captured["qr_settings"]["general"]["server_url"]
+        qr_settings["general"]["server_url"]
         == "https://example-odk.trycloudflare.com/v1/key/app-token/projects/2"
     )
-    assert captured["qr_micro"] is False
 
 
 async def test_delete_project_with_downstream_deletes_ftm_after_remote(monkeypatch):
@@ -1080,3 +967,24 @@ async def test_fail_stale_jobs_marks_old_in_progress_jobs_failed(
         )
         remaining = [row[0] for row in await cur.fetchall()]
     assert remaining == [new_job]
+
+
+async def test_download_extract_geojson(monkeypatch):
+    """The extract is fetched with httpx; HTTP errors become ServiceErrors."""
+    featcol = {"type": "FeatureCollection", "features": []}
+    codes = iter([200, 500])
+
+    def handler(_request):
+        return httpx.Response(next(codes), json=featcol)
+
+    real_client = httpx.AsyncClient
+    monkeypatch.setattr(
+        project_services.httpx,
+        "AsyncClient",
+        lambda **kw: real_client(transport=httpx.MockTransport(handler), **kw),
+    )
+
+    url = "https://extract.example.org/a.geojson"
+    assert await project_services._download_extract_geojson(url) == featcol
+    with pytest.raises(project_services.ServiceError):
+        await project_services._download_extract_geojson(url)

@@ -174,14 +174,6 @@ async def test_finalize_odk_project_allows_collect_new_data_only_mode():
     ):
         return ("field-tm-manager-42@fieldtm.org", "SecurePass12345abcde")
 
-    @asynccontextmanager
-    async def fake_get_odk_dataset(_):
-        class FakeDataset:
-            async def listDatasets(self, odk_id):  # noqa: N802
-                return []
-
-        yield FakeDataset()
-
     mock_create_entity_list = AsyncMock()
 
     creds = ODKCentral(
@@ -226,10 +218,6 @@ async def test_finalize_odk_project_allows_collect_new_data_only_mode():
         patch(
             "app.projects.project_services.central_crud.create_project_manager_user",
             side_effect=fake_create_project_manager_user,
-        ),
-        patch(
-            "app.projects.project_services.central_deps.get_odk_dataset",
-            fake_get_odk_dataset,
         ),
     ):
         result = await finalize_odk_project(
@@ -323,15 +311,6 @@ async def test_finalize_odk_project_returns_manager_credentials():
     ):
         return ("field-tm-manager-42@fieldtm.org", "SecurePass12345abcde")
 
-    # Mock dataset check
-    @asynccontextmanager
-    async def fake_get_odk_dataset(_):
-        class FakeDataset:
-            async def listDatasets(self, odk_id):  # noqa: N802
-                return []
-
-        yield FakeDataset()
-
     creds = ODKCentral(
         external_project_instance_url="https://central.example.org",
         external_project_username="admin@example.org",
@@ -378,10 +357,6 @@ async def test_finalize_odk_project_returns_manager_credentials():
         patch(
             "app.projects.project_services.central_crud.create_project_manager_user",
             side_effect=fake_create_project_manager_user,
-        ),
-        patch(
-            "app.projects.project_services.central_deps.get_odk_dataset",
-            fake_get_odk_dataset,
         ),
     ):
         result = await finalize_odk_project(
@@ -435,14 +410,6 @@ async def test_finalize_odk_project_persists_custom_odk_credentials():
     ):
         return ("field-tm-manager-42@fieldtm.org", "SecurePass12345abcde")
 
-    @asynccontextmanager
-    async def fake_get_odk_dataset(_):
-        class FakeDataset:
-            async def listDatasets(self, odk_id):  # noqa: N802
-                return []
-
-        yield FakeDataset()
-
     mock_update = AsyncMock()
 
     creds = ODKCentral(
@@ -491,10 +458,6 @@ async def test_finalize_odk_project_persists_custom_odk_credentials():
         patch(
             "app.projects.project_services.central_crud.create_project_manager_user",
             side_effect=fake_create_project_manager_user,
-        ),
-        patch(
-            "app.projects.project_services.central_deps.get_odk_dataset",
-            fake_get_odk_dataset,
         ),
     ):
         await finalize_odk_project(
@@ -551,14 +514,6 @@ async def test_finalize_odk_project_prefers_public_url_for_manager_link():
     ):
         return ("field-tm-manager-42@fieldtm.org", "SecurePass12345abcde")
 
-    @asynccontextmanager
-    async def fake_get_odk_dataset(_):
-        class FakeDataset:
-            async def listDatasets(self, odk_id):  # noqa: N802
-                return []
-
-        yield FakeDataset()
-
     with (
         patch(
             "app.projects.project_services.DbProject.one",
@@ -595,10 +550,6 @@ async def test_finalize_odk_project_prefers_public_url_for_manager_link():
         patch(
             "app.projects.project_services.central_crud.create_project_manager_user",
             side_effect=fake_create_project_manager_user,
-        ),
-        patch(
-            "app.projects.project_services.central_deps.get_odk_dataset",
-            fake_get_odk_dataset,
         ),
         patch("app.projects.project_services.settings") as mock_settings,
     ):
@@ -645,14 +596,6 @@ async def test_finalize_odk_project_generate_files_failure():
     async def fake_generate_project_files(db, project_id, odk_credentials=None):
         return False  # Signal failure
 
-    @asynccontextmanager
-    async def fake_get_odk_dataset(_):
-        class FakeDataset:
-            async def listDatasets(self, odk_id):  # noqa: N802
-                return []
-
-        yield FakeDataset()
-
     creds = ODKCentral(
         external_project_instance_url="https://central.example.org",
         external_project_username="admin@example.org",
@@ -687,10 +630,6 @@ async def test_finalize_odk_project_generate_files_failure():
         patch(
             "app.projects.project_services.project_crud.generate_project_files",
             side_effect=fake_generate_project_files,
-        ),
-        patch(
-            "app.projects.project_services.central_deps.get_odk_dataset",
-            fake_get_odk_dataset,
         ),
     ):
         with pytest.raises(ServiceError, match="Failed to generate project files"):
@@ -735,14 +674,6 @@ async def test_finalize_odk_project_manager_user_failure_raises_service_error():
     async def fake_create_project_manager_user(*args, **kwargs):
         raise Exception("central user-create failed")
 
-    @asynccontextmanager
-    async def fake_get_odk_dataset(_):
-        class FakeDataset:
-            async def listDatasets(self, odk_id):  # noqa: N802
-                return []
-
-        yield FakeDataset()
-
     creds = ODKCentral(
         external_project_instance_url="https://central.example.org",
         external_project_username="admin@example.org",
@@ -785,10 +716,6 @@ async def test_finalize_odk_project_manager_user_failure_raises_service_error():
         patch(
             "app.projects.project_services.central_crud.create_project_manager_user",
             side_effect=fake_create_project_manager_user,
-        ),
-        patch(
-            "app.projects.project_services.central_deps.get_odk_dataset",
-            fake_get_odk_dataset,
         ),
     ):
         with pytest.raises(
@@ -1306,3 +1233,84 @@ async def test_derive_simple_project_metadata_uses_translated_fallback_strings()
     assert description == "Descripcion traducida"
     assert hashtags == ["osm", "buildings", "simple"]
     assert location_str is None
+
+
+def _fake_entities(rows: list[dict]) -> SimpleNamespace:
+    """Fake pyodk `client.entities`, recording writes in `calls`."""
+    calls = {"updated": [], "created": [], "deleted": []}
+    return SimpleNamespace(
+        calls=calls,
+        get_table=lambda **_: {"value": rows},
+        update=lambda uuid, data, **_: calls["updated"].append((uuid, data)),
+        create_many=lambda data, **_: calls["created"].extend(data),
+        delete=lambda uuid, **_: calls["deleted"].append(uuid),
+    )
+
+
+def _fake_pyodk_client(entities):
+    client = SimpleNamespace(
+        entities=entities,
+        entity_lists=SimpleNamespace(
+            list=lambda **_: [SimpleNamespace(name="tasks")],
+            create=lambda **_: pytest.fail("dataset exists"),
+        ),
+        session=SimpleNamespace(
+            get=lambda _path: SimpleNamespace(status_code=200, json=list),
+            post=lambda *_a, **_k: SimpleNamespace(status_code=201),
+        ),
+    )
+
+    @asynccontextmanager
+    async def fake(_creds):
+        yield client
+
+    return fake
+
+
+def _odk_row(task_id: int, status: str = "mapped") -> dict:
+    return {
+        "__id": f"uuid-{task_id}",
+        "__system": {"version": 1},
+        "label": f"Task {task_id}",
+        "geometry": "old",
+        "task_id": str(task_id),
+        "status": status,
+        "assigned_to": "",
+    }
+
+
+@pytest.mark.parametrize(("reset", "status"), [(False, None), (True, "ready")])
+async def test_sync_odk_tasks_updates_or_resets_and_deletes(reset, status):
+    """Re-sync updates task 1, adds task 3, deletes task 2; reset sets status."""
+    project = FakeProject(
+        task_areas_geojson={
+            "type": "FeatureCollection",
+            "features": [
+                _task_feature(properties={"task_id": 1, "assigned_to": "Bo"}),
+                _task_feature(properties={"task_id": 3}),
+            ],
+        }
+    )
+    entities = _fake_entities([_odk_row(1), _odk_row(2)])
+
+    async def fake_feature_geojson_to_entity_dict(feature, **kwargs):
+        return {"label": "", "data": {"geometry": "old"}}
+
+    with (
+        patch(
+            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            side_effect=fake_feature_geojson_to_entity_dict,
+        ),
+        patch(
+            "app.central.central_crud.central_deps.pyodk_client",
+            _fake_pyodk_client(entities),
+        ),
+    ):
+        await sync_odk_tasks(project, None, 17, reset=reset)
+
+    [(uuid, update)] = entities.calls["updated"]
+    assert uuid == "uuid-1"
+    assert update["assigned_to"] == "Bo"
+    assert update.get("status") == status
+    assert [row["label"] for row in entities.calls["created"]] == ["Task 3"]
+    assert entities.calls["deleted"] == ["uuid-2"]

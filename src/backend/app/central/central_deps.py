@@ -30,7 +30,6 @@ from urllib.parse import urlparse
 from litestar import status_codes as status
 from litestar.datastructures import UploadFile
 from litestar.exceptions import HTTPException
-from osm_fieldwork.OdkCentralAsync import OdkDataset
 from pyodk.client import Client
 
 from app.central.central_schemas import ODKCentral
@@ -131,24 +130,6 @@ async def pyodk_client(odk_creds: Optional[ODKCentral]):
             yield client
         finally:
             await loop.run_in_executor(None, client.close, None, None, None)
-
-
-@asynccontextmanager
-async def get_odk_dataset(odk_creds: Optional[ODKCentral]):
-    """Wrap getting an OdkDataset object with ConnectionError handling."""
-    creds = _resolve_odk_creds(odk_creds)
-    try:
-        async with OdkDataset(
-            url=creds.external_project_instance_url,
-            user=creds.external_project_username,
-            passwd=creds.external_project_password,
-        ) as odk_central:
-            yield odk_central
-    except ConnectionError as conn_error:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(conn_error),
-        ) from conn_error
 
 
 async def validate_xlsform_extension(xlsform: UploadFile):

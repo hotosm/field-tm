@@ -20,7 +20,9 @@
 import base64
 from contextlib import asynccontextmanager
 from io import BytesIO
+from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -634,6 +636,63 @@ async def test_create_qfield_project_passes_resolved_language_to_qgis_wrapper(
     )
 
     assert captured["language"] == "french(fr)"
+
+
+async def test_resync_qfield_tasks_uploads_only_task_layers(monkeypatch, tmp_path):
+    """Re-sync regenerates the project but uploads only the task layers."""
+
+    class DummyDb:
+        async def commit(self):
+            return None
+
+    captured: dict = {}
+
+    async def fake_call_qgis_wrapper(**kwargs):
+        captured["wrapper"] = kwargs
+
+    async def fake_read_qgis_job_outputs(*args, **kwargs):
+        names = ["project.qgz", "survey.gpkg", "tasks.gpkg", "project-area.gpkg"]
+        return {name: base64.b64encode(b"x").decode() for name in names}
+
+    @asynccontextmanager
+    async def fake_qfield_client(_creds=None):
+        class FakeClient:
+            def upload_files(self, **kwargs):
+                captured["project_id"] = kwargs["project_id"]
+                captured["files"] = sorted(
+                    p.name for p in Path(kwargs["project_path"]).iterdir()
+                )
+
+        yield FakeClient()
+
+    monkeypatch.setattr(qfield_crud, "_insert_qgis_job", AsyncMock())
+    monkeypatch.setattr(qfield_crud, "_delete_qgis_job", AsyncMock())
+    monkeypatch.setattr(qfield_crud, "_call_qgis_wrapper", fake_call_qgis_wrapper)
+    monkeypatch.setattr(
+        qfield_crud, "_read_qgis_job_outputs", fake_read_qgis_job_outputs
+    )
+    monkeypatch.setattr(qfield_crud, "qfield_client", fake_qfield_client)
+
+    project = SimpleNamespace(
+        id=11,
+        project_name="demo",
+        description="description",
+        created_by_sub="user",
+        outline={"type": "Polygon", "coordinates": [[[85.3, 27.7], [85.4, 27.7]]]},
+        xlsform_content=b"qfield-xlsform",
+        data_extract_geojson={"type": "FeatureCollection", "features": []},
+        task_areas_geojson={},
+        external_project_id="qfc-123",
+        external_project_instance_url=None,
+        external_project_username=None,
+        external_project_password_encrypted=None,
+    )
+
+    await qfield_crud.resync_qfield_tasks(DummyDb(), project)
+
+    assert captured["wrapper"]["title"] == "demo"
+    assert captured["project_id"] == "qfc-123"
+    assert captured["files"] == ["project-area.gpkg", "tasks.gpkg"]
 
 
 if __name__ == "__main__":

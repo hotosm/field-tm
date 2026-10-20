@@ -64,12 +64,10 @@ async def geojson_area_km2(db: AsyncConnection, geojson_geom: dict) -> float:
 
 
 def merge_featcol_polygons_sync(db_url: str, featcol: dict) -> dict:
-    """Union all polygon features in a FeatureCollection into a single feature.
+    """Union polygon features into one feature.
 
-    FIXME: Workaround for geojson_aoi_parser<=0.3.5 where the `merge` flag is
-    unimplemented (commented as "Potential future polygon merging feature" in
-    geojson_aoi/_sync/postgis.py). Once merging is wired up upstream, drop this
-    helper and rely on parse_aoi(..., merge=True) again.
+    Workaround for geojson_aoi_parser<=0.3.5 ignoring merge=True; remove
+    once upstream implements merging in geojson_aoi/_sync/postgis.py.
     """
     features = featcol.get("features", [])
     if len(features) <= 1:
@@ -166,13 +164,10 @@ def _valid_task_id(task_id) -> bool:
 
 
 def stamp_missing_task_ids(featcol: dict) -> dict:
-    """Stamp a stable integer ``task_id`` onto features lacking a valid one.
+    """Ensure unique positive integer task_ids, normalizing digit strings in place.
 
-    A valid id is a unique positive integer; digit-strings are normalized to
-    int in place. Features whose id is missing, malformed (non-int, zero,
-    negative, bool), or a duplicate of an earlier feature's id are re-stamped
-    with the smallest unused positive integers (starting from 1), so the
-    collection always ends up with unique integer ids.
+    Preserve the first occurrence of each valid ID. Replace missing, invalid,
+    or duplicate IDs with the smallest unused positive integers.
     """
     features = featcol.get("features", []) if isinstance(featcol, dict) else []
 
@@ -273,46 +268,25 @@ async def check_crs(  # noqa: C901
 
 
 async def geojson_to_javarosa_geom(geojson_geometry: dict) -> str:
-    """Convert a GeoJSON geometry to JavaRosa format string.
-
-    This format is unique to ODK and the JavaRosa XForm processing library.
-    Example JavaRosa polygon (semicolon separated):
-    -8.38071535576881 115.640801902838 0.0 0.0;
-    -8.38074220774489 115.640848633963 0.0 0.0;
-    -8.38080128208577 115.640815355738 0.0 0.0;
-    -8.38077407987063 115.640767444534 0.0 0.0;
-    -8.38071535576881 115.640801902838 0.0 0.0
-
-    Args:
-        geojson_geometry (dict): The GeoJSON geometry.
-
-    Returns:
-        str: A string representing the geometry in JavaRosa format.
-    """
+    """Convert GeoJSON to JavaRosa: lat lon 0.0 0.0 points separated by semicolons."""
     if geojson_geometry is None:
         return ""
 
     coordinates = geojson_geometry.get("coordinates", [])
     geometry_type = geojson_geometry["type"]
 
-    # Normalise single geometries into the same structure as multi-geometries
-    # We end up with three levels of nesting for the processing below
+    # Normalize to groups of coordinate pairs.
     if geometry_type == "Point":
-        # Format [x, y]
         coordinates = [[coordinates]]
     elif geometry_type in ["LineString", "MultiPoint"]:
-        # Format [[x, y], [x, y]]
         coordinates = [coordinates]
     elif geometry_type in ["Polygon", "MultiLineString"]:
-        # Format [[[x, y], [x, y]]]
         pass
     elif geometry_type == "MultiPolygon":
-        # Format [[[[x, y], [x, y]]]], flatten coords
         coordinates = [coord for poly in coordinates for coord in poly]
     else:
         raise ValueError(f"Unsupported GeoJSON geometry type: {geometry_type}")
 
-    # Prepare the JavaRosa format by iterating over coordinates
     javarosa_geometry = []
     for polygon_or_line in coordinates:
         for lon, lat in polygon_or_line:
@@ -322,17 +296,7 @@ async def geojson_to_javarosa_geom(geojson_geometry: dict) -> str:
 
 
 async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
-    """Convert a JavaRosa format string to GeoJSON geometry.
-
-    The geometry type is automatically inferred from the geometry
-    coordinate structure.
-
-    Args:
-        javarosa_geom_string (str): The JavaRosa geometry.
-
-    Returns:
-        dict: A geojson geometry.
-    """
+    """Convert JavaRosa to GeoJSON, inferring point, line, or closed polygon."""
     if not javarosa_geom_string or not isinstance(javarosa_geom_string, str):
         return {}
 
@@ -341,7 +305,6 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
     for point_str in javarosa_geom_string.strip().split(";"):
         parts = point_str.strip().split()
 
-        # Expect at least lat and lon
         if len(parts) < MIN_LAT_LON_PARTS:
             continue
 
@@ -350,20 +313,17 @@ async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
             lon = float(parts[1])
             coordinates.append([lon, lat])
         except ValueError:
-            continue  # Skip if conversion fails
+            continue
 
     if not coordinates:
         return {}
 
-    # Determine geometry type
     if len(coordinates) == 1:
         geom_type = "Point"
-        coordinates = coordinates[0]  # Flatten for Point
-    elif (
-        coordinates[0] == coordinates[-1] and len(coordinates) >= MIN_POLYGON_POINTS
-    ):  # Check if closed loop
+        coordinates = coordinates[0]
+    elif coordinates[0] == coordinates[-1] and len(coordinates) >= MIN_POLYGON_POINTS:
         geom_type = "Polygon"
-        coordinates = [coordinates]  # Wrap in extra list for Polygon
+        coordinates = [coordinates]
     else:
         geom_type = "LineString"
 

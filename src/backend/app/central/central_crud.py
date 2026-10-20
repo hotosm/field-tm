@@ -21,7 +21,7 @@ import logging
 import re
 import secrets
 import string
-from asyncio import gather
+from asyncio import gather, to_thread
 from contextlib import suppress
 from io import BytesIO
 from typing import Optional, Union
@@ -34,6 +34,7 @@ from osm_fieldwork.update_xlsform import append_field_mapping_fields
 from psycopg import AsyncConnection
 from pyodk.errors import PyODKError
 from pyxform.xls2xform import convert as xform_convert
+from requests import RequestException
 
 from app.central import central_deps, central_schemas
 from app.config import settings
@@ -187,15 +188,7 @@ async def create_odk_xform(
     xform_data: BytesIO,
     odk_credentials: Optional[central_schemas.ODKCentral],
 ) -> None:
-    """Create an XForm on a remote ODK Central server.
-
-    Args:
-        odk_id (str): Project ID for ODK Central.
-        xform_data (BytesIO): XForm data to set.
-        odk_credentials (ODKCentral): Creds for ODK Central.
-
-    Returns: None
-    """
+    """Create an XForm on a remote ODK Central server."""
     try:
         form_definition: str | bytes = xform_data.getvalue()
         # pyodk validates bytes as XLS/XLSX only; XML must be passed as text.
@@ -266,15 +259,10 @@ def _missing_choice_lists(
 
 
 def _validate_user_xlsform_choices(xlsform: BytesIO) -> None:
-    """Catch obvious select/choice mismatches in a user-uploaded XLSForm.
+    """Reject select_one/select_multiple references missing from the choices sheet.
 
-    Raises HTTPException(422) listing each survey row whose
-    select_one/select_multiple references a list_name that is not present in
-    the choices sheet. select_one_from_file is skipped (the source is a CSV,
-    not a list).
-
-    Leaves ``xlsform`` seeked back to position 0 so the subsequent merge step
-    can read it again.
+    Raises HTTPException(422) with the original survey row numbers. Skips
+    select_one_from_file (CSV references) and rewinds xlsform before returning.
     """
     try:
         xlsform.seek(0)
@@ -317,14 +305,7 @@ def _validate_user_xlsform_choices(xlsform: BytesIO) -> None:
 
 
 async def read_and_test_xform(input_data: BytesIO) -> None:
-    """Read and validate an XForm.
-
-    Args:
-        input_data (BytesIO): form to be tested.
-
-    Returns:
-        BytesIO: the converted XML representation of the XForm.
-    """
+    """Validate an XForm and return its XML in a BytesIO buffer."""
     try:
         log.debug(
             f"Parsing XLSForm --> XML data: input type {type(input_data)} | "
@@ -376,9 +357,7 @@ async def validate_and_update_user_xlsform(
     use_odk_collect: bool = False,
 ) -> BytesIO:  # noqa: PLR0913
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
-    # Pre-validate: catch select/choice mismatches up-front so we can point at
-    # the user's row in their original file, rather than a row in the merged
-    # form which they can't see.
+    # Validate before merging to report row numbers from the original upload.
     _validate_user_xlsform_choices(xlsform)
 
     xform_id, updated_file_bytes = await append_fields_to_user_xlsform(
@@ -392,25 +371,15 @@ async def validate_and_update_user_xlsform(
         use_odk_collect=use_odk_collect,
     )
 
-    # Validate and return the form
     log.debug("Validating uploaded XLS form")
     return await read_and_test_xform(updated_file_bytes)
 
 
 def flatten_json(data: dict, target: dict):
-    """Flatten json properties to a single level.
-
-    Removes any existing GeoJSON data from captured GPS coordinates in
-    ODK submission.
-
-    Usage:
-        new_dict = {}
-        flatten_json(original_dict, new_dict)
-    """
+    """Flatten submission properties into target, skipping GeoJSON GPS data."""
     for k, v in data.items():
         if isinstance(v, dict):
             if "type" in v and "coordinates" in v:
-                # GeoJSON object found, skip it
                 continue
             flatten_json(v, target)
         else:
@@ -622,13 +591,10 @@ def _upsert_entity_rows(
     project_id: int,
     dataset_name: str,
     merge_rows: list[dict[str, str]],
+    target_by_label: dict[str, dict],
     keep_existing: frozenset[str] = frozenset(),
 ) -> None:
     """Insert new entities and minimally update existing ones by label."""
-    target_by_label = _index_entities_by_label(
-        client.entities.get_table(entity_list_name=dataset_name, project_id=project_id)
-    )
-
     to_insert = []
     for source_row in merge_rows:
         label = source_row.get("label")
@@ -676,72 +642,92 @@ def _upsert_entity_rows(
         )
 
 
-async def create_entity_list(
+def _delete_missing_entities(
+    client,
+    project_id: int,
+    dataset_name: str,
+    merge_rows: list[dict[str, str]],
+    target_by_label: dict[str, dict],
+) -> None:
+    """Delete entities whose label is not in the incoming rows."""
+    keep = {row["label"] for row in merge_rows}
+    for label, row in target_by_label.items():
+        if label not in keep:
+            client.entities.delete(
+                uuid=row["__id"], entity_list_name=dataset_name, project_id=project_id
+            )
+
+
+def _sync_entity_list(  # noqa: PLR0913
+    client,
+    project_id: int,
+    dataset_name: str,
+    properties: list[str],
+    merge_rows: list[dict[str, str]],
+    keep_existing: frozenset[str],
+    delete_missing: bool,
+) -> None:
+    """Ensure the dataset and its properties exist, then upsert entity rows."""
+    existing = {ds.name for ds in client.entity_lists.list(project_id=project_id)}
+    if dataset_name not in existing:
+        log.info(f"Creating dataset '{dataset_name}' for ODK project {project_id}")
+        client.entity_lists.create(entity_list_name=dataset_name, project_id=project_id)
+
+    _ensure_dataset_properties(
+        client,
+        project_id,
+        dataset_name,
+        _collect_required_property_keys(properties, merge_rows),
+        _get_existing_dataset_property_names(client, project_id, dataset_name),
+    )
+    if not merge_rows and not delete_missing:
+        return
+
+    target_by_label = _index_entities_by_label(
+        client.entities.get_table(entity_list_name=dataset_name, project_id=project_id)
+    )
+    _upsert_entity_rows(
+        client, project_id, dataset_name, merge_rows, target_by_label, keep_existing
+    )
+    if delete_missing:
+        _delete_missing_entities(
+            client, project_id, dataset_name, merge_rows, target_by_label
+        )
+
+
+async def create_entity_list(  # noqa: PLR0913
     odk_creds: Optional[central_schemas.ODKCentral],
     odk_id: int,
     properties: list[str],
     dataset_name: str = "features",
     entities_list: list[central_schemas.EntityDict] = None,
     keep_existing: frozenset[str] = frozenset(),
+    delete_missing: bool = False,
 ) -> None:
-    """Create a new Entity list (dataset) in ODK and upsert entities.
+    """Create an Entity list (dataset) in ODK if needed and upsert entities.
 
     Properties in `keep_existing` are only set on new entities.
-
-    Notes on implementation:
-    - Dataset creation uses the async ODK client (`osm_fieldwork.OdkCentralAsync`)
-      because it is already used elsewhere and is async-friendly.
-    - Entity upsert uses **official `pyodk`** (sync) via `Client.entities.merge()` to
-      provide idempotent behavior on retries (insert/update; optionally delete).
+    With `delete_missing`, entities not in `entities_list` are deleted.
     """
-    log.info("Creating ODK Entity properties list")
-    properties = central_schemas.entity_fields_to_list(properties)
-    merge_rows = _build_entity_merge_rows(entities_list)
-
     if odk_id is None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=_("ODK project_id is missing; cannot create/merge entity lists."),
         )
 
-    async with central_deps.get_odk_dataset(odk_creds) as odk_central:
-        # Step 1: ensure dataset exists (idempotent)
-        dataset_exists = False
-        try:
-            datasets = await odk_central.listDatasets(odk_id)
-            dataset_exists = any(
-                ds.get("name") == dataset_name for ds in (datasets or [])
-            )
-        except Exception as exc:
-            log.warning(f"Could not list datasets for ODK project {odk_id}: {exc}")
-
-        if not dataset_exists:
-            await odk_central.createDataset(
-                odk_id, datasetName=dataset_name, properties=properties
-            )
-        else:
-            log.info(
-                f"Dataset '{dataset_name}' already exists "
-                f"for ODK project {odk_id}; will reuse it."
-            )
-
-    if not merge_rows:
-        return
-
+    properties = central_schemas.entity_fields_to_list(properties)
+    merge_rows = _build_entity_merge_rows(entities_list)
     async with central_deps.pyodk_client(odk_creds) as client:
-        pid = int(odk_id)
-        required_keys = _collect_required_property_keys(properties, merge_rows)
-        existing_property_names = _get_existing_dataset_property_names(
-            client, pid, dataset_name
-        )
-        _ensure_dataset_properties(
+        await to_thread(
+            _sync_entity_list,
             client,
-            pid,
+            int(odk_id),
             dataset_name,
-            required_keys,
-            existing_property_names,
+            properties,
+            merge_rows,
+            keep_existing,
+            delete_missing,
         )
-        _upsert_entity_rows(client, pid, dataset_name, merge_rows, keep_existing)
 
 
 async def get_appuser_token(
@@ -749,16 +735,7 @@ async def get_appuser_token(
     project_odk_id: int,
     odk_credentials: Optional[central_schemas.ODKCentral],
 ):
-    """Get the app user token for a specific project.
-
-    Args:
-        odk_credentials: ODK credentials for the project.
-        project_odk_id: The ODK ID of the project.
-        xform_id: The ID of the XForm.
-
-    Returns:
-        The app user token.
-    """
+    """Get the app user token for a project and XForm."""
     try:
         appuser_name = "fieldtm_user"
         log.info(
@@ -973,18 +950,10 @@ async def create_project_manager_user(
     project_name: str,
     odk_credentials: Optional[central_schemas.ODKCentral],
 ) -> tuple[str, str]:
-    """Create a Central web user scoped to one project as Project Manager.
+    """Create a Central Project Manager and return (email, password).
 
-    The user is created with email + password so they can log directly into
-    the ODK Central UI.  Credentials are returned once and never stored.
-
-    ODK Central sends a welcome email on creation; a local mail-catcher
-    (the 'mail' service) must be reachable in development so that delivery
-    does not fail.  In production point EMAIL_HOST / EMAIL_PORT at a real
-    SMTP server via environment variables.
-
-    Returns:
-        tuple[str, str]: (manager_email, manager_password)
+    Credentials are returned once, without storage. Central sends a welcome
+    email, so a reachable mail-catcher (development) or SMTP server is required.
     """
     try:
         async with central_deps.pyodk_client(odk_credentials) as client:
@@ -1034,12 +1003,21 @@ async def odk_credentials_test(odk_creds: central_schemas.ODKCentral):
     Returns status 200 if credentials are valid, otherwise raises HTTPException.
     """
     try:
-        async with central_deps.get_odk_dataset(odk_creds):
+        async with central_deps.pyodk_client(odk_creds):
             pass
         return status.HTTP_200_OK
-    except HTTPException as e:
-        log.error(f"ODK Central credential test failed: {e.detail}")
-        raise
+    except PyODKError as e:
+        log.error(f"ODK Central credential test failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=_("ODK credentials are invalid, or may have changed."),
+        ) from e
+    except RequestException as e:
+        log.error(f"ODK Central credential test failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=_("Failed to connect to Central. Is the URL valid?"),
+        ) from e
     except Exception as e:
         log.error(f"Unexpected error during ODK Central credential test: {str(e)}")
         raise HTTPException(
