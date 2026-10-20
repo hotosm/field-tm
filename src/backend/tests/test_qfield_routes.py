@@ -117,8 +117,8 @@ def test_build_tasks_geojson_keeps_stored_ids_and_stamps_legacy_rows():
     assert stored_ids == [2, 1, 4, 3]
 
 
-def test_build_tasks_geojson_passes_assignments_and_resets_status():
-    """Assignment fields reach the tasks layer; every task starts available."""
+def test_build_tasks_geojson_maps_assigned_group_to_group():
+    """Only task_id and group reach QField; status lives in tasks_events."""
     project = SimpleNamespace(
         task_areas_geojson={
             "type": "FeatureCollection",
@@ -144,22 +144,8 @@ def test_build_tasks_geojson_passes_assignments_and_resets_status():
 
     first, second = (f["properties"] for f in _build_tasks_geojson(project)["features"])
 
-    assert first == {
-        "task_id": 3,
-        "status": "available",
-        "assigned_group": "team-a",
-        "assigned_to": "Chomba",
-        "comment": "Start Monday",
-        "colour": "#d63f3f",
-    }
-    assert second == {
-        "task_id": 1,
-        "status": "available",
-        "assigned_group": None,
-        "assigned_to": None,
-        "comment": None,
-        "colour": None,
-    }
+    assert first == {"task_id": 3, "group": "team-a"}
+    assert second == {"task_id": 1, "group": None}
 
 
 def test_build_tasks_geojson_restamps_duplicate_and_invalid_ids():

@@ -277,13 +277,11 @@ def _qgis_safe_tags_value(tags) -> str:
     return str(tags)
 
 
-TASK_PLAN_FIELDS = ("assigned_group", "assigned_to", "comment", "colour")
-
-
 def _build_tasks_geojson(project: DbProject) -> dict:
-    """Build available tasks from the task plan, falling back to the outline.
+    """Build tasks from the task plan, falling back to the outline.
 
-    The QField plugin manages subsequent status changes.
+    The QField plugin reads ``group`` (the planner's ``assigned_group``);
+    field progress lives in the separate ``tasks_events`` layer.
     """
     task_areas = project.task_areas_geojson
     if task_areas and isinstance(task_areas, dict) and task_areas.get("features"):
@@ -304,8 +302,7 @@ def _build_tasks_geojson(project: DbProject) -> dict:
                 "geometry": feature.get("geometry"),
                 "properties": {
                     "task_id": properties.get("task_id", task_id),
-                    "status": "available",
-                    **{key: properties.get(key) or None for key in TASK_PLAN_FIELDS},
+                    "group": properties.get("assigned_group") or None,
                 },
             }
         )

@@ -18,10 +18,11 @@ Item {
   property var mapCanvas: iface.mapCanvas()
   property var mapCanvasContainer: iface.findItemByObjectName("mapCanvasContainer")
   property var busyOverlay: iface.findItemByObjectName("busyOverlay")
+  property var locatorItem: iface.findItemByObjectName("locatorItem")
 
   property var qfieldSettings: iface.findItemByObjectName("qfieldSettings")
   property ProjectInfo projectInfo: iface.findItemByObjectName("projectInfo")
-
+  
   property QFieldCloudConnection cloudConnection: iface.findItemByObjectName("cloudConnection")
   property QFieldCloudProjectsModel cloudProjectsModel: iface.findItemByObjectName("cloudProjectsModel")
 
@@ -30,13 +31,14 @@ Item {
   property bool singleTaskMode: false
 
   property string currentUser: ""
+  property string currentGroup: ""
   property var currentTask: undefined
-  property bool currentTaskHasAddedFeature: false
-  property var myTaskIds: []
-  property var pendingTask: undefined
 
   property var tasksLayer: qgisProject.mapLayersByName("tasks")[0];
+  property var tasksEventsLayer: qgisProject.mapLayersByName("tasks_events")[0];
+  
   property var surveyLayer: qgisProject.mapLayersByName("survey")[0];
+  property var surveyEventsLayer: qgisProject.mapLayersByName("survey_events")[0];
 
   property string mainColor: "#d73f3f"
 
@@ -57,11 +59,12 @@ Item {
   Rectangle {
     id: fieldTMContainer
     parent: mapCanvasContainer
+    visible: locatorItem.state === "off"
     anchors {
       top: parent.top
       left: parent.left
       right: parent.right
-      topMargin: mainWindow.sceneTopMargin + 56
+      topMargin: mainWindow.sceneTopMargin + 4
       leftMargin: mainWindow.sceneLeftMargin + 56
       rightMargin: mainWindow.sceneRightMargin + 56
     }
@@ -72,11 +75,14 @@ Item {
         top: parent.top
         left: parent.left
         right: parent.right
-        topMargin: 24
+        topMargin: 20
       }
 
       height: fieldTM.currentTask === undefined ? informationLayout.childrenRect.height + 48 : 0
       Behavior on height {
+        id: informationBehavior
+        enabled: false
+
         PropertyAnimation {
           duration: 250
           easing.type: Easing.OutQuart
@@ -84,11 +90,12 @@ Item {
       }
 
       gradient: Gradient {
-        GradientStop { position: 0.0; color: "#fdebef" }
-        GradientStop { position: 1.0; color: "#ffffff" }
+        GradientStop { position: 0.0; color: Theme.darkTheme ? "#452727" : "#fdebef" }
+        GradientStop { position: 1.0; color: Theme.controlBackgroundColor }
       }
+
       border.width: 1
-      border.color: "#fdcfd6"
+      border.color: Theme.darkTheme ? "#452727" : "#fdebef"
       radius: 12
       clip: true
 
@@ -105,27 +112,37 @@ Item {
 
         Text {
           Layout.fillWidth: true
+          Layout.preferredHeight: text !== "" ? contentHeight : 0
           font: Theme.tipFont
-          color: "#222222"
+          color: Theme.mainTextColor
           wrapMode: Text.WordWrap
 
-          text: fieldTM.reader ? qsTranslate("FieldTM", "Tap on an available task area on the map to view surveys.") : qsTranslate("FieldTM", "Tap on an available task area on the map to start surveying.")
+          text: groupComboBox.count > 0 ? qsTranslate("FieldTM", "Pick your group to focus on a subset of tasks.") : ""
+        }
+
+        QfComboBox {
+          id: groupComboBox
+          Layout.fillWidth: true
+          visible: count > 1
+
+          onCurrentTextChanged: {
+            if (fieldTM.currentGroup !== currentText) {
+              fieldTM.currentGroup = currentText;
+            }
+          }
         }
 
         Text {
           Layout.fillWidth: true
-          Layout.preferredHeight: text !== "" ? contentHeight : 0
           font: Theme.tipFont
-          color: "#222222"
+          color: Theme.mainTextColor
           wrapMode: Text.WordWrap
-          linkColor: fieldTM.mainColor
 
-          text: fieldTM.myTaskIds.length > 0 ? `<a href=\"#mytasks\">${qsTranslate("FieldTM", "Your tasks: %1").arg(fieldTM.myTaskIds.map(id => "#" + id).join(", "))}</a>` : ""
-
-          onLinkActivated: (link) => {
-            if (link === "#mytasks") {
-              zoomToMyTasks();
+          text: {
+            if (fieldTM.reader) {
+              return qsTranslate("FieldTM", "Tap on an available task area on the map to view surveys.");
             }
+            return qsTranslate("FieldTM", "Tap on an available task area on the map to start surveying.");
           }
         }
 
@@ -133,73 +150,16 @@ Item {
           Layout.fillWidth: true
           Layout.preferredHeight: text !== "" ? contentHeight : 0
           font: Theme.tipFont
-          color: "#f67c0f"
+          color: Theme.warningColor
           wrapMode: Text.WordWrap
 
-          text: fieldTM.outdated ? qsTranslate("FieldTM", "Data sync occurred over half an hour ago, synchronizing is recommended.") : ""
-        }
-
-        Text {
-          Layout.fillWidth: true
-          Layout.preferredHeight: text !== "" ? contentHeight : 0
-          font: Theme.tipFont
-          color: "#99222222"
-          wrapMode: Text.WordWrap
-          linkColor: fieldTM.mainColor
-
-          text: fieldTM.cloudConnection.hasToken && fieldTM.cloudConnection.isReachable ? `<a href=\"#synchronize\">${qsTranslate("FieldTM", "Synchronize tasks")}</a>` : ""
-
-          onLinkActivated: (link) => {
-            if (link === "#synchronize") {
-              fieldTM.busyOverlay.text = qsTranslate("FieldTM", "Synchronizing tasks");
-              fieldTM.busyOverlay.showProgress = false;
-              fieldTM.busyOverlay.state = "visible";
-              synchronizeCloud();
+          text: {
+            if (fieldTM.outdated) {
+              return qsTranslate("FieldTM", "Data sync occurred over half an hour ago, synchronizing is recommended.");
             }
+            return "";
           }
         }
-      }
-    }
-
-    Rectangle {
-      id: taskInfoContainer
-      anchors {
-        top: parent.top
-        left: parent.left
-        right: parent.right
-        topMargin: 24
-      }
-
-      height: taskInfoText.text !== "" ? taskInfoText.contentHeight + 48 : 0
-      Behavior on height {
-        PropertyAnimation {
-          duration: 250
-          easing.type: Easing.OutQuart
-        }
-      }
-
-      color: "#ffffff"
-      border.width: 1
-      border.color: "#fdcfd6"
-      radius: 12
-      clip: true
-
-      Text {
-        id: taskInfoText
-        anchors {
-          top: parent.top
-          left: parent.left
-          right: parent.right
-          topMargin: 36
-          leftMargin: 12
-          rightMargin: 12
-        }
-        font: Theme.tipFont
-        color: "#222222"
-        wrapMode: Text.WordWrap
-        textFormat: Text.PlainText
-
-        text: fieldTM.currentTask !== undefined ? taskInfoSummary(fieldTM.currentTask) : ""
       }
     }
 
@@ -252,7 +212,7 @@ Item {
           id: releaseButton
           round: true
 
-          iconSource: Theme.getThemeVectorIcon("ic_arrow_left_white_24dp")
+          iconSource: fieldTM.currentTask !== undefined ? Theme.getThemeVectorIcon("ic_arrow_left_white_24dp") : Theme.getThemeVectorIcon("refresh_24dp")
           iconColor: "#000000"
           bgcolor: "#ffffff"
           padding: 0
@@ -261,18 +221,17 @@ Item {
           Layout.preferredHeight: 36
           Layout.leftMargin: 8
           Layout.alignment: Qt.AlignVCenter
-          visible: fieldTM.currentTask !== undefined && !fieldTM.singleTaskMode
+          visible: fieldTM.currentTask === undefined || !fieldTM.singleTaskMode
 
           onClicked: {
             if (fieldTM.currentTask !== undefined) {
-              const taskId = fieldTM.currentTask.attribute("task_id");
-              if (!fieldTM.reader && isAssignedToMe(fieldTM.currentTask)) {
-                releaseTask(fieldTM.currentTask);
-                mainWindow.displayToast(qsTranslate("FieldTM", "Released task #%1").arg(taskId));
-              } else {
-                mainWindow.displayToast(qsTranslate("FieldTM", "Leaving task #%1").arg(taskId));
-              }
+              mainWindow.displayToast(qsTranslate("FieldTM", "Released task #%1").arg(fieldTM.currentTask.attribute("task_id")));
               fieldTM.currentTask = undefined;
+            } else {
+              fieldTM.busyOverlay.text = qsTranslate("FieldTM", "Synchronizing tasks");
+              fieldTM.busyOverlay.showProgress = false;
+              fieldTM.busyOverlay.state = "visible";
+              synchronizeCloud();
             }
           }
         }
@@ -289,16 +248,22 @@ Item {
           Layout.preferredWidth: 36
           Layout.preferredHeight: 36
           Layout.alignment: Qt.AlignVCenter
-          visible: fieldTM.currentTask !== undefined && (fieldTM.currentTaskHasAddedFeature || fieldTM.currentTask.attribute("status") === "completed")
+          visible: fieldTM.currentTask !== undefined && !fieldTM.reader
 
           onClicked: {
             if (fieldTM.currentTask !== undefined) {
-              if (!fieldTM.reader) {
-                setTaskAttributes(fieldTM.currentTask, { "status": "completed" });
+              let eventFeature = FeatureUtils.createFeature(fieldTM.tasksEventsLayer);
+              eventFeature.setAttribute("task_id", fieldTM.currentTask.attribute("task_id"));
+              eventFeature.setAttribute("event_type", "status");
+              eventFeature.setAttribute("event_value", "completed");
+              eventFeature.setAttribute("user", fieldTM.currentUser);
+              fieldTM.tasksEventsLayer.startEditing();
+              LayerUtils.addFeature(fieldTM.tasksEventsLayer, eventFeature);
+              fieldTM.tasksEventsLayer.commitChanges();
+              pushToCloud();
 
-                mainWindow.displayToast(qsTranslate("FieldTM", "Marked task #%1 as completed").arg(fieldTM.currentTask.attribute("task_id")));
-                rewardEmitter.reward();
-              }
+              mainWindow.displayToast(qsTranslate("FieldTM", "Marked task #%1 as completed").arg(fieldTM.currentTask.attribute("task_id")));
+              rewardEmitter.reward();
 
               if (!fieldTM.singleTaskMode) {
                 fieldTM.currentTask = undefined;
@@ -326,7 +291,8 @@ Item {
           visible: fieldTM.currentTask !== undefined
 
           onClicked: {
-            fieldTM.featureListForm.model.setFeatures(fieldTM.surveyLayer, taskIntersectsExpression(fieldTM.currentTask));
+            let filterExpression = "intersects(@geometry, geom_from_wkt('"+fieldTM.currentTask.geometry.asWkt(8)+"'))"
+            fieldTM.featureListForm.model.setFeatures(fieldTM.surveyLayer, filterExpression);
             featureListForm.extentController.zoomToAllFeatures();
           }
         }
@@ -355,40 +321,6 @@ Item {
           }
         }
       }
-    }
-  }
-
-  Dialog {
-    id: takeoverDialog
-    parent: mainWindow.contentItem
-    modal: true
-    font: Theme.defaultFont
-    title: qsTranslate("FieldTM", "Task already assigned")
-
-    property string assignee: ""
-
-    x: (mainWindow.width - width) / 2
-    y: (mainWindow.height - height - 80) / 2
-
-    Label {
-      width: Math.min(mainWindow.width - 60, 400)
-      font: Theme.defaultFont
-      color: Theme.mainTextColor
-      wrapMode: Text.WordWrap
-      textFormat: Text.PlainText
-      text: fieldTM.pendingTask !== undefined ? qsTranslate("FieldTM", "Task #%1 is assigned to %2. Enter it anyway? It will stay assigned to them.").arg(taskAttribute(fieldTM.pendingTask, "task_id")).arg(takeoverDialog.assignee) : ""
-    }
-
-    standardButtons: Dialog.Ok | Dialog.Cancel
-
-    onAccepted: {
-      if (fieldTM.pendingTask !== undefined) {
-        enterTask(fieldTM.pendingTask, false);
-      }
-      fieldTM.pendingTask = undefined;
-    }
-    onRejected: {
-      fieldTM.pendingTask = undefined;
     }
   }
 
@@ -429,6 +361,61 @@ Item {
       height: 10
       radius: 5
       color: "red"
+    }
+  }
+
+  function pushToCloud() {
+    if (fieldTM.cloudProjectsModel.currentProject && fieldTM.cloudProjectsModel.currentProject.status === QFieldCloudProject.Idle) {
+      fieldTM.cloudProjectsModel.projectPush(fieldTM.cloudProjectsModel.currentProjectId, false);
+    }
+  }
+
+  function synchronizeCloud() {
+    if (fieldTM.cloudProjectsModel.currentProject && fieldTM.cloudProjectsModel.currentProject.status === QFieldCloudProject.Idle) {
+      fieldTM.cloudProjectsModel.projectPush(fieldTM.cloudProjectsModel.currentProjectId, true);
+    }
+  }
+
+  function checkOutdated() {
+    if (fieldTM.cloudProjectsModel.currentProject && fieldTM.cloudProjectsModel.currentProject.status === QFieldCloudProject.Idle) {
+      // If we last synchronized / downloaded the project over 30 min ago, we're outdated
+      const lastLocalExportedAt = new Date(fieldTM.cloudProjectsModel.currentProject.lastLocalExportedAt);
+      fieldTM.outdated = (Date.now() - lastLocalExportedAt.getTime()) / 1000 > 1800;
+    } else {
+      // Not being viewed in a cloud context
+      fieldTM.outdated = false;
+    }
+  }
+  
+  function touchCurrentTask() {
+    if (fieldTM.currentTask !== undefined && !fieldTM.reader) {
+      let status = fieldTM.currentTask.attribute("tasks_status_value");
+      if (status === undefined || status === "") {
+        let eventFeature = FeatureUtils.createFeature(fieldTM.tasksEventsLayer);
+        eventFeature.setAttribute("task_id", fieldTM.currentTask.attribute("task_id"));
+        eventFeature.setAttribute("event_type", "status");
+        eventFeature.setAttribute("event_value", "in_progress");
+        eventFeature.setAttribute("user", fieldTM.currentUser);
+        fieldTM.tasksEventsLayer.startEditing();
+        LayerUtils.addFeature(fieldTM.tasksEventsLayer, eventFeature);
+        fieldTM.tasksEventsLayer.commitChanges();
+        pushToCloud();
+
+        fieldTM.currentTask.setAttribute("tasks_status_value", "in_progress")
+      }
+    }
+  }
+
+  function touchSurveyFeature(surveyFeature) {
+    if (surveyFeature !== undefined && !fieldTM.reader) {
+      let eventFeature = FeatureUtils.createFeature(fieldTM.surveyEventsLayer);
+      eventFeature.setAttribute("survey_uuid", surveyFeature.attribute("uuid"));
+      eventFeature.setAttribute("event_type", "status");
+      eventFeature.setAttribute("event_value", "mapped");
+      eventFeature.setAttribute("user", fieldTM.currentUser);
+      fieldTM.surveyEventsLayer.startEditing();
+      LayerUtils.addFeature(fieldTM.surveyEventsLayer, eventFeature);
+      fieldTM.surveyEventsLayer.commitChanges();
     }
   }
 
@@ -478,174 +465,6 @@ Item {
     }
   }
 
-  // Quote a value as a QGIS expression string literal ('' escapes ').
-  function quoteExpressionString(value) {
-    return "'" + String(value === undefined || value === null ? "" : value).split("'").join("''") + "'";
-  }
-
-  function taskIntersectsExpression(task) {
-    return `intersects(@geometry, geom_from_wkt(${quoteExpressionString(task.geometry.asWkt(8))}))`;
-  }
-
-  function taskAttribute(task, name) {
-    const value = task.attribute(name);
-    return value === undefined || value === null ? "" : String(value);
-  }
-
-  function isAssignedToMe(task) {
-    return fieldTM.currentUser !== "" && taskAttribute(task, "assigned_to").toLowerCase() === fieldTM.currentUser.toLowerCase();
-  }
-
-  // Name of whoever else holds the task, or "" if it is free / ours.
-  function otherAssignee(task) {
-    if (isAssignedToMe(task)) {
-      return "";
-    }
-    const assignee = taskAttribute(task, "assigned_to");
-    if (assignee !== "") {
-      return assignee;
-    }
-    return taskAttribute(task, "status") === "in_progress" ? qsTranslate("FieldTM", "another mapper") : "";
-  }
-
-  function taskInfoSummary(task) {
-    let lines = [qsTranslate("FieldTM", "Task #%1").arg(taskAttribute(task, "task_id"))];
-    const group = taskAttribute(task, "assigned_group");
-    const assignee = taskAttribute(task, "assigned_to");
-    const comment = taskAttribute(task, "comment");
-    if (group !== "") {
-      lines.push(qsTranslate("FieldTM", "Team: %1").arg(group));
-    }
-    if (assignee !== "") {
-      lines.push(qsTranslate("FieldTM", "Assigned to: %1").arg(assignee));
-    }
-    if (comment !== "") {
-      lines.push(comment);
-    }
-    return lines.length > 1 ? lines.join("\n") : "";
-  }
-
-  function setTaskAttributes(task, values) {
-    fieldTM.tasksLayer.startEditing();
-    for (const name in values) {
-      fieldTM.tasksLayer.changeAttributeValue(task.id, fieldTM.tasksLayer.fields.indexOf(name), values[name]);
-      task.setAttribute(name, values[name]);
-    }
-    fieldTM.tasksLayer.commitChanges();
-    pushToCloud();
-    refreshMyTasks();
-  }
-
-  function claimTask(task) {
-    if (!fieldTM.reader && taskAttribute(task, "assigned_to") === "") {
-      setTaskAttributes(task, { "assigned_to": fieldTM.currentUser });
-      return true;
-    }
-    return false;
-  }
-
-  function releaseTask(task) {
-    let values = { "assigned_to": "" };
-    if (taskAttribute(task, "status") !== "completed") {
-      values["status"] = "available";
-    }
-    setTaskAttributes(task, values);
-  }
-
-  function enterTask(task, claim) {
-    fieldTM.currentTask = task;
-    const taskId = taskAttribute(task, "task_id");
-    if (fieldTM.reader) {
-      mainWindow.displayToast(qsTranslate("FieldTM", "Viewing task #%1").arg(taskId));
-    } else if (claim && claimTask(task)) {
-      mainWindow.displayToast(qsTranslate("FieldTM", "Assigned task #%1").arg(taskId));
-    } else {
-      mainWindow.displayToast(qsTranslate("FieldTM", "Entered task #%1").arg(taskId));
-    }
-  }
-
-  function refreshMyTasks() {
-    let ids = [];
-    if (fieldTM.currentUser !== "") {
-      let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, `lower(coalesce("assigned_to", '')) = lower(${quoteExpressionString(fieldTM.currentUser)}) and coalesce("status", '') != 'completed'`);
-      while (it.hasNext()) {
-        ids.push(it.next().attribute("task_id"));
-      }
-      delete it;
-    }
-    ids.sort((a, b) => a - b);
-    fieldTM.myTaskIds = ids;
-  }
-
-  function zoomToMyTasks() {
-    if (fieldTM.myTaskIds.length === 0) {
-      return;
-    }
-    let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, `"task_id" = ${quoteExpressionString(fieldTM.myTaskIds[0])}`);
-    if (it.hasNext()) {
-      const task = it.next();
-      const rectangle = GeometryUtils.reprojectRectangle(GeometryUtils.boundingBox(task.geometry), fieldTM.tasksLayer.crs, mapCanvas.mapSettings.destinationCrs);
-      mapCanvas.mapSettings.setExtent(rectangle, true);
-    }
-    delete it;
-  }
-
-  function pushToCloud() {
-    if (fieldTM.cloudProjectsModel.currentProject && fieldTM.cloudProjectsModel.currentProject.status === QFieldCloudProject.Idle) {
-      fieldTM.cloudProjectsModel.projectPush(fieldTM.cloudProjectsModel.currentProjectId, false);
-    }
-  }
-
-  function synchronizeCloud() {
-    if (fieldTM.cloudProjectsModel.currentProject && fieldTM.cloudProjectsModel.currentProject.status === QFieldCloudProject.Idle) {
-      fieldTM.cloudProjectsModel.projectPush(fieldTM.cloudProjectsModel.currentProjectId, true);
-    }
-  }
-
-  function checkOutdated() {
-    if (fieldTM.cloudProjectsModel.currentProject && fieldTM.cloudProjectsModel.currentProject.status === QFieldCloudProject.Idle) {
-      // If we last synchronized / downloaded the project over 30 min ago, we're outdated
-      const lastLocalExportedAt = new Date(fieldTM.cloudProjectsModel.currentProject.lastLocalExportedAt);
-      fieldTM.outdated = (Date.now() - lastLocalExportedAt.getTime()) / 1000 > 1800;
-    } else {
-      // Not being viewed in a cloud context
-      fieldTM.outdated = false;
-    }
-  }
-
-  function updateCurrentTaskStatus() {
-    if (fieldTM.currentTask != undefined && !fieldTM.reader) {
-      // If it hadn't been assigned yet, lay claim on it
-      if (fieldTM.currentTask.attribute("status") === "available") {
-        setTaskAttributes(fieldTM.currentTask, { "status": "in_progress" });
-      }
-
-      if (!fieldTM.currentTaskHasAddedFeature && fieldTM.currentTask.attribute("status") !== "completed") {
-        // Check if the task is ready to be marked as complete
-        let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.surveyLayer, taskIntersectsExpression(fieldTM.currentTask))
-        let markAsCompleted = it.hasNext()
-        while (it.hasNext()) {
-          const feature = it.next()
-          if (feature.attribute("status") == "") { // type coercion required
-            markAsCompleted = false;
-          }
-        }
-        delete it;
-
-        if (markAsCompleted) {
-          setTaskAttributes(fieldTM.currentTask, { "status": "completed" });
-
-          mainWindow.displayToast(qsTranslate("FieldTM", "Completed task #%1").arg(fieldTM.currentTask.attribute("task_id")));
-          rewardEmitter.reward();
-
-          if (!fieldTM.singleTaskMode) {
-            fieldTM.currentTask = undefined;
-          }
-        }
-      }
-    }
-  }
-
   Connections {
     id: cloudProjectConnection
     target: fieldTM.cloudProjectsModel.currentProject ? fieldTM.cloudProjectsModel.currentProject : null
@@ -674,32 +493,35 @@ Item {
     enabled: fieldTM.currentTask !== undefined
 
     function onCommittedFeaturesAdded(layerId, addedFeatures) {
-      fieldTM.currentTaskHasAddedFeature = true;
-    }
-
-    function onCommittedFeaturesRemoved(layerId, deletedFeatureIds) {
-      updateCurrentTaskStatus();
+      for (addedFeature of addedFeatures) {
+        touchSurveyFeature(addedFeature);
+      }
+      touchCurrentTask();
     }
 
     function onCommittedAttributeValuesChanges(layerId, changedAttributesValues) {
-      updateCurrentTaskStatus();
-    }
-
-    function onCommittedGeometriesChanges(layerId, changedGeometries) {
-      updateCurrentTaskStatus();
+      touchSurveyFeature(fieldTM.featureListForm.selection.focusedFeature);
+      touchCurrentTask();
     }
   }
 
-  onCurrentTaskChanged: {
-    fieldTM.currentTaskHasAddedFeature = false
+  onCurrentGroupChanged: {
+    ExpressionContextUtils.setProjectVariable(qgisProject ,"current_group", currentGroup);
+    projectInfo.saveVariable("current_group", currentGroup);
 
+    tasksLayer.triggerRepaint();
+  }
+
+  onCurrentTaskChanged: {
     if (currentTask != undefined) {
-      ExpressionContextUtils.setLayerVariable(tasksLayer, "current_task_id", currentTask.attribute("task_id"));
+      ExpressionContextUtils.setProjectVariable(qgisProject ,"current_task_id", currentTask.attribute("task_id"));
+      projectInfo.saveVariable("current_task_id", currentTask.attribute("task_id"));
       // Hide tasks from identify while inside a task so taps land on buildings
       // without a disambiguation popup. Bit 0 = QgsMapLayer::Identifiable.
       tasksLayer.flags = tasksLayer.flags & ~1;
     } else {
-      ExpressionContextUtils.setLayerVariable(tasksLayer, "current_task_id", -1);
+      ExpressionContextUtils.setProjectVariable(qgisProject ,"current_task_id", -1);
+      projectInfo.saveVariable("current_task_id", -1);
       fieldTM.featureListForm.model.clear();
       tasksLayer.flags = tasksLayer.flags | 1;
     }
@@ -712,12 +534,13 @@ Item {
     fieldTM.qfieldSettings.autoOpenFormSingleIdentify = true;
     fieldTM.qfieldSettings.autoZoomToIdentifiedFeature = true;
 
-    fieldTM.currentUser = projectInfo.cloudUserInformation.username || "";
+    fieldTM.currentUser = projectInfo.cloudUserInformation.username;
     fieldTM.reader = cloudProjectsModel.currentProject && cloudProjectsModel.currentProject.userRole === "reader";
-    ExpressionContextUtils.setLayerVariable(tasksLayer, "fieldtm_current_user", fieldTM.currentUser);
+    fieldTM.currentTask = undefined;
 
-    // Single-task projects skip the locking UX: auto-claim the lone task so taps
-    // land directly on the survey layer.
+    const projectVariables = ExpressionContextUtils.projectVariables(qgisProject);
+
+    // Single-task projects open straight into their only task.
     let allTasksIt = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, "1=1");
     let firstTask = allTasksIt.hasNext() ? allTasksIt.next() : null;
     let hasSecondTask = allTasksIt.hasNext();
@@ -726,15 +549,22 @@ Item {
 
     if (fieldTM.singleTaskMode) {
       fieldTM.currentTask = firstTask;
-      claimTask(firstTask);
-    } else {
-      let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, `"status" = 'in_progress' and lower(coalesce("assigned_to", '')) = lower(${quoteExpressionString(fieldTM.currentUser)})`);
-      fieldTM.currentTask = it.hasNext() ? it.next() : undefined;
-      delete it;
+    } else if ("current_task_id" in projectVariables && projectVariables["current_task_id"] !== -1) {
+      let it = LayerUtils.createFeatureIteratorFromExpression(fieldTM.tasksLayer, '"task_id" = ' + projectVariables["current_task_id"]);
+      if (it.hasNext()) {
+        fieldTM.currentTask = it.next();
+      }
     }
-    refreshMyTasks();
-    if (fieldTM.currentTask === undefined) {
-      zoomToMyTasks();
+    informationBehavior.enabled = true;
+
+    let groupNames = LayerUtils.uniqueValuesForVectorLayerFieldIndex(fieldTM.tasksLayer, fieldTM.tasksLayer.fields.indexOf("group"));
+    groupNames = groupNames.filter(name => name != "");
+    groupNames = [""].concat(groupNames);
+    groupNames.sort();
+    groupComboBox.model = groupNames;
+    if ("current_group" in projectVariables && groupNames.indexOf(projectVariables["current_group"]) > -1) {
+      fieldTM.currentGroup = projectVariables["current_group"];
+      groupComboBox.currentIndex = groupNames.indexOf(projectVariables["current_group"]);
     }
 
     const pointHandler = iface.findItemByObjectName("pointHandler");
@@ -763,17 +593,9 @@ Item {
                                    const rectangle = GeometryUtils.reprojectRectangle(GeometryUtils.createRectangleFromPoints(tl, br), mapCanvas.mapSettings.destinationCrs, fieldTM.tasksLayer.crs);
 
                                    let it = LayerUtils.createFeatureIteratorFromRectangle(fieldTM.tasksLayer, rectangle);
-                                   const task = it.hasNext() ? it.next() : undefined;
-                                   delete it;
-                                   if (task !== undefined) {
-                                     const other = fieldTM.reader ? "" : otherAssignee(task);
-                                     if (other !== "") {
-                                       fieldTM.pendingTask = task;
-                                       takeoverDialog.assignee = other;
-                                       takeoverDialog.open();
-                                     } else {
-                                       enterTask(task, true);
-                                     }
+                                   if (it.hasNext()) {
+                                     fieldTM.currentTask = it.next();
+                                     mainWindow.displayToast(qsTranslate("FieldTM", "Assigned task #%1").arg(fieldTM.currentTask.attribute("task_id")));
                                    }
                                    return true;
                                  });

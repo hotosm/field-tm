@@ -294,8 +294,8 @@ with your field mappers first:
   - ODK: the task entities are replaced and every task status is reset.
     Submissions are kept in ODK Central.
   - QField: the task layer is regenerated and re-uploaded. Mappers must
-    sync or re-download the project, and unsynced local task edits may
-    be lost. Survey data already synced to QField Cloud is kept.
+    sync or re-download the project. Task progress (in progress, completed)
+    and survey data already synced to QField Cloud are kept.
 
 ### Project Creation Tips
 

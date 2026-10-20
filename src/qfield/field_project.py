@@ -171,8 +171,8 @@ def _prepare_tasks_layer(
 ) -> Optional[str]:
     """Convert task GeoJSON to a packaged GeoPackage when available.
 
-    Ensures task plan columns (see ``_add_plugin_task_fields``) so the
-    field-tm QField plugin can drive task assignment state.
+    Ensures the columns the field-tm QField plugin reads (see
+    ``_add_plugin_task_fields``).
     """
     log.info("Processing task geometries")
     set_project_file_permissions(project_path)
@@ -195,15 +195,9 @@ def _prepare_tasks_layer(
     return str(tasks_gpkg_path_final)
 
 
-# String columns the field-tm QField plugin reads/writes on the tasks layer.
-# Values come from the task plan GeoJSON properties when present.
-PLUGIN_TASK_STRING_FIELDS = (
-    "status",
-    "assigned_to",
-    "assigned_group",
-    "comment",
-    "colour",
-)
+# String columns the field-tm QField plugin reads on the tasks layer.
+# Task progress is written to the tasks_events layer instead.
+PLUGIN_TASK_STRING_FIELDS = ("group",)
 
 
 def _is_blank(value) -> bool:
@@ -220,15 +214,14 @@ def _fill_blank_task_fields(layer, feature) -> None:
         )
     for name in PLUGIN_TASK_STRING_FIELDS:
         if _is_blank(feature[name]):
-            default = "available" if name == "status" else ""
-            layer.changeAttributeValue(feature.id(), fields.indexOf(name), default)
+            layer.changeAttributeValue(feature.id(), fields.indexOf(name), "")
 
 
 def _add_plugin_task_fields(tasks_gpkg_path: str, log: logging.Logger) -> None:
     """Ensure task plan columns exist on the tasks layer.
 
     Existing values from the input GeoJSON are kept; NULLs become ``""``
-    (``status`` defaults to ``available``) so plugin comparisons work.
+    so plugin comparisons work.
     """
     from qgis.core import QgsField, QgsVectorLayer
     from qgis.PyQt.QtCore import QMetaType
@@ -258,90 +251,119 @@ def _add_plugin_task_fields(tasks_gpkg_path: str, log: logging.Logger) -> None:
     log.info("Ensured task plan fields on tasks layer")
 
 
-def _apply_task_colour_style(project, log: logging.Logger) -> None:
-    """Outline tasks in their ``colour`` property (e.g. team colour).
-
-    Only applied when at least one task has a colour; tasks without one
-    keep the bundled outline.
-    """
-    from qgis.core import QgsProperty, QgsRenderContext, QgsSymbolLayer
-
-    layers = project.mapLayersByName("tasks")
-    if not layers:
-        return
-    layer = layers[0]
-    if layer.fields().indexOf("colour") == -1:
-        return
-    if all(_is_blank(f["colour"]) for f in layer.getFeatures()):
-        return
-
-    renderer = layer.renderer()
-    if renderer is None:
-        return
-    has_colour = "coalesce(\"colour\", '') != ''"
-    for symbol in renderer.symbols(QgsRenderContext()):
-        for sl in symbol.symbolLayers():
-            if sl.layerType() != "SimpleFill":
-                continue
-            c = sl.strokeColor()
-            default = f"{c.red()},{c.green()},{c.blue()},{c.alpha()}"
-            sl.setDataDefinedProperty(
-                QgsSymbolLayer.Property.StrokeColor,
-                QgsProperty.fromExpression(
-                    f"if({has_colour}, \"colour\", '{default}')"
-                ),
-            )
-            sl.setDataDefinedProperty(
-                QgsSymbolLayer.Property.StrokeWidth,
-                QgsProperty.fromExpression(
-                    f"if({has_colour}, 0.8, {sl.strokeWidth()})"
-                ),
-            )
-    layer.triggerRepaint()
-    log.info("Applied task colour styling")
-
-
-def _add_plugin_survey_fields(project, log: logging.Logger) -> None:
-    """Add a ``status`` string column to the survey layer.
-
-    The bundled QField plugin styles survey features by this attribute
-    ('mapped', 'invalid', or empty/null for the default unmapped style)
-    and reads it to decide when a task is complete.
-    """
-    from qgis.core import QgsDefaultValue, QgsField
+def _create_events_gpkg(path: Path, id_field: str, id_type) -> None:
+    """Create an empty, geometry-less events GeoPackage."""
+    from qgis.core import (
+        Qgis,
+        QgsCoordinateReferenceSystem,
+        QgsCoordinateTransformContext,
+        QgsField,
+        QgsFields,
+        QgsVectorFileWriter,
+    )
     from qgis.PyQt.QtCore import QMetaType
 
-    layers = project.mapLayersByName("survey")
-    if not layers:
-        log.warning("Could not find survey layer to add plugin fields")
-        return
-    layer = layers[0]
+    options = QgsVectorFileWriter.SaveVectorOptions()
+    options.fileEncoding = "utf-8"
 
-    status_idx = layer.fields().indexOf("status")
-    if status_idx == -1:
-        if not layer.startEditing():
-            log.warning("Could not start editing survey layer to add plugin fields")
-            return
-        layer.addAttribute(QgsField("status", QMetaType.Type.QString))
-
-        status_idx = layer.fields().indexOf("status")
-        for feature in layer.getFeatures():
-            layer.changeAttributeValue(feature.id(), status_idx, "")
-
-        if not layer.commitChanges():
-            log.warning("Failed to commit plugin fields to survey layer")
-            return
-        log.info("Added status field to survey layer")
-    else:
-        log.debug("Survey layer already has 'status' field; skipping creation")
-        return
-
-    layer.setDefaultValueDefinition(
-        status_idx,
-        QgsDefaultValue(
-            'if("status" is null or "status" = \'\', \'mapped\', "status")', True
-        ),
+    fields = QgsFields()
+    fields.append(QgsField(id_field, id_type))
+    fields.append(QgsField("event_type", QMetaType.Type.QString))
+    fields.append(QgsField("event_value", QMetaType.Type.QString))
+    fields.append(QgsField("user", QMetaType.Type.QString))
+    sink = QgsVectorFileWriter.create(
+        str(path),
+        fields,
+        Qgis.WkbType.NoGeometry,
+        QgsCoordinateReferenceSystem(),
+        QgsCoordinateTransformContext(),
+        options,
     )
+    sink.flushBuffer()
+    del sink
+
+
+def _latest_status_query(events_layer: str, id_field: str) -> str:
+    """Virtual layer SQL: the most recent status event per id."""
+    return f"""select
+ {id_field},
+ (select ev.event_value from {events_layer} as ev where ev.{id_field} = {events_layer}.{id_field} and event_type = 'status' order by ROWID desc limit 1) as value
+from
+ {events_layer}
+where
+ event_type = 'status' group by {id_field}"""
+
+
+def _add_layer_to_tree_end(project, layer) -> None:
+    """Register a layer and append it to the layer tree (headless-safe)."""
+    if not layer.isValid() or not project.addMapLayer(layer, addToLegend=False):
+        raise RuntimeError(f"Could not add {layer.name()} layer to project")
+    root = project.layerTreeRoot()
+    root.insertLayer(len(root.children()), layer)
+
+
+def _add_plugin_event_layers(project, final_output_dir: Path, log: logging.Logger):
+    """Add append-only status events and join their latest value for symbology.
+
+    Mappers only ever add rows to ``tasks_events`` / ``survey_events``, so
+    concurrent offline edits never conflict and Field-TM can re-upload
+    ``tasks.gpkg`` without wiping field progress. The virtual
+    ``tasks_status`` / ``survey_status`` layers expose the latest status,
+    joined as ``tasks_status_value`` / ``survey_status_value``.
+    """
+    from qgis.core import QgsVectorLayer, QgsVectorLayerJoinInfo
+    from qgis.PyQt.QtCore import QMetaType, QUrl, QUrlQuery
+
+    # (events layer, id field, id type, status layer, target layer, target field)
+    specs = [
+        (
+            "tasks_events",
+            "task_id",
+            QMetaType.Type.LongLong,
+            "tasks_status",
+            "tasks",
+            "task_id",
+        ),
+        (
+            "survey_events",
+            "survey_uuid",
+            QMetaType.Type.QString,
+            "survey_status",
+            "survey",
+            "uuid",
+        ),
+    ]
+    for events_name, id_field, id_type, status_name, target_name, target_field in specs:
+        targets = project.mapLayersByName(target_name)
+        if not targets:
+            log.warning("No %s layer; skipping %s", target_name, events_name)
+            continue
+
+        events_path = final_output_dir / f"{events_name}.gpkg"
+        _create_events_gpkg(events_path, id_field, id_type)
+        events_layer = QgsVectorLayer(str(events_path), events_name, "ogr")
+        _add_layer_to_tree_end(project, events_layer)
+
+        # The virtual layer resolves events_name from the project, so the
+        # events layer must be added first and keep that exact name.
+        query = QUrlQuery()
+        query.addQueryItem("query", _latest_status_query(events_name, id_field))
+        status_layer = QgsVectorLayer(
+            f"?{query.toString(QUrl.ComponentFormattingOption.FullyEncoded)}"
+            "&nogeometry",
+            status_name,
+            "virtual",
+        )
+        _add_layer_to_tree_end(project, status_layer)
+
+        join_info = QgsVectorLayerJoinInfo()
+        join_info.setUsingMemoryCache(False)
+        join_info.setJoinLayer(status_layer)
+        join_info.setJoinFieldName(id_field)
+        join_info.setTargetFieldName(target_field)
+        join_info.setJoinFieldNamesSubset(["value"])
+        targets[0].addJoin(join_info)
+        log.info("Added %s and %s join on %s", events_name, status_name, target_name)
 
 
 def _load_generated_project(project_file: str):
@@ -727,17 +749,16 @@ def generate_qgis_project(
         log.info("Opening generated QGIS project to add task layer")
         project = _load_generated_project(project_file)
         _add_task_layer_to_project(project, tasks_gpkg_path_final, log)
-        _add_plugin_survey_fields(project, log)
         if tasks_gpkg_path_final:
             _add_project_area_layer(
                 project, tasks_gpkg_path_final, final_output_dir, log
             )
+        _add_plugin_event_layers(project, final_output_dir, log)
         _normalize_root_layer_order(project, log)
 
         _apply_plugin_and_styles(
             project, plugin_zip, final_output_dir, project_file, log
         )
-        _apply_task_colour_style(project, log)
 
         # Add metadata details
         project_metadata = project.metadata()
