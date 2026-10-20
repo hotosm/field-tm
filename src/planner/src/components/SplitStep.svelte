@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Planner } from '../lib/planner.svelte';
   import { classify, SKELETON_MAX_FEATURES, type SplitAlgorithm } from '../lib/engine/splitter';
-  import { estimateTasks, gridSize, recommend, MAX_TASKS } from '../lib/recommend';
+  import { dropEmptyByDefault, estimateTasks, gridSize, recommend, MAX_TASKS } from '../lib/recommend';
 
   let { planner, ondone }: { planner: Planner; ondone?: () => void } = $props();
 
@@ -23,7 +23,8 @@
   let numTasks = $state(10);
   let mainRoadsOnly = $state(false);
   let onlySelected = $state(false);
-  let dropEmpty = $state(true);
+  // Resets when the method changes; the checkbox can still override it.
+  let dropEmpty = $derived(dropEmptyByDefault(algorithm));
   const byFeatures = $derived(algorithm === 'AVG_BUILDING_VORONOI' || algorithm === 'AVG_BUILDING_SKELETON');
 
   // Adopt the recommendation whenever the inputs change.

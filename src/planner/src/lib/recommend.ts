@@ -68,3 +68,8 @@ export function estimateTasks(
   }
   return null;
 }
+
+/** Empty squares and blocks can still get new features, so keep them by default. */
+export function dropEmptyByDefault(algorithm: SplitAlgorithm): boolean {
+  return algorithm === "AVG_BUILDING_VORONOI" || algorithm === "AVG_BUILDING_SKELETON";
+}

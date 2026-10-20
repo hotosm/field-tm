@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { Polygon } from "geojson";
-import { estimateTasks, recommend } from "../src/lib/recommend";
+import { dropEmptyByDefault, estimateTasks, recommend } from "../src/lib/recommend";
 
 // ~1 km square near the equator.
 const aoi: Polygon = {
@@ -33,5 +33,16 @@ describe("estimateTasks", () => {
 describe("recommend", () => {
   it("splits by roads when there are only roads", () => {
     expect(recommend(aoi, 0, 10).algorithm).toBe("SPLIT_BY_ROADS");
+  });
+});
+
+describe("dropEmptyByDefault", () => {
+  it("keeps empty squares and road blocks", () => {
+    expect(dropEmptyByDefault("DIVIDE_BY_SQUARE")).toBe(false);
+    expect(dropEmptyByDefault("SPLIT_BY_ROADS")).toBe(false);
+  });
+  it("drops empty tasks for the feature-based methods", () => {
+    expect(dropEmptyByDefault("AVG_BUILDING_VORONOI")).toBe(true);
+    expect(dropEmptyByDefault("AVG_BUILDING_SKELETON")).toBe(true);
   });
 });
