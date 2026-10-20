@@ -75,4 +75,14 @@ describe("recommend", () => {
     expect(recommend(squareAround([0, 0], 1000), 50_000).params.num_buildings).toBe(100);
     expect(recommend(squareAround([0, 0], 1000), 667).params.num_buildings).toBe(10);
   });
+
+  it("prefers the street-following split, and the quick one for lots of data", () => {
+    const aoi = squareAround([0, 0], 1000);
+    expect(recommend(aoi, 667).algorithm).toBe("AVG_BUILDING_SKELETON");
+    expect(recommend(aoi, 50_000).algorithm).toBe("AVG_BUILDING_VORONOI");
+  });
+
+  it("suggests splitting by roads when only roads are loaded", () => {
+    expect(recommend(squareAround([0, 0], 1000), 0, 12).algorithm).toBe("SPLIT_BY_ROADS");
+  });
 });

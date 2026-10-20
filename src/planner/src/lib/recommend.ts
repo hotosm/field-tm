@@ -1,23 +1,43 @@
 import { areaM2, type Area } from "./geo";
-import type { SplitAlgorithm, SplitParams } from "./engine/splitter";
+import {
+  SKELETON_MAX_FEATURES,
+  SKELETON_MAX_TASKS,
+  type SplitAlgorithm,
+  type SplitParams,
+} from "./engine/splitter";
 
 export const MAX_TASKS = 100;
 export const FEATURES_PER_TASK = 100;
 
-/** Sensible defaults: aim for <= ~100 tasks and <= ~100 features per task. */
+/**
+ * Sensible defaults: aim for <= ~100 tasks and <= ~100 features per task.
+ * Prefer the street-following split (straight skeleton) when it is fast enough.
+ */
 export function recommend(
   aoi: Area,
   features: number,
+  lines = 0,
 ): { algorithm: SplitAlgorithm; params: SplitParams; note: string } {
   if (features > 0) {
     const perTask = Math.min(
       FEATURES_PER_TASK,
       Math.max(10, Math.ceil(features / MAX_TASKS / 10) * 10),
     );
+    const tasks = Math.ceil(features / perTask);
+    const skeleton = features <= SKELETON_MAX_FEATURES && tasks <= SKELETON_MAX_TASKS;
     return {
-      algorithm: "AVG_BUILDING_VORONOI",
+      algorithm: skeleton ? "AVG_BUILDING_SKELETON" : "AVG_BUILDING_VORONOI",
       params: { num_buildings: perTask },
-      note: `${features} features: about ${perTask} per task gives ~${Math.ceil(features / perTask)} tasks.`,
+      note: skeleton
+        ? `${features} features: about ${perTask} per task gives ~${tasks} tasks, with edges along streets.`
+        : `${features} features: about ${perTask} per task gives ~${tasks} tasks. The quick method suits this much data.`,
+    };
+  }
+  if (lines > 0) {
+    return {
+      algorithm: "SPLIT_BY_ROADS",
+      params: {},
+      note: "Roads loaded: split into blocks between main roads, rivers and railways.",
     };
   }
   return {

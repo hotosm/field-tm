@@ -9,13 +9,13 @@
   const available = $derived<{ id: SplitAlgorithm; label: string; help: string; ok: boolean }[]>([
     { id: 'DIVIDE_BY_SQUARE', label: 'Square grid', help: 'Equal squares. Needs no data.', ok: true },
     { id: 'SPLIT_BY_ROADS', label: 'By roads', help: 'Blocks bounded by main roads, rivers and railways.', ok: data.lines.length > 0 },
-    { id: 'AVG_BUILDING_VORONOI', label: 'By number of features', help: 'Groups nearby features into tasks of similar size. Follows roads if you added them.', ok: data.polys.length > 0 },
-    { id: 'AVG_BUILDING_SKELETON', label: 'By number of features (straight skeleton)', help: 'Like above, but task edges follow streets better. Slower.', ok: data.polys.length > 0 && data.polys.length <= SKELETON_MAX_FEATURES },
+    { id: 'AVG_BUILDING_SKELETON', label: 'Similar-sized tasks, following streets', help: 'Groups nearby features; task edges run along streets and gaps between features. Takes a little longer.', ok: data.polys.length > 0 && data.polys.length <= SKELETON_MAX_FEATURES },
+    { id: 'AVG_BUILDING_VORONOI', label: 'Similar-sized tasks, quick', help: 'Groups nearby features fast; edges can cut between features. Best for very large areas.', ok: data.polys.length > 0 },
   ]);
   const unavailable = (id: SplitAlgorithm) =>
     id === 'SPLIT_BY_ROADS' ? 'Add roads, rivers and railways in step 2.' : data.polys.length > SKELETON_MAX_FEATURES ? `Only for up to ${SKELETON_MAX_FEATURES} features.` : 'Add features to map in step 2.';
 
-  const rec = $derived(planner.aoi ? recommend(planner.aoi, data.polys.length) : null);
+  const rec = $derived(planner.aoi ? recommend(planner.aoi, data.polys.length, data.lines.length) : null);
   let algorithm = $state<SplitAlgorithm>('DIVIDE_BY_SQUARE');
   let cellSize = $state(500);
   let numFeatures = $state(50);
@@ -53,7 +53,7 @@
     {#each available as a (a.id)}
       <label class="choice" class:disabled={!a.ok}>
         <input type="radio" name="algorithm" value={a.id} bind:group={algorithm} disabled={!a.ok} />
-        <span><strong>{a.label}</strong><br /><small>{a.ok ? a.help : unavailable(a.id)}</small></span>
+        <span><strong>{a.label}</strong>{#if rec?.algorithm === a.id} <wa-badge variant="success" pill>Recommended</wa-badge>{/if}<br /><small>{a.ok ? a.help : unavailable(a.id)}</small></span>
       </label>
     {/each}
   </fieldset>
