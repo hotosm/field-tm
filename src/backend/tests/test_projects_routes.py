@@ -37,7 +37,6 @@ from app.db.enums import FieldMappingApp, ProjectStatus
 from app.helpers.geometry_utils import check_crs, featcol_polygons_to_centroids
 from app.projects import project_crud, project_services
 from app.projects.project_schemas import ProjectUpdate
-from app.qfield.qfield_crud import QFieldProjectResult
 
 
 @pytest.mark.parametrize(
@@ -787,13 +786,7 @@ async def test_finalize_qfield_project_allows_collect_new_data_only_mode(monkeyp
         _custom_qfield_creds=None,
         default_language=None,
     ):
-        return QFieldProjectResult(
-            qfield_url="https://qfield.example.org/projects/1",
-            manager_username=None,
-            manager_password=None,
-            mapper_username=None,
-            mapper_password=None,
-        )
+        return "https://qfield.example.org/projects/1"
 
     db = Mock()
     db.commit = fake_commit

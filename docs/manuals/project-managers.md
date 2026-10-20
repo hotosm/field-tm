@@ -171,7 +171,8 @@ Once the project is ready:
    display the **QR code**.
 2. Mappers install **QField** on their Android or iOS device and log in
    with their QField Cloud account (free to create at
-   [app.qfield.cloud](https://app.qfield.cloud)).
+   [app.qfield.cloud](https://app.qfield.cloud)). No invites are needed:
+   the project is public and anyone logged in can sync data to it.
 3. They scan the QR code or open the shared link to download the project.
 4. Mapped data syncs to QField Cloud automatically or manually - the
    project manager can review progress from the Field-TM dashboard.

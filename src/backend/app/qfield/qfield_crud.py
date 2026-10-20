@@ -29,12 +29,10 @@ import zipfile
 from asyncio import get_running_loop
 from contextlib import asynccontextmanager
 from copy import deepcopy
-from dataclasses import dataclass
 from functools import partial
 from io import BytesIO
 from pathlib import Path
 from random import getrandbits
-from secrets import token_urlsafe
 from typing import Optional
 from uuid import uuid4
 
@@ -44,11 +42,9 @@ from litestar.exceptions import HTTPException
 from osm_fieldwork.enums import DbGeomType
 from osm_fieldwork.update_xlsform import modify_form_for_qfield
 from psycopg import AsyncConnection
-from qfieldcloud_sdk.interfaces import QfcRequestException
 from qfieldcloud_sdk.sdk import (
     FileTransferType,
     JobTypes,
-    OrganizationMemberRole,
     ProjectCollaboratorRole,
 )
 
@@ -119,17 +115,6 @@ def _build_qfield_plugin_zip_b64() -> Optional[str]:
         len(_qfield_plugin_zip_b64),
     )
     return _qfield_plugin_zip_b64
-
-
-@dataclass(slots=True)
-class QFieldProjectResult:
-    """Details returned after QField project creation."""
-
-    qfield_url: str
-    manager_username: Optional[str]
-    manager_password: Optional[str]
-    mapper_username: Optional[str]
-    mapper_password: Optional[str]
 
 
 # Geometry helpers
@@ -231,15 +216,6 @@ def _sanitize_qfc_project_name(name: str) -> str:
     cleaned = QFC_NAME_SANITIZE_PATTERN.sub("-", (name or "").strip())
     cleaned = re.sub(r"-{2,}", "-", cleaned).strip("-.")
     return cleaned or f"FieldTM-project-{getrandbits(32)}"
-
-
-def _build_qfc_service_account_email(username: str) -> str:
-    """Build a non-empty email for QFieldCloud service-account provisioning."""
-    local_part = re.sub(r"[^A-Za-z0-9._+-]+", "-", (username or "").strip()).strip(".-")
-    if not local_part:
-        local_part = "ftm-qfield-user"
-
-    return f"{local_part}@fieldtm.org"
 
 
 # Data preparation helpers
@@ -501,10 +477,10 @@ async def create_qfield_project(
     project: DbProject,
     custom_qfield_creds: QFieldCloud | None = None,
     default_language: str | None = None,
-) -> QFieldProjectResult:
-    """Generate a QGIS project, upload it, and provision manager/mapper accounts.
+) -> str:
+    """Generate a QGIS project, upload it, and return its QFieldCloud URL.
 
-    Returns the project URL and credentials. Raises HTTPException on failure.
+    Raises HTTPException on failure.
     """
     if not project.outline:
         raise HTTPException(
@@ -922,50 +898,6 @@ async def _download_file_for_qfield_upload(url: str, destination: Path) -> None:
         )
 
 
-async def _create_qfc_user(username: str, password: str, client) -> bool:
-    """Create a QFieldCloud user; return True if created or already present.
-
-    Returns False for unavailable endpoints (404/405) or missing staff permission
-    (403), allowing callers to continue without collaborator provisioning.
-    """
-    loop = get_running_loop()
-    email = _build_qfc_service_account_email(username)
-    try:
-        await loop.run_in_executor(
-            None,
-            partial(client.create_user, username, password, email, exist_ok=True),
-        )
-        log.info("QFC user '%s' created or already exists", username)
-        return True
-    except QfcRequestException as exc:
-        status_code = exc.response.status_code
-        if status_code in (
-            status.HTTP_404_NOT_FOUND,
-            status.HTTP_405_METHOD_NOT_ALLOWED,
-        ):
-            log.warning(
-                "QFC user creation API not available "
-                "(upgrade QFieldCloud to enable automated account provisioning)"
-            )
-            return False
-        if status_code == status.HTTP_403_FORBIDDEN:
-            log.warning(
-                "QFC service account lacks staff permission for user creation; "
-                "ensure the account has is_staff=True in QFieldCloud"
-            )
-            return False
-        log.warning(
-            "Unexpected QFC user creation response %s for '%s': %s",
-            status_code,
-            username,
-            exc,
-        )
-        return False
-    except Exception as exc:
-        log.warning("QFC user creation call failed for '%s': %s", username, exc)
-        return False
-
-
 async def _upload_to_qfieldcloud(
     *,
     project: DbProject,
@@ -974,10 +906,11 @@ async def _upload_to_qfieldcloud(
     final_project_dir: str,
     custom_qfield_creds: QFieldCloud | None,
     db: AsyncConnection,
-) -> QFieldProjectResult:
-    """Create a QFieldCloud project, upload files, and provision manager/mapper users.
+) -> str:
+    """Create a public QFieldCloud project, upload files, and return its URL.
 
-    Returns a QFieldProjectResult with the project URL and credentials.
+    Any QFieldCloud user can open the project and sync data as an editor, so
+    mappers need no invites or shared accounts.
     """
     loop = get_running_loop()
 
@@ -993,12 +926,12 @@ async def _upload_to_qfieldcloud(
                 owner=qfc_owner,
                 description=description,
                 is_public=True,
+                public_collaborator_role=ProjectCollaboratorRole.EDITOR,
             ),
         )
         log.debug("QFieldCloud project created: %s", qfield_project)
 
         api_project_id = qfield_project.get("id")
-        api_project_owner = qfield_project.get("owner") or qfc_owner
 
         try:
             log.info(f"Uploading files to QFieldCloud project {qfc_project_name}")
@@ -1040,35 +973,6 @@ async def _upload_to_qfieldcloud(
                 % {"error": e},
             ) from e
 
-        # Skip account provisioning if the instance lacks the API or permission.
-        manager_username, manager_password = await _provision_project_user(
-            loop=loop,
-            client=client,
-            api_project_id=api_project_id,
-            api_project_owner=api_project_owner,
-            username=f"ftm_manager_{project.id}",
-            role=ProjectCollaboratorRole.MANAGER,
-            role_label="manager",
-        )
-        mapper_username, mapper_password = await _provision_project_user(
-            loop=loop,
-            client=client,
-            api_project_id=api_project_id,
-            api_project_owner=api_project_owner,
-            username=f"ftm_mapper_{project.id}",
-            role=ProjectCollaboratorRole.EDITOR,
-            role_label="mapper",
-        )
-        if not manager_username:
-            log.info(
-                "QField service-account provisioning skipped for %s",
-                (
-                    custom_qfield_creds.qfield_cloud_url
-                    if custom_qfield_creds
-                    else "default instance"
-                ),
-            )
-
     # Prefer a canonical URL returned by QFieldCloud, otherwise fall back to
     # the instance root instead of guessing an internal route.
     qfield_url = _resolve_qfield_project_url(qfield_project, custom_qfield_creds)
@@ -1077,155 +981,18 @@ async def _upload_to_qfieldcloud(
         external_project_id=api_project_id,
         external_project_instance_url=qfield_url,
     )
-    if mapper_username and mapper_password:
-        update_payload.external_project_username = mapper_username
+    # Keep custom credentials so later resyncs, basemaps and exports reach
+    # the same instance; deployment defaults need nothing stored.
+    if custom_qfield_creds:
+        update_payload.external_project_username = custom_qfield_creds.qfield_cloud_user
         update_payload.external_project_password_encrypted = encrypt_value(
-            mapper_password
+            custom_qfield_creds.qfield_cloud_password
         )
     await DbProject.update(db, project.id, update_payload)
     await db.commit()
     log.info("QFieldCloud project created: %s", qfield_url)
 
-    return QFieldProjectResult(
-        qfield_url=qfield_url,
-        manager_username=manager_username,
-        manager_password=manager_password,
-        mapper_username=mapper_username,
-        mapper_password=mapper_password,
-    )
-
-
-async def _provision_project_user(
-    *,
-    loop,
-    client,
-    api_project_id: str,
-    api_project_owner: str,
-    username: str,
-    role: ProjectCollaboratorRole,
-    role_label: str,
-) -> tuple[Optional[str], Optional[str]]:
-    """Create a QFieldCloud user and add them to the project.
-
-    Returns (username, password) on success, (None, None) if creation failed.
-    """
-    password = token_urlsafe(16)
-    created = await _create_qfc_user(username, password, client)
-    if not created:
-        log.warning(
-            "Could not create QFC %s user '%s'; skipping collaborator assignment.",
-            role_label,
-            username,
-        )
-        return None, None
-
-    try:
-        if _is_org_owned_project(api_project_owner, getattr(client, "username", None)):
-            await _ensure_org_membership(
-                loop=loop,
-                client=client,
-                organization=api_project_owner,
-                username=username,
-            )
-
-        await loop.run_in_executor(
-            None,
-            partial(
-                client.add_project_collaborator,
-                api_project_id,
-                username,
-                role,
-            ),
-        )
-        log.info(
-            "Added QFC %s '%s' to project %s", role_label, username, api_project_id
-        )
-    except Exception as exc:
-        log.warning(
-            "Could not add '%s' as %s to project %s: %s",
-            username,
-            role_label,
-            api_project_id,
-            exc,
-        )
-        return None, None
-
-    if not await _project_has_collaborator(
-        loop=loop,
-        client=client,
-        api_project_id=api_project_id,
-        username=username,
-    ):
-        log.warning(
-            "QField project %s does not list '%s' as a collaborator after add; "
-            "withholding %s credentials.",
-            api_project_id,
-            username,
-            role_label,
-        )
-        return None, None
-
-    return username, password
-
-
-def _is_org_owned_project(project_owner: str, client_username: str | None) -> bool:
-    """Whether the project owner is an organization rather than the auth user."""
-    return bool(project_owner and client_username and project_owner != client_username)
-
-
-async def _ensure_org_membership(
-    *,
-    loop,
-    client,
-    organization: str,
-    username: str,
-) -> None:
-    """Ensure a user is a member of the owning organization."""
-    members = await loop.run_in_executor(
-        None,
-        partial(client.get_organization_members, organization),
-    )
-    if any(member.get("member") == username for member in members):
-        return
-
-    try:
-        await loop.run_in_executor(
-            None,
-            partial(
-                client.add_organization_member,
-                organization,
-                username,
-                OrganizationMemberRole.MEMBER,
-                False,
-            ),
-        )
-    except QfcRequestException as exc:
-        # QFieldCloud returns 404 with "User matching query does not exist."
-        # when the username has no QFC account. Surface that to callers as a
-        # clean "user not found" so they can render a friendly message.
-        if exc.response.status_code == status.HTTP_404_NOT_FOUND:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=_("User '%(username)s' does not exist on QFieldCloud.")
-                % {"username": username},
-            ) from exc
-        raise
-    log.info("Added QFC user '%s' to organization '%s'", username, organization)
-
-
-async def _project_has_collaborator(
-    *,
-    loop,
-    client,
-    api_project_id: str,
-    username: str,
-) -> bool:
-    """Confirm the project collaborator was persisted by QFieldCloud."""
-    collaborators = await loop.run_in_executor(
-        None,
-        partial(client.get_project_collaborators, api_project_id),
-    )
-    return any(collab.get("collaborator") == username for collab in collaborators)
+    return qfield_url
 
 
 def _resolve_qfc_owner(client, custom_creds: QFieldCloud | None) -> str:
@@ -1293,95 +1060,6 @@ def _resolve_qfield_project_url(
             return f"{base}{candidate}"
 
     return base
-
-
-# Collaborator management
-
-
-async def add_qfc_project_collaborator(
-    client,
-    qfc_project_id: str,
-    username: str,
-    role: ProjectCollaboratorRole,
-) -> None:
-    """Add a user as a collaborator to a QFieldCloud project.
-
-    Handles org-owned projects by ensuring org membership first.
-    Raises HTTPException on failure.
-    """
-    loop = get_running_loop()
-
-    try:
-        project = await loop.run_in_executor(
-            None, partial(client.get_project, qfc_project_id)
-        )
-    except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=_("QFieldCloud project '%(project_id)s' not found.")
-            % {"project_id": qfc_project_id},
-        ) from exc
-
-    owner = project.get("owner", "")
-    client_username = getattr(client, "username", None)
-
-    if _is_org_owned_project(owner, client_username):
-        try:
-            await _ensure_org_membership(
-                loop=loop,
-                client=client,
-                organization=owner,
-                username=username,
-            )
-        except HTTPException:
-            # _ensure_org_membership already raises a user-friendly HTTPException
-            # for the "user does not exist" case; preserve it verbatim.
-            raise
-        except Exception as exc:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=(
-                    _(
-                        "Project belongs to organization '%(owner)s'. "
-                        "Could not add '%(username)s' to the organization: "
-                        "%(error)s"
-                    )
-                    % {"owner": owner, "username": username, "error": exc}
-                ),
-            ) from exc
-
-    try:
-        await loop.run_in_executor(
-            None,
-            partial(client.add_project_collaborator, qfc_project_id, username, role),
-        )
-    except QfcRequestException as exc:
-        status_code = exc.response.status_code
-        if status_code == status.HTTP_404_NOT_FOUND:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=_("User '%(username)s' does not exist on QFieldCloud.")
-                % {"username": username},
-            ) from exc
-        if status_code == status.HTTP_409_CONFLICT:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail=_(
-                    "User '%(username)s' is already a collaborator on this project."
-                )
-                % {"username": username},
-            ) from exc
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("Failed to add collaborator: %(exc)s") % {"exc": exc},
-        ) from exc
-
-    log.info(
-        "Added QFC user '%s' to project '%s' with role '%s'",
-        username,
-        qfc_project_id,
-        role,
-    )
 
 
 # Credential testing

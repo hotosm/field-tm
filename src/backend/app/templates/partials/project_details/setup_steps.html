@@ -35,14 +35,6 @@ if status_value == 'PUBLISHED' %}
       </div>
     </div>
   </wa-card>
-  {% endif %} {% if show_qfc_collaborator_form %}
-  <div
-    hx-get="/projects/{{ project.id }}/qfc-collaborator-form"
-    hx-trigger="load"
-    hx-swap="outerHTML"
-  >
-    <wa-spinner></wa-spinner> {{ _("Loading collaborator form...") }}
-  </div>
   {% endif %} {% include "partials/project_details/tasks_section.html" %}
 </section>
 {% elif status_value == 'DRAFT' %}

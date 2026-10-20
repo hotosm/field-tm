@@ -21,18 +21,15 @@
 import json
 import logging
 from contextlib import suppress
-from html import escape
 
-from litestar import delete, get, post
+from litestar import delete, get
 from litestar import status_codes as status
 from litestar.di import Provide
-from litestar.enums import RequestEncodingType
 from litestar.exceptions import HTTPException
-from litestar.params import Body, Parameter
+from litestar.params import Parameter
 from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Response
 from psycopg import AsyncConnection
-from qfieldcloud_sdk.sdk import ProjectCollaboratorRole
 
 from app.auth.auth_deps import (
     get_optional_auth_user,
@@ -43,7 +40,6 @@ from app.auth.auth_deps import (
 from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import check_access, ensure_project_viewable, project_manager
 from app.central import central_crud
-from app.config import decrypt_value
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp, ProjectRole
 from app.db.models import DbProject
@@ -54,12 +50,8 @@ from app.projects.project_services import (
     NotFoundError,
     delete_project_with_downstream,
 )
-from app.qfield.qfield_crud import (
-    add_qfc_project_collaborator,
-    export_qfield_project_geojson,
-)
-from app.qfield.qfield_deps import qfield_client
-from app.qfield.qfield_utils import is_default_qfc_instance_url
+from app.qfield.qfield_crud import export_qfield_project_geojson
+from app.qfield.qfield_utils import strip_qfc_api_suffix
 
 from .htmx_helpers import callout as _callout
 from .setup_steps.setup_step_responses import (
@@ -91,34 +83,6 @@ def _can_delete_project(auth_user: object | None, project: DbProject) -> bool:
     with suppress(Exception):
         return get_user_sub(auth_user) == project.created_by_sub
     return False
-
-
-async def _mapper_credentials(
-    db: AsyncConnection, project: DbProject, auth_user: object | None
-) -> tuple[str | None, str | None]:
-    """QField mapper credentials, only for logged-in users with a project role."""
-    if project.field_mapping_app != FieldMappingApp.QFIELD or auth_user is None:
-        return None, None
-    if not project.external_project_password_encrypted:
-        return None, None
-    if not await check_access(
-        auth_user, db, project_id=project.id, role=ProjectRole.MAPPER
-    ):
-        return None, None
-    try:
-        password = decrypt_value(project.external_project_password_encrypted)
-    except Exception:
-        return None, None
-    return project.external_project_username, password
-
-
-def _show_qfc_collaborator_form(project: DbProject) -> bool:
-    """Whether to show the QFieldCloud collaborator form on project details."""
-    return (
-        project.field_mapping_app == FieldMappingApp.QFIELD
-        and bool(project.external_project_id)
-        and is_default_qfc_instance_url(project.external_project_instance_url)
-    )
 
 
 async def _is_project_manager(
@@ -162,8 +126,6 @@ async def project_details(
                 "is_manager": is_manager,
                 "form_templates_json": json.dumps(form_templates),
                 "can_delete_project": _can_delete_project(auth_user, project),
-                "show_qfc_collaborator_form": is_manager
-                and _show_qfc_collaborator_form(project),
             },
         )
     except KeyError:
@@ -175,7 +137,6 @@ async def project_details(
                 "is_manager": False,
                 "form_templates_json": "[]",
                 "can_delete_project": False,
-                "show_qfc_collaborator_form": False,
             },
         )
 
@@ -263,14 +224,14 @@ async def project_qrcode_htmx(
         app_name = _app_name(project)
         qr_download_name = f"{project.project_name}_{app_name}_{project_id}"
         open_app_url = None
+        qfc_signup_url = None
         if (
             project.field_mapping_app == FieldMappingApp.QFIELD
             and project.external_project_id
         ):
             open_app_url = f"qfield://cloud?project={project.external_project_id}"
-        mapper_username, mapper_password = await _mapper_credentials(
-            db, project, auth_user
-        )
+            qfc_base = strip_qfc_api_suffix(project.external_project_instance_url or "")
+            qfc_signup_url = f"{qfc_base}/accounts/signup/" if qfc_base else None
         return HTMXTemplate(
             template_name="partials/project_details/fragments/qr_panel.html",
             context={
@@ -278,8 +239,7 @@ async def project_qrcode_htmx(
                 "qr_download_name": qr_download_name,
                 "app_name": app_name,
                 "open_app_url": open_app_url,
-                "mapper_username": mapper_username,
-                "mapper_password": mapper_password,
+                "qfc_signup_url": qfc_signup_url,
             },
         )
 
@@ -293,214 +253,6 @@ async def project_qrcode_htmx(
             media_type="text/html",
             status_code=e.status_code,
         )
-
-
-def _parse_collaborator_usernames(raw: str) -> list[str]:
-    """Parse a comma-separated list of QFieldCloud usernames."""
-    seen: set[str] = set()
-    usernames: list[str] = []
-    for piece in (raw or "").split(","):
-        name = piece.strip()
-        if not name:
-            continue
-        key = name.lower()
-        if key in seen:
-            continue
-        seen.add(key)
-        usernames.append(name)
-    return usernames
-
-
-def _render_collaborator_result(
-    project_id: int,
-    *,
-    added: list[str],
-    failed: list[tuple[str, str]],
-) -> str:
-    """Build the post-submit result panel for the collaborator form."""
-    blocks: list[str] = []
-    if added:
-        names = ", ".join(added)
-        success_msg = _(
-            "Added the following user(s) as project editors: %(names)s."
-        ) % {"names": names}
-        blocks.append(_callout("success", success_msg))
-    for username, reason in failed:
-        msg = _("Could not add '%(username)s': %(reason)s") % {
-            "username": username,
-            "reason": reason,
-        }
-        blocks.append(_callout("danger", msg))
-
-    add_more_label = escape(_("Add more collaborators"), quote=True)
-    refresh_button = (
-        f'<wa-button variant="neutral" appearance="outlined" size="s" '
-        f'hx-get="/projects/{project_id}/qfc-collaborator-form" '
-        f'hx-target="#qfc-collaborator-section" hx-swap="outerHTML" '
-        f">{add_more_label}</wa-button>"
-    )
-    inner = "".join(blocks) + f"<div>{refresh_button}</div>"
-    return f'<div id="qfc-collaborator-section" class="wa-stack">{inner}</div>'
-
-
-def _render_collaborator_form(project_id: int, *, error_msg: str | None = None) -> str:
-    """Render the QFieldCloud collaborator form on the project details page."""
-    heading = escape(_("Invite QFieldCloud collaborators"), quote=True)
-    step_intro = escape(
-        _(
-            "Mappers must have an account on QFieldCloud before you can give "
-            "them access to this project."
-        ),
-        quote=True,
-    )
-    step_create = _(
-        "Have each mapper create a free account at "
-        '<a href="https://app.qfield.cloud" target="_blank" rel="noopener" '
-        'class="ftm-link--brand">app.qfield.cloud</a>.'
-    )
-    step_enter = escape(
-        _(
-            "Enter their QFieldCloud usernames below (comma-separated for "
-            "multiple users) and click submit. They will be added as editors "
-            "and can log in to QField to start mapping."
-        ),
-        quote=True,
-    )
-    placeholder = escape(_("e.g. alice, bob, charlie"), quote=True)
-    submit_label = escape(_("Add collaborators"), quote=True)
-
-    error_html = _callout("danger", error_msg) if error_msg else ""
-
-    return (
-        f'<wa-card id="qfc-collaborator-section" with-header>'
-        f'<h3 slot="header" class="ftm-section-title">{heading}</h3>'
-        f'<div class="wa-stack">'
-        f'<ol class="ftm-hint">'
-        f"<li>{step_intro}</li>"
-        f"<li>{step_create}</li>"
-        f"<li>{step_enter}</li>"
-        f"</ol>"
-        f"{error_html}"
-        f'<form hx-post="/projects/{project_id}/qfc-collaborators" '
-        f'hx-target="#qfc-collaborator-section" hx-swap="outerHTML" '
-        f'class="wa-flank:end wa-gap-s">'
-        f'<wa-input name="qfc_usernames" placeholder="{placeholder}" required>'
-        f"</wa-input>"
-        f'<wa-button type="submit" variant="brand">{submit_label}</wa-button>'
-        f"</form>"
-        f"</div>"
-        f"</wa-card>"
-    )
-
-
-@get(
-    path="/projects/{project_id:int}/qfc-collaborator-form",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-        "current_user": Provide(project_manager),
-    },
-)
-async def qfc_collaborator_form_htmx(
-    request: HTMXRequest,
-    current_user: ProjectUserDict,
-    auth_user: object,
-    project_id: int = Parameter(),
-) -> Response:
-    """Re-render the QFieldCloud collaborator form (e.g. after submit)."""
-    project, not_found_response = _authorized_project_or_response(
-        current_user, project_id
-    )
-    if not_found_response:
-        return not_found_response
-
-    if not _show_qfc_collaborator_form(project):
-        return Response(
-            content='<div id="qfc-collaborator-section"></div>',
-            media_type="text/html",
-            status_code=status.HTTP_200_OK,
-        )
-
-    return Response(
-        content=_render_collaborator_form(project_id),
-        media_type="text/html",
-        status_code=status.HTTP_200_OK,
-    )
-
-
-@post(
-    path="/projects/{project_id:int}/qfc-collaborators",
-    dependencies={
-        "db": Provide(db_conn),
-        "auth_user": Provide(login_required),
-        "current_user": Provide(project_manager),
-    },
-)
-async def add_qfc_collaborators_htmx(
-    request: HTMXRequest,
-    db: AsyncConnection,
-    current_user: ProjectUserDict,
-    auth_user: object,
-    project_id: int = Parameter(),
-    data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
-) -> Response:
-    """Add one or more QFieldCloud users as editors on the given project."""
-    _project, not_found_response = _authorized_project_or_response(
-        current_user, project_id
-    )
-    if not_found_response:
-        return not_found_response
-
-    usernames = _parse_collaborator_usernames(data.get("qfc_usernames") or "")
-    if not usernames:
-        return Response(
-            content=_render_collaborator_form(
-                project_id, error_msg=_("Enter at least one QFieldCloud username.")
-            ),
-            media_type="text/html",
-            status_code=status.HTTP_200_OK,
-        )
-
-    project = await DbProject.one(db, project_id)
-    qfc_project_id = project.external_project_id
-    if not qfc_project_id:
-        return _html_error_response(
-            _("QFieldCloud project ID not found for this project."),
-            status.HTTP_400_BAD_REQUEST,
-        )
-    if not is_default_qfc_instance_url(project.external_project_instance_url):
-        return _html_error_response(
-            _(
-                "This project was created on a custom QFieldCloud instance. "
-                "Use the QFieldCloud Admin tab to manage collaborators."
-            ),
-            status.HTTP_400_BAD_REQUEST,
-        )
-
-    added: list[str] = []
-    failed: list[tuple[str, str]] = []
-    async with qfield_client() as client:
-        for username in usernames:
-            try:
-                await add_qfc_project_collaborator(
-                    client,
-                    str(qfc_project_id),
-                    username,
-                    ProjectCollaboratorRole.EDITOR,
-                )
-            except HTTPException as exc:
-                failed.append((username, str(exc.detail)))
-            except Exception as exc:
-                log.warning("QFC add collaborator failed for '%s': %s", username, exc)
-                failed.append((username, str(exc)))
-            else:
-                added.append(username)
-
-    return Response(
-        content=_render_collaborator_result(project_id, added=added, failed=failed),
-        media_type="text/html",
-        status_code=status.HTTP_200_OK,
-    )
 
 
 def _safe_export_filename(project: DbProject) -> str:

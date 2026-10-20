@@ -39,15 +39,13 @@
     <p class="ftm-hint">
       {{ _("If %(app_name)s is installed on this device.") % {"app_name": app_name} }}
     </p>
-    {% endif %} {% if mapper_username and mapper_password %}
-    <div class="ftm-panel ftm-panel--quiet wa-stack wa-gap-2xs">
-      <strong>{{ _("Mapper Login (QFieldCloud)") }}</strong>
-      <span>{{ _("Username:") }} <code>{{ mapper_username }}</code></span>
-      <span>{{ _("Password:") }} <code>{{ mapper_password }}</code></span>
-      <span class="ftm-hint"
-        >{{ _("Scan the QR code, then enter these credentials in QField.") }}</span
+    {% endif %} {% if qfc_signup_url %}
+    <p class="ftm-hint">
+      {{ _("Log in to QField with your own QFieldCloud account, then scan the QR code.") }}
+      <a href="{{ qfc_signup_url }}" target="_blank" rel="noopener"
+        >{{ _("Create a free account") }}</a
       >
-    </div>
+    </p>
     {% endif %}
   </div>
 </wa-card>

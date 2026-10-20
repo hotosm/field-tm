@@ -1,20 +1,14 @@
 <div class="wa-stack">
   <wa-callout variant="success"> {{ _("Project created in QFieldCloud.") }}</wa-callout>
   <div class="ftm-panel ftm-panel--quiet wa-stack wa-gap-xs">
-    <h4 class="ftm-section-title">{{ _("Manager Access (QFieldCloud)") }}</h4>
+    <h4 class="ftm-section-title">{{ _("QFieldCloud") }}</h4>
     <p>
       <a href="{{ result.qfield_url }}" target="_blank"> {{ _("Open project in QFieldCloud") }} </a>
     </p>
-    {% if result.manager_username and result.manager_password %}
-    <p><strong>{{ _("Username:") }}</strong> <code>{{ result.manager_username }}</code></p>
-    <p><strong>{{ _("Password:") }}</strong> <code>{{ result.manager_password }}</code></p>
-    <p class="ftm-hint">{{ _("Save these credentials now. They will only be shown once.") }}</p>
-    {% else %}
     <p class="ftm-hint">
-      {{ _("Manager account could not be created automatically. Log in to QFieldCloud as admin to
-      manage the project.") }}
+      {{ _("The project is public: anyone logged in to QFieldCloud can open it in QField and sync
+      their data. No invites needed.") }}
     </p>
-    {% endif %}
   </div>
   <div>
     <wa-button class="cta" variant="brand" id="view-fieldtm-project-btn">

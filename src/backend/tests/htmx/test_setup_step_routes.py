@@ -480,8 +480,6 @@ def test_build_qfield_finalize_success_html_emits_finalize_event():
     """QField finalize helper should emit explicit finalize-complete trigger."""
     result = SimpleNamespace(
         qfield_url="https://app.qfield.cloud/projects/99",
-        manager_username="manager@fieldtm.org",
-        manager_password="Pass123!",
     )
 
     response_template = build_qfield_finalize_success_html(result, project_id=99)

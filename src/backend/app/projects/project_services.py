@@ -153,8 +153,6 @@ class QFieldFinalizeResult:
     """Details returned after QField finalization."""
 
     qfield_url: str
-    manager_username: Optional[str]
-    manager_password: Optional[str]
 
 
 @dataclass(slots=True)
@@ -1310,7 +1308,7 @@ async def finalize_qfield_project(
     custom_qfield_creds=None,
     default_language: str | None = None,
 ) -> QFieldFinalizeResult:
-    """Publish to QFieldCloud and return its URL and manager credentials.
+    """Publish to QFieldCloud and return its URL.
 
     Raises ValidationError for missing prerequisites or ServiceError if creation fails.
     """
@@ -1325,7 +1323,7 @@ async def finalize_qfield_project(
         )
 
     log.info(f"Creating QField project for Field-TM project {project_id}")
-    result = await create_qfield_project(
+    qfield_url = await create_qfield_project(
         db,
         project,
         custom_qfield_creds,
@@ -1342,8 +1340,4 @@ async def finalize_qfield_project(
     )
     await db.commit()
 
-    return QFieldFinalizeResult(
-        qfield_url=result.qfield_url,
-        manager_username=result.manager_username,
-        manager_password=result.manager_password,
-    )
+    return QFieldFinalizeResult(qfield_url=qfield_url)

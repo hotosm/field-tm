@@ -28,10 +28,7 @@ import pytest
 
 from app.qfield import qfield_crud
 from app.qfield.qfield_crud import (
-    _build_qfc_service_account_email,
     _build_tasks_geojson,
-    _create_qfc_user,
-    _is_org_owned_project,
     _resolve_backend_qfc_url,
     _resolve_qfield_project_url,
     _sanitize_qfc_project_name,
@@ -329,103 +326,6 @@ def test_sanitize_qfc_project_name_handles_unicode_and_symbols():
     assert sanitized == "FieldTM-Kathmandu-1"
 
 
-def test_build_qfc_service_account_email_uses_fieldtm_domain():
-    """Provisioned QField users should always get a non-empty email."""
-    email = _build_qfc_service_account_email("ftm_manager_14")
-
-    assert email == "ftm_manager_14@fieldtm.org"
-
-
-def test_build_qfc_service_account_email_sanitizes_local_part():
-    """Usernames should be normalized into valid email local parts."""
-    email = _build_qfc_service_account_email("ftm mapper 14")
-
-    assert email == "ftm-mapper-14@fieldtm.org"
-
-
-@pytest.mark.asyncio
-async def test_create_qfc_user_passes_generated_email_to_sdk():
-    """User creation should send a concrete email to QFieldCloud."""
-
-    class FakeClient:
-        def __init__(self):
-            self.calls = []
-
-        def create_user(self, username, password, email="", exist_ok=False):
-            self.calls.append(
-                {
-                    "username": username,
-                    "password": password,
-                    "email": email,
-                    "exist_ok": exist_ok,
-                }
-            )
-            return {"username": username}
-
-    client = FakeClient()
-
-    created = await _create_qfc_user("ftm_mapper_14", "secret", client)
-
-    assert created is True
-    assert client.calls == [
-        {
-            "username": "ftm_mapper_14",
-            "password": "secret",
-            "email": "ftm_mapper_14@fieldtm.org",
-            "exist_ok": True,
-        }
-    ]
-
-
-@pytest.mark.asyncio
-async def test_add_qfc_project_collaborator_user_not_found_in_org():
-    """404 from add_organization_member should surface as a clean user-not-found."""
-    from unittest.mock import MagicMock
-
-    from litestar.exceptions import HTTPException
-    from qfieldcloud_sdk.interfaces import QfcRequestException
-    from qfieldcloud_sdk.sdk import ProjectCollaboratorRole
-
-    from app.qfield.qfield_crud import add_qfc_project_collaborator
-
-    response = MagicMock()
-    response.status_code = 404
-    response.url = "http://qfield-app:8000/api/v1/members/HOTOSM/?limit=20&offset=0"
-    response.reason = "Not Found"
-    response.json.return_value = {
-        "code": "object_not_found",
-        "message": "Object not found",
-    }
-    response.content = b'{"detail": "User matching query does not exist."}'
-
-    class FakeClient:
-        username = "svcftm"
-
-        def get_project(self, _project_id):
-            return {"owner": "HOTOSM"}
-
-        def get_organization_members(self, _organization):
-            return []
-
-        def add_organization_member(self, *_args, **_kwargs):
-            raise QfcRequestException(response)
-
-    with pytest.raises(HTTPException) as excinfo:
-        await add_qfc_project_collaborator(
-            FakeClient(),
-            "qfc-project-7",
-            "spwoodcock",
-            ProjectCollaboratorRole.EDITOR,
-        )
-
-    assert excinfo.value.status_code == 404
-    assert "spwoodcock" in str(excinfo.value.detail)
-    assert "does not exist" in str(excinfo.value.detail)
-    # Make sure the noisy "Could not add ... to the organization: ..." wrapper
-    # did not get re-applied on top of the friendly message.
-    assert "Could not add" not in str(excinfo.value.detail)
-
-
 def test_strip_feature_properties_for_qfield_removes_seed_attributes():
     """Seed geometries should not leak raw source attributes into the QField layer."""
     stripped = _strip_feature_properties_for_qfield(
@@ -448,12 +348,6 @@ def test_strip_feature_properties_for_qfield_removes_seed_attributes():
         "coordinates": [1, 2],
     }
     assert stripped["features"][0]["properties"] == {}
-
-
-def test_org_owned_project_detection_only_triggers_for_different_owner():
-    """Only org-owned projects need organization membership before sharing."""
-    assert _is_org_owned_project("HOTOSM", "svcftm") is True
-    assert _is_org_owned_project("svcftm", "svcftm") is False
 
 
 @pytest.mark.asyncio
@@ -591,13 +485,7 @@ async def test_create_qfield_project_passes_resolved_language_to_qgis_wrapper(
         return None
 
     async def fake_upload_to_qfieldcloud(**kwargs):
-        return qfield_crud.QFieldProjectResult(
-            qfield_url="https://app.qfield.cloud/project/demo",
-            manager_username=None,
-            manager_password=None,
-            mapper_username=None,
-            mapper_password=None,
-        )
+        return "https://app.qfield.cloud/project/demo"
 
     monkeypatch.setattr(
         qfield_crud, "modify_form_for_qfield", fake_modify_form_for_qfield
@@ -693,6 +581,100 @@ async def test_resync_qfield_tasks_uploads_only_task_layers(monkeypatch, tmp_pat
     assert captured["wrapper"]["title"] == "demo"
     assert captured["project_id"] == "qfc-123"
     assert captured["files"] == ["project-area.gpkg", "tasks.gpkg"]
+
+
+def _fake_upload_client(calls: dict):
+    @asynccontextmanager
+    async def fake_qfield_client(creds=None):
+        class FakeClient:
+            username = "hotosm-bot"
+
+            def create_project(self, name, **kwargs):
+                calls["create_project"] = {"name": name, **kwargs}
+                return {"id": "qfc-9", "owner": kwargs["owner"]}
+
+            def upload_files(self, **kwargs):
+                calls["upload_project_id"] = kwargs["project_id"]
+
+        calls["creds"] = creds
+        yield FakeClient()
+
+    return fake_qfield_client
+
+
+async def _run_upload(monkeypatch, custom_creds):
+    calls: dict = {}
+    updates = []
+
+    async def fake_update(_db, project_id, payload):
+        updates.append(payload)
+
+    class DummyDb:
+        async def commit(self):
+            return None
+
+    monkeypatch.setattr(qfield_crud, "qfield_client", _fake_upload_client(calls))
+    monkeypatch.setattr(qfield_crud, "_wait_for_projectfile_processing", AsyncMock())
+    monkeypatch.setattr(qfield_crud.DbProject, "update", fake_update)
+    monkeypatch.setattr(qfield_crud.settings, "QFIELDCLOUD_PROJECT_OWNER", "HOTOSM")
+
+    url = await qfield_crud._upload_to_qfieldcloud(
+        project=SimpleNamespace(id=5),
+        description="demo",
+        qfc_project_name="FieldTM-demo",
+        final_project_dir="unused-dir",
+        custom_qfield_creds=custom_creds,
+        db=DummyDb(),
+    )
+    return url, calls, updates[0]
+
+
+async def test_upload_creates_public_project_with_editor_role(monkeypatch):
+    """Anyone on QFieldCloud can sync as editor; nothing is stored for defaults."""
+    from qfieldcloud_sdk.sdk import ProjectCollaboratorRole
+
+    _url, calls, update = await _run_upload(monkeypatch, None)
+
+    assert calls["create_project"]["owner"] == "HOTOSM"
+    assert calls["create_project"]["is_public"] is True
+    assert (
+        calls["create_project"]["public_collaborator_role"]
+        == ProjectCollaboratorRole.EDITOR
+    )
+    assert calls["upload_project_id"] == "qfc-9"
+    assert update.external_project_id == "qfc-9"
+    assert update.external_project_username is None
+    assert update.external_project_password_encrypted is None
+
+
+async def test_upload_stores_custom_credentials_for_later_calls(monkeypatch):
+    """Custom-instance credentials are kept (encrypted) for resync and exports."""
+    from app.config import decrypt_value
+
+    creds = QFieldCloud(
+        qfield_cloud_url="https://qfc.example.org",
+        qfield_cloud_user="manager",
+        qfield_cloud_password="secret",  # gitleaks:allow
+        qfield_cloud_org="my-org",
+    )
+
+    _url, calls, update = await _run_upload(monkeypatch, creds)
+
+    assert calls["create_project"]["owner"] == "my-org"
+    assert update.external_project_username == "manager"
+    assert decrypt_value(update.external_project_password_encrypted) == "secret"
+    restored = qfield_crud._resolve_project_qfield_credentials(
+        SimpleNamespace(
+            id=5,
+            external_project_instance_url="https://qfc.example.org/a/my-org/demo",
+            external_project_username=update.external_project_username,
+            external_project_password_encrypted=(
+                update.external_project_password_encrypted
+            ),
+        )
+    )
+    assert restored.qfield_cloud_url == "https://qfc.example.org/api/v1/"
+    assert restored.qfield_cloud_user == "manager"
 
 
 if __name__ == "__main__":

@@ -14,15 +14,12 @@ from app.htmx.project_create.project_create_xlsform_routes import (
     ROUTE_HANDLERS as PROJECT_CREATE_XLSFORM_HANDLERS,
 )
 from app.htmx.project_detail_routes import (
-    add_qfc_collaborators_htmx,
     delete_project_htmx,
     export_project_geojson_htmx,
     project_details,
     project_qrcode_htmx,
-    qfc_collaborator_form_htmx,
 )
 from app.htmx.project_list_routes import project_listing
-from app.htmx.qfc_admin.qfc_admin_routes import ROUTE_HANDLERS as QFC_ADMIN_HANDLERS
 from app.htmx.setup_steps.setup_step_extract_routes import (
     ROUTE_HANDLERS as SETUP_STEP_EXTRACT_HANDLERS,
 )
@@ -76,11 +73,8 @@ htmx_router = Router(
         *TASK_PLAN_HANDLERS,
         *SETUP_STEP_FINALIZE_HANDLERS,
         project_qrcode_htmx,
-        qfc_collaborator_form_htmx,
-        add_qfc_collaborators_htmx,
         export_project_geojson_htmx,
         *SETUP_STEP_VALIDATE_HANDLERS,
-        *QFC_ADMIN_HANDLERS,
         *BASEMAP_HANDLERS,
         serve_planner,
     ],

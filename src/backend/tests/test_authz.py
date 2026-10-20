@@ -20,7 +20,6 @@ MANAGER_ONLY_ROUTES = [
     ("POST", "/discard-data-extract-htmx?project_id={id}"),
     ("POST", "/upload-xlsform-htmx?project_id={id}"),
     ("GET", "/projects/{id}/export/geojson"),
-    ("POST", "/projects/{id}/qfc-collaborators"),
 ]
 
 
@@ -111,7 +110,9 @@ async def _make_qfield_project_with_creds(db, project_id):
             """
             UPDATE projects
             SET field_mapping_app = 'QField',
-                external_project_username = '<b>mapper</b>',
+                external_project_id = 'qfc-abc',
+                external_project_instance_url = 'https://app.qfield.cloud/a/HOTOSM/demo',
+                external_project_username = '<b>manager</b>',
                 external_project_password_encrypted = %(pw)s
             WHERE id = %(id)s
             """,
@@ -131,44 +132,22 @@ async def _get_qr_panel(client, project_id):
         )
 
 
-async def test_qr_panel_hides_mapper_credentials_from_guests(
-    client, db, project, login_as
+@pytest.mark.parametrize("user", [None, "stranger", "local_admin"])
+async def test_qr_panel_never_shows_stored_qfc_credentials(
+    client, db, project, login_as, user
 ):
-    """Anonymous viewers of a public project never see the mapper password."""
+    """Stored QFieldCloud credentials stay server-side; mappers use own accounts."""
     await _make_qfield_project_with_creds(db, project.id)
-    await login_as(None)
+    if user != "local_admin":
+        await login_as(user)
 
     response = await _get_qr_panel(client, project.id)
 
     assert response.status_code == status.HTTP_200_OK
     assert "pw" not in response.text
-    assert "Mapper Login" not in response.text
-
-
-async def test_qr_panel_hides_mapper_credentials_without_project_role(
-    client, db, project, login_as
-):
-    """Logged-in users without a role on the project do not see credentials."""
-    await _make_qfield_project_with_creds(db, project.id)
-    await login_as("stranger")
-
-    response = await _get_qr_panel(client, project.id)
-
-    assert "Mapper Login" not in response.text
-
-
-async def test_qr_panel_shows_escaped_mapper_credentials_to_managers(
-    client, db, project
-):
-    """Managers see the credentials, HTML-escaped."""
-    await _make_qfield_project_with_creds(db, project.id)
-
-    response = await _get_qr_panel(client, project.id)
-
-    assert "Mapper Login" in response.text
-    assert "&lt;script&gt;pw&lt;/script&gt;" in response.text
-    assert "<script>pw" not in response.text
-    assert "&lt;b&gt;mapper&lt;/b&gt;" in response.text
+    assert "&lt;b&gt;manager" not in response.text
+    assert "<b>manager" not in response.text
+    assert "https://app.qfield.cloud/accounts/signup/" in response.text
 
 
 async def test_project_page_hides_setup_from_non_managers(client, project, login_as):
@@ -251,28 +230,3 @@ async def test_non_owner_does_not_see_delete(client, project, login_as):
     await login_as("viewer")
     page = await client.get(f"/projects/{project.id}")
     assert f'hx-delete="/projects/{project.id}"' not in page.text
-
-
-@pytest.mark.parametrize(
-    ("method", "path"),
-    [
-        ("POST", "/qfc-admin/login"),
-        ("GET", "/qfc-admin/projects/abc/collaborators"),
-        ("POST", "/qfc-admin/projects/abc/collaborators"),
-        ("DELETE", "/qfc-admin/projects/abc/collaborators/someone"),
-        ("PATCH", "/qfc-admin/projects/abc/collaborators/someone"),
-    ],
-)
-async def test_qfc_admin_requires_login(client, login_as, method, path):
-    """The QFieldCloud admin tools are only for logged-in users."""
-    await login_as(None)
-    response = await client.request(method, path)
-    assert response.status_code == status.HTTP_401_UNAUTHORIZED
-
-
-async def test_qfc_admin_page_redirects_to_login(client, login_as):
-    """Anonymous visitors are sent to log in first."""
-    await login_as(None)
-    response = await client.get("/qfc-admin", follow_redirects=False)
-    assert response.status_code == status.HTTP_307_TEMPORARY_REDIRECT
-    assert "/login" in response.headers["location"]
