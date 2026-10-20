@@ -15,6 +15,7 @@
   import type { Area } from '../lib/geo';
   import { bbox } from '../lib/geo';
   import { taskColour } from '../lib/colours';
+  import { addBlankImage, loadBasemap } from '../lib/basemap';
   import type { Task } from '../lib/taskPlan';
 
   export type Tool = 'none' | 'polygon' | 'rectangle' | 'line' | 'edit';
@@ -117,12 +118,16 @@
     const ev = e.originalEvent;
     onselect?.(hit ? Number(hit.properties.task_id) : null, ev.shiftKey || ev.ctrlKey || ev.metaKey);
   }
+
+  const basemap = loadBasemap();
 </script>
 
+{#await basemap then style}
 <MapLibre
   bind:map
   class="map"
-  style="https://tiles.openfreemap.org/styles/liberty"
+  {style}
+  onstyleimagemissing={(e) => map && addBlankImage(map, e.id)}
   center={[0, 20]}
   zoom={1.5}
   autoloadGlobalCss={false}
@@ -163,3 +168,4 @@
 
   <TerraDraw mode={MODE[tool]} {modes} bind:draw {onfinish} {onchange} />
 </MapLibre>
+{/await}
