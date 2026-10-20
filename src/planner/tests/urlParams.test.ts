@@ -26,7 +26,15 @@ describe("parseMode", () => {
       aoi: undefined,
       features: undefined,
       roads: undefined,
+      returnTo: undefined,
     });
+  });
+
+  it("reads an absolute http(s) return_to and ignores anything else", () => {
+    const back = "https://field.hotosm.org/projects/12";
+    expect(parseMode(`?return_to=${encodeURIComponent(back)}`)).toMatchObject({ returnTo: back });
+    expect(parseMode("?return_to=javascript:alert(1)")).toMatchObject({ returnTo: undefined });
+    expect(parseMode("?return_to=/projects/12")).toMatchObject({ returnTo: undefined });
   });
 
   it("reads public GeoJSON urls and ignores unsafe schemes", () => {
@@ -38,6 +46,7 @@ describe("parseMode", () => {
       aoi: "https://example.org/a.geojson",
       features: undefined,
       roads: "data/r.geojson",
+      returnTo: undefined,
     });
   });
 

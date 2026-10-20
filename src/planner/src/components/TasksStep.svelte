@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Map } from 'maplibre-gl';
   import type { Planner } from '../lib/planner.svelte';
   import type { Tool } from './MapView.svelte';
   import { GROUP_PATTERN } from '../lib/taskPlan';
@@ -6,7 +7,7 @@
   import TaskDetails from './TaskDetails.svelte';
   import Legend from './Legend.svelte';
 
-  let { planner, tool = $bindable(), multi = $bindable() }: { planner: Planner; tool: Tool; multi: boolean } = $props();
+  let { planner, tool = $bindable(), multi = $bindable(), map, title }: { planner: Planner; tool: Tool; multi: boolean; map?: Map; title?: string } = $props();
 
   const n = $derived(planner.selected.length);
   const single = $derived(n === 1 ? planner.selectedTasks[0] : undefined);
@@ -41,7 +42,7 @@
   {/if}
 
   {#if single}
-    <TaskDetails task={single} onassign={(patch) => planner.assignSelected(patch)} />
+    <TaskDetails task={single} {map} {title} onassign={(patch) => planner.assignSelected(patch)} />
   {:else if n > 1}
     <form onsubmit={bulk} class="stack">
       <h3>Assign {n} tasks</h3>

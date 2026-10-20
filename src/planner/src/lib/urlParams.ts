@@ -2,9 +2,20 @@ import type { Task } from "./taskPlan";
 import { decodeTask } from "./share";
 
 export type Mode =
-  | { kind: "standalone"; aoi?: string; features?: string; roads?: string }
+  | { kind: "standalone"; aoi?: string; features?: string; roads?: string; returnTo?: string }
   | { kind: "fieldtm"; project: string; view: boolean }
   | { kind: "task"; task: Task };
+
+/** An absolute http(s) URL to send the user back to, e.g. a Field-TM project page. */
+function returnUrl(v: string | null): string | undefined {
+  try {
+    return v && ["http:", "https:"].includes(new URL(v).protocol)
+      ? new URL(v).toString()
+      : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 const isHttpUrl = (s: string) => {
   try {
@@ -30,5 +41,11 @@ export function parseMode(search: string, hash = ""): Mode {
     const v = q.get(k);
     return v && isHttpUrl(v) ? v : undefined;
   };
-  return { kind: "standalone", aoi: url("aoi"), features: url("features"), roads: url("roads") };
+  return {
+    kind: "standalone",
+    aoi: url("aoi"),
+    features: url("features"),
+    roads: url("roads"),
+    returnTo: returnUrl(q.get("return_to")),
+  };
 }

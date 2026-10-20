@@ -4,15 +4,17 @@
   import { download } from '../lib/io/files';
   import { ApiError, loginUrl, projectUrl, saveTaskPlan } from '../lib/io/fieldtm';
 
-  let { planner, project }: { planner: Planner; project?: { id: number | string; name: string } } = $props();
+  let { planner, project, returnTo }: { planner: Planner; project?: { id: number | string; name: string }; returnTo?: string } = $props();
 
   let saved = $state<number | null>(null);
   let authError = $state(false);
+  let downloaded = $state(false);
 
   function downloadPlan() {
     planner.run('Preparing download', async () => {
       download(`${project ? `project-${project.id}-` : ''}task-plan.geojson`, planGeoJSON(planner.plan));
       planner.unsaved = false;
+      downloaded = true;
     });
   }
 
@@ -48,10 +50,22 @@
       <wa-callout variant="warning" size="s"><a href={loginUrl(location.pathname + location.search)} target="_top">Log in to Field-TM</a>, then save again. Your work is kept in this browser.</wa-callout>
     {/if}
   {/if}
+  {#if returnTo && !project}
+    <wa-callout variant="brand" size="s">
+      <strong>Tip:</strong> download your task plan, then upload the file in the Tasks section of
+      your Field-TM project page ("Or upload a task plan file").
+    </wa-callout>
+  {/if}
   <div>
-    <wa-button variant={project ? 'neutral' : 'brand'} appearance={project ? 'outlined' : 'accent'} onclick={downloadPlan}>Download task plan (GeoJSON)</wa-button>
+    <wa-button class={project ? '' : 'cta'} variant={project ? 'neutral' : 'brand'} appearance={project ? 'outlined' : 'accent'} onclick={downloadPlan}>Download task plan (GeoJSON)</wa-button>
     <p class="hint">Keep the file as a backup: you can import it again in step 1 to keep editing.</p>
   </div>
+  {#if returnTo && !project}
+    <div>
+      <wa-button variant="brand" appearance={downloaded ? 'accent' : 'outlined'} href={returnTo} target="_top">Return to Field-TM project</wa-button>
+      {#if !downloaded}<p class="hint">Download the task plan first, so you have the file to upload.</p>{/if}
+    </div>
+  {/if}
   <p class="hint">
     The task plan is a GeoJSON file with one polygon per task and the assignments. Select a task to download it as GPX or
     GeoJSON, or to share a link and QR code.

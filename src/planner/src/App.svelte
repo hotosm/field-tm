@@ -93,7 +93,8 @@
       return;
     }
     planner.toggleSelect(id, additive || multi);
-    if (step < 2) step = 3;
+    // Jump to Tasks to edit the clicked task; the Split step keeps its selection for re-splitting.
+    if (step !== 2) step = 3;
   }
 
   function ondrawn(g: Polygon | LineString) {
@@ -159,7 +160,7 @@
 <svelte:window {onkeydown} {onbeforeunload} />
 
 {#snippet details(task: Task)}
-  <TaskDetails {task} readonly />
+  <TaskDetails {task} readonly {map} title={project?.name} />
 {/snippet}
 
 <div class="app" class:viewer={readonly}>
@@ -188,6 +189,7 @@
           <wa-button size="s" appearance="outlined" onclick={() => planner.undo()} disabled={!planner.canUndo} title="Undo (Ctrl+Z)">↶ Undo</wa-button>
           <wa-button size="s" appearance="outlined" onclick={() => planner.redo()} disabled={!planner.canRedo} title="Redo (Ctrl+Shift+Z)">↷ Redo</wa-button>
           {#if project}<wa-button size="s" appearance="plain" href={projectUrl(project.id)} target="_top">Back to project</wa-button>{/if}
+          {#if mode.kind === 'standalone' && mode.returnTo}<wa-button size="s" appearance="plain" href={mode.returnTo} target="_top">Return to Field-TM project</wa-button>{/if}
         </div>
 
         {#if draft}
@@ -220,9 +222,9 @@
           {:else if step === 2}
             <SplitStep {planner} ondone={() => (step = 3)} />
           {:else if step === 3}
-            <TasksStep {planner} bind:tool bind:multi />
+            <TasksStep {planner} bind:tool bind:multi {map} title={project?.name} />
           {:else}
-            <ExportStep {planner} project={project ?? undefined} />
+            <ExportStep {planner} project={project ?? undefined} returnTo={mode.kind === 'standalone' ? mode.returnTo : undefined} />
           {/if}
         </section>
         <p class="hint">

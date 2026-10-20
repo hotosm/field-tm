@@ -7,19 +7,35 @@
   import { groupColour } from '../lib/colours';
   import type { Assignment } from '../lib/planEdit';
   import QrCode from './QrCode.svelte';
+  import type { Map } from 'maplibre-gl';
+  import { printTask } from '../lib/print';
 
   interface Props {
     task: Task;
     readonly?: boolean;
+    /** Needed to print the task map. */
+    map?: Map;
+    title?: string;
     onassign?: (patch: Assignment) => void;
   }
-  let { task, readonly = false, onassign }: Props = $props();
+  let { task, readonly = false, map, title, onassign }: Props = $props();
 
   const p = $derived(task.properties);
   const link = $derived(shareUrl(task, location.href));
   const shownColour = $derived(p.colour ?? groupColour(p.assigned_group));
   let showQr = $state(false);
   let copied = $state(false);
+  let printError = $state<string | null>(null);
+
+  async function print() {
+    if (!map) return;
+    printError = null;
+    try {
+      await printTask(map, task, title);
+    } catch (e) {
+      printError = e instanceof Error ? e.message : String(e);
+    }
+  }
 
   async function copy() {
     try {
@@ -67,18 +83,56 @@
     {/key}
   {/if}
 
-  <div class="row">
-    <wa-button size="s" appearance="outlined" onclick={() => download(`task-${p.task_id}.geojson`, taskGeoJSON(task))}>GeoJSON</wa-button>
-    <wa-button size="s" appearance="outlined" onclick={() => download(`task-${p.task_id}.gpx`, taskGPX(task), 'application/gpx+xml')}>GPX</wa-button>
-    <wa-button size="s" appearance="outlined" onclick={copy}>{copied ? 'Copied' : 'Copy link'}</wa-button>
-    <wa-button size="s" appearance="outlined" onclick={() => (showQr = !showQr)} aria-expanded={showQr}>QR code</wa-button>
-  </div>
+  <h4>Use this task</h4>
+  <ul class="uses">
+    <li>
+      <span><strong>Navigate</strong><small>GPX for OsmAnd, CoMaps, Organic Maps or a GPS</small></span>
+      <wa-button size="s" appearance="outlined" onclick={() => download(`task-${p.task_id}.gpx`, taskGPX(task), 'application/gpx+xml')}>Download GPX</wa-button>
+    </li>
+    {#if map}
+      <li>
+        <span><strong>Print</strong><small>Paper map for the field (save as PDF)</small></span>
+        <wa-button size="s" appearance="outlined" onclick={print}>Print / PDF</wa-button>
+      </li>
+    {/if}
+    <li>
+      <span><strong>Share</strong><small>Link or QR code to open on a phone</small></span>
+      <span class="row">
+        <wa-button size="s" appearance="outlined" onclick={copy}>{copied ? 'Copied' : 'Copy link'}</wa-button>
+        <wa-button size="s" appearance="outlined" onclick={() => (showQr = !showQr)} aria-expanded={showQr}>QR code</wa-button>
+      </span>
+    </li>
+    <li>
+      <span><strong>GIS</strong><small>GeoJSON for QGIS, JOSM or other tools</small></span>
+      <wa-button size="s" appearance="outlined" onclick={() => download(`task-${p.task_id}.geojson`, taskGeoJSON(task))}>Download GeoJSON</wa-button>
+    </li>
+  </ul>
+  {#if printError}<wa-callout variant="warning" size="s">{printError}</wa-callout>{/if}
   {#if showQr}<QrCode text={link} />{/if}
 </section>
 
 <style>
-  h3 {
+  h3,
+  h4 {
     margin: 0;
+  }
+  .uses {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--wa-space-xs);
+  }
+  .uses li {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--wa-space-xs);
+  }
+  .uses small {
+    display: block;
+    color: var(--wa-color-text-quiet);
   }
   dl {
     display: grid;
