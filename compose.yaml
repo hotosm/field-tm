@@ -82,7 +82,7 @@ x-qfield-common-env: &qfield-common-env
   EMAIL_HOST_USER: ""
   EMAIL_HOST_PASSWORD: ""
   DEFAULT_FROM_EMAIL: noreply@field.localhost
-  QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:${QFIELDCLOUD_TAG:-26.3}
+  QFIELDCLOUD_QGIS_IMAGE_NAME: ghcr.io/opengisch/qfieldcloud-qgis:${QFIELDCLOUD_APP_TAG:-commit-1853f7b}
   # NOTE this must point to the QFieldCloud API root and end with trailing slash
   QFIELDCLOUD_WORKER_QFIELDCLOUD_URL: ${QFIELDCLOUD_WORKER_QFIELDCLOUD_URL:-http://qfield-app:8000/api/v1/}
   QFIELDCLOUD_AUTH_TOKEN_EXPIRATION_HOURS: 720
@@ -98,10 +98,9 @@ x-qfield-common-env: &qfield-common-env
   TMP_DIRECTORY: /tmp
 
 x-qfield-common: &qfield-common
-  # This override contains the user creation API from PR:
-  # https://github.com/opengisch/QFieldCloud/pull/1506
-  # Once merged, we can use the official image
-  image: "ghcr.io/hotosm/field-tm/qfieldcloud-app:${QFIELDCLOUD_TAG:-26.3}"
+  # Upstream master build with public_collaborator_role (QFieldCloud#1858).
+  # Switch to the next release tag once it is published.
+  image: "ghcr.io/opengisch/qfieldcloud-app:${QFIELDCLOUD_APP_TAG:-commit-1853f7b}"
   volumes:
     - qfield_static:/usr/src/app/staticfiles
   networks:
@@ -484,7 +483,7 @@ services:
   qfield-worker:
     profiles: ["qfield"]
     <<: *qfield-common
-    image: ghcr.io/opengisch/qfieldcloud-worker-wrapper:${QFIELDCLOUD_TAG:-26.3}
+    image: ghcr.io/opengisch/qfieldcloud-worker-wrapper:${QFIELDCLOUD_APP_TAG:-commit-1853f7b}
     depends_on:
       qfield-app:
         condition: service_healthy
