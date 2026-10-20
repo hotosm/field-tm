@@ -28,7 +28,7 @@ service:
 webauthn:
   enabled: true
   relying_party:
-    id: "localhost"
+    id: "${HANKO_COOKIE_DOMAIN}"
     display_name: "Field-TM"
     origins:
       - "${HANKO_ALLOWED_ORIGIN}"
@@ -71,7 +71,7 @@ session:
     domain: "${HANKO_COOKIE_DOMAIN}"
     http_only: true
     same_site: lax
-    secure: false
+    secure: ${HANKO_COOKIE_SECURE}
 
 third_party:
   redirect_url: "${HANKO_REDIRECT_URL}"

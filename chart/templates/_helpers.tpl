@@ -97,14 +97,16 @@ Auth and monitoring env for the backend container.
 */}}
 {{- define "field-tm.authEnv" -}}
 {{- $provider := .Values.auth.provider | default "hotosm" -}}
-{{- if not (has $provider (list "hotosm" "custom" "disabled")) -}}
-{{- fail (printf "auth.provider must be one of hotosm, custom, disabled (got %q)" $provider) -}}
+{{- if not (has $provider (list "hotosm" "bundled" "custom" "disabled")) -}}
+{{- fail (printf "auth.provider must be one of hotosm, bundled, custom, disabled (got %q)" $provider) -}}
 {{- end }}
 - name: AUTH_PROVIDER
   value: {{ $provider | quote }}
-{{- if eq $provider "custom" }}
+{{- if has $provider (list "bundled" "custom") }}
 - name: HANKO_API_URL
-  value: {{ required "auth.hankoApiUrl is required when auth.provider=custom" .Values.auth.hankoApiUrl | quote }}
+  value: {{ required (printf "auth.hankoApiUrl is required when auth.provider=%s" $provider) .Values.auth.hankoApiUrl | quote }}
+{{- end }}
+{{- if eq $provider "custom" }}
 - name: LOGIN_URL
   value: {{ required "auth.loginUrl is required when auth.provider=custom" .Values.auth.loginUrl | quote }}
 {{- end }}

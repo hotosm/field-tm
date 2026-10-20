@@ -2,8 +2,9 @@
 
 > **Deprecated.** Helm (`chart/`) is the only supported production path; see
 > `docs/dev/Production.md`. These compose files still work and are kept for
-> existing deployments, but are community-supported. `compose.login.yaml` is
-> still the recommended way to self-host a Hanko login for any deployment.
+> existing deployments, but are community-supported. `compose.login.yaml` adds
+> a self-hosted Hanko login to this stack; for Helm, see "Auth" in
+> `chart/README.md`.
 
 Use the `just start prod*` commands from the repo root instead of calling
 `docker compose` against these files directly. The production commands handle

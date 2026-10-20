@@ -10,7 +10,6 @@ Requires secrets to be pre-populated inside the correct namespace:
 
 ```bash
 kubectl create namespace field-tm
-kubectl 
 ```
 
 - **db-ftm-vars** for backend database settings (optional when `db.enabled=true`)
@@ -45,15 +44,26 @@ kubectl
 
 ## Auth
 
-`auth.provider` defaults to `hotosm` (shared login at login.hotosm.org).
-To use your own Hanko instance (e.g. run with `deploy/compose.login.yaml`):
+The chart does not run Hanko. `auth.provider`:
+
+- `hotosm` (default): the shared HOT login at login.hotosm.org. HOT
+  deployments only, as its session cookie is scoped to `hotosm.org`.
+- `bundled`: a Hanko you run yourself (same mode as
+  `deploy/compose.login.yaml`). Field-TM serves the login form at `/login`.
+  Hanko's cookie domain must cover `ingress.host`; see
+  `contrib/login/hanko-config.tpl.yaml` for a config template.
+- `custom`: your own Hanko plus your own login app (e.g. a fork of
+  hotosm/login).
+- `disabled`: no login, every request is an admin. Local dev only.
 
 ```bash
 helm upgrade --install field-tm . \
-  --set auth.provider=custom \
-  --set auth.hankoApiUrl=https://login.example.com \
-  --set auth.loginUrl=https://login.example.com/app
+  --set auth.provider=bundled \
+  --set auth.hankoApiUrl=https://login.example.com
 ```
+
+Use Hanko's public URL: the browser uses it too, and hotosm-auth derives its
+cookie domain from it. `custom` also needs `auth.loginUrl`.
 
 ## Monitoring
 
@@ -62,7 +72,9 @@ to enable Sentry (`MONITORING=sentry`). Unset means monitoring is off.
 
 ## Backups
 
-`backup.enabled` (default `true`) runs a nightly `pg_dump -Fc` CronJob.
+Only for the bundled database (`db.enabled=true`): a nightly `pg_dump -Fc`
+CronJob (`backup.enabled`, default `true`). An external database such as
+CloudNativePG manages its own backups, so no CronJob is created.
 
 - With `backup.s3.bucket` set, dumps are uploaded with `aws s3 cp`. Set
   `backup.s3.endpoint` for non-AWS storage and `backup.s3.existingSecret` to a
@@ -80,9 +92,12 @@ helm upgrade --install field-tm oci://ghcr.io/hotosm/charts/field-tm \
   --namespace field-tm
 ```
 
-By default the chart expects an external database (`db.enabled=false`).
-Set `db.enabled=true` to run an in-cluster PostGIS database.
-When `db.enabled=false`, provide `FTM_DB_HOST` via your DB secret/env.
+By default the chart expects an external database (`db.enabled=false`, e.g.
+CloudNativePG); provide `FTM_DB_*` via `existingSecret`. Set
+`db.enabled=true` to run a single in-cluster PostGIS instead.
+
+Field-TM itself needs no object storage (S3). Only QFieldCloud does, and it is
+deployed separately.
 
 Chart values can be overridden using `values.yaml` or the `--set` flag.
 
@@ -91,7 +106,7 @@ helm upgrade --install field-tm . \
   --set image.tag=dev \
   --set qfieldCloud.tag=26.3 \
   --set image.pullPolicy="Always" \
-  --set domain="some.new.domain"
+  --set ingress.host="some.new.domain"
 ```
 
 ## Local cluster override (no ingress)
@@ -105,10 +120,11 @@ helm upgrade --install field-tm ./chart \
   -f chart/values.local.yaml
 ```
 
-This disables ingress, keeps the service as `ClusterIP`, enables bundled PostGIS
-(`db.enabled=true`), and sets stricter pod/container security contexts for local
-Talos-style `restricted` policies.
-It also includes local fallback env vars so `api-ftm-vars` secret creation is optional.
+This disables ingress and auth (`auth.provider=disabled`), keeps the service as
+`ClusterIP`, enables bundled PostGIS (`db.enabled=true`), and sets stricter
+pod/container security contexts for local Talos-style `restricted` policies.
+It also includes local fallback env vars so `api-ftm-vars` secret creation is
+optional.
 Access the app locally with:
 
 ```bash

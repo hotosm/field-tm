@@ -88,14 +88,16 @@ volumeMounts: []
 command: []
 args: []
 
-# Login provider (Hanko). Self-hosters wanting their own Hanko can run
-# deploy/compose.login.yaml and use provider=custom.
+# Login (Hanko). The chart does not run Hanko; see "Auth" in chart/README.md.
 auth:
   # hotosm   - shared HOT login at login.hotosm.org (default)
-  # custom   - your own Hanko; set hankoApiUrl and loginUrl
-  # disabled - no login, public read-only access
+  # bundled  - a Hanko you run; Field-TM serves the login form at /login
+  # custom   - a Hanko you run plus your own login app (loginUrl)
+  # disabled - no login; every request is an admin. Local dev only!
   provider: hotosm
+  # bundled/custom: public Hanko URL, e.g. https://login.example.org
   hankoApiUrl: ""
+  # custom: login app URL.
   loginUrl: ""
 
 # Sentry monitoring. Enabled when dsn or existingSecret is set.
@@ -104,8 +106,9 @@ sentry:
   # Name of a secret with key SENTRY_DSN (preferred over dsn).
   existingSecret: ""
 
-# Nightly pg_dump. Uploads to S3 when s3.bucket is set, otherwise keeps
-# retentionDays of dumps on a PVC.
+# Nightly pg_dump of the bundled database (db.enabled=true only). An external
+# database (e.g. CloudNativePG) handles its own backups. Uploads to S3 when
+# s3.bucket is set, otherwise keeps retentionDays of dumps on a PVC.
 backup:
   enabled: true
   schedule: "0 2 * * *"

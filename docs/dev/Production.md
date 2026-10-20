@@ -42,10 +42,18 @@ Migrations run automatically in an init container.
 
 ### Auth
 
-The chart defaults to `auth.provider=hotosm` (shared login at
-login.hotosm.org). To use your own Hanko instance, for example one run with
-`deploy/compose.login.yaml`, set `auth.provider=custom`, `auth.hankoApiUrl`
-and `auth.loginUrl`.
+Field-TM's management app needs a Hanko login; the chart does not run one.
+
+- **HOT deployments** use the default `auth.provider=hotosm` (login.hotosm.org).
+- **Other organisations** run their own Hanko and set
+  `auth.provider=bundled` with `auth.hankoApiUrl` (Hanko's public URL).
+  Field-TM serves the login form at `/login`. Without Kubernetes, the
+  compose stack below runs Hanko for you (`AUTH_PROVIDER=bundled`).
+- `auth.provider=custom` is for your own Hanko plus your own login app
+  (`auth.loginUrl`).
+
+The task planner needs no login or backend: build `src/planner` and host the
+static files anywhere (e.g. GitHub Pages).
 
 ### Monitoring
 
@@ -54,8 +62,11 @@ name. This sets `MONITORING=sentry`. Leave it unset to disable monitoring.
 
 ## Backup & restore
 
-The chart runs a nightly `pg_dump -Fc` CronJob (`backup.enabled`, default
-`true`):
+With an external database (the default, e.g. CloudNativePG), use that
+database's backups; the chart creates no backup job.
+
+With the bundled database (`db.enabled=true`), the chart runs a nightly
+`pg_dump -Fc` CronJob (`backup.enabled`, default `true`):
 
 - with `backup.s3.bucket` set, dumps are uploaded to S3-compatible storage
   (`backup.s3.endpoint`, `backup.s3.existingSecret` with
@@ -116,43 +127,33 @@ The `setup` wizard configures these automatically, but you may want to review:
 
 ### Authentication options
 
-`AUTH_PROVIDER` controls how users sign in:
+`AUTH_PROVIDER` is required and controls how users sign in:
 
-- `hotosm`: HOT's hosted login at `login.hotosm.org`
-  Deploy with `just start prod`
-- `custom`: Your own Hanko instance
-  Deploy with `just start prod`
-- `bundled`: Self-hosted Hanko via the login overlay
-  Deploy with `just start prod` (login overlay is included automatically)
+- `hotosm`: HOT's hosted login at `login.hotosm.org` (HOT deployments only).
+  Sets `HANKO_API_URL` and `LOGIN_URL` automatically.
+- `bundled`: a self-hosted Hanko; Field-TM serves the login form at `/login`.
+  Set `HANKO_API_URL` (backend to Hanko) and `HANKO_PUBLIC_URL` (browser to
+  Hanko). With compose, `deploy/compose.login.yaml` runs Hanko and sets both.
+- `custom`: your own Hanko plus your own login app. Set `HANKO_API_URL` and
+  `LOGIN_URL` (defaults to `$HANKO_API_URL/app`).
+- `disabled`: no login, every request is an admin. Local dev only.
 
-If you use `AUTH_PROVIDER=hotosm`, set:
+Optional OSM account linking (read by hotosm-auth; on when both are set):
 
-- `OSM_CLIENT_ID`: OAuth2 client ID from OpenStreetMap
-- `OSM_CLIENT_SECRET`: OAuth2 client secret
+- `OSM_CLIENT_ID`, `OSM_CLIENT_SECRET`: OpenStreetMap OAuth2 app
+- `OSM_API_URL` (default: `https://www.openstreetmap.org`)
+- `OSM_SCOPES` (default: `read_prefs`): space-separated
 
-Optional OSM settings:
+For the compose Hanko overlay (`AUTH_PROVIDER=bundled`), also set:
 
-- `OSM_URL` (default: `https://www.openstreetmap.org`): OSM server URL
-- `OSM_SCOPE` (default: `["read_prefs","send_messages"]`): OAuth2 scopes
+- `HANKO_SECRET`: generate with `openssl rand -base64 32`
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`,
+  `SMTP_FROM_ADDRESS`: for login passcode emails
+- `GOOGLE_ENABLED` (default: `false`), `GOOGLE_CLIENT_ID`,
+  `GOOGLE_CLIENT_SECRET`: optional Google sign-in
 
-If you use `AUTH_PROVIDER=custom`, also set:
-
-- `HANKO_API_URL`: URL of your Hanko instance
-- `LOGIN_URL`: _(optional)_ URL of your login UI, if hosted separately
-
-If you use `AUTH_PROVIDER=bundled` (self-hosted Hanko), also review:
-
-- `HANKO_SECRET` (default: _(dev default)_): Secret for Hanko. Generate with
-  `openssl rand -base64 32`
-- `HANKO_COOKIE_DOMAIN` (default: `field.localhost`): Domain for Hanko
-  cookies. Set this to `$FTM_DOMAIN`
-- `HANKO_ALLOWED_ORIGIN` (default: `http://field.localhost:7050`): Allowed
-  origin for Hanko. Set this to `https://$FTM_DOMAIN`
-- `HANKO_REDIRECT_URL` (default: `http://field.localhost:7050`): Redirect URL
-  after login. Set this to `https://$FTM_DOMAIN`
-- `GOOGLE_ENABLED` (default: `false`): Enable Google OAuth in Hanko
-- `GOOGLE_CLIENT_ID` (default: _(empty)_): Google OAuth client ID
-- `GOOGLE_CLIENT_SECRET` (default: _(empty)_): Google OAuth client secret
+The overlay derives Hanko's cookie domain, allowed origin and redirect URL
+from `FTM_DOMAIN`, and serves Hanko at `login.$FTM_DOMAIN`.
 
 ### ODK Central configuration
 

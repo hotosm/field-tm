@@ -23,8 +23,7 @@
 # compose.sub.yaml.  `just start prod` handles this automatically when
 # AUTH_PROVIDER=bundled is set in .env.
 #
-# For non-VM deployments see AUTH_PROVIDER=hotosm (centralised HOT login)
-# or AUTH_PROVIDER=custom (bring-your-own Hanko).
+# For Helm, see "Auth" in chart/README.md.
 
 name: field-tm
 
@@ -77,6 +76,7 @@ services:
       # HANKO_SECRET is required in prod - generate with: openssl rand -base64 32
       HANKO_SECRET: ${HANKO_SECRET}
       HANKO_COOKIE_DOMAIN: ${FTM_DOMAIN}
+      HANKO_COOKIE_SECURE: "true"
       HANKO_ALLOWED_ORIGIN: https://${FTM_DOMAIN}
       HANKO_REDIRECT_URL: https://${FTM_DOMAIN}
       SMTP_HOST: ${SMTP_HOST}

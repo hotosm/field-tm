@@ -1,4 +1,4 @@
-{{- if .Values.backup.enabled -}}
+{{- if and .Values.db.enabled .Values.backup.enabled -}}
 {{- $s3 := .Values.backup.s3 -}}
 {{- $name := printf "%s-backup" (include "field-tm.fullname" .) | trunc 63 | trimSuffix "-" -}}
 {{- if not $s3.bucket }}
@@ -61,11 +61,6 @@ spec:
                 {{- with include "field-tm.dbEnv" . | trim }}{{ . | nindent 16 }}{{- end }}
                 - name: RETENTION_DAYS
                   value: {{ .Values.backup.retentionDays | quote }}
-              {{- if .Values.existingSecret.name }}
-              envFrom:
-                - secretRef:
-                    name: {{ .Values.existingSecret.name | quote }}
-              {{- end }}
               command:
                 - /bin/sh
                 - -ec

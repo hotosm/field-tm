@@ -38,6 +38,10 @@ env:
   OSM_CLIENT_ID: local-dev
   OSM_CLIENT_SECRET: local-dev
 
+# HOT login cookies can't reach localhost; never use this on a public cluster.
+auth:
+  provider: disabled
+
 db:
   enabled: true
   auth:

@@ -172,7 +172,7 @@ backend-no-docker:
   uv run --group dev pybabel compile -d app/locales
 
   # Task planner at /planner/ needs `just build planner` first
-  FTM_DOMAIN="" OSM_CLIENT_ID="" OSM_CLIENT_SECRET="" \
+  AUTH_PROVIDER=disabled FTM_DOMAIN="" OSM_CLIENT_ID="" OSM_CLIENT_SECRET="" \
   ENCRYPTION_KEY="" PLANNER_DIR="{{justfile_directory()}}/src/planner/dist" \
     uv run uvicorn app.main:api --host 0.0.0.0 --port 8000
 

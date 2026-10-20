@@ -88,6 +88,7 @@ services:
       HANKO_DB_NAME: ${HANKO_DB_NAME:-hanko}
       HANKO_SECRET: ${HANKO_SECRET:-Dqn09li1XXUdLwUry07XWYnLRpmqkzzsu7AtR6Oum5g=}
       HANKO_COOKIE_DOMAIN: ${HANKO_COOKIE_DOMAIN:-field.localhost}
+      HANKO_COOKIE_SECURE: "false"
       HANKO_ALLOWED_ORIGIN: ${HANKO_ALLOWED_ORIGIN:-http://field.localhost:7050}
       HANKO_REDIRECT_URL: ${HANKO_REDIRECT_URL:-http://field.localhost:7050}
       # From main compose.yaml mailpit instance
