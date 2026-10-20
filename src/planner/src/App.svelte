@@ -138,6 +138,21 @@
     cancelTool();
   });
 
+  type Tab = { label: string; href?: string; clickEvent: () => void };
+  const go = (href: string) => () => window.top!.location.assign(href);
+  const open = (href: string) => () => window.open(href, '_blank', 'noopener');
+  const tabs = $derived<Tab[]>([
+    ...(project
+      ? [
+          { label: 'Projects', clickEvent: go('/projects') },
+          { label: project.name, clickEvent: go(projectUrl(project.id)) },
+        ]
+      : [{ label: 'Field-TM', clickEvent: open('https://field.hotosm.org') }]),
+    { label: 'Task planner', href: location.pathname, clickEvent: () => {} },
+    { label: 'Docs', clickEvent: open('https://docs.field.hotosm.org') },
+    { label: 'Report a bug', clickEvent: open('https://roadmap.hotosm.org/#tech-request') },
+  ]);
+
   init();
 </script>
 
@@ -149,40 +164,52 @@
 
 <div class="app" class:viewer={readonly}>
   {#if !readonly}
-    <header class="topbar">
-      <h1>Task Planner{#if project}<span class="project"> · {project.name}</span>{/if}</h1>
-      <div class="row">
-        {#if project}<a class="button" href={projectUrl(project.id)} target="_top">Back to project</a>{/if}
-        <button type="button" onclick={() => planner.undo()} disabled={!planner.canUndo} title="Undo (Ctrl+Z)">Undo</button>
-        <button type="button" onclick={() => planner.redo()} disabled={!planner.canRedo} title="Redo (Ctrl+Shift+Z)">Redo</button>
-      </div>
-    </header>
+    <hot-header title="Task Planner" logo="./field-tm-logo.svg" size="s" {tabs}>
+      <div slot="auth"><hot-tool-menu></hot-tool-menu></div>
+      <div slot="drawer-auth"><hot-tool-menu></hot-tool-menu></div>
+    </hot-header>
   {/if}
 
   <main>
     {#if !readonly}
       <aside class="panel">
-        <nav aria-label="Steps">
-          <ol class="steps">
+        <nav aria-label="Steps" class="steps">
             {#each STEPS as label, i (label)}
-              <li><button type="button" aria-current={step === i ? 'step' : undefined} onclick={() => (step = i)}>{i + 1}. {label}</button></li>
+              <wa-button
+                size="small"
+                variant={step === i ? 'brand' : 'neutral'}
+                appearance={step === i ? 'accent' : 'outlined'}
+                aria-current={step === i ? 'step' : undefined}
+                onclick={() => (step = i)}>{i + 1}. {label}</wa-button
+              >
             {/each}
-          </ol>
         </nav>
+        <div class="row">
+          <wa-button size="small" appearance="outlined" onclick={() => planner.undo()} disabled={!planner.canUndo} title="Undo (Ctrl+Z)">↶ Undo</wa-button>
+          <wa-button size="small" appearance="outlined" onclick={() => planner.redo()} disabled={!planner.canRedo} title="Redo (Ctrl+Shift+Z)">↷ Redo</wa-button>
+          {#if project}<wa-button size="small" appearance="plain" href={projectUrl(project.id)} target="_top">Back to project</wa-button>{/if}
+        </div>
 
         {#if draft}
-          <div class="banner" role="status">
-            <p>You have an unsaved draft from {new Date(draft.savedAt).toLocaleString()}.</p>
-            <div class="row"><button type="button" class="primary" onclick={restoreDraft}>Restore</button><button type="button" onclick={discardDraft}>Discard</button></div>
-          </div>
+          <wa-callout variant="brand" role="status">
+            <div class="stack">
+              <p>You have an unsaved draft from {new Date(draft.savedAt).toLocaleString()}.</p>
+              <div class="row">
+                <wa-button size="small" variant="brand" onclick={restoreDraft}>Restore</wa-button>
+                <wa-button size="small" appearance="outlined" onclick={discardDraft}>Discard</wa-button>
+              </div>
+            </div>
+          </wa-callout>
         {/if}
         {#if planner.error}
-          <div class="banner error" role="alert">
-            <p>{planner.error}</p>
-            <button type="button" onclick={() => (planner.error = null)}>Dismiss</button>
-          </div>
+          <wa-callout variant="danger" role="alert">
+            <div class="stack">
+              <p>{planner.error}</p>
+              <div><wa-button size="small" appearance="outlined" onclick={() => (planner.error = null)}>Dismiss</wa-button></div>
+            </div>
+          </wa-callout>
         {/if}
-        {#if planner.busy}<p class="busy" role="status" aria-live="polite"><span class="spinner"></span>{planner.busy}…</p>{/if}
+        {#if planner.busy}<p class="row" role="status" aria-live="polite"><wa-spinner></wa-spinner>{planner.busy}…</p>{/if}
 
         <section class="step">
           <h2>{STEPS[step]}</h2>
@@ -198,9 +225,9 @@
             <ExportStep {planner} project={project ?? undefined} />
           {/if}
         </section>
-        <footer class="hint">
-          <a href="https://github.com/hotosm/field-tm" target="_blank" rel="noopener">Field-TM</a> by HOT. Runs in your browser; nothing is uploaded unless you save to Field-TM.
-        </footer>
+        <p class="hint">
+          <a href="https://github.com/hotosm/field-tm" target="_blank" rel="noopener">Field-TM</a> by HOT. Everything remains in your browser, unless you save to Field-TM.
+        </p>
       </aside>
     {/if}
 
@@ -222,14 +249,14 @@
       {#if tool === 'edit'}
         <div class="floating row">
           <span>Drag points to reshape. Click a point to delete it.</span>
-          <button type="button" class="primary" onclick={applyEdit} disabled={!pendingEdit}>Apply</button>
-          <button type="button" onclick={cancelTool}>Cancel</button>
+          <wa-button size="small" variant="brand" onclick={applyEdit} disabled={!pendingEdit}>Apply</wa-button>
+          <wa-button size="small" appearance="outlined" onclick={cancelTool}>Cancel</wa-button>
         </div>
       {:else if tool !== 'none'}
-        <div class="floating row"><button type="button" onclick={cancelTool}>Cancel drawing</button></div>
+        <div class="floating row"><wa-button size="small" appearance="outlined" onclick={cancelTool}>Cancel drawing</wa-button></div>
       {/if}
       {#if readonly}
-        <div class="overlay">
+        <div class="overlay stack">
           {#if mode.kind === 'task'}
             <p class="hint">Shared task. <a href={location.pathname}>Open the Task Planner</a></p>
           {:else if !planner.tasks.length && !fatal}
@@ -242,10 +269,8 @@
     </div>
   </main>
 
-  {#if fatal}
-    <div class="modal" role="alertdialog" aria-labelledby="fatal-msg">
-      <p id="fatal-msg">{fatal.message}</p>
-      {#if fatal.login}<a class="button primary" href={loginUrl(location.pathname + location.search)} target="_top">Log in</a>{/if}
-    </div>
-  {/if}
+  <wa-dialog open={!!fatal} label="Something went wrong" onwa-hide={(e: Event) => e.preventDefault()}>
+    <p>{fatal?.message}</p>
+    {#if fatal?.login}<wa-button slot="footer" variant="brand" href={loginUrl(location.pathname + location.search)} target="_top">Log in</wa-button>{/if}
+  </wa-dialog>
 </div>

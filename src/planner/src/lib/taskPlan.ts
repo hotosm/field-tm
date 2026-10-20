@@ -6,7 +6,12 @@ export const GROUP_RE = /^[A-Za-z0-9_-]+$/;
 export const GROUP_PATTERN = "[A-Za-z0-9_\\-]+";
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
-export type Algorithm = "DIVIDE_BY_SQUARE" | "SPLIT_BY_ROADS" | "AVG_BUILDING_VORONOI" | "MANUAL";
+export type Algorithm =
+  | "DIVIDE_BY_SQUARE"
+  | "SPLIT_BY_ROADS"
+  | "AVG_BUILDING_VORONOI"
+  | "AVG_BUILDING_SKELETON"
+  | "MANUAL";
 
 export interface TaskProps {
   task_id: number;
@@ -14,7 +19,7 @@ export interface TaskProps {
   assigned_to?: string;
   comment?: string;
   colour?: string;
-  building_count?: number;
+  feature_count?: number;
 }
 
 export type Task = Feature<Polygon, TaskProps>;
@@ -112,7 +117,7 @@ function cleanProps(p: TaskProps): TaskProps {
     const v = p[k]?.trim();
     if (v) out[k] = v;
   }
-  if (typeof p.building_count === "number") out.building_count = p.building_count;
+  if (typeof p.feature_count === "number") out.feature_count = p.feature_count;
   return out;
 }
 

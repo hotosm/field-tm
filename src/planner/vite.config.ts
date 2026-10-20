@@ -1,5 +1,6 @@
 import { defineConfig } from "vitest/config";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { circularChunkGuard, WEBAWESOME_CHUNK } from "@hotosm/ui/vite";
 import { fileURLToPath } from "node:url";
 
 const algorithms = fileURLToPath(
@@ -9,7 +10,7 @@ const algorithms = fileURLToPath(
 export default defineConfig({
   // './' keeps asset paths relative, so the same build works at / , a sub-path, or /planner/.
   base: process.env.PLANNER_BASE ?? "./",
-  plugins: [svelte()],
+  plugins: [svelte(), circularChunkGuard()],
   resolve: { alias: { "@algorithms": algorithms } },
   server: { fs: { allow: [".", algorithms] } },
   optimizeDeps: { exclude: ["@electric-sql/pglite", "@electric-sql/pglite-postgis"] },
@@ -19,7 +20,11 @@ export default defineConfig({
     target: "es2022",
     chunkSizeWarningLimit: 2000,
     // PGlite's Emscripten glue uses eval; nothing we can change.
-    rolldownOptions: { checks: { eval: false } },
+    rolldownOptions: {
+      checks: { eval: false },
+      // Cache WebAwesome in its own chunk across deploys.
+      output: { codeSplitting: { groups: [WEBAWESOME_CHUNK] } },
+    },
   },
   test: { include: ["tests/**/*.test.ts"], testTimeout: 120_000, hookTimeout: 120_000 },
 });

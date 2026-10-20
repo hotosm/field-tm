@@ -113,10 +113,31 @@ export function areaM2(g: Area): number {
   );
 }
 
-export function countBuildings(fc: FeatureCollection | null): number {
-  return (
-    fc?.features.filter(
-      (f) => f.geometry?.type === "Polygon" || f.geometry?.type === "MultiPolygon",
-    ).length ?? 0
-  );
+/** A representative point: mean of a polygon's outer ring, a line's middle vertex, or the point. */
+export function featurePoint(g: Geometry): Position | null {
+  switch (g.type) {
+    case "Point":
+      return g.coordinates;
+    case "MultiPoint":
+      return g.coordinates[0] ?? null;
+    case "LineString":
+      return g.coordinates[Math.floor(g.coordinates.length / 2)] ?? null;
+    case "MultiLineString":
+      return g.coordinates[0]?.[Math.floor(g.coordinates[0].length / 2)] ?? null;
+    case "Polygon":
+    case "MultiPolygon": {
+      const ring = g.type === "Polygon" ? g.coordinates[0] : g.coordinates[0]?.[0];
+      if (!ring?.length) return null;
+      const n = ring.length > 1 ? ring.length - 1 : 1; // skip the closing vertex
+      let x = 0;
+      let y = 0;
+      for (let i = 0; i < n; i++) {
+        x += ring[i][0];
+        y += ring[i][1];
+      }
+      return [x / n, y / n];
+    }
+    default:
+      return null;
+  }
 }

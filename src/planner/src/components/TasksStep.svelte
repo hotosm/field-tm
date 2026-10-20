@@ -23,19 +23,19 @@
   <p>Split the area first.</p>
 {:else}
   <p class="hint">Click tasks on the map to select them. Shift-click, or turn on multi-select, to select several.</p>
-  <div class="row wrap">
-    <label class="row"><input type="checkbox" bind:checked={multi} /> Multi-select</label>
-    <button type="button" onclick={() => (planner.selected = planner.tasks.map((t) => t.properties.task_id))}>Select all</button>
-    <button type="button" onclick={() => (planner.selected = [])} disabled={!n}>Clear selection</button>
+  <div class="row">
+    <wa-switch size="small" checked={multi} onchange={(e: Event) => (multi = (e.currentTarget as HTMLInputElement).checked)}>Multi-select</wa-switch>
+    <wa-button size="small" appearance="outlined" onclick={() => (planner.selected = planner.tasks.map((t) => t.properties.task_id))}>Select all</wa-button>
+    <wa-button size="small" appearance="outlined" onclick={() => (planner.selected = [])} disabled={!n}>Clear selection</wa-button>
   </div>
 
   {#if n}
     <p><strong>{n} selected</strong></p>
-    <div class="row wrap">
-      <button type="button" onclick={() => planner.mergeSelected()} disabled={n < 2 || !!planner.busy}>Merge</button>
-      <button type="button" aria-pressed={tool === 'line'} onclick={() => (tool = tool === 'line' ? 'none' : 'line')} disabled={n !== 1}>Split with line</button>
-      <button type="button" onclick={() => (tool = 'edit')} disabled={n !== 1}>Edit shape</button>
-      <button type="button" class="danger" onclick={() => planner.deleteSelected()}>Delete</button>
+    <div class="row">
+      <wa-button size="small" appearance="outlined" onclick={() => planner.mergeSelected()} disabled={n < 2 || !!planner.busy}>Merge</wa-button>
+      <wa-button size="small" variant={tool === 'line' ? 'brand' : 'neutral'} appearance={tool === 'line' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'line' ? 'none' : 'line')} disabled={n !== 1}>Split with line</wa-button>
+      <wa-button size="small" appearance="outlined" onclick={() => (tool = 'edit')} disabled={n !== 1}>Edit shape</wa-button>
+      <wa-button size="small" variant="danger" appearance="outlined" onclick={() => planner.deleteSelected()}>Delete</wa-button>
     </div>
     {#if tool === 'line'}<p class="hint">Draw a line across the task; double-click (or click the last point again) to finish.</p>{/if}
   {/if}
@@ -46,12 +46,12 @@
     <form onsubmit={bulk} class="stack">
       <h3>Assign {n} tasks</h3>
       <p class="hint">Blank fields are left unchanged.</p>
-      <label>Group <input name="assigned_group" pattern={GROUP_PATTERN} placeholder="e.g. team-a" /></label>
-      <label>Assigned to <input name="assigned_to" /></label>
-      <label>Comment <input name="comment" /></label>
-      <div class="row wrap">
-        <button type="submit" class="primary">Assign</button>
-        <button type="button" onclick={() => planner.assignSelected({ assigned_group: '', assigned_to: '', comment: '', colour: '' })}>Clear assignment</button>
+      <wa-input size="small" label="Group" name="assigned_group" pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
+      <wa-input size="small" label="Assigned to" name="assigned_to"></wa-input>
+      <wa-input size="small" label="Comment" name="comment"></wa-input>
+      <div class="row">
+        <wa-button size="small" type="submit" variant="brand">Assign</wa-button>
+        <wa-button size="small" appearance="outlined" onclick={() => planner.assignSelected({ assigned_group: '', assigned_to: '', comment: '', colour: '' })}>Clear assignment</wa-button>
       </div>
     </form>
   {/if}
@@ -66,7 +66,7 @@
           <span class="swatch" style:background={taskColour(t)}></span>
           {id}
           <small>{[t.properties.assigned_group, t.properties.assigned_to].filter(Boolean).join(' · ')}</small>
-          {#if t.properties.building_count != null}<small class="count">{t.properties.building_count} bldg</small>{/if}
+          {#if t.properties.feature_count != null}<small class="count">{t.properties.feature_count} features</small>{/if}
         </button>
       </li>
     {/each}
@@ -81,8 +81,12 @@
     max-height: 16rem;
     overflow: auto;
   }
+  .tasklist li {
+    margin: 0;
+  }
   .tasklist button {
     width: 100%;
+    justify-content: flex-start;
     display: flex;
     gap: 0.5rem;
     align-items: center;
@@ -91,6 +95,10 @@
     border-bottom: 1px solid var(--border);
     border-radius: 0;
     background: none;
+    padding: var(--wa-space-2xs) var(--wa-space-xs);
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
   }
   .tasklist button.selected {
     background: var(--selected);

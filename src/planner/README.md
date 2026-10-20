@@ -43,16 +43,24 @@ both directories in the build context.
 ## Architecture
 
 - `src/lib/taskPlan.ts` task plan types, validation, (de)serialisation.
-- `src/lib/engine/` PGlite + PostGIS in a Web Worker, lazy-loaded on first
-  split. `splitter.ts` ports `area_splitter/splitter.py`: it loads the AOI and
-  data into the same temp tables and runs the backend's SQL files, imported
-  with `?raw` (not copied). Grid split is a small SQL port of `splitBySquare`.
+- `src/lib/engine/`: PGlite + PostGIS in a Web Worker, loaded on first split.
+  `splitter.ts` ports the backend splitter and imports its SQL with `?raw`.
+- `skeleton.ts`: CGAL wasm replaces `CG_StraightSkeleton`, since PGlite lacks
+  SFCGAL. `sql.ts` runs the SQL in two passes around it. Limited to 5000
+  features and ~250 tasks; see [SPIKE.md](SPIKE.md) for timings and workarounds.
 - `src/lib/exports.ts`, `share.ts`, `history.ts`, `planEdit.ts`, `draft.ts`
   (localStorage autosave), `io/` (files, Field-TM API, Overpass).
 - `src/lib/planner.svelte.ts` reactive state; `src/components/` UI only.
-- Basemap: OpenFreeMap. Roads: Overpass API. Buildings: upload, e.g. from
-  [export.hotosm.org](https://export.hotosm.org).
-- Plain HTML/CSS with HOT red rather than `@hotosm/ui`, to avoid loading the
-  web component bundle from a CDN in an offline-friendly static app.
+- Basemap: OpenFreeMap. Roads: Overpass API. Features to map (buildings,
+  points or lines): upload, e.g. from [export.hotosm.org](https://export.hotosm.org).
+  Points and lines become ~2 m squares so the shared building SQL splits them;
+  the algorithm IDs keep their `AVG_BUILDING_*` names for backend parity.
+- UI: `@hotosm/ui` (WebAwesome, HOT header and tool menu), bundled from npm
+  so it works offline. `wa-icon` and the header's mobile menu icon still load
+  from the WebAwesome CDN.
 
-TODO: straight-skeleton splitting (needs SFCGAL, not in PGlite's PostGIS).
+## Licences
+
+PGlite's PostGIS build is GPL-2.0-or-later. `straight-skeleton` is MIT, but
+bundles CGAL's Straight_skeleton_2, which is GPL-3.0-or-later. Both are
+compatible with Field-TM's AGPL-3.0.

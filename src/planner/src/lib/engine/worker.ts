@@ -18,6 +18,10 @@ self.onmessage = async (e: MessageEvent<{ id: number; op: Op; args: unknown[] }>
     const result = await fn(await db, ...args, progress);
     self.postMessage({ id, result });
   } catch (err) {
+    // A failed GEOS call can leave PGlite unusable, so start fresh next time.
+    const failed = db;
+    db = null;
+    failed?.then((d) => d.close?.()).catch(() => {});
     self.postMessage({ id, error: err instanceof Error ? err.message : String(err) });
   }
 };

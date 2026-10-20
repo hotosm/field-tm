@@ -1,15 +1,36 @@
-import type { Feature, FeatureCollection, LineString, Polygon } from "geojson";
-import type { Area } from "../geo";
-import type { Task } from "../taskPlan";
-import { CREATE_TABLES, DROP_TABLES, LINES_VIEW, SQL_FILES, substitute } from "./sql";
+import type { Feature, FeatureCollection, LineString, Polygon, Position } from "geojson";
+import { featurePoint, type Area } from "../geo";
+import { renumber, type Task } from "../taskPlan";
+import { straightSkeleton } from "./skeleton";
+import {
+  CREATE_TABLES,
+  DROP_TABLES,
+  LINES_VIEW,
+  SKELETON_INPUT,
+  SKELETON_POST,
+  SKELETON_PRE,
+  SKELETON_TASKS,
+  SQL_FILES,
+  substitute,
+} from "./sql";
 
 /** The subset of PGlite used here, so tests can pass any instance. */
 export interface Db {
   exec(sql: string): Promise<{ rows: Record<string, unknown>[] }[]>;
   query<T = Record<string, unknown>>(sql: string, params?: unknown[]): Promise<{ rows: T[] }>;
+  close?(): Promise<void>;
 }
 
-export type SplitAlgorithm = "DIVIDE_BY_SQUARE" | "SPLIT_BY_ROADS" | "AVG_BUILDING_VORONOI";
+export type SplitAlgorithm =
+  | "DIVIDE_BY_SQUARE"
+  | "SPLIT_BY_ROADS"
+  | "AVG_BUILDING_VORONOI"
+  | "AVG_BUILDING_SKELETON";
+
+/** Same limit as the backend's simple flow: the skeleton gets slow beyond this. */
+export const SKELETON_MAX_FEATURES = 5000;
+/** Time grows ~quadratically with clusters: 220 took ~3 min in Node. */
+export const SKELETON_MAX_TASKS = 250;
 
 export interface SplitParams {
   cell_size?: number;
@@ -18,6 +39,8 @@ export interface SplitParams {
   include_rivers?: boolean;
   include_railways?: boolean;
   include_aeroways?: boolean;
+  /** Drop tasks with no features to map (only when features are loaded). */
+  drop_empty?: boolean;
 }
 
 export interface SplitInput {
@@ -57,20 +80,49 @@ export function isLinearSplitFeature(tags: Tags): boolean {
   );
 }
 
-/** Bucket input features into building polygons and split lines (as _insert_split_sql_extract does). */
+/** Half the side of the square a point or line becomes (~1 m). */
+const MARKER_HALF_DEG = 1e-5;
+
+function marker([x, y]: Position): Polygon {
+  const d = MARKER_HALF_DEG;
+  return {
+    type: "Polygon",
+    coordinates: [
+      [
+        [x - d, y - d],
+        [x + d, y - d],
+        [x + d, y + d],
+        [x - d, y + d],
+        [x - d, y - d],
+      ],
+    ],
+  };
+}
+
+/**
+ * Bucket input into features to map and split lines.
+ *
+ * Polygons are mapped as they are. Points and lines become a small square at
+ * their location, so the shared SQL (written for buildings) handles them too.
+ * In a file that also has polygons or points, road-like lines are split lines
+ * (as _insert_split_sql_extract does); a lines-only file is all features.
+ */
 export function classify(features?: FeatureCollection | null, roads?: FeatureCollection | null) {
   const polys: { g: unknown; id: unknown; t: Tags }[] = [];
   const lines: { g: unknown; id: unknown; t: Tags }[] = [];
   const isLine = (f: Feature) =>
     f.geometry?.type === "LineString" || f.geometry?.type === "MultiLineString";
+  const mixed = (features?.features ?? []).some((f) => f.geometry && !isLine(f));
   for (const f of features?.features ?? []) {
     const t = tagsOf(f.properties);
     const id = f.properties?.osm_id ?? f.id ?? null;
     if (f.geometry?.type === "Polygon" || f.geometry?.type === "MultiPolygon") {
-      // Any polygon the user provides is treated as a feature to map.
       polys.push({ g: f.geometry, id, t: { building: "yes", ...t } });
-    } else if (isLine(f) && isLinearSplitFeature(t)) {
-      lines.push({ g: f.geometry, id, t });
+    } else if (isLine(f) && mixed) {
+      if (isLinearSplitFeature(t)) lines.push({ g: f.geometry, id, t });
+    } else {
+      const p = f.geometry ? featurePoint(f.geometry) : null;
+      if (p) polys.push({ g: marker(p), id, t: { building: "yes", ...t } });
     }
   }
   for (const f of roads?.features ?? []) {
@@ -105,7 +157,7 @@ export function metresToDegrees(m: number, lat: number): [dLng: number, dLat: nu
   return [(m / (n * Math.cos((lat * Math.PI) / 180))) * deg, (m / mer) * deg];
 }
 
-async function loadInputs(db: Db, input: SplitInput) {
+export async function loadInputs(db: Db, input: SplitInput) {
   await db.exec(DROP_TABLES);
   await db.exec(CREATE_TABLES);
   await db.query(
@@ -126,7 +178,7 @@ async function loadInputs(db: Db, input: SplitInput) {
     );
   }
   await db.exec(LINES_VIEW);
-  return { buildings: polys.length, lines: lines.length };
+  return { features: polys.length, lines: lines.length };
 }
 
 async function gridSplit(db: Db, cellSize: number) {
@@ -177,7 +229,7 @@ async function gridSplit(db: Db, cellSize: number) {
 
 async function sqlSplit(
   db: Db,
-  algorithm: "SPLIT_BY_ROADS" | "AVG_BUILDING_VORONOI",
+  algorithm: "SPLIT_BY_ROADS" | "AVG_BUILDING_VORONOI" | "AVG_BUILDING_SKELETON",
   p: SplitParams,
   progress: Progress,
 ) {
@@ -188,18 +240,44 @@ async function sqlSplit(
     include_railways: bool(p.include_railways),
     include_aeroways: bool(p.include_aeroways),
   };
-  const numBuildings =
-    algorithm === "AVG_BUILDING_VORONOI"
-      ? Math.round(posNum(p.num_buildings, "Buildings per task", 10000))
+  const numFeatures =
+    algorithm !== "SPLIT_BY_ROADS"
+      ? Math.round(posNum(p.num_buildings, "Features per task", 10000))
       : 0;
   await db.exec(
-    `SET area_splitter.num_buildings = ${numBuildings}; SET area_splitter.num_enumerators = 0;`,
+    `SET area_splitter.num_buildings = ${numFeatures}; SET area_splitter.num_enumerators = 0;`,
   );
   let last: { rows: Record<string, unknown>[] }[] = [];
-  const files = SQL_FILES[algorithm];
-  for (const [i, sql] of files.entries()) {
-    progress(`Running step ${i + 1} of ${files.length}`);
-    last = await db.exec(substitute(sql, params));
+  const skeletonStep = async () => {
+    await db.exec(SKELETON_INPUT);
+    // CGAL fails on some near-degenerate rings; a tiny simplification (~1 cm, then ~10 cm) fixes them.
+    let lines = null;
+    for (const tolerance of [1e-7, 1e-6]) {
+      const { rows } = await db.query<{ g: Polygon }>(
+        `SELECT ST_AsGeoJSON(ST_ForcePolygonCCW(d.geom))::jsonb AS g
+         FROM planner_skeleton_input s,
+           LATERAL ST_Dump(ST_CollectionExtract(ST_MakeValid(ST_SimplifyPreserveTopology(s.geom, $1)), 3)) d`,
+        [tolerance],
+      );
+      progress("Computing the straight skeleton (can take a few minutes)");
+      lines = await straightSkeleton(rows.map((r) => r.g));
+      if (lines) break;
+    }
+    if (!lines) throw new Error("Straight skeleton failed on this area. Try Voronoi instead.");
+    await db.query(
+      `CREATE TEMP TABLE planner_skeleton_lines AS
+       SELECT ST_SetSRID(ST_GeomFromGeoJSON($1), 4326) AS geom`,
+      [JSON.stringify(lines)],
+    );
+    return db.exec(SKELETON_TASKS);
+  };
+  const steps: (string | (() => Promise<typeof last>))[] =
+    algorithm === "AVG_BUILDING_SKELETON"
+      ? [...SKELETON_PRE, skeletonStep, ...SKELETON_POST]
+      : [...SQL_FILES[algorithm]];
+  for (const [i, step] of steps.entries()) {
+    progress(`Running step ${i + 1} of ${steps.length}`);
+    last = typeof step === "string" ? await db.exec(substitute(step, params)) : await step();
   }
   const row = last.at(-1)?.rows[0];
   const fc = (row ? Object.values(row)[0] : null) as FeatureCollection | null;
@@ -207,7 +285,7 @@ async function sqlSplit(
 }
 
 /** Split polygons into single Polygons, drop slivers, and count buildings by centroid. */
-async function normalise(db: Db, fc: FeatureCollection, countBuildings: boolean): Promise<Task[]> {
+async function normalise(db: Db, fc: FeatureCollection, countFeatures: boolean): Promise<Task[]> {
   const { rows } = await db.query<{ g: Polygon; n: number }>(
     `SELECT ST_AsGeoJSON(d.geom, 7)::jsonb AS g,
        (SELECT count(*) FROM ways_poly b WHERE b.geom && d.geom AND ST_Contains(d.geom, ST_PointOnSurface(b.geom)))::int AS n
@@ -225,7 +303,7 @@ async function normalise(db: Db, fc: FeatureCollection, countBuildings: boolean)
   return rows.map((r, i) => ({
     type: "Feature",
     geometry: r.g,
-    properties: countBuildings ? { task_id: i + 1, building_count: r.n } : { task_id: i + 1 },
+    properties: countFeatures ? { task_id: i + 1, feature_count: r.n } : { task_id: i + 1 },
   }));
 }
 
@@ -244,14 +322,28 @@ export async function split(
     if (!counts.lines) throw new Error("No roads or other split lines found in the area");
     fc = await sqlSplit(db, "SPLIT_BY_ROADS", input.params, progress);
   } else if (input.algorithm === "AVG_BUILDING_VORONOI") {
-    if (!counts.buildings) throw new Error("Upload buildings (or other polygon features) first");
+    if (!counts.features) throw new Error("Add features to map in step 2 first");
     fc = await sqlSplit(db, "AVG_BUILDING_VORONOI", input.params, progress);
+  } else if (input.algorithm === "AVG_BUILDING_SKELETON") {
+    if (!counts.features) throw new Error("Add features to map in step 2 first");
+    if (counts.features > SKELETON_MAX_FEATURES)
+      throw new Error(
+        `Straight skeleton is limited to ${SKELETON_MAX_FEATURES} features (this area has ${counts.features}). Use Voronoi instead.`,
+      );
+    const tasks = Math.ceil(counts.features / Number(input.params.num_buildings));
+    if (tasks > SKELETON_MAX_TASKS)
+      throw new Error(
+        `Straight skeleton is limited to about ${SKELETON_MAX_TASKS} tasks (this would make ${tasks}). Use more features per task, or Voronoi.`,
+      );
+    fc = await sqlSplit(db, "AVG_BUILDING_SKELETON", input.params, progress);
   } else {
     throw new Error(`Unknown algorithm ${input.algorithm}`);
   }
   progress("Tidying tasks");
-  const tasks = await normalise(db, fc, counts.buildings > 0);
+  let tasks = await normalise(db, fc, counts.features > 0);
   await db.exec(DROP_TABLES);
+  if (counts.features > 0 && input.params.drop_empty)
+    tasks = renumber(tasks.filter((t) => (t.properties.feature_count ?? 0) > 0));
   if (!tasks.length) throw new Error("Splitting produced no tasks");
   return tasks;
 }

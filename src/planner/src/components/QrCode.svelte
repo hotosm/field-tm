@@ -1,31 +1,31 @@
 <script lang="ts">
-  import qrcode from 'qrcode-generator';
-
   let { text }: { text: string } = $props();
+  let qr = $state<HTMLElement & { shadowRoot: ShadowRoot | null }>();
 
-  const svg = $derived.by(() => {
-    try {
-      const qr = qrcode(0, 'L');
-      qr.addData(text);
-      qr.make();
-      return qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
-    } catch {
-      return null;
-    }
-  });
+  function save() {
+    const canvas = qr?.shadowRoot?.querySelector('canvas');
+    if (!canvas) return;
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = 'task-qr.png';
+    a.click();
+  }
 </script>
 
-{#if svg}
-  <!-- SVG generated locally by qrcode-generator from our own URL -->
-  <div class="qr" role="img" aria-label="QR code for the task link">{@html svg}</div>
-{:else}
+<!-- Byte-mode capacity of a version 40 QR code at error correction L. -->
+{#if text.length > 2900}
   <p class="hint">This task is too detailed for a QR code. Share the link instead.</p>
+{:else}
+<div class="stack">
+  <wa-qr-code bind:this={qr} value={text} label="QR code for the task link" size="200" error-correction="L"></wa-qr-code>
+  <div><wa-button size="small" appearance="outlined" onclick={save}>Download PNG</wa-button></div>
+</div>
 {/if}
 
 <style>
-  .qr {
-    width: 200px;
-    max-width: 100%;
+  wa-qr-code {
+    align-self: flex-start;
+    padding: var(--wa-space-xs);
     background: #fff;
   }
 </style>

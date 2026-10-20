@@ -22,14 +22,17 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.25rem 0.75rem;
-    font-size: 0.85rem;
+    font-size: var(--wa-font-size-s);
+  }
+  li {
+    margin: 0;
   }
   .swatch {
     display: inline-block;
     width: 0.9rem;
     height: 0.9rem;
     border-radius: 2px;
-    margin-right: 0.3rem;
+    margin-inline-end: var(--wa-space-2xs);
     vertical-align: -0.1rem;
     opacity: 0.8;
   }

@@ -17,7 +17,7 @@ function fromBase64Url(s: string): string {
 
 /** Encode one task (geometry rounded to ~10 cm) for a #task= link. */
 export function encodeTask(t: Task): string {
-  const { building_count: _, ...props } = t.properties;
+  const { feature_count: _, ...props } = t.properties;
   const geometry = {
     type: "Polygon",
     coordinates: t.geometry.coordinates.map((r) => r.map(([x, y]) => [round(x), round(y)])),

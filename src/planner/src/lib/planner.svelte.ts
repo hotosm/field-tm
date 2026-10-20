@@ -1,4 +1,5 @@
 import type { FeatureCollection, LineString, Polygon } from "geojson";
+import { featurePoints, withFeatureCounts } from "./counts";
 import { engine } from "./engine/client";
 import type { SplitAlgorithm, SplitParams } from "./engine/splitter";
 import { saveDraft, type Draft } from "./draft";
@@ -22,6 +23,8 @@ export class Planner {
   params = $state.raw<Record<string, unknown>>({});
   features = $state.raw<FeatureCollection | null>(null);
   roads = $state.raw<FeatureCollection | null>(null);
+  /** One point per uploaded building, for recounting tasks after edits. */
+  points = $derived(featurePoints(this.features));
   selected = $state<number[]>([]);
   busy = $state<string | null>(null);
   error = $state<string | null>(null);
@@ -65,6 +68,8 @@ export class Planner {
 
   commit(changes: Partial<Snapshot>, select?: number[]) {
     const next = { ...this.#snapshot(), ...changes };
+    if (changes.tasks && this.points.length)
+      next.tasks = withFeatureCounts(next.tasks, this.points);
     this.#history.push(next);
     if (select) this.selected = select;
     this.#apply(next);
@@ -78,7 +83,9 @@ export class Planner {
     this.roads = d.roads ?? null;
     const s: Snapshot = {
       aoi: d.aoi ?? null,
-      tasks: d.plan?.features ?? [],
+      tasks: d.features
+        ? withFeatureCounts(d.plan?.features ?? [], featurePoints(d.features))
+        : (d.plan?.features ?? []),
       algorithm: d.plan?.algorithm ?? d.algorithm ?? "MANUAL",
       params: d.plan?.params ?? d.params ?? {},
     };
@@ -158,7 +165,7 @@ export class Planner {
       this.tasks,
       ids,
       parts.map((t) => t.geometry),
-      parts.map((t) => t.properties.building_count ?? 0),
+      parts.map((t) => t.properties.feature_count ?? 0),
     );
     this.commit(
       { tasks, algorithm: "MANUAL" },
@@ -172,8 +179,8 @@ export class Planner {
     const g = await this.run("Merging", () => engine.merge(sel.map((t) => t.geometry)));
     if (!g) return;
     const ids = sel.map((t) => t.properties.task_id);
-    const counts = sel.every((t) => typeof t.properties.building_count === "number")
-      ? [sel.reduce((s, t) => s + (t.properties.building_count ?? 0), 0)]
+    const counts = sel.every((t) => typeof t.properties.feature_count === "number")
+      ? [sel.reduce((s, t) => s + (t.properties.feature_count ?? 0), 0)]
       : undefined;
     const tasks = replaceTasks(this.tasks, ids, [g], counts);
     this.commit({ tasks, algorithm: "MANUAL" }, [Math.min(...ids)]);

@@ -19,16 +19,16 @@ const sq = (x: number): Task["geometry"] => ({
 const tasks: Task[] = [1, 2, 3, 4].map((id) => ({
   type: "Feature",
   geometry: sq(id),
-  properties: { task_id: id, assigned_group: `g${id}`, building_count: id },
+  properties: { task_id: id, assigned_group: `g${id}`, feature_count: id },
 }));
 
 describe("plan edits", () => {
   it("replaces tasks in place, keeps the first assignment and renumbers", () => {
     const out = replaceTasks(tasks, [2, 3], [sq(9)], [5]);
     expect(out.map((t) => t.properties)).toEqual([
-      { task_id: 1, assigned_group: "g1", building_count: 1 },
-      { task_id: 2, assigned_group: "g2", building_count: 5 },
-      { task_id: 3, assigned_group: "g4", building_count: 4 },
+      { task_id: 1, assigned_group: "g1", feature_count: 1 },
+      { task_id: 2, assigned_group: "g2", feature_count: 5 },
+      { task_id: 3, assigned_group: "g4", feature_count: 4 },
     ]);
   });
 
@@ -58,7 +58,7 @@ describe("plan edits", () => {
       assigned_group: "",
       comment: undefined,
     });
-    expect(out[0].properties).toEqual({ task_id: 1, assigned_to: "Ana", building_count: 1 });
+    expect(out[0].properties).toEqual({ task_id: 1, assigned_to: "Ana", feature_count: 1 });
     expect(out[2]).toBe(tasks[2]);
   });
 });

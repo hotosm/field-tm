@@ -40,16 +40,16 @@
 {:else}
   <p>{planner.tasks.length} tasks.</p>
   {#if project}
-    <button type="button" class="primary" onclick={save} disabled={!!planner.busy}>Save to Field-TM</button>
+    <div><wa-button class="cta" variant="brand" onclick={save} disabled={!!planner.busy}>Save to Field-TM</wa-button></div>
     {#if saved != null}
-      <p role="status">Saved {saved} tasks. <a href={projectUrl(project.id)} target="_top">Return to project</a></p>
+      <wa-callout variant="success" size="small" role="status">Saved {saved} tasks. <a href={projectUrl(project.id)} target="_top">Return to project</a></wa-callout>
     {/if}
     {#if authError}
-      <p><a href={loginUrl(location.pathname + location.search)} target="_top">Log in to Field-TM</a>, then save again. Your work is kept in this browser.</p>
+      <wa-callout variant="warning" size="small"><a href={loginUrl(location.pathname + location.search)} target="_top">Log in to Field-TM</a>, then save again. Your work is kept in this browser.</wa-callout>
     {/if}
   {/if}
-  <div class="row wrap">
-    <button type="button" class={project ? '' : 'primary'} onclick={downloadPlan}>Download task plan (GeoJSON)</button>
+  <div>
+    <wa-button variant={project ? 'neutral' : 'brand'} appearance={project ? 'outlined' : 'accent'} onclick={downloadPlan}>Download task plan (GeoJSON)</wa-button>
   </div>
   <p class="hint">
     The task plan is a GeoJSON file with one polygon per task and the assignments. Select a task to download it as GPX or

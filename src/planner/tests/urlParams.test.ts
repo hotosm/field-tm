@@ -16,7 +16,7 @@ const t: Task = {
       ],
     ],
   },
-  properties: { task_id: 3, assigned_group: "team-a", comment: "Ñamaste ✓", building_count: 9 },
+  properties: { task_id: 3, assigned_group: "team-a", comment: "Ñamaste ✓", feature_count: 9 },
 };
 
 describe("parseMode", () => {

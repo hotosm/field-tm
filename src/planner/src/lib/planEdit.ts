@@ -9,15 +9,15 @@ export function replaceTasks(
   tasks: Task[],
   ids: number[],
   geoms: Polygon[],
-  buildingCounts?: number[],
+  featureCounts?: number[],
 ): Task[] {
   const idx = tasks.findIndex((t) => ids.includes(t.properties.task_id));
   if (idx < 0) return tasks;
-  const { building_count: _, ...inherit } = tasks[idx].properties;
+  const { feature_count: _, ...inherit } = tasks[idx].properties;
   const added: Task[] = geoms.map((geometry, i) => ({
     type: "Feature",
     geometry,
-    properties: { ...inherit, ...(buildingCounts ? { building_count: buildingCounts[i] } : {}) },
+    properties: { ...inherit, ...(featureCounts ? { feature_count: featureCounts[i] } : {}) },
   }));
   const kept = tasks.filter((t) => !ids.includes(t.properties.task_id));
   const before = tasks.slice(0, idx).filter((t) => !ids.includes(t.properties.task_id)).length;
@@ -42,9 +42,9 @@ export function assign(tasks: Task[], ids: number[], patch: Assignment): Task[] 
   });
 }
 
-export function sumBuildings(tasks: Task[], ids: number[]): number | undefined {
+export function sumFeatures(tasks: Task[], ids: number[]): number | undefined {
   const sel = tasks.filter((t) => ids.includes(t.properties.task_id));
-  return sel.every((t) => typeof t.properties.building_count === "number")
-    ? sel.reduce((s, t) => s + (t.properties.building_count ?? 0), 0)
+  return sel.every((t) => typeof t.properties.feature_count === "number")
+    ? sel.reduce((s, t) => s + (t.properties.feature_count ?? 0), 0)
     : undefined;
 }

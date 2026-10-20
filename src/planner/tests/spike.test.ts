@@ -95,7 +95,7 @@ describe.skipIf(!process.env.SPIKE)("spike timings", () => {
       });
       lap(
         `${name} grid 50m`,
-        `${r.length} tasks, ${r.filter((x) => x.properties.building_count).length} non-empty`,
+        `${r.length} tasks, ${r.filter((x) => x.properties.feature_count).length} non-empty`,
       );
       r = await split(db, { ...input, algorithm: "SPLIT_BY_ROADS", params: {} });
       lap(`${name} roads`, `${r.length} tasks`);
@@ -105,12 +105,26 @@ describe.skipIf(!process.env.SPIKE)("spike timings", () => {
           algorithm: "AVG_BUILDING_VORONOI",
           params: { num_buildings: nb },
         });
-        const counts = r.map((x) => x.properties.building_count ?? 0);
+        const counts = r.map((x) => x.properties.feature_count ?? 0);
         lap(
           `${name} voronoi ${nb}/task`,
           `${r.length} tasks, buildings/task min ${Math.min(...counts)} max ${Math.max(...counts)}`,
         );
       }
     }
-  }, 900_000);
+    for (const [name, input, nbs] of [
+      ["kathmandu (667 buildings)", k, [5, 10, 100]],
+      ["synthetic 2k", synthetic(2_000, [36.8, -1.28]), [20, 100]],
+      ["synthetic 5k", synthetic(5_000, [36.8, -1.28]), [100]],
+    ] as const) {
+      for (const nb of nbs) {
+        const r = await split(db, {
+          ...input,
+          algorithm: "AVG_BUILDING_SKELETON",
+          params: { num_buildings: nb },
+        });
+        lap(`${name} skeleton ${nb}/task`, `${r.length} tasks`);
+      }
+    }
+  }, 3_600_000);
 });

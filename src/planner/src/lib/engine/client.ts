@@ -9,6 +9,9 @@ type Pending = {
   onProgress?: (m: string) => void;
 };
 
+/** GEOS/CGAL can hang on rare inputs; stop the worker rather than spin forever. */
+const TIMEOUT_MS = 10 * 60_000;
+
 let worker: Worker | null = null;
 let nextId = 0;
 const pending = new Map<number, Pending>();
@@ -29,7 +32,22 @@ function call<T>(op: Op, args: unknown[], onProgress?: (m: string) => void): Pro
   }
   const id = nextId++;
   return new Promise<T>((resolve, reject) => {
-    pending.set(id, { resolve, reject, onProgress });
+    const timer = setTimeout(() => {
+      worker?.terminate();
+      worker = null;
+      const err = new Error(
+        "This took too long and was stopped. Try larger tasks or another method.",
+      );
+      for (const p of pending.values()) p.reject(err);
+      pending.clear();
+    }, TIMEOUT_MS);
+    const done =
+      <A>(f: (a: A) => void) =>
+      (a: A) => {
+        clearTimeout(timer);
+        f(a);
+      };
+    pending.set(id, { resolve: done(resolve), reject: done(reject), onProgress });
     // $state proxies can't be cloned; plain JSON round-trip strips them.
     worker!.postMessage({ id, op, args: JSON.parse(JSON.stringify(args)) });
   });

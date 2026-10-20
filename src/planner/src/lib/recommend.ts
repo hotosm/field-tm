@@ -2,22 +2,22 @@ import { areaM2, type Area } from "./geo";
 import type { SplitAlgorithm, SplitParams } from "./engine/splitter";
 
 export const MAX_TASKS = 100;
-export const BUILDINGS_PER_TASK = 100;
+export const FEATURES_PER_TASK = 100;
 
-/** Sensible defaults: aim for <= ~100 tasks and <= ~100 buildings per task. */
+/** Sensible defaults: aim for <= ~100 tasks and <= ~100 features per task. */
 export function recommend(
   aoi: Area,
-  buildings: number,
+  features: number,
 ): { algorithm: SplitAlgorithm; params: SplitParams; note: string } {
-  if (buildings > 0) {
+  if (features > 0) {
     const perTask = Math.min(
-      BUILDINGS_PER_TASK,
-      Math.max(10, Math.ceil(buildings / MAX_TASKS / 10) * 10),
+      FEATURES_PER_TASK,
+      Math.max(10, Math.ceil(features / MAX_TASKS / 10) * 10),
     );
     return {
       algorithm: "AVG_BUILDING_VORONOI",
       params: { num_buildings: perTask },
-      note: `${buildings} buildings: about ${perTask} per task gives ~${Math.ceil(buildings / perTask)} tasks.`,
+      note: `${features} features: about ${perTask} per task gives ~${Math.ceil(features / perTask)} tasks.`,
     };
   }
   return {
@@ -38,11 +38,14 @@ export function estimateTasks(
   aoi: Area,
   algorithm: SplitAlgorithm,
   params: SplitParams,
-  buildings: number,
+  features: number,
 ): number | null {
   if (algorithm === "DIVIDE_BY_SQUARE" && params.cell_size)
     return Math.ceil(areaM2(aoi) / params.cell_size ** 2);
-  if (algorithm === "AVG_BUILDING_VORONOI" && params.num_buildings)
-    return Math.ceil(buildings / params.num_buildings);
+  if (
+    (algorithm === "AVG_BUILDING_VORONOI" || algorithm === "AVG_BUILDING_SKELETON") &&
+    params.num_buildings
+  )
+    return Math.ceil(features / params.num_buildings);
   return null;
 }

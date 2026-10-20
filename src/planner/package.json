@@ -11,11 +11,13 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@awesome.me/webawesome": "3.11.0",
     "@electric-sql/pglite": "0.5.10",
     "@electric-sql/pglite-postgis": "0.2.10",
+    "@hotosm/ui": "3.0.0",
     "@svelte-maplibre-gl/terradraw": "2.1.0",
     "maplibre-gl": "6.15.0",
-    "qrcode-generator": "2.0.4",
+    "straight-skeleton": "3.0.0",
     "svelte-maplibre-gl": "2.2.1",
     "terra-draw": "1.38.0",
     "terra-draw-maplibre-gl-adapter": "1.4.1"

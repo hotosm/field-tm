@@ -40,14 +40,14 @@
       assigned_to: String(f.get('assigned_to') ?? ''),
       comment: String(f.get('comment') ?? ''),
       // Store a colour only when the user picked one; otherwise it follows the group.
-      colour: colour === shownColour ? (p.colour ?? '') : colour,
+      colour: colour.toLowerCase() === shownColour.toLowerCase() ? (p.colour ?? '') : colour,
     });
   }
 </script>
 
-<section class="task" aria-label="Task {p.task_id}">
+<section class="stack" aria-label="Task {p.task_id}">
   <h3>Task {p.task_id}</h3>
-  {#if p.building_count != null}<p class="hint">{p.building_count} buildings</p>{/if}
+  {#if p.feature_count != null}<p class="hint">{p.feature_count} features</p>{/if}
 
   {#if readonly}
     <dl>
@@ -58,30 +58,33 @@
   {:else}
     {#key task}
       <form onsubmit={save} class="stack">
-        <label>Group <input name="assigned_group" value={p.assigned_group ?? ''} pattern={GROUP_PATTERN} placeholder="e.g. team-a" /></label>
-        <label>Assigned to <input name="assigned_to" value={p.assigned_to ?? ''} placeholder="Name or username" /></label>
-        <label>Comment <textarea name="comment" rows="2">{p.comment ?? ''}</textarea></label>
-        <label class="row">Colour <input type="color" name="colour" value={shownColour} /></label>
-        <button type="submit" class="primary">Save task</button>
+        <wa-input size="small" label="Group" name="assigned_group" value={p.assigned_group ?? ''} pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
+        <wa-input size="small" label="Assigned to" name="assigned_to" value={p.assigned_to ?? ''} placeholder="Name or username"></wa-input>
+        <wa-textarea size="small" label="Comment" name="comment" rows="2" value={p.comment ?? ''}></wa-textarea>
+        <wa-color-picker size="small" label="Colour" name="colour" value={shownColour}></wa-color-picker>
+        <div><wa-button size="small" type="submit" variant="brand">Save task</wa-button></div>
       </form>
     {/key}
   {/if}
 
-  <div class="row wrap">
-    <button type="button" onclick={() => download(`task-${p.task_id}.geojson`, taskGeoJSON(task))}>GeoJSON</button>
-    <button type="button" onclick={() => download(`task-${p.task_id}.gpx`, taskGPX(task), 'application/gpx+xml')}>GPX</button>
-    <button type="button" onclick={copy}>{copied ? 'Copied' : 'Copy link'}</button>
-    <button type="button" onclick={() => (showQr = !showQr)} aria-expanded={showQr}>QR code</button>
+  <div class="row">
+    <wa-button size="small" appearance="outlined" onclick={() => download(`task-${p.task_id}.geojson`, taskGeoJSON(task))}>GeoJSON</wa-button>
+    <wa-button size="small" appearance="outlined" onclick={() => download(`task-${p.task_id}.gpx`, taskGPX(task), 'application/gpx+xml')}>GPX</wa-button>
+    <wa-button size="small" appearance="outlined" onclick={copy}>{copied ? 'Copied' : 'Copy link'}</wa-button>
+    <wa-button size="small" appearance="outlined" onclick={() => (showQr = !showQr)} aria-expanded={showQr}>QR code</wa-button>
   </div>
   {#if showQr}<QrCode text={link} />{/if}
 </section>
 
 <style>
+  h3 {
+    margin: 0;
+  }
   dl {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 0.2rem 0.75rem;
-    margin: 0.5rem 0;
+    gap: var(--wa-space-2xs) var(--wa-space-s);
+    margin: 0;
   }
   dt {
     font-weight: 600;

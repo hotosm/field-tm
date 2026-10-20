@@ -39,11 +39,11 @@ exchange. It is plain GeoJSON, so any GIS tool can read it.
 
 ## Top level
 
-| Key                 | Type   | Notes                                                                                 |
-| ------------------- | ------ | ------------------------------------------------------------------------------------- |
-| `task_plan_version` | int    | Always `1`                                                                            |
-| `algorithm`         | string | `DIVIDE_BY_SQUARE`, `SPLIT_BY_ROADS`, `AVG_BUILDING_VORONOI`, or `MANUAL` after edits |
-| `params`            | object | Parameters used, e.g. `cell_size` (m) or `num_buildings`                              |
+| Key                 | Type   | Notes                                                                                                          |
+| ------------------- | ------ | -------------------------------------------------------------------------------------------------------------- |
+| `task_plan_version` | int    | Always `1`                                                                                                     |
+| `algorithm`         | string | `DIVIDE_BY_SQUARE`, `SPLIT_BY_ROADS`, `AVG_BUILDING_VORONOI`, `AVG_BUILDING_SKELETON`, or `MANUAL` after edits |
+| `params`            | object | Parameters used, e.g. `cell_size` (m), `num_buildings` (features per task) or `drop_empty`                     |
 
 ## Each feature (one task)
 
@@ -58,7 +58,7 @@ Geometry must be a single `Polygon` (WGS84 lon/lat).
 | `colour`         | string | no       | `#rrggbb`. Defaults to a colour derived from `assigned_group` |
 
 Readers should ignore unknown properties (the planner may add
-`building_count`). Empty optional values are omitted.
+`feature_count`, the number of features to map in the task). Empty optional values are omitted.
 
 Reference implementation: `src/planner/src/lib/taskPlan.ts`.
 
