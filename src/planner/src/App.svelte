@@ -214,7 +214,7 @@
         <section class="step">
           <h2>{STEPS[step]}</h2>
           {#if step === 0}
-            <AreaStep {planner} {map} bind:tool />
+            <AreaStep {planner} {map} bind:tool onplan={() => (step = 3)} />
           {:else if step === 1}
             <DataStep {planner} />
           {:else if step === 2}

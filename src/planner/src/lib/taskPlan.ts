@@ -135,6 +135,19 @@ export function serialise(plan: TaskPlan): string {
   return JSON.stringify(out);
 }
 
+/** True for a task plan file, including older exports without `task_plan_version` (polygons with `task_id`). */
+export function isTaskPlan(input: unknown): boolean {
+  const fc = input as { type?: string; task_plan_version?: unknown; features?: Task[] };
+  if (fc?.type !== "FeatureCollection" || !Array.isArray(fc.features) || !fc.features.length)
+    return false;
+  if (fc.task_plan_version != null) return true;
+  return (
+    fc.features.every(
+      (f) => f?.geometry?.type === "Polygon" || f?.geometry?.type === "MultiPolygon",
+    ) && fc.features.some((f) => Number.isInteger(f?.properties?.task_id))
+  );
+}
+
 /** Parse and validate a task plan. Accepts single-part MultiPolygons and missing task_ids. */
 export function parse(input: string | unknown): TaskPlan {
   const raw = (typeof input === "string" ? JSON.parse(input) : input) as TaskPlan;

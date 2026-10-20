@@ -50,6 +50,7 @@
   {/if}
   <div>
     <wa-button variant={project ? 'neutral' : 'brand'} appearance={project ? 'outlined' : 'accent'} onclick={downloadPlan}>Download task plan (GeoJSON)</wa-button>
+    <p class="hint">Keep the file as a backup: you can import it again in step 1 to keep editing.</p>
   </div>
   <p class="hint">
     The task plan is a GeoJSON file with one polygon per task and the assignments. Select a task to download it as GPX or

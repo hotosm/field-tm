@@ -4,28 +4,33 @@
   import type { Tool } from './MapView.svelte';
   import { areaM2, squareAround, toArea } from '../lib/geo';
   import { readJsonFile } from '../lib/io/files';
-  import { parse } from '../lib/taskPlan';
+  import { isTaskPlan, parse } from '../lib/taskPlan';
 
-  let { planner, map, tool = $bindable() }: { planner: Planner; map?: Map; tool: Tool } = $props();
+  let { planner, map, tool = $bindable(), onplan }: { planner: Planner; map?: Map; tool: Tool; onplan?: () => void } = $props();
 
   let size = $state(1000);
   let fileInput = $state<HTMLInputElement>();
+  let planInput = $state<HTMLInputElement>();
   const km2 = $derived(planner.aoi ? areaM2(planner.aoi) / 1e6 : 0);
 
-  async function upload(e: Event) {
+  function importPlan(json: unknown) {
+    const plan = parse(json);
+    planner.load({ aoi: toArea(plan), plan, features: planner.features, roads: planner.roads });
+    planner.unsaved = true;
+    onplan?.();
+  }
+
+  /** An area file, or a task plan (detected) to keep editing. */
+  async function upload(e: Event, asPlan: boolean) {
     const input = e.currentTarget as HTMLInputElement;
     const file = input.files?.[0];
     input.value = '';
     if (!file) return;
     await planner.run('Reading file', async () => {
-      const json = (await readJsonFile(file)) as { task_plan_version?: number };
-      if (json.task_plan_version) {
-        const plan = parse(json);
-        planner.load({ aoi: toArea(plan), plan, features: planner.features, roads: planner.roads });
-      } else {
-        planner.commit({ aoi: toArea(json), tasks: [] }, []);
-        planner.fitKey++;
-      }
+      const json = await readJsonFile(file);
+      if (asPlan || isTaskPlan(json)) return importPlan(json);
+      planner.commit({ aoi: toArea(json), tasks: [] }, []);
+      planner.fitKey++;
     });
   }
 
@@ -41,8 +46,8 @@
 <div class="row">
   <wa-button size="s" variant={tool === 'polygon' ? 'brand' : 'neutral'} appearance={tool === 'polygon' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'polygon' ? 'none' : 'polygon')}>Draw polygon</wa-button>
   <wa-button size="s" variant={tool === 'rectangle' ? 'brand' : 'neutral'} appearance={tool === 'rectangle' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'rectangle' ? 'none' : 'rectangle')}>Draw rectangle</wa-button>
-  <wa-button size="s" appearance="outlined" onclick={() => fileInput?.click()}>Upload GeoJSON</wa-button>
-  <input bind:this={fileInput} type="file" accept=".geojson,.json,application/geo+json,application/json" onchange={upload} hidden />
+  <wa-button size="s" appearance="outlined" onclick={() => fileInput?.click()}>Upload area</wa-button>
+  <input bind:this={fileInput} type="file" accept=".geojson,.json,application/geo+json,application/json" onchange={(e) => upload(e, false)} hidden />
 </div>
 {#if tool === 'polygon'}<p class="hint">Click to add points; click the first point to finish.</p>{/if}
 {#if tool === 'rectangle'}<p class="hint">Click two opposite corners.</p>{/if}
@@ -55,7 +60,16 @@
     <wa-option value="5000">5 km</wa-option>
   </wa-select>
 </div>
-<p class="hint">You can also upload a saved task plan to keep working on it.</p>
+
+<h3>Or continue a task plan</h3>
+<p class="hint">
+  Import a task plan you downloaded earlier (e.g. a backup) to edit it and
+  download it again. Its tasks, teams and comments are kept.
+</p>
+<div class="row">
+  <wa-button size="s" appearance="outlined" onclick={() => planInput?.click()}>Import task plan</wa-button>
+  <input bind:this={planInput} type="file" accept=".geojson,.json,application/geo+json,application/json" onchange={(e) => upload(e, true)} hidden />
+</div>
 
 {#if planner.aoi}
   <p><strong>Area:</strong> {km2 < 1 ? `${Math.round(km2 * 100) / 100}` : Math.round(km2 * 10) / 10} km²</p>
