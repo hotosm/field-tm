@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-19 20:39+0100\n"
+"POT-Creation-Date: 2026-10-20 23:29+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: om\n"
@@ -30,7 +30,7 @@ msgstr "Dogoggorri hin eegamne uumame. Maaloo bulchaa qunnamaa."
 msgid "Could not connect to database"
 msgstr "Kuusdeetaa waliin walqabsiisuu hin dandeenye"
 
-#: app/auth/auth_deps.py:79
+#: app/auth/auth_deps.py:81
 msgid "Authenticated user is missing a valid identifier."
 msgstr "Fayyadamaan mirkanaa'e adda baastuu sirrii dhabeera."
 
@@ -40,29 +40,29 @@ msgstr "Fayyadamaan pirojekticha argachuuf hayyama hin qabu."
 
 #: app/auth/roles.py:178
 msgid "You must be logged in to view this project."
-msgstr ""
+msgstr "Pirojektii kana ilaaluuf seenuu qabda."
 
 #: app/auth/user_crud.py:84
 #, python-format
 msgid "User (%(user_sub)s) could not be inserted in db"
 msgstr "(%(user_sub)s) db keessatti galfamuu hin dandeenye"
 
-#: app/central/central_crud.py:164
+#: app/central/central_crud.py:165
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
 msgstr "Pirojektii ODK Central irratti uumuurratti dogoggorri uumame: %(error)s"
 
-#: app/central/central_crud.py:226
+#: app/central/central_crud.py:219
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
 msgstr "Unka gara ODK Central: %(error)s tti olkaa'uu hin dandeenye"
 
-#: app/central/central_crud.py:267
+#: app/central/central_crud.py:273
 #, python-format
 msgid "Could not read XLSForm file: %(error)s"
 msgstr "Faayilii XLSForm dubbisuu hin dandeenye: %(error)s ."
 
-#: app/central/central_crud.py:307
+#: app/central/central_crud.py:299
 #, python-format
 msgid ""
 "XLSForm has select questions referencing lists that aren't defined in the"
@@ -72,51 +72,59 @@ msgstr ""
 "keessatti hin ibsamne qaba: %(rows)s. Waraqaa qorannoo fi filannoo kee "
 "ilaali."
 
-#: app/central/central_crud.py:333
+#: app/central/central_crud.py:318
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
 msgstr "XLSForm sirrii miti: %(error)s"
 
-#: app/central/central_crud.py:427
+#: app/central/central_crud.py:400
 msgid "'geometry' data field is mandatory"
 msgstr "dirqama"
 
-#: app/central/central_crud.py:700
+#: app/central/central_crud.py:715
 msgid "ODK project_id is missing; cannot create/merge entity lists."
 msgstr ""
 "ODK pirojektii_id dhabameera; tarreewwan qaama uumuu/walitti makuu hin "
 "danda'u."
 
-#: app/central/central_crud.py:774
+#: app/central/central_crud.py:755
 msgid "Could not generate token for app user."
 msgstr "Fayyadamaa appiidhaaf mallattoo uumuu hin dandeenye."
 
-#: app/central/central_crud.py:806 app/central/central_crud.py:812
+#: app/central/central_crud.py:787 app/central/central_crud.py:793
 msgid "An error occurred while creating the app user token."
 msgstr "Koodii QR uumuun irratti dogoggorri hin eegamne uumame."
 
-#: app/central/central_crud.py:826
+#: app/central/central_crud.py:807
 #, python-format
 msgid "Could not assign %(scope)s role to app user."
 msgstr "Gahee %(scope)s fayyadamaa appiif ramaduu hin dandeenye."
 
-#: app/central/central_crud.py:865
+#: app/central/central_crud.py:846
 msgid "Could not find 'Project Manager' role in ODK Central."
 msgstr "Pirojektii ODK Central keessatti bani"
 
-#: app/central/central_crud.py:890
+#: app/central/central_crud.py:871
 msgid "ODK Central returned no user ID after creation."
 msgstr "ODK Central erga uumamee booda ID fayyadamaa tokkollee hin deebisne."
 
-#: app/central/central_crud.py:1023
+#: app/central/central_crud.py:996
 msgid "Failed to create ODK Central manager user."
 msgstr "Fayyadamaa hogganaa Giddugaleessaa ODK uumuu hin dandeenye."
 
-#: app/central/central_crud.py:1043
+#: app/central/central_crud.py:1013
+msgid "ODK credentials are invalid, or may have changed."
+msgstr "Ragaaleen eenyummaa ODK sirrii miti, ykn jijjiiramanii ta'uu danda'u."
+
+#: app/central/central_crud.py:1019
+msgid "Failed to connect to Central. Is the URL valid?"
+msgstr "Central waliin walqunnamuun hin danda'amne. URL-n sirriidhaa?"
+
+#: app/central/central_crud.py:1025
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "Koodii QR uumuun irratti dogoggorri hin eegamne uumame."
 
-#: app/central/central_deps.py:163
+#: app/central/central_deps.py:144
 #: app/htmx/project_create/project_create_templates.py:104
 msgid "Provide a valid .xls or .xlsx file"
 msgstr "Faayilii .xls ykn .xlsx sirrii dhiheessi"
@@ -144,136 +152,71 @@ msgstr "APIn Tilepack HTTP %(status_code)s deebise."
 msgid "Failed to convert YAML form to XLSForm."
 msgstr "Unka YAML gara XLSForm jijjiiruu hin dandeenye."
 
-#: app/htmx/project_detail_routes.py:203
+#: app/htmx/project_detail_routes.py:164
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "Pirojektiin (%(project_id)s) hin argamne."
 
-#: app/htmx/project_detail_routes.py:210
+#: app/htmx/project_detail_routes.py:171
 msgid "Only the project manager can delete this project."
 msgstr "Pirojektii kana haquu kan danda'u hoogganaa pirojektii qofa."
 
-#: app/htmx/project_detail_routes.py:254 app/templates/project_details.html:313
+#: app/htmx/project_detail_routes.py:215 app/templates/project_details.html:204
 msgid "Project not found."
 msgstr "Pirojektiin hin argamne."
 
-#: app/htmx/project_detail_routes.py:294
+#: app/htmx/project_detail_routes.py:251
 #: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Dogoggora: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:328
-#, python-format
-msgid "Added the following user(s) as project editors: %(names)s."
-msgstr ""
-"Fayyadamaa(wwan) armaan gadii akka gulaaltota pirojektiitti dabalameera: "
-"%(names)s."
-
-#: app/htmx/project_detail_routes.py:332
-#, python-format
-msgid "Could not add '%(username)s': %(reason)s"
-msgstr "'%(username)s' dabaluu hin dandeenye: %(reason)s ."
-
-#: app/htmx/project_detail_routes.py:338
-msgid "Add more collaborators"
-msgstr "Tumsitoota dabalataa itti dabalaa"
-
-#: app/htmx/project_detail_routes.py:351
-msgid "Invite QFieldCloud collaborators"
-msgstr "Tumsitoota QFieldCloud afeeraa"
-
-#: app/htmx/project_detail_routes.py:354
-msgid ""
-"Mappers must have an account on QFieldCloud before you can give them "
-"access to this project."
-msgstr ""
-"Mappers pirojektii kanaaf qaqqabummaa isaaniif kennuu kee dura "
-"QFieldCloud irratti herrega qabaachuu qabu."
-
-#: app/htmx/project_detail_routes.py:360
-msgid ""
-"Have each mapper create a free account at <a "
-"href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
-"class=\"ftm-link--brand\">app.qfield.cloud</a>."
-msgstr ""
-"Tokkoon tokkoon kaartaa akkaawuntii bilisaa <a "
-"href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
-"class=\"ftm-link--brand\">app.qfield.cloud</a> irratti akka uumu taasisi."
-
-#: app/htmx/project_detail_routes.py:366
-msgid ""
-"Enter their QFieldCloud usernames below (comma-separated for multiple "
-"users) and click submit. They will be added as editors and can log in to "
-"QField to start mapping."
-msgstr ""
-"Maqaa fayyadamtoota isaanii QFieldCloud armaan gadii galchi "
-"(fayyadamtoota hedduudhaaf komaandiin adda baafame) fi galchi cuqaasi. "
-"Isaan akka gulaaltotaatti kan dabalaman yoo ta'u, kaartaa jalqabuuf gara "
-"QField seenuu danda'u."
-
-#: app/htmx/project_detail_routes.py:372
-msgid "e.g. alice, bob, charlie"
-msgstr "fkn. aliis, bob, chaarlii"
-
-#: app/htmx/project_detail_routes.py:373
-msgid "Add collaborators"
-msgstr "Tumsitoota itti dabali"
-
-#: app/htmx/project_detail_routes.py:465
-msgid "Enter at least one QFieldCloud username."
-msgstr "Yoo xiqqaate maqaa fayyadamaa QFieldCloud tokko galchi."
-
-#: app/htmx/project_detail_routes.py:475
-msgid "QFieldCloud project ID not found for this project."
-msgstr "ID pirojektii QFieldCloud pirojektii kanaaf hin argamne."
-
-#: app/htmx/project_detail_routes.py:481
-msgid ""
-"This project was created on a custom QFieldCloud instance. Use the "
-"QFieldCloud Admin tab to manage collaborators."
-msgstr ""
-"Pirojektiin kun fakkeenya QFieldCloud amala irratti uumame. Tumsa "
-"bulchuuf caancala Bulchiinsa QFieldCloud fayyadami."
-
-#: app/htmx/project_detail_routes.py:547
+#: app/htmx/project_detail_routes.py:292
 msgid "GeoJSON export is only available for QField projects."
 msgstr "Al-ergiin GeoJSON pirojektoota QField qofaaf argama."
 
-#: app/htmx/project_detail_routes.py:552
+#: app/htmx/project_detail_routes.py:297
 msgid "This project is not yet linked to a QFieldCloud project."
 msgstr "Pirojektiin kun ammallee pirojektii QFieldCloud waliin wal hin hidhamne."
 
-#: app/htmx/project_detail_routes.py:563
+#: app/htmx/project_detail_routes.py:308
 #, python-format
 msgid "Failed to export GeoJSON: %(error)s"
 msgstr "GeoJSON erguu hin dandeenye: %(error)s ."
 
 #: app/htmx/static_routes.py:140
 msgid "Not found."
-msgstr ""
+msgstr "Hin argamne."
 
 #: app/htmx/static_routes.py:143
 msgid ""
 "The task planner has not been built. Run `just build planner`, or set "
 "PLANNER_DIR to the planner build directory."
 msgstr ""
+"Karoorsaan hojii hin ijaaramne. `just build planner` hojjechiisi, ykn "
+"PLANNER_DIR gara kuusaa ijaarsa karoorsaatti qindeessi."
 
-#: app/htmx/task_plan_routes.py:60
+#: app/htmx/task_plan_routes.py:62
 msgid "The file is not valid GeoJSON."
-msgstr ""
+msgstr "Faayilichi GeoJSON sirrii miti."
 
-#: app/htmx/task_plan_routes.py:88
-msgid "Only published ODK projects can be re-synced."
+#: app/htmx/task_plan_routes.py:89
+msgid "Only published ODK and QField projects can be re-synced."
 msgstr ""
+"Pirojektota ODK fi QField maxxanfaman qofatu irra deebi'ee walsimsiifamuu"
+" danda'a."
 
-#: app/htmx/task_plan_routes.py:98
-msgid "Could not update the tasks in ODK Central. Please try again."
+#: app/htmx/task_plan_routes.py:134
+#, python-format
+msgid "Could not update the tasks in %(app)s. Please try again."
 msgstr ""
+"Hojiiwwan %(app)s keessatti haaromsuun hin danda'amne. Maaloo irra "
+"deebi'ii yaali."
 
-#: app/htmx/task_plan_routes.py:102
-msgid "Tasks updated in ODK Central."
-msgstr ""
+#: app/htmx/task_plan_routes.py:139
+#, python-format
+msgid "Tasks updated in %(app)s."
+msgstr "Hojiiwwan %(app)s keessatti haaromfamaniiru."
 
 #: app/htmx/basemap/basemap_attach_flow.py:69
 msgid ""
@@ -404,226 +347,54 @@ msgstr ""
 "Foormiin mirkanaa'e, milkaa'inaan olkaa'ame! Fuulli irra deebi'ee fe'amaa"
 " jira..."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:73
-msgid "This user does not exist. Please create it first."
-msgstr "Fayyadamaan kun hin jiru. Maaloo dura uumi."
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:46
+msgid ""
+"Tasks were planned with the old data. They are kept, but reopen the task "
+"planner to update feature counts."
+msgstr ""
+"Hojiiwwan deetaa duriitiin karoorfamaniiru. Ni eegamu, garuu lakkoofsa "
+"wantootaa haaromsuuf karoorsaa hojii irra deebi'ii bani."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:75
-msgid "This user is already a collaborator on this project."
-msgstr "Fayyadamaan kun duraan pirojektii kana irratti hirmaataa dha."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1404
-#, python-format
-msgid "Failed to add collaborator: %(exc)s"
-msgstr "Hirmaataa dabaluu dadhabe: %(exc)s"
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:106
-msgid "All fields are required."
-msgstr "Dirreewwan hundi barbaachisoodha."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:121
-msgid "Login succeeded but no token received."
-msgstr "Seensi milkaa'e garuu token hin argamne."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:129
-msgid "Login failed. Check your URL and credentials."
-msgstr "Seensi kufe. URL fi ragaa keessan ilaalaa."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:168
-msgid "Session expired. Please log in again."
-msgstr "Yeroon walqunnamtii darbeera. Maaloo irra deebi'ii seeni."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:183
-#, python-format
-msgid "Could not load collaborators: %(exc)s"
-msgstr "Hirmaatota fe'uu hin dandeenye: %(exc)s"
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:214
-msgid "Username is required."
-msgstr "Maqaan fayyadamaa barbaachisaa dha."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:268
-#, python-format
-msgid "Failed to remove collaborator: %(exc)s"
-msgstr "Hirmaataa balleessuu dadhabe: %(exc)s"
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:311
-#, python-format
-msgid "Failed to update collaborator: %(exc)s"
-msgstr "Hirmaataa haaromsuu dadhabe: %(exc)s"
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:338
-#, python-format
-msgid "Collaborator refresh failed: %(exc)s"
-msgstr "Haaromsi hirmaataa kufe: %(exc)s"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:9
-msgid "Admin"
-msgstr "Bulchaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:10
-#: app/templates/project_details.html:207
-msgid "Manager"
-msgstr "Hogganaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:11
-msgid "Editor"
-msgstr "Gulaalaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:12
-msgid "Reporter"
-msgstr "Gabaasaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:13
-msgid "Reader"
-msgstr "Dubbisaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:51
-msgid "QFieldCloud Projects"
-msgstr "Pirojektoota QFieldCloud"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:56
-msgid "Connected as"
-msgstr "Akka kanaan walqabame"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:57
-msgid "to"
-msgstr "gara"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:63
-msgid "Log Out"
-msgstr "Ba'i"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:68
-msgid "No projects found."
-msgstr "Pirojektiin hin argamne."
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:77
-msgid "Public"
-msgstr "Uummataaf banaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:79
-msgid "Private"
-msgstr "Dhuunfaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:93
-msgid "Manage"
-msgstr "Bulchi"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:103
-msgid "Project"
-msgstr "Pirojektii"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:103
-msgid "Owner"
-msgstr "Abbaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:103
-msgid "Visibility"
-msgstr "Mul'achuu"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/project_details.html:193
-msgid "Description"
-msgstr "Ibsa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:175
-msgid "Update"
-msgstr "Haaromsi"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:178
-#: app/htmx/qfc_admin/qfc_admin_templates.py:185
-#: app/htmx/qfc_admin/qfc_admin_templates.py:193
-msgid "Remove"
-msgstr "Balleessi"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:183
-msgid "Remove Collaborator"
-msgstr "Hirmaataa balleessi"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:185
-msgid "from this project?"
-msgstr "piirojektii kana irraa?"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:189
-#: app/templates/new_project_custom.html:139
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:90
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:200
-msgid "Cancel"
-msgstr "Dhiisi"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:199
-msgid "User"
-msgstr "Fayyadamaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:199
-msgid "Role"
-msgstr "Gahee"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:199
-msgid "Actions"
-msgstr "Gochaawwan"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:205
-msgid "No collaborators yet."
-msgstr "Amma hirmaataan hin jiru."
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:218
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:114
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:120
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:163
-#: app/templates/qfc_admin.html:52
-msgid "Username"
-msgstr "Maqaa fayyadamaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:228
-msgid "Add Collaborator"
-msgstr "Hirmaataa dabali"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:236
-msgid "Close"
-msgstr "Cufi"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:243
-msgid "Collaborators"
-msgstr "Hirmaatota"
-
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:67
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:79
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "Data OSM milkaa'inaan buufame! Amaloonni %(feature_count)s argamaniiru."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:70
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:82
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "downloading again with different parameters."
 msgstr ""
+"Yoo sirrii fakkaate, \"Baafata dataa fudhadhu\" cuqaasi. Yoo kana hin "
+"taane, ulaagaalee biroon irra deebi'ii buusi."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:102
-#: app/templates/partials/project_details/style_and_scripts.html:26
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:115
+#: app/templates/partials/project_details/style_and_scripts.html:24
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "Gosti faayilii sirrii miti. Maaloo faayilii .geojson ykn .json olkaa'i."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:125
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:138
 msgid "No valid geometries found in GeoJSON."
 msgstr "GeoJSON keessatti geometry sirrii hin argamne."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:139
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:152
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ GeoJSON milkaa'inaan olkaa'ame! Amaloonni %(feature_count)s argamaniiru."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:142
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:155
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "uploading a different file."
 msgstr ""
+"Yoo sirrii fakkaate, \"Baafata dataa fudhadhu\" cuqaasi. Yoo kana hin "
+"taane, faayilii biraa olkaasi."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:174
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:188
 msgid "✓ Collect-new-data mode selected. You can continue."
-msgstr ""
+msgstr "✓ Haalli deetaa haaraa sassaabuu filatameera. Itti fufuu dandeessa."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:208
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:222
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -631,17 +402,21 @@ msgstr ""
 "Data GeoJSON hin argamne. Maaloo dura data OSM buufadhaa ykn faayilii "
 "GeoJSON olkaa'aa."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:227
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:241
 msgid "✓ Data extract successfully saved! You can now continue to the Tasks step."
 msgstr ""
+"✓ Baafanni deetaa kuufameera! Amma gara tarkaanfii Hojiiwwaniitti darbuu "
+"dandeessa."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:274
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:288
 msgid ""
 "No data extract is staged. Please download OSM data or upload a GeoJSON "
 "file first."
 msgstr ""
+"Baafanni deetaa qophaa'e hin jiru. Jalqaba deetaa OSM buusi ykn faayilii "
+"GeoJSON olkaasi."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:289
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:303
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
@@ -650,9 +425,11 @@ msgstr ""
 "✓ Baafanni deetaa fudhatameera! Amaloota %(feature_count)s olkaa'ameera. "
 "Tarkaanfiin 3 amma xumurameera."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:329
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:343
 msgid "Data extract discarded. Choose a data source above to try again."
 msgstr ""
+"Baafanni deetaa gatameera. Irra deebi'ii yaaluuf madda deetaa olii "
+"filadhu."
 
 #: app/htmx/setup_steps/setup_step_extract_helpers.py:42
 msgid "Invalid GeoJSON data in request. Please try uploading again."
@@ -691,24 +468,28 @@ msgstr ""
 #: app/htmx/setup_steps/setup_step_validate_routes.py:61
 msgid "Could not reach Tasking Manager. Please try again later."
 msgstr ""
+"Tasking Manager bira ga'uun hin danda'amne. Maaloo booda irra deebi'ii "
+"yaali."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:66
 #, python-format
 msgid "Tasking Manager project %(id)s was not found."
-msgstr ""
+msgstr "Pirojektiin Tasking Manager %(id)s hin argamne."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:71
 #, python-format
 msgid "Tasking Manager returned an error (HTTP %(status)s)."
-msgstr ""
+msgstr "Tasking Manager dogoggora deebiseera (HTTP %(status)s)."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:84
 msgid "Tasking Manager returned an invalid response."
-msgstr ""
+msgstr "Tasking Manager deebii sirrii hin taane deebiseera."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:94
 msgid "Tasking Manager project AOI did not contain any polygon geometries."
 msgstr ""
+"Naannoon fedhii pirojektii Tasking Manager jiomeetirii poligonii "
+"tokkollee hin qabu."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
@@ -738,151 +519,161 @@ msgstr "Geometry polygon hin argamne. Naannoon pirojektii polygon ta'uu qaba."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:206
 msgid "Tasking Manager project ID must be a positive integer."
-msgstr ""
+msgstr "ID pirojektii Tasking Manager lakkoofsa guutuu poozatiivii ta'uu qaba."
 
 #: app/projects/mapping_apps.py:48
 msgid "GIS mapping app for Android and iOS, with our simple task plugin."
-msgstr ""
+msgstr "Appii kaartaa GIS Android fi iOS-iif, plugin hojii salphaa keenya waliin."
 
 #: app/projects/mapping_apps.py:49
 msgid "Drawing and editing geometry, detailed surveys"
-msgstr ""
+msgstr "Jiomeetirii kaasuu fi gulaaluu, qorannoo bal'aa"
 
 #: app/projects/mapping_apps.py:57
 msgid "Form-based survey app for Android."
-msgstr ""
+msgstr "Appii qorannoo foormii irratti hundaa'e Android-iif."
 
 #: app/projects/mapping_apps.py:58
 msgid "Form-heavy surveys, simple phones"
-msgstr ""
+msgstr "Qorannoo foormii baay'ee qabu, bilbilota salphaa"
 
 #: app/projects/mapping_apps.py:66
 msgid "Fast OpenStreetMap editor for shops, amenities and entrances."
-msgstr ""
+msgstr "Gulaalaa OpenStreetMap saffisaa suuqiiwwan, tajaajilootaa fi balbalaaf."
 
 #: app/projects/mapping_apps.py:67
 msgid "Updating existing OSM buildings and points of interest"
-msgstr ""
+msgstr "Gamoowwan fi bakkeewwan fedhii OSM jiran haaromsuu"
 
 #: app/projects/mapping_apps.py:75
 msgid "Answer simple quests to complete OpenStreetMap data."
-msgstr ""
+msgstr "Deetaa OpenStreetMap guutuuf gaaffiiwwan salphaa deebisi."
 
 #: app/projects/mapping_apps.py:76
 msgid "Quick OSM attribute quests on roads and points of interest"
-msgstr ""
+msgstr "Gaaffiiwwan amala OSM saffisaa karaa fi bakkeewwan fedhii irratti"
 
 #: app/projects/mapping_apps.py:84
 msgid "Offline-first mapping for communities and territories."
-msgstr ""
+msgstr "Kaartaa interneetii malee jalqabaa hawaasaa fi naannolee'f."
 
 #: app/projects/mapping_apps.py:85
 msgid "Offline, community-led mapping"
-msgstr ""
+msgstr "Kaartaa interneetii malee, kan hawaasni geggeessu"
 
 #: app/projects/mapping_apps.py:93
 msgid "Offline maps and navigation, with OSM editing."
-msgstr ""
+msgstr "Kaartaawwan fi qajeelfama karaa interneetii malee, gulaallii OSM waliin."
 
 #: app/projects/mapping_apps.py:94
 msgid "Navigating to tasks, editing OSM points"
-msgstr ""
+msgstr "Gara hojiiwwaniitti qajeelchuu, qabxiiwwan OSM gulaaluu"
 
 #: app/projects/mapping_apps.py:102
 msgid "Open street-level imagery, captured with any camera."
-msgstr ""
+msgstr "Suuraawwan sadarkaa daandii banaa, kaameraa kamiinuu ka'an."
 
 #: app/projects/mapping_apps.py:103
 msgid "Street-level imagery along roads"
-msgstr ""
+msgstr "Suuraawwan sadarkaa daandii daandiiwwan cinaa"
 
 #: app/projects/mapping_apps.py:111
 msgid "Print paper maps, sketch on them, scan them back."
 msgstr ""
+"Kaartaawwan waraqaa maxxansi, irratti kaasi, achiis deebisii iskaanii "
+"godhi."
 
 #: app/projects/mapping_apps.py:112
 msgid "Paper maps and sketch mapping"
-msgstr ""
+msgstr "Kaartaawwan waraqaa fi kaartaa fakkii harkaa"
 
 #: app/projects/mapping_apps.py:120
 msgid "Turn locations shared in chat apps into a map."
-msgstr ""
+msgstr "Bakkeewwan appii haasawaa keessatti qoodaman gara kaartaatti jijjiiri."
 
 #: app/projects/mapping_apps.py:121
 msgid "Location sharing from chat apps"
-msgstr ""
+msgstr "Bakka appii haasawaa irraa qooduu"
 
 #: app/projects/mapping_apps.py:125
 msgid "Other app"
-msgstr ""
+msgstr "Appii biraa"
 
 #: app/projects/mapping_apps.py:129
 msgid "Any other app. Share the tasks as files and links."
-msgstr ""
+msgstr "Appii biraa kamiyyuu. Hojiiwwan akka faayilootaa fi liinkiitti qoodi."
 
 #: app/projects/mapping_apps.py:130
 msgid "Any app"
-msgstr ""
+msgstr "Appii kamiyyuu"
 
 #: app/projects/mapping_apps.py:157
 msgid ""
 "Not for OpenStreetMap: QField for map-based capture and editing, or ODK "
 "for form-heavy surveys."
 msgstr ""
+"OpenStreetMap-iif miti: sassaabbii fi gulaallii kaartaa irratti QField, "
+"ykn qorannoo foormii baay'ee qabuuf ODK."
 
 #: app/projects/mapping_apps.py:162
 msgid "Poorly mapped: QField lets mappers draw the missing geometry."
 msgstr ""
+"Sirriitti hin kaafamne: QField kaartaa kaastonni jiomeetirii hir'ate akka"
+" kaasan ni dandeessisa."
 
 #: app/projects/mapping_apps.py:166
 msgid ""
 "Already mapped: Every Door is the quickest way to update buildings and "
 "points of interest."
 msgstr ""
+"Duraan kaafameera: Every Door gamoowwanii fi bakkeewwan fedhii haaromsuuf"
+" karaa saffisaa ta'e dha."
 
 #: app/projects/mapping_apps.py:171
 msgid ""
 "Already mapped: StreetComplete for road details, or Panoramax for street-"
 "level imagery."
 msgstr ""
+"Duraan kaafameera: StreetComplete bal'ina daandiif, ykn Panoramax suuraa "
+"sadarkaa daandiif."
 
 #: app/projects/mapping_apps.py:174
 msgid "QField handles any kind of feature."
-msgstr ""
+msgstr "QField gosa wantaa kamiyyuu ni qabata."
 
-#: app/projects/project_crud.py:137
+#: app/projects/project_crud.py:120
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
 msgstr "Bal'inni filatame baay'ee guddaadha. Mee naannoo 200 km² gadi filadhu."
 
-#: app/projects/project_crud.py:148
+#: app/projects/project_crud.py:131
 msgid "Failed to generate data extract from the raw data API."
 msgstr "API deetaa raw irraa deetaa baasuu maddisiisuu hin dandeenye."
 
-#: app/projects/project_crud.py:227
+#: app/projects/project_crud.py:206
 msgid "This job was interrupted. Please try again."
-msgstr ""
+msgstr "Hojiin kun addaan citeera. Maaloo irra deebi'ii yaali."
 
-#: app/projects/project_crud.py:724
+#: app/projects/project_crud.py:692
 msgid "QField project ID not found."
 msgstr "Pirojektiin hin argamne."
 
-#: app/projects/project_crud.py:757
+#: app/projects/project_crud.py:712
 msgid "Project name not found."
 msgstr "Pirojektiin hin argamne."
 
-#: app/projects/project_crud.py:764
+#: app/projects/project_crud.py:719
 msgid "ODK project ID not found."
 msgstr "Pirojektiin hin argamne."
 
-#: app/projects/project_crud.py:773
+#: app/projects/project_crud.py:728
 msgid "Appuser token not found."
 msgstr "Pirojektiin hin argamne."
 
-#: app/projects/project_crud.py:790
+#: app/projects/project_crud.py:745
 msgid "Failed to generate QR code."
 msgstr "Foormiin fakkeenyaa fe'amuu dadhabe."
 
-#: app/projects/project_services.py:77
+#: app/projects/project_services.py:74
 msgid ""
 "This project was created with a simplified workflow in FieldTM and is "
 "made to collect building data to enhance OpenStreetMap."
@@ -890,93 +681,103 @@ msgstr ""
 "Pirojektiin kun adeemsa hojii salphifame FieldTM keessatti uumamee "
 "OpenStreetMap fooyyessuuf deetaa gamoo walitti qabuuf qophaaʼeera."
 
-#: app/projects/project_services.py:84
+#: app/projects/project_services.py:81
 msgid "Unnamed Area"
 msgstr "Naannoo maqaa hin qabne"
 
-#: app/projects/project_services.py:97
+#: app/projects/project_services.py:94
 #, python-brace-format
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "Naannoo {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:396
+#: app/projects/project_services.py:389
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
+#: app/projects/project_services.py:1154
+msgid "Task areas changed. Confirm the reset to re-sync the tasks."
+msgstr ""
+"Naannoleen hojii jijjiiramaniiru. Hojiiwwan irra deebi'anii walsimsiisuuf"
+" haaressuu mirkaneessi."
+
 #: app/projects/task_plan.py:31
 #, python-format
 msgid "Values must be %(max_length)s characters or fewer."
-msgstr ""
+msgstr "Gatiiwwan qubee %(max_length)s ykn isaa gadi ta'uu qabu."
 
 #: app/projects/task_plan.py:44
 msgid "Group labels may only contain letters, numbers, hyphens and underscores."
 msgstr ""
+"Mallattooleen garee qubee, lakkoofsa, sarara gabaabaa fi sarara jalaa "
+"qofa qabaachuu danda'u."
 
 #: app/projects/task_plan.py:61
 msgid "Colours must be hex values such as #d63f3f."
-msgstr ""
+msgstr "Halluun gatii hex kan akka #d63f3f ta'uu qaba."
 
-#: app/projects/task_plan.py:120
-msgid "A task plan must be a GeoJSON FeatureCollection."
-msgstr ""
+#: app/projects/task_plan.py:112
+#, python-format
+msgid "Task %(number)s must be a Polygon with WGS84 coordinates."
+msgstr "Hojiin %(number)s poligonii qindaa'ina WGS84 qabu ta'uu qaba."
 
 #: app/projects/task_plan.py:122
-msgid "The task plan has no tasks."
-msgstr ""
+#, python-format
+msgid "Task %(number)s: %(error)s"
+msgstr "Hojii %(number)s: %(error)s"
 
-#: app/projects/task_plan.py:125
+#: app/projects/task_plan.py:143
+msgid "A task plan must be a GeoJSON FeatureCollection."
+msgstr "Karoorri hojii GeoJSON FeatureCollection ta'uu qaba."
+
+#: app/projects/task_plan.py:145
+msgid "The task plan has no tasks."
+msgstr "Karoorri hojii hojii tokkollee hin qabu."
+
+#: app/projects/task_plan.py:148
 #, python-format
 msgid "A task plan can have at most %(max_tasks)s tasks."
 msgstr ""
+"Karoorri hojii tokko yoo baay'ate hojiiwwan %(max_tasks)s qabaachuu "
+"danda'a."
 
-#: app/projects/task_plan.py:134
-#, python-format
-msgid "Task %(number)s must be a Polygon with WGS84 coordinates."
-msgstr ""
-
-#: app/projects/task_plan.py:144
-#, python-format
-msgid "Task %(number)s: %(error)s"
-msgstr ""
-
-#: app/qfield/qfield_crud.py:168
+#: app/qfield/qfield_crud.py:157
 msgid "Project outline is missing or has no geometry."
 msgstr "Yaadni pirojektii dhabameera ykn ji’oomeetirii hin qabu."
 
-#: app/qfield/qfield_crud.py:174
+#: app/qfield/qfield_crud.py:163
 msgid "Project outline geometry has no coordinates."
 msgstr "Ji’oomeetiriin yaada pirojektii qindeessaa hin qabu."
 
-#: app/qfield/qfield_crud.py:484
-msgid "Project outline is required for QField project creation."
-msgstr "✓ Qoodinsi hojii qindaa'ina pirojektii kanaaf barbaachisaa miti."
-
-#: app/qfield/qfield_crud.py:489
-msgid "XLSForm is required for QField project creation."
-msgstr "XLSForm piroojektii QField uumuuf barbaachisaadha."
-
-#: app/qfield/qfield_crud.py:506
-msgid "Failed to modify XLSForm for QField."
-msgstr "XLSForm QField'f fooyyessuu hin dandeenye."
-
-#: app/qfield/qfield_crud.py:555
+#: app/qfield/qfield_crud.py:450
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS wrapper xumurame garuu faayilii baasaa hin barreessine."
 
-#: app/qfield/qfield_crud.py:569
+#: app/qfield/qfield_crud.py:462
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "Marsaan QGIS xumurame garuu faayilii .qgz firii keessa hin jiru."
 
-#: app/qfield/qfield_crud.py:599
+#: app/qfield/qfield_crud.py:485
+msgid "Project outline is required for QField project creation."
+msgstr "✓ Qoodinsi hojii qindaa'ina pirojektii kanaaf barbaachisaa miti."
+
+#: app/qfield/qfield_crud.py:490
+msgid "XLSForm is required for QField project creation."
+msgstr "XLSForm piroojektii QField uumuuf barbaachisaadha."
+
+#: app/qfield/qfield_crud.py:502
+msgid "Failed to modify XLSForm for QField."
+msgstr "XLSForm QField'f fooyyessuu hin dandeenye."
+
+#: app/qfield/qfield_crud.py:572
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField pirojektii ID dhabameera; basemap maxxansiisuu hin danda'u."
 
-#: app/qfield/qfield_crud.py:636
+#: app/qfield/qfield_crud.py:609
 msgid "Basemap attach completed but produced no project files."
 msgstr "Kaartaan bu'uuraa pirojektii QField irratti maxxanfameera."
 
-#: app/qfield/qfield_crud.py:824
+#: app/qfield/qfield_crud.py:794
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -985,74 +786,50 @@ msgstr ""
 "QFieldCloud yaalii %(attempts)d booda faayila pirojektii xumursee hin "
 "adeemsifne (haala dhumaa: %(status)s)."
 
-#: app/qfield/qfield_crud.py:882 app/qfield/qfield_crud.py:896
+#: app/qfield/qfield_crud.py:848 app/qfield/qfield_crud.py:862
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "Dhaloonni pirojektii QGIS hin milkoofne: %(error)s"
 
-#: app/qfield/qfield_crud.py:889
+#: app/qfield/qfield_crud.py:855
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "Marsaan QGIS JSON sirrii hin taane deebiseera."
 
-#: app/qfield/qfield_crud.py:913
+#: app/qfield/qfield_crud.py:879
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr ""
 "MBTiles kaartaa bu'uuraa olkaa'uuf buufachuu hin dandeenye (HTTP "
 "%(status)s)."
 
-#: app/qfield/qfield_crud.py:928
+#: app/qfield/qfield_crud.py:894
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "Koodii QR buufadhu"
 
-#: app/qfield/qfield_crud.py:1055
+#: app/qfield/qfield_crud.py:969
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "Faayilota gara QFieldCloud: %(error)s tti olkaa'uu hin dandeenye"
 
-#: app/qfield/qfield_crud.py:1229 app/qfield/qfield_crud.py:1391
-#, python-format
-msgid "User '%(username)s' does not exist on QFieldCloud."
-msgstr "Fayyadamaan '%(username)s' QFieldCloud irratti hin jiru."
-
-#: app/qfield/qfield_crud.py:1349
-#, python-format
-msgid "QFieldCloud project '%(project_id)s' not found."
-msgstr "Pirojektiin (%(project_id)s) hin argamne."
-
-#: app/qfield/qfield_crud.py:1373
-#, python-format
-msgid ""
-"Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
-" to the organization: %(error)s"
-msgstr ""
-"Pirojektiin kan dhaabbata '%(owner)s' ti. '%(username)s' dhaabbatichatti "
-"dabaluu hin dandeenye: %(error)s"
-
-#: app/qfield/qfield_crud.py:1398
-#, python-format
-msgid "User '%(username)s' is already a collaborator on this project."
-msgstr "Fayyadamaan '%(username)s' duraan pirojektii kana irratti hirmaataa dha."
-
-#: app/qfield/qfield_crud.py:1439
+#: app/qfield/qfield_crud.py:1084
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Ragaan sirrii dha!"
 
-#: app/qfield/qfield_crud.py:1484
+#: app/qfield/qfield_crud.py:1115
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "Pirojektiin kun pirojektii QFieldCloud waliin wal hin hidhamne."
 
-#: app/qfield/qfield_crud.py:1491
+#: app/qfield/qfield_crud.py:1122
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "QFIELDCLOUD_QGIS_URL hin qindaa'in."
 
-#: app/qfield/qfield_crud.py:1521
+#: app/qfield/qfield_crud.py:1152
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr ""
 "Faayiloonni GeoPackage tokkollee paakeejii QFieldCloud keessatti hin "
 "argamne."
 
-#: app/qfield/qfield_crud.py:1543
+#: app/qfield/qfield_crud.py:1171
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
@@ -1060,15 +837,15 @@ msgstr ""
 "Daataan qorannoo paakeejii QFieldCloud keessatti hin argamne. Kaartaa "
 "hojjetan hanga ammaatti deebii tokkollee hin dhiheessine ta'a."
 
-#: app/qfield/qfield_crud.py:1566
+#: app/qfield/qfield_crud.py:1194
 msgid "QFieldCloud did not return a package job id."
 msgstr "QFieldCloud id hojii paakeejii hin deebisne."
 
-#: app/qfield/qfield_crud.py:1583
+#: app/qfield/qfield_crud.py:1211
 msgid "QFieldCloud failed to package the project."
 msgstr "QFieldCloud pirojekticha paakeejii gochuu hin dandeenye."
 
-#: app/qfield/qfield_crud.py:1589
+#: app/qfield/qfield_crud.py:1217
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
@@ -1077,138 +854,130 @@ msgstr ""
 "QFieldCloud piroojektii akka paakeejii taasisu eeguun yeroon isaa darbe "
 "(haala dhumaa: %(status)s)."
 
-#: app/qfield/qfield_crud.py:1613
+#: app/qfield/qfield_crud.py:1237
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "Jijjiirraan Ji'ooPaakeejii hin milkoofne: %(error)s ."
 
-#: app/qfield/qfield_crud.py:1620
+#: app/qfield/qfield_crud.py:1244
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "Marsaan QGIS JSON sirrii hin taane /erguuf deebise."
 
-#: app/templates/home.html:13
-msgid "Filters"
-msgstr "Calaltuu"
+#: app/templates/home.html:4 app/templates/layout.html:286
+msgid "Projects"
+msgstr "Pirojektoota"
 
-#: app/templates/home.html:17
-msgid "All projects"
-msgstr "Pirojektoota hunda"
-
-#: app/templates/home.html:17
-msgid "Draft"
-msgstr "Qabiyyee dura"
-
-#: app/templates/home.html:18
-msgid "Published"
-msgstr "Maxxanfame"
-
-#: app/templates/home.html:18
-msgid "Completed"
-msgstr "Xumurame"
-
-#: app/templates/home.html:18
-msgid "Archived"
-msgstr "Kuusame"
-
-#: app/templates/home.html:21
-msgid "Project Status"
-msgstr "Haala pirojektii"
-
-#: app/templates/home.html:35
-msgid "Newest first"
-msgstr "Haaraa jalqabaa"
-
-#: app/templates/home.html:35
-msgid "Oldest first"
-msgstr "Moofaa jalqabaa"
-
-#: app/templates/home.html:36
-msgid "Name (A-Z)"
-msgstr "Maqaa (A-Z)"
-
-#: app/templates/home.html:36
-msgid "Name (Z-A)"
-msgstr "Maqaa (Z-A)"
-
-#: app/templates/home.html:38
-msgid "Sort By"
-msgstr "Akka kanaan tartiibsi"
-
-#: app/templates/home.html:52
-msgid "Search"
-msgstr "Barbaadi"
-
-#: app/templates/home.html:58
-msgid "Search projects…"
-msgstr "Pirojektoota barbaadi…"
-
-#: app/templates/home.html:68 app/templates/landing.html:441
-#: app/templates/layout.html:294 app/templates/new_project_chooser.html:1
-#: app/templates/new_project_simple.html:44
+#: app/templates/home.html:7 app/templates/landing.html:447
+#: app/templates/new_project_chooser.html:1
+#: app/templates/new_project_simple.html:42
 msgid "Create Project"
 msgstr "Pirojektii uum"
 
-#: app/templates/home.html:69
-msgid "+ New"
-msgstr "+ Haaraa"
+#: app/templates/home.html:11
+msgid "All projects"
+msgstr "Pirojektoota hunda"
 
-#: app/templates/home.html:74
+#: app/templates/home.html:11
+msgid "Draft"
+msgstr "Qabiyyee dura"
+
+#: app/templates/home.html:12
+msgid "Published"
+msgstr "Maxxanfame"
+
+#: app/templates/home.html:12
+msgid "Completed"
+msgstr "Xumurame"
+
+#: app/templates/home.html:12
+msgid "Archived"
+msgstr "Kuusame"
+
+#: app/templates/home.html:13
+msgid "Newest first"
+msgstr "Haaraa jalqabaa"
+
+#: app/templates/home.html:13
+msgid "Oldest first"
+msgstr "Moofaa jalqabaa"
+
+#: app/templates/home.html:14
+msgid "Name (A-Z)"
+msgstr "Maqaa (A-Z)"
+
+#: app/templates/home.html:14
+msgid "Name (Z-A)"
+msgstr "Maqaa (Z-A)"
+
+#: app/templates/home.html:20
+msgid "Project Status"
+msgstr "Haala pirojektii"
+
+#: app/templates/home.html:31
+msgid "Sort By"
+msgstr "Akka kanaan tartiibsi"
+
+#: app/templates/home.html:43
+msgid "Search"
+msgstr "Barbaadi"
+
+#: app/templates/home.html:44
+msgid "Search projects…"
+msgstr "Pirojektoota barbaadi…"
+
+#: app/templates/home.html:53
 #, python-format
 msgid "Showing %(count)s project"
 msgid_plural "Showing %(count)s projects"
 msgstr[0] "Pirojektii %(count)s agarsiisaa jira"
 msgstr[1] "Pirojektoota %(count)s agarsiisaa jira"
 
-#: app/templates/home.html:75
+#: app/templates/home.html:54
 #, python-format
 msgid "in %(status)s"
 msgstr "%(status)s keessatti"
 
-#: app/templates/home.html:76
+#: app/templates/home.html:55
 #, python-format
 msgid ""
 "matching\n"
-"      \"%(query)s\""
-msgstr "\"%(query)s\" wajjin wal sima"
+"    \"%(query)s\""
+msgstr "kan \"%(query)s\" waliin walsimu"
 
-#: app/templates/home.html:90
+#: app/templates/home.html:70
 msgid "Private Project"
 msgstr "Pirojektii dhuunfaa"
 
-#: app/templates/home.html:107 app/templates/project_details.html:30
+#: app/templates/home.html:85 app/templates/project_details.html:22
 msgid "Unnamed Project"
 msgstr "Pirojektii maqaa hin qabne"
 
-#: app/templates/home.html:116
+#: app/templates/home.html:90
 msgid "Location:"
 msgstr "Iddoo:"
 
-#: app/templates/home.html:135
+#: app/templates/home.html:106
 msgid "Created:"
 msgstr "Uumame:"
 
-#: app/templates/home.html:136
-msgid "N/A"
-msgstr "Hin hojjetu"
-
-#: app/templates/home.html:146
+#: app/templates/home.html:117
 msgid "Project pages"
-msgstr ""
+msgstr "Fuulota pirojektii"
 
-#: app/templates/home.html:148
+#: app/templates/home.html:121
 msgid "Previous"
-msgstr ""
+msgstr "Kan duraa"
 
-#: app/templates/home.html:150
+#: app/templates/home.html:124
 #, python-format
 msgid "Page %(page)s"
-msgstr ""
+msgstr "Fuula %(page)s"
 
-#: app/templates/home.html:152
+#: app/templates/home.html:127
 msgid "Next"
-msgstr ""
+msgstr "Kan itti aanu"
 
-#: app/templates/home.html:158
+#: app/templates/home.html:133
 msgid "No projects found. Create your first project to get started!"
 msgstr "Pirojektiin hin argamne. Jalqabuuf pirojektii kee isa jalqabaa uum."
 
@@ -1222,19 +991,19 @@ msgid ""
 "coordination."
 msgstr "Qindoomina gaarii ta'een gahumsaa fi sirrummaa kaartaa dirree fooyyessuu."
 
-#: app/templates/landing.html:439
+#: app/templates/landing.html:440
 msgid "Explore Projects"
 msgstr "Pirojektoota ilaali"
 
-#: app/templates/landing.html:451
+#: app/templates/landing.html:457
 msgid "Loading metrics..."
 msgstr "Safartuun fe'amaa jira..."
 
-#: app/templates/landing.html:459
+#: app/templates/landing.html:465
 msgid "What is it?"
 msgstr "Kun maal dha?"
 
-#: app/templates/landing.html:461
+#: app/templates/landing.html:467
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
 "map features\n"
@@ -1244,7 +1013,7 @@ msgstr ""
 " irratti dabaluu keessatti isaan gargaara, hojii kaartaa dirree "
 "qindeessuudhaan."
 
-#: app/templates/landing.html:465
+#: app/templates/landing.html:471
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
 "mature tools\n"
@@ -1258,21 +1027,21 @@ msgstr ""
 " danda'e kan gareewwan meeshaalee Android yeroo baay'ee argaman "
 "fayyadamuun data geospatial gahumsaan walitti qabuu gargaaru dha."
 
-#: app/templates/landing.html:472
+#: app/templates/landing.html:478
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr ""
 "Hogganaan pirojektii tokko adeemsa hojii kaartaa FieldTM laptop irratti "
 "agarsiisaa jira"
 
-#: app/templates/landing.html:478
+#: app/templates/landing.html:484
 msgid "Main Features"
 msgstr "Amaloota ijoo"
 
-#: app/templates/landing.html:481
+#: app/templates/landing.html:487
 msgid "Flexible Data Collection"
 msgstr "Walitti qabuu dataa laafaa"
 
-#: app/templates/landing.html:483
+#: app/templates/landing.html:489
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
 "workflows that\n"
@@ -1281,11 +1050,11 @@ msgstr ""
 "Foormii qorannoo garaagaraa, foormaata dataa hedduu, fi adeemsa hojii "
 "fedhii hojiirra oolmaa garaagaraa waliin wal madaalu ni deeggara."
 
-#: app/templates/landing.html:488
+#: app/templates/landing.html:494
 msgid "Open Source and Customizable"
 msgstr "Madda banaa fi haala barbaadamuun jijjiiramuu danda'u"
 
-#: app/templates/landing.html:490
+#: app/templates/landing.html:496
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
 "\n"
@@ -1294,11 +1063,11 @@ msgstr ""
 "Field-TM mantii qorannoo, caasaa dataa, fi fedhii walitti hidhaminsa kee "
 "waliin madaqsi."
 
-#: app/templates/landing.html:495
+#: app/templates/landing.html:501
 msgid "Entity-Level Tracking"
 msgstr "Hordoffii sadarkaa wantaa"
 
-#: app/templates/landing.html:497
+#: app/templates/landing.html:503
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed\n"
@@ -1307,19 +1076,19 @@ msgstr ""
 "Hoggantoonni murtoo odeeffannoo qabu saffisaan akka kennanitti guddina "
 "qorannoo sadarkaa hojii fi amalaatti hordofi."
 
-#: app/templates/landing.html:505
+#: app/templates/landing.html:511
 msgid "Who is it for?"
 msgstr "Eenyuf dha?"
 
-#: app/templates/landing.html:508
+#: app/templates/landing.html:514
 msgid "Project Manager"
 msgstr "Hogganaa pirojektii"
 
-#: app/templates/landing.html:509
+#: app/templates/landing.html:515
 msgid "Create and coordinate field campaigns"
 msgstr "Duula dirree uumii qindeessi"
 
-#: app/templates/landing.html:511
+#: app/templates/landing.html:517
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
 " interest,\n"
@@ -1329,31 +1098,31 @@ msgstr ""
 "naannoo fedhii ibsuuf, foormii qorannoo qopheessuuf, fi hojii gara hojii "
 "bulchuu danda'amutti qooduuf fayyadamu."
 
-#: app/templates/landing.html:515
+#: app/templates/landing.html:521
 msgid "Define a project area and upload or choose a survey form"
 msgstr "Naannoo pirojektii ibsi fi foormii qorannoo olkaa'i ykn filadhu"
 
-#: app/templates/landing.html:516
+#: app/templates/landing.html:522
 msgid "Split the area into tasks and generate a data extract"
 msgstr "Naannoo sana gara hojiiwwanitti qoodi fi baafata dataa uumi"
 
-#: app/templates/landing.html:517
+#: app/templates/landing.html:523
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "Pirojektii gara ODK Central ykn QFieldCloud maxxansi"
 
-#: app/templates/landing.html:518
+#: app/templates/landing.html:524
 msgid "Share a QR code so mappers can start collecting data"
 msgstr "Kaarta hojjettoonni data walitti qabu jalqabuuf koodii QR qoodi"
 
-#: app/templates/landing.html:522
+#: app/templates/landing.html:528
 msgid "Field Mapper"
 msgstr "Kaarta hojjataa dirree"
 
-#: app/templates/landing.html:523
+#: app/templates/landing.html:529
 msgid "Collect data in the field with your phone"
 msgstr "Bilbila kee fayyadamuun dirree keessatti data walitti qabi"
 
-#: app/templates/landing.html:525
+#: app/templates/landing.html:531
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
 "publishes a\n"
@@ -1364,35 +1133,35 @@ msgstr ""
 "pirojektii tokko maxxanse erga, kaarta hojjettoonni appii moobaayilaa "
 "filatan keessatti kallattiin argatu."
 
-#: app/templates/landing.html:529
+#: app/templates/landing.html:535
 msgid "Scan the QR code shared by your project manager"
 msgstr "Koodii QR hogganaan pirojektii kee qoodde skaan godhi"
 
-#: app/templates/landing.html:530
+#: app/templates/landing.html:536
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "Pirojektiin ofumaan ODK Collect ykn QField keessatti fe'ama"
 
-#: app/templates/landing.html:531
+#: app/templates/landing.html:537
 msgid "Navigate to your assigned task area and collect data"
 msgstr "Gara naannoo hojii siif ramadamee deemi, dataas walitti qabi"
 
-#: app/templates/landing.html:532
+#: app/templates/landing.html:538
 msgid "Submit your survey, which goes straight to the server"
 msgstr "Qorannoo kee ergi; inni kallattiin gara seervaraatti deema"
 
-#: app/templates/landing.html:539
+#: app/templates/landing.html:545
 msgid "Field-TM Use Cases"
 msgstr "Fayyadama Field-TM"
 
-#: app/templates/landing.html:544
+#: app/templates/landing.html:550
 msgid "Field mapping in progress"
 msgstr "Kaartaan dirree adeemsarra jira"
 
-#: app/templates/landing.html:549
+#: app/templates/landing.html:555
 msgid "1. Community Mapping"
 msgstr "1. Kaartaa hawaasaa"
 
-#: app/templates/landing.html:551
+#: app/templates/landing.html:557
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public\n"
@@ -1401,11 +1170,11 @@ msgstr ""
 "Field Tasking Manager hawaasa qubannaa al-idilee, tajaajila uummataa, fi "
 "tajaajiloota naannoo kaartessuuf humneessa, karoora hirmaachisaa ta'eef."
 
-#: app/templates/landing.html:556
+#: app/templates/landing.html:562
 msgid "2. Urban Planning and Management"
 msgstr "2. Karooraa fi bulchiinsa magaalaa"
 
-#: app/templates/landing.html:558
+#: app/templates/landing.html:564
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities\n"
@@ -1414,11 +1183,11 @@ msgstr ""
 "Gandoota, daandiiwwan, fi bu'uura tajaajilaa qorannoo qindaa'e fi hojii "
 "kaartaa ifa ta'een bulchuu danda'amuun magaalaa ogeessa ta'e ijaari."
 
-#: app/templates/landing.html:563
+#: app/templates/landing.html:569
 msgid "3. Disaster Response and Recovery"
 msgstr "3. Deebii balaa fi haaromsa"
 
-#: app/templates/landing.html:565
+#: app/templates/landing.html:571
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
 "volunteers, and\n"
@@ -1427,97 +1196,128 @@ msgstr ""
 "Balaa booda bu'uura tajaajilaa miidhame saffisaan kaartessi, fedhii tola "
 "ooltota qindeessi, hojii gargaarsaaf data amanamaa dhiheessi."
 
-#: app/templates/landing.html:574
+#: app/templates/landing.html:580
 msgid "Resources"
 msgstr "Qabeenya"
 
-#: app/templates/landing.html:582
+#: app/templates/landing.html:588
 msgid "Data Prep"
 msgstr "Qophii dataa"
 
-#: app/templates/landing.html:583
+#: app/templates/landing.html:589
 msgid "HOT Export Tool"
 msgstr "Meeshaa baafata HOT"
 
-#: app/templates/landing.html:585
+#: app/templates/landing.html:591
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr ""
 "Naannoo pirojektii keessaniif baafata dataa geospatial hojii-fudhaaf "
 "qophaa'e buufadhu."
 
-#: app/templates/landing.html:594 app/templates/landing.html:606
+#: app/templates/landing.html:600 app/templates/landing.html:612
 msgid "Documentation"
 msgstr "Dokumantii"
 
-#: app/templates/landing.html:595
+#: app/templates/landing.html:601
 msgid "ODK Central Guide"
 msgstr "Qajeelfama ODK Central"
 
-#: app/templates/landing.html:597
+#: app/templates/landing.html:603
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr ""
 "Foormii, fayyadamtoota appii, fi galmee dirree ODK keessatti akkamitti "
 "bulchan baradhu."
 
-#: app/templates/landing.html:607
+#: app/templates/landing.html:613
 msgid "QField Guide"
 msgstr "Qajeelfama QField"
 
-#: app/templates/landing.html:609
+#: app/templates/landing.html:615
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "Kaartaa offline tiif pirojektoota QFieldCloud fi adeemsa hojii "
 "moobaayilaa qopheessi."
 
-#: app/templates/layout.html:13
+#: app/templates/layout.html:14
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Duula Open Mapping tiif kaartaa dirree qindaa'e."
 
-#: app/templates/layout.html:173
-msgid "Need help or have a request?"
-msgstr ""
+#: app/templates/layout.html:125
+msgid "Login off (dev)"
+msgstr "Seenuun cufameera (dev)"
 
-#: app/templates/layout.html:175
+#: app/templates/layout.html:151
+msgid "Please confirm"
+msgstr "Maaloo mirkaneessi"
+
+#: app/templates/layout.html:154 app/templates/new_project_custom.html:147
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:36
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:88
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:157
+msgid "Cancel"
+msgstr "Dhiisi"
+
+#: app/templates/layout.html:156
+msgid "Confirm"
+msgstr "Mirkaneessi"
+
+#: app/templates/layout.html:161
+msgid "Need help or have a request?"
+msgstr "Gargaarsa barbaaddaa ykn gaaffii qabdaa?"
+
+#: app/templates/layout.html:163
 msgid "Submit a tech request"
-msgstr ""
+msgstr "Gaaffii teeknikaa ergi"
+
+#: app/templates/layout.html:167 app/templates/layout.html:289
+msgid "Docs"
+msgstr "Sanadoota"
 
 #: app/templates/layout.html:287
-msgid "Projects"
-msgstr "Pirojektoota"
+msgid "Create project"
+msgstr "Pirojektii uumi"
 
-#: app/templates/layout.html:301
-msgid "QField Admin"
-msgstr "Bulchaa QField"
+#: app/templates/layout.html:288
+msgid "Task planner"
+msgstr "Karoorsaa hojii"
+
+#: app/templates/layout.html:291
+msgid "Report a bug"
+msgstr "Dogoggora gabaasi"
 
 #: app/templates/login.html:1
 msgid "Login"
 msgstr "Seeni"
 
-#: app/templates/login.html:5
+#: app/templates/login.html:7
 msgid "Sign in to Field-TM"
 msgstr "Gara Field-TM seeni"
 
-#: app/templates/login.html:17
+#: app/templates/login.html:18
 msgid "Redirecting to the centralized login service."
 msgstr "Gara tajaajila seensaa giddugaleessaatti si geessaa jira."
 
-#: app/templates/login.html:18
+#: app/templates/login.html:20
 msgid "Continue to login"
 msgstr "Seensatti itti fufi"
 
-#: app/templates/login.html:26
+#: app/templates/login.html:30
 msgid "Authentication is disabled on this deployment."
 msgstr "Mirkaneessi kuusaa kana irratti dhaabbatee jira."
 
-#: app/templates/login.html:29
+#: app/templates/login.html:34
 msgid "Back to home"
 msgstr "Gara manaatti deebi'i"
 
-#: app/templates/new_project_chooser.html:4
+#: app/templates/new_project_chooser.html:7
+msgid "More details about this option"
+msgstr "Waa'ee filannoo kanaa bal'inaan"
+
+#: app/templates/new_project_chooser.html:12
 msgid "What do you want to map?"
 msgstr "Maal kaartessuu barbaadda?"
 
-#: app/templates/new_project_chooser.html:6
+#: app/templates/new_project_chooser.html:14
 msgid ""
 "Pick the option that fits your project. You can change your mind later by"
 " starting over."
@@ -1525,70 +1325,36 @@ msgstr ""
 "Filannoo pirojektii kee wajjin walsimu fili. Booda irra deebi'uun yaada "
 "kee jijjiiruu dandeessa."
 
-#: app/templates/new_project_chooser.html:20
-#: app/templates/new_project_chooser.html:32
+#: app/templates/new_project_chooser.html:27
+#: app/templates/new_project_chooser.html:44
 msgid "Add tags to OSM buildings"
 msgstr "Gamoowwan OSM irratti mallattoo dabaluu"
 
-#: app/templates/new_project_chooser.html:23
+#: app/templates/new_project_chooser.html:33
 msgid "Quickest way to start. Just draw your area on the map and you're done."
 msgstr ""
 "Karaa saffisaa ittiin jalqabdu. Naannoo kee kaartaa irratti qofa kaasi, "
 "ni xumurama."
 
-#: app/templates/new_project_chooser.html:27
+#: app/templates/new_project_chooser.html:37
 msgid "Use building outlines already in OpenStreetMap"
 msgstr "Sarara ijaarsaa duraan OpenStreetMap keessatti fayyadami"
 
-#: app/templates/new_project_chooser.html:28
+#: app/templates/new_project_chooser.html:38
 msgid "Includes a ready-made survey to add OSM tags to existing buildings"
 msgstr ""
 "Gamoowwan jiran irratti mallattoolee OSM dabaluudhaaf qorannoo qophaa’e "
 "of keessatti qabata"
 
-#: app/templates/new_project_chooser.html:29
+#: app/templates/new_project_chooser.html:39
 msgid "Fill in gaps for unmapped buildings during digitisation"
 msgstr "Yeroo dijiitaalaayizeeshinii gamoo kaartaa hin qabneef qaawwa guutuu"
 
-#: app/templates/new_project_chooser.html:38
-#: app/templates/new_project_chooser.html:98
-msgid "More details about this option"
-msgstr "Waa'ee filannoo kanaa bal'inaan"
-
-#: app/templates/new_project_chooser.html:44
-msgid "How this option is set up"
-msgstr "Akkaataa filannoo kun itti qindaa'u"
-
-#: app/templates/new_project_chooser.html:46
-msgid "Mapping happens in QField on Android."
-msgstr "Kaartaan kan raawwatamu QField keessatti Android irratti."
-
-#: app/templates/new_project_chooser.html:48
-msgid ""
-"The area is split into tasks of ~10 buildings each, using roads, rivers,\n"
-"              railways and airstrips as boundaries."
-msgstr ""
-"Naannoon kun hojiiwwan tokkoon tokkoon isaanii gamoo ~10, daandii, laga, "
-".\n"
-"              daandii baaburaa fi buufata xiyyaaraa akka daangaatti."
-
 #: app/templates/new_project_chooser.html:51
-msgid "Photo upload is enabled but optional."
-msgstr "Suuraa olkaa'uun dandeessifameera garuu filannoodha."
-
-#: app/templates/new_project_chooser.html:52
-msgid "A basemap is generated automatically for offline use (if available)."
-msgstr "Kaartaan bu'uuraa ofumaan fayyadama sarara ala ta'eef (yoo jiraate) uuma."
-
-#: app/templates/new_project_chooser.html:55
-msgid "Preview the building survey in XLSForm Editor →"
-msgstr "Qorannoon gamoo Gulaalaa XLSForm → keessatti dursee ilaali"
-
-#: app/templates/new_project_chooser.html:71
 msgid "Something else"
 msgstr "Waan biraa"
 
-#: app/templates/new_project_chooser.html:74
+#: app/templates/new_project_chooser.html:57
 msgid ""
 "For anything that isn't tagging OSM buildings - bring your own survey, or"
 " use one\n"
@@ -1598,7 +1364,7 @@ msgstr ""
 "fidaa, ykn tokko fayyadamaa\n"
 "          hawaasni gumaache."
 
-#: app/templates/new_project_chooser.html:80
+#: app/templates/new_project_chooser.html:63
 msgid ""
 "Other OpenStreetMap features - roads, water points, schools, healthcare, "
 "and\n"
@@ -1608,7 +1374,7 @@ msgstr ""
 "barnootaa, eegumsa fayyaa, fi\n"
 "            caalaa"
 
-#: app/templates/new_project_chooser.html:84
+#: app/templates/new_project_chooser.html:67
 msgid ""
 "Non-OSM surveys - vaccination campaigns, census mapping, healthcare "
 "facility\n"
@@ -1618,66 +1384,103 @@ msgstr ""
 "dhaabbata eegumsa fayyaa\n"
 "            odiitii, sakatta’iinsa bu’uuraalee misoomaa"
 
-#: app/templates/new_project_chooser.html:87
+#: app/templates/new_project_chooser.html:70
 msgid "Bring your own map data, or start with an empty map"
 msgstr "Deetaa kaartaa kee fidi, yookaan kaartaa duwwaa irraa jalqabi"
 
-#: app/templates/new_project_chooser.html:88
+#: app/templates/new_project_chooser.html:71
 msgid "Control how the area is divided up for mappers"
 msgstr "Naannoon kaartessitootaaf akkamitti akka qoodamu to'adhu"
 
-#: app/templates/new_project_chooser.html:89
+#: app/templates/new_project_chooser.html:72
 msgid "Use QField, ODK or another app such as Every Door or StreetComplete"
 msgstr ""
+"QField, ODK ykn appii biraa kan akka Every Door ykn StreetComplete "
+"fayyadami"
 
-#: app/templates/new_project_chooser.html:92
+#: app/templates/new_project_chooser.html:82
 msgid "Set up a custom project"
 msgstr "Pirojektoota barbaadi…"
 
-#: app/templates/new_project_chooser.html:104
+#: app/templates/new_project_chooser.html:89
+msgid "How this option is set up"
+msgstr "Akkaataa filannoo kun itti qindaa'u"
+
+#: app/templates/new_project_chooser.html:91
+msgid "Mapping happens in QField on Android."
+msgstr "Kaartaan kan raawwatamu QField keessatti Android irratti."
+
+#: app/templates/new_project_chooser.html:93
+msgid ""
+"The area is split into tasks of ~10 buildings each, using roads, rivers, "
+"railways\n"
+"          and airstrips as boundaries."
+msgstr ""
+"Naannichi hojiiwwan tokkoon tokkoon isaanii gamoowwan 10 naannoo "
+"qabanitti qoodama, daandiiwwan, laggeen, karaa baaburaa fi dirree "
+"xiyyaaraa akka daangaatti fayyadamuun."
+
+#: app/templates/new_project_chooser.html:96
+msgid "Photo upload is enabled but optional."
+msgstr "Suuraa olkaa'uun dandeessifameera garuu filannoodha."
+
+#: app/templates/new_project_chooser.html:97
+msgid "A basemap is generated automatically for offline use (if available)."
+msgstr "Kaartaan bu'uuraa ofumaan fayyadama sarara ala ta'eef (yoo jiraate) uuma."
+
+#: app/templates/new_project_chooser.html:100
+msgid "Preview the building survey in XLSForm Editor →"
+msgstr "Qorannoon gamoo Gulaalaa XLSForm → keessatti dursee ilaali"
+
+#: app/templates/new_project_chooser.html:108
 msgid "Where to find a survey"
 msgstr "Qorannoon eessaa akka argattu"
 
-#: app/templates/new_project_chooser.html:106
+#: app/templates/new_project_chooser.html:110
 msgid "Upload your own XLSForm, or"
 msgstr "XLSForm mataa keetii olkaa'i, ykn"
 
-#: app/templates/new_project_chooser.html:109
+#: app/templates/new_project_chooser.html:113
 msgid "Browse the community XLSForm gallery →"
 msgstr "Galmee hawaasaa XLSForm daawwadhu →"
 
-#: app/templates/new_project_chooser.html:113
+#: app/templates/new_project_chooser.html:117
 msgid ""
 "Pick from QField, ODK Collect and other apps. We recommend one based on "
 "what you\n"
-"              map."
+"          map."
 msgstr ""
+"QField, ODK Collect fi appiiwwan biroo keessaa filadhu. Waan ati kaastu "
+"irratti hundaa'uun tokko siif gorsina."
 
 #: app/templates/new_project_custom.html:1
 msgid "Create Custom Project"
 msgstr "Pirojektii uum"
 
-#: app/templates/new_project_custom.html:6
-#: app/templates/new_project_simple.html:6
+#: app/templates/new_project_custom.html:5
+#: app/templates/new_project_simple.html:5
 msgid "Back"
 msgstr "Duuba"
 
-#: app/templates/new_project_custom.html:8
+#: app/templates/new_project_custom.html:6
 msgid "Set up your project"
 msgstr "Pirojektoota ilaali"
 
-#: app/templates/new_project_custom.html:10
+#: app/templates/new_project_custom.html:8
 msgid ""
 "Just the basics on this page: what you're mapping, where, and which app "
 "mappers will use.\n"
 "    You'll set up the survey, map data and tasks on the next page."
 msgstr ""
+"Fuula kana irratti bu'uuraalee qofa: maal akka kaastu, eessatti, fi "
+"kaartaa kaastonni appii kam akka fayyadaman. Qorannoo, deetaa kaartaa fi "
+"hojiiwwan fuula itti aanu irratti qindeessita."
 
-#: app/templates/new_project_custom.html:33
+#: app/templates/new_project_custom.html:32
 msgid "About your project"
 msgstr "Gara pirojektootaatti deebi'i"
 
-#: app/templates/new_project_custom.html:35
+#: app/templates/new_project_custom.html:34
 msgid ""
 "Give your project a clear name and a short summary so mappers know what "
 "it's\n"
@@ -1686,20 +1489,20 @@ msgstr ""
 "Kaartessitoonni maal akka ta'e akka beekaniif pirojektii keef maqaa ifa "
 "ta'e fi cuunfaa gabaabaa kenni."
 
-#: app/templates/new_project_custom.html:41
+#: app/templates/new_project_custom.html:43
 msgid "Project name"
 msgstr "Maqaa pirojektii"
 
-#: app/templates/new_project_custom.html:46
+#: app/templates/new_project_custom.html:44
 msgid "e.g. Buildings in West Nairobi"
 msgstr "fakkeenya: Gamoowwan Nairobi Lixaa"
 
-#: app/templates/new_project_custom.html:54
-#: app/templates/new_project_custom.html:81
+#: app/templates/new_project_custom.html:53
+#: app/templates/new_project_custom.html:82
 msgid "What are you mapping?"
 msgstr "Kaartaaf qophaa'eera"
 
-#: app/templates/new_project_custom.html:59
+#: app/templates/new_project_custom.html:54
 msgid ""
 "A short description. e.g. Mapping water points and toilets in informal "
 "settlements."
@@ -1707,75 +1510,77 @@ msgstr ""
 "Ibsa gabaabaa. fakkeenya: iddoowwan bishaanii fi mana fincaanii qubsuma "
 "sirna alaa keessatti kaartessuu."
 
-#: app/templates/new_project_custom.html:68
+#: app/templates/new_project_custom.html:65
 msgid "Which app will mappers use?"
 msgstr "Kaartessitoonni app kamiin fayyadamu?"
 
-#: app/templates/new_project_custom.html:70
+#: app/templates/new_project_custom.html:67
 msgid "Answer three quick questions for a recommendation, or pick any app below."
 msgstr ""
+"Gorsa argachuuf gaaffiiwwan gabaabaa sadii deebisi, ykn appii kamiyyuu "
+"armaan gaditti filadhu."
 
-#: app/templates/new_project_custom.html:82
+#: app/templates/new_project_custom.html:85
 msgid "Buildings"
-msgstr ""
+msgstr "Gamoowwan"
 
-#: app/templates/new_project_custom.html:82
+#: app/templates/new_project_custom.html:85
 msgid "Roads"
-msgstr ""
+msgstr "Daandiiwwan"
 
-#: app/templates/new_project_custom.html:83
+#: app/templates/new_project_custom.html:86
 msgid "Rivers"
-msgstr ""
+msgstr "Laggeen"
 
-#: app/templates/new_project_custom.html:83
+#: app/templates/new_project_custom.html:86
 msgid "Points of interest"
-msgstr ""
+msgstr "Bakkeewwan fedhii"
 
-#: app/templates/new_project_custom.html:83
+#: app/templates/new_project_custom.html:86
 msgid "Other"
-msgstr ""
-
-#: app/templates/new_project_custom.html:88
-msgid "Will the data go into OpenStreetMap?"
-msgstr ""
-
-#: app/templates/new_project_custom.html:89
-#: app/templates/new_project_custom.html:94
-msgid "Yes"
-msgstr ""
-
-#: app/templates/new_project_custom.html:90
-#: app/templates/new_project_custom.html:95
-msgid "No"
-msgstr ""
+msgstr "Kan biraa"
 
 #: app/templates/new_project_custom.html:93
-msgid "Is it already well mapped in OpenStreetMap?"
-msgstr ""
+msgid "Will the data go into OpenStreetMap?"
+msgstr "Deetaan gara OpenStreetMap ni seenaa?"
 
 #: app/templates/new_project_custom.html:96
-msgid "Not sure"
-msgstr ""
+#: app/templates/new_project_custom.html:105
+msgid "Yes"
+msgstr "Eeyyee"
 
-#: app/templates/new_project_custom.html:103
+#: app/templates/new_project_custom.html:97
+#: app/templates/new_project_custom.html:106
+msgid "No"
+msgstr "Lakki"
+
+#: app/templates/new_project_custom.html:102
+msgid "Is it already well mapped in OpenStreetMap?"
+msgstr "OpenStreetMap keessatti duraan sirriitti kaafameeraa?"
+
+#: app/templates/new_project_custom.html:107
+msgid "Not sure"
+msgstr "Hin mirkanoofne"
+
+#: app/templates/new_project_custom.html:116
 msgid "Where are you mapping?"
 msgstr "Kaartaaf qophaa'eera"
 
-#: app/templates/new_project_custom.html:105
+#: app/templates/new_project_custom.html:118
 msgid "Draw the area mappers will cover. Smaller areas are easier to coordinate."
 msgstr ""
 "Naannoo kaartessitoonni uwwisan kaasi. Naannoon xiqqaan qindeessuuf "
 "salphaa dha."
 
-#: app/templates/new_project_custom.html:112
+#: app/templates/new_project_custom.html:126
 msgid "Tags"
 msgstr "Hashtagoota"
 
-#: app/templates/new_project_custom.html:114
+#: app/templates/new_project_custom.html:126
 msgid "optional"
 msgstr "filannoo"
 
-#: app/templates/new_project_custom.html:118
+#: app/templates/new_project_custom.html:128
 msgid ""
 "Add tags so other people can find your project. Tags are like #buildings "
 "or\n"
@@ -1784,34 +1589,38 @@ msgstr ""
 "Namoonni biroon pirojektii kee akka arganiif tag dabali. Tag jechuun akka"
 " #buildings yookaan #campaign-2026 ti."
 
-#: app/templates/new_project_custom.html:124
+#: app/templates/new_project_custom.html:135
 msgid "Type a tag and press Enter"
 msgstr "Hashtagoota barreessi, Enter ykn comma cuqaasi"
 
-#: app/templates/new_project_custom.html:129
+#: app/templates/new_project_custom.html:136
 msgid "Press Enter or comma after each tag. Click × on a tag to remove it."
 msgstr ""
 "Dabaluuf hashtagoota barreessi Enter ykn comma cuqaasi. Balleessuuf "
 "mallattoo × irratti cuqaasi."
 
-#: app/templates/new_project_custom.html:135
-#: app/templates/partials/project_details/setup_steps/step2_form.html:82
+#: app/templates/new_project_custom.html:144
+#: app/templates/partials/project_details/setup_steps/step2_form.html:116
 msgid "Continue"
 msgstr "Itti fufi"
 
-#: app/templates/new_project_custom.html:137
+#: app/templates/new_project_custom.html:150
 msgid "Creating..."
 msgstr "Uumamaa jira..."
 
-#: app/templates/new_project_custom.html:147
+#: app/templates/new_project_custom.html:158
 msgid "Something went wrong. Please try again."
 msgstr "Wanti tokko dogoggoreera. Maaloo irra deebi'i yaali."
 
-#: app/templates/new_project_custom.html:301
+#: app/templates/new_project_custom.html:312
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Pirojektiin maqaa kana qabu duraan jira. Maaloo maqaa biraa filadhu."
 
-#: app/templates/new_project_custom.html:374
+#: app/templates/new_project_custom.html:386
+msgid "Project name is required."
+msgstr "Maqaan pirojektii barbaachisaa dha."
+
+#: app/templates/new_project_custom.html:396
 msgid "Description is required."
 msgstr "Ibsi barbaachisaa dha."
 
@@ -1819,11 +1628,11 @@ msgstr "Ibsi barbaachisaa dha."
 msgid "Quick Setup - OSM Buildings"
 msgstr "Saagi Saffisaa - Gamoowwan OSM"
 
-#: app/templates/new_project_simple.html:8
+#: app/templates/new_project_simple.html:6
 msgid "Map buildings"
 msgstr "Gamoo OSM"
 
-#: app/templates/new_project_simple.html:10
+#: app/templates/new_project_simple.html:8
 msgid ""
 "Just draw the area you want to map. We'll set everything up for you using"
 " building\n"
@@ -1833,11 +1642,11 @@ msgstr ""
 "OpenStreetMap irraa fi qorannoo gamoowwaniif qophaa'e fayyadamuun "
 "hundumaa qopheessina."
 
-#: app/templates/new_project_simple.html:15
+#: app/templates/new_project_simple.html:13
 msgid "This is only for mapping buildings."
 msgstr "Kun gamoowwan kaartessuuf qofa."
 
-#: app/templates/new_project_simple.html:16
+#: app/templates/new_project_simple.html:14
 msgid ""
 "If you want to map something else (like roads or water points), use your "
 "own survey\n"
@@ -1847,15 +1656,15 @@ msgstr ""
 "bishaanii), gaaffilee qorannoo kee fayyadamuu, yookaan deetaa kaartaa kee"
 " fiduu barbaadde,"
 
-#: app/templates/new_project_simple.html:18
+#: app/templates/new_project_simple.html:16
 msgid "set up a custom project instead"
 msgstr "bakka isaa pirojektii addaa qopheessi"
 
-#: app/templates/new_project_simple.html:47
+#: app/templates/new_project_simple.html:45
 msgid "Switch to Custom Project"
 msgstr "Pirojektii QField irratti maxxansi"
 
-#: app/templates/new_project_simple.html:56
+#: app/templates/new_project_simple.html:48
 msgid "Creating project and preparing map..."
 msgstr "Pirojektiin uumamaa fi kaartaan qophaaʼaa jira..."
 
@@ -1863,13 +1672,12 @@ msgstr "Pirojektiin uumamaa fi kaartaan qophaaʼaa jira..."
 msgid "Creating Project"
 msgstr "Pirojektii uumamaa jira"
 
-#: app/templates/partials/new_project/creating_fragment.html:11
-#: app/templates/project_details.html:6 app/templates/project_details.html:307
-#: app/templates/project_details.html:318
+#: app/templates/partials/new_project/creating_fragment.html:10
+#: app/templates/project_details.html:4
 msgid "Back to Projects"
 msgstr "Gara pirojektootaatti deebi'i"
 
-#: app/templates/project_details.html:42
+#: app/templates/project_details.html:34
 msgid ""
 "Trigger a fresh QFieldCloud package and download the project data as a "
 "single GeoJSON file."
@@ -1877,29 +1685,31 @@ msgstr ""
 "Paakeejii QFieldCloud haaraa kakaasi fi deetaa pirojektii akka faayilii "
 "GeoJSON tokkootti buufadhu."
 
-#: app/templates/project_details.html:45
+#: app/templates/project_details.html:38
 msgid "Export Data"
 msgstr "Daataa Al-ergii"
 
-#: app/templates/project_details.html:53
+#: app/templates/project_details.html:45
 msgid "This project is still being created. Refresh the page in a minute or two."
 msgstr ""
+"Pirojektiin kun ammallee uumamaa jira. Daqiiqaa tokko ykn lama booda "
+"fuula haaromsi."
 
 #: app/templates/partials/new_project/creating_fragment.html:4
-#: app/templates/project_details.html:57
+#: app/templates/project_details.html:49
 msgid "Project creation failed."
 msgstr "Pirojektii uumuun hin milkoofne."
 
-#: app/templates/partials/new_project/creating_fragment.html:6
-#: app/templates/project_details.html:58
+#: app/templates/partials/new_project/creating_fragment.html:5
+#: app/templates/project_details.html:50
 msgid "An unexpected error occurred."
 msgstr "Dogoggorri hin eegamne uumame."
 
-#: app/templates/project_details.html:59
+#: app/templates/project_details.html:51
 msgid "Create the project again, or contact an admin if this keeps happening."
-msgstr ""
+msgstr "Pirojektii irra deebi'ii uumi, ykn yoo kun itti fufe bulchaa qunnami."
 
-#: app/templates/project_details.html:93 app/templates/project_details.html:101
+#: app/templates/project_details.html:61
 msgid ""
 "Packaging project on QFieldCloud - this may take a minute, please be "
 "patient..."
@@ -1907,121 +1717,91 @@ msgstr ""
 "Pirojektii paakeejii QFieldCloud irratti - kun daqiiqaa tokko fudhachuu "
 "danda'a, maaloo obsaa..."
 
-#: app/templates/project_details.html:102
+#: app/templates/project_details.html:62
 msgid "✓ Download started."
 msgstr "✓ Buufachuuf jalqabe."
 
-#: app/templates/project_details.html:103
+#: app/templates/project_details.html:63
 msgid "Export failed:"
 msgstr "Al-ergiin hin milkoofne:"
 
-#: app/templates/project_details.html:104
+#: app/templates/project_details.html:64
 msgid "Network error while exporting. Please try again."
 msgstr "Dogoggora networkii yeroo erguu. Mee irra deebi'ii yaalaa."
 
-#: app/templates/project_details.html:181
-msgid "Project Metadata"
-msgstr "Metadata pirojektii"
-
-#: app/templates/project_details.html:183
-msgid "Project metadata and setup information for managers."
-msgstr "Metadata pirojektii fi odeeffannoo qophii hoggantootaaf."
-
-#: app/templates/project_details.html:201
+#: app/templates/project_details.html:123
 msgid "Project ID"
 msgstr "ID pirojektii"
 
-#: app/templates/project_details.html:212
+#: app/templates/project_details.html:128
+msgid "Manager"
+msgstr "Hogganaa"
+
+#: app/templates/project_details.html:133
 msgid "Created"
 msgstr "Uumame"
 
-#: app/templates/project_details.html:219
+#: app/templates/project_details.html:138
 msgid "Last Updated"
 msgstr "Yeroo dhuma haaromfame"
 
-#: app/templates/project_details.html:230
-msgid "Hashtags"
-msgstr "Hashtagoota"
-
-#: app/templates/project_details.html:242
+#: app/templates/project_details.html:143
 msgid "External Project"
 msgstr "Pirojektii alaa"
 
-#: app/templates/project_details.html:244
-msgid "Instance:"
-msgstr "Instansii:"
-
-#: app/templates/project_details.html:246
-msgid "Project ID:"
-msgstr "ID pirojektii:"
-
-#: app/templates/project_details.html:256
-#: app/templates/project_details.html:264
+#: app/templates/project_details.html:150
 msgid "View Project in ODK Central →"
 msgstr "Pirojektii ODK Central keessatti ilaali →"
 
-#: app/templates/project_details.html:271
-msgid "Manage QFieldCloud Project →"
-msgstr "Pirojektii QFieldCloud bulchi →"
+#: app/templates/project_details.html:153
+msgid "View Project in QFieldCloud →"
+msgstr "Pirojektii QFieldCloud keessatti ilaali →"
 
-#: app/templates/project_details.html:279
+#: app/templates/project_details.html:157
 msgid "View Project Externally →"
 msgstr "Pirojektii alaan ilaali →"
 
-#: app/templates/project_details.html:286
+#: app/templates/project_details.html:175
 msgid "This project is not ready for mapping yet."
-msgstr ""
+msgstr "Pirojektiin kun ammaaf kaartaa kaasuuf qophaa'aa miti."
 
-#: app/templates/project_details.html:315
+#: app/templates/project_details.html:180
+#: app/templates/project_details.html:198
+msgid "Delete project"
+msgstr "Pirojektii haqi"
+
+#: app/templates/project_details.html:183
+msgid ""
+"Deletes the project here and in the mapping app (ODK Central or "
+"QFieldCloud), including\n"
+"      data collected there. This cannot be undone."
+msgstr ""
+"Pirojektii asii fi appii kaartaa (ODK Central ykn QFieldCloud) keessaa, "
+"deetaa achitti sassaabame dabalatee ni haqa. Kun deebi'uu hin danda'u."
+
+#: app/templates/project_details.html:186
+msgid ""
+"Delete this project in Field-TM and in the mapping app, including\n"
+"    collected data? This cannot be undone."
+msgstr ""
+"Pirojektii kana Field-TM fi appii kaartaa keessaa, deetaa sassaabame "
+"dabalatee haquu barbaaddaa? Kun deebi'uu hin danda'u."
+
+#: app/templates/project_details.html:188
+msgid "Deletes the project and its tasks. This cannot be undone."
+msgstr "Pirojektii fi hojiiwwan isaa ni haqa. Kun deebi'uu hin danda'u."
+
+#: app/templates/project_details.html:189
+msgid "Delete this project and its tasks? This cannot be undone."
+msgstr ""
+"Pirojektii kana fi hojiiwwan isaa haquu barbaaddaa? Kun deebi'uu hin "
+"danda'u."
+
+#: app/templates/project_details.html:205
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
-" to view\n"
-"        it."
+" to view it."
 msgstr "Pirojektiin ati barbaaddu hin jiru ykn isa ilaaluuf hayyama hin qabdu."
-
-#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
-msgid "QFieldCloud Admin"
-msgstr "Bulchaa QFieldCloud"
-
-#: app/templates/qfc_admin.html:21
-msgid ""
-"This page is for managing the users in your QField project, after "
-"creation."
-msgstr ""
-"Fuul-barruun kun pirojektii QField keessan keessatti fayyadamtoota "
-"bulchuuf, erga uumamee booda."
-
-#: app/templates/qfc_admin.html:25
-msgid "Enter your QFieldCloud credentials to manage collaborators."
-msgstr "Hirmaatota bulchuuf ragaa QFieldCloud keessan galchaa."
-
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:151
-#: app/templates/qfc_admin.html:36
-msgid "QField Cloud URL"
-msgstr "URL QField Cloud"
-
-#: app/templates/qfc_admin.html:46
-msgid "The base URL of your QFieldCloud instance (without /api/v1)."
-msgstr "URL bu'uuraa instansii QFieldCloud keessanii (/api/v1 malee)."
-
-#: app/templates/qfc_admin.html:54
-msgid "admin"
-msgstr "admin"
-
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:126
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:132
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:175
-#: app/templates/qfc_admin.html:59
-msgid "Password"
-msgstr "Jecha icciitii"
-
-#: app/templates/qfc_admin.html:70
-msgid "Connect"
-msgstr "Walqabsiisi"
-
-#: app/templates/qfc_admin.html:76
-msgid "Connecting…"
-msgstr "Walqabsiisaa jira…"
 
 #: app/templates/partials/metrics.html:5
 msgid "Features Surveyed (Approximate)"
@@ -2045,23 +1825,23 @@ msgstr "Appii kaartaa deggaramu"
 
 #: app/templates/partials/new_project/app_picker.html:20
 msgid "Recommended"
-msgstr ""
+msgstr "Kan gorfame"
 
 #: app/templates/partials/new_project/app_picker.html:24
 msgid "Good for:"
-msgstr ""
+msgstr "Kanaaf gaarii:"
 
-#: app/templates/partials/new_project/app_picker.html:27
+#: app/templates/partials/new_project/app_picker.html:26
 msgid "Tasks sync to the app."
-msgstr ""
+msgstr "Hojiiwwan appii waliin walsimu."
 
-#: app/templates/partials/new_project/app_picker.html:27
+#: app/templates/partials/new_project/app_picker.html:26
 msgid ""
 "Mappers download task\n"
 "          files."
-msgstr ""
+msgstr "Kaartaa kaastonni faayilota hojii buusu."
 
-#: app/templates/partials/new_project/creating_fragment.html:10
+#: app/templates/partials/new_project/creating_fragment.html:8
 msgid "Try Again"
 msgstr "Ammas yaali"
 
@@ -2119,77 +1899,74 @@ msgstr ""
 
 #: app/templates/partials/new_project/map_script.html:12
 msgid "Enter a Tasking Manager project ID first."
-msgstr ""
+msgstr "Jalqaba ID pirojektii Tasking Manager galchi."
 
 #: app/templates/partials/new_project/map_script.html:13
 msgid "Could not load AOI from Tasking Manager."
-msgstr ""
+msgstr "Naannoo fedhii Tasking Manager irraa fe'uun hin danda'amne."
 
-#: app/templates/partials/new_project/map_section.html:3
-msgid "Project Area"
-msgstr "Naannoo pirojektii"
-
-#: app/templates/partials/new_project/map_section.html:6
-msgid "Draw the area you want to map on the map below."
-msgstr "Kaartaa armaan gadii irratti naannoo kaartessuu barbaaddu kaasi."
-
-#: app/templates/partials/new_project/map_section.html:15
+#: app/templates/partials/new_project/map_section.html:5
 msgid "Draw Area"
 msgstr "Naannoo kaasi"
 
-#: app/templates/partials/new_project/map_section.html:18
+#: app/templates/partials/new_project/map_section.html:8
 msgid "Clear"
 msgstr "Haqi"
 
-#: app/templates/partials/new_project/map_section.html:32
-#: app/templates/partials/project_details/setup_steps/step2_form.html:89
-#: app/templates/partials/project_details/setup_steps/step3_data.html:73
+#: app/templates/partials/new_project/map_section.html:11
+msgid "Project Area"
+msgstr "Naannoo pirojektii"
+
+#: app/templates/partials/new_project/map_section.html:11
+msgid ""
+"Draw the area you want to\n"
+"      map on the map below."
+msgstr "Naannoo kaasuu barbaaddu kaartaa armaan gadii irratti kaasi."
+
+#: app/templates/partials/new_project/map_section.html:20
+#: app/templates/partials/project_details/setup_steps/step2_form.html:70
+#: app/templates/partials/project_details/setup_steps/step3_data.html:44
 msgid "More options"
 msgstr "Filannoowwan unkaa:"
 
-#: app/templates/partials/new_project/map_section.html:38
+#: app/templates/partials/new_project/map_section.html:23
 msgid "Upload a GeoJSON file"
-msgstr ""
+msgstr "Faayilii GeoJSON olkaasi"
 
-#: app/templates/partials/new_project/map_section.html:40
+#: app/templates/partials/new_project/map_section.html:25
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
 "          drawing."
 msgstr ""
+"Yoo faayilii kaartaa daangaa naannoo kee qabu qabaatte, kaasuu mannaa as "
+"olkaasi."
 
-#: app/templates/partials/new_project/map_section.html:50
+#: app/templates/partials/new_project/map_section.html:31
 msgid "Upload your own map file (GeoJSON)"
 msgstr "GeoJSON dhuunfaa olkaa'i"
 
-#: app/templates/partials/new_project/map_section.html:55
-#: app/templates/partials/new_project/map_section.html:56
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
-#: app/templates/partials/project_details/setup_steps/step3_data.html:60
-msgid "or"
-msgstr "yookaan"
+#: app/templates/partials/new_project/map_section.html:39
+msgid "Load from a HOT Tasking Manager project"
+msgstr "Pirojektii HOT Tasking Manager irraa fe'i"
+
+#: app/templates/partials/new_project/map_section.html:41
+msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
+msgstr "Naannoo fedhii isaa fe'uuf ID pirojektii HOT Tasking Manager galchi."
+
+#: app/templates/partials/new_project/map_section.html:50
+msgid "Tasking Manager project ID"
+msgstr "ID pirojektii Tasking Manager"
+
+#: app/templates/partials/new_project/map_section.html:53
+msgid "Load AOI"
+msgstr "Naannoo fe'i"
 
 #: app/templates/partials/new_project/map_section.html:60
-msgid "Load from a HOT Tasking Manager project"
-msgstr ""
-
-#: app/templates/partials/new_project/map_section.html:62
-msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
-msgstr ""
-
-#: app/templates/partials/new_project/map_section.html:71
-msgid "Tasking Manager project ID"
-msgstr ""
-
-#: app/templates/partials/new_project/map_section.html:75
-msgid "Load AOI"
-msgstr ""
-
-#: app/templates/partials/new_project/map_section.html:84
 msgid "Combine multiple shapes into one"
 msgstr "Boca hedduu gara tokkootti walitti maki"
 
-#: app/templates/partials/new_project/map_section.html:89
+#: app/templates/partials/new_project/map_section.html:64
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2199,11 +1976,11 @@ msgstr ""
 "gurguddoon (200 km² ol) deetaa kaartaa hunda ofumaan buusuu dhiisuu "
 "danda'u."
 
-#: app/templates/partials/project_details/basemap_section.html:2
+#: app/templates/partials/project_details/basemap_section.html:13
 msgid "Offline Basemap"
 msgstr "Kaartaa buʼuuraa al-sararaa"
 
-#: app/templates/partials/project_details/basemap_section.html:4
+#: app/templates/partials/project_details/basemap_section.html:15
 msgid ""
 "Search HOT OpenAerialMap imagery for this AOI and generate an MBTiles "
 "basemap."
@@ -2211,122 +1988,102 @@ msgstr ""
 "AOI kanaaf suuraa HOT OpenAerialMap barbaadiitii kaartaa buʼuuraa MBTiles"
 " uumi."
 
-#: app/templates/partials/project_details/basemap_section.html:32
-msgid ""
-"A basemap job is currently in progress. Wait for it to finish before "
-"starting a new search."
-msgstr ""
-"Hojiin kaartaa bu’uuraa amma deemaa jira. Barbaacha haaraa jalqabuu dura "
-"akka xumuramu eegi."
-
-#: app/templates/partials/project_details/basemap_section.html:37
+#: app/templates/partials/project_details/basemap_section.html:27
 msgid "Search OAM Imagery"
 msgstr "Suuraa OAM barbaadi"
 
-#: app/templates/partials/project_details/basemap_section.html:41
+#: app/templates/partials/project_details/basemap_section.html:30
 msgid "Search is disabled while a basemap job is running."
 msgstr "Hojiin kaartaa bu’uuraa yeroo deemaa jiru barbaachuun cufama."
 
-#: app/templates/partials/project_details/basemap_section.html:56
+#: app/templates/partials/project_details/basemap_section.html:44
 msgid "Basemap generation previously failed. Please search again and retry."
 msgstr ""
 "Uuminsi kaartaa buʼuuraa kanaan dura fashale. Mee irra deebiʼii "
 "barbaadiitii yaali."
 
-#: app/templates/partials/project_details/basemap_section.html:60
+#: app/templates/partials/project_details/basemap_section.html:47
 msgid "No basemap selected yet."
 msgstr "Amma iyyuu kaartaan buʼuuraa hin filatamne."
 
-#: app/templates/partials/project_details/manager_setup_summary.html:3
+#: app/templates/partials/project_details/manager_setup_summary.html:1
 msgid "Manager Setup Summary"
 msgstr "Cuunfaa qophii hogganaa"
 
-#: app/templates/partials/project_details/manager_setup_summary.html:6
+#: app/templates/partials/project_details/manager_setup_summary.html:4
 msgid "The project setup flow is complete and shown below for reference."
 msgstr ""
 "Adeemsi qophii pirojektii xumurameera, akka wabii armaan gadii "
 "agarsiifameera."
 
-#: app/templates/partials/project_details/manager_setup_summary.html:14
-msgid "Project Location"
-msgstr "Iddoo pirojektii"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:25
-#: app/templates/partials/project_details/setup_steps.html:61
+#: app/templates/partials/project_details/manager_setup_summary.html:7
+#: app/templates/partials/project_details/setup_steps.html:44
 msgid "Survey Form"
 msgstr "Foormii Qorannoo"
 
-#: app/templates/partials/project_details/manager_setup_summary.html:28
-#: app/templates/partials/project_details/manager_setup_summary.html:39
-#: app/templates/partials/project_details/manager_setup_summary.html:50
-#: app/templates/partials/project_details/manager_setup_summary.html:61
-msgid "Complete"
-msgstr "Xumurame"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:36
+#: app/templates/partials/project_details/manager_setup_summary.html:7
 msgid "Map Data"
 msgstr "Deetaa Kaartaa"
 
-#: app/templates/partials/project_details/manager_setup_summary.html:47
-#: app/templates/partials/project_details/setup_steps.html:62
-#: app/templates/partials/project_details/setup_steps.html:63
+#: app/templates/partials/project_details/manager_setup_summary.html:7
+#: app/templates/partials/project_details/setup_steps.html:45
+#: app/templates/partials/project_details/setup_steps.html:46
 #: app/templates/partials/project_details/tasks_section.html:8
 msgid "Tasks"
-msgstr "ID Hojii"
+msgstr "Hojiiwwan"
 
-#: app/templates/partials/project_details/manager_setup_summary.html:58
+#: app/templates/partials/project_details/manager_setup_summary.html:7
 msgid "Project Created"
 msgstr "Pirojektoota uumaman"
 
-#: app/templates/partials/project_details/manager_setup_summary.html:69
+#: app/templates/partials/project_details/manager_setup_summary.html:10
+msgid "Complete"
+msgstr "Xumurame"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:16
 msgid ""
 "If you need to upload additional media files to this project, such as "
-"images and\n"
-"          videos, log into ODK Central and upload them in the form "
-"settings."
+"images and videos,\n"
+"      log into ODK Central and upload them in the form settings."
 msgstr ""
-"Yoo pirojektii kanaaf faayilii meedii dabalataa akka suuraa fi viidiyoo "
-"olkaa'uun barbaachise, ODK Central seeniitii qindaa'ina foormii keessatti"
-" olkaa'i."
+"Yoo pirojektii kanaaf faayilota miidiyaa dabalataa kan akka suuraa fi "
+"viidiyoo olkaasuu barbaadde, ODK Central seenii qindaa'ina foormii "
+"keessatti olkaasi."
 
 #: app/templates/partials/project_details/setup_steps.html:14
 msgid "Ready for Mapping"
 msgstr "Kaartaaf qophaa'eera"
 
-#: app/templates/partials/project_details/setup_steps.html:26
+#: app/templates/partials/project_details/setup_steps.html:23
 msgid "Loading QR code..."
 msgstr "Koodii QR fe'amaa jira..."
 
-#: app/templates/partials/project_details/setup_steps.html:39
+#: app/templates/partials/project_details/setup_steps.html:33
 msgid "Get the app"
-msgstr ""
+msgstr "Appii argadhu"
 
-#: app/templates/partials/project_details/setup_steps.html:52
-msgid "Loading collaborator form..."
-msgstr "Unka tumsaa fe'amaa jira..."
-
-#: app/templates/partials/project_details/setup_steps.html:59
+#: app/templates/partials/project_details/setup_steps.html:42
 msgid "Project Setup"
 msgstr "Qophii pirojektii"
 
-#: app/templates/partials/project_details/setup_steps.html:61
-#: app/templates/partials/project_details/setup_steps.html:63
+#: app/templates/partials/project_details/setup_steps.html:44
+#: app/templates/partials/project_details/setup_steps.html:46
 msgid "Project Details"
 msgstr "AOI pirojektii"
 
-#: app/templates/partials/project_details/setup_steps.html:62
+#: app/templates/partials/project_details/setup_steps.html:45
 msgid "Get Data"
 msgstr "Tarkaanfii 3: Data argadhu"
 
-#: app/templates/partials/project_details/setup_steps.html:62
+#: app/templates/partials/project_details/setup_steps.html:45
 msgid "Finalise"
 msgstr "Pirojektii xumuri"
 
-#: app/templates/partials/project_details/setup_steps.html:64
+#: app/templates/partials/project_details/setup_steps.html:47
 msgid "Publish"
-msgstr ""
+msgstr "Maxxansi"
 
-#: app/templates/partials/project_details/setup_steps.html:65
+#: app/templates/partials/project_details/setup_steps.html:48
 msgid "Project setup progress"
 msgstr "Qophii pirojektii"
 
@@ -2411,32 +2168,23 @@ msgstr ""
 "Maddi gorfame haaromfameera (%(geom_label)s). Data kaartaa irratti "
 "ilaali, sana booda itti fufi."
 
-#: app/templates/partials/project_details/style_and_scripts.html:24
-msgid "Downloading..."
-msgstr "Buufamaa jira..."
-
-#: app/templates/partials/project_details/setup_steps/step3_data.html:28
 #: app/templates/partials/project_details/style_and_scripts.html:25
-msgid "Use OSM data"
-msgstr "Data OSM buufadhu"
-
-#: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "ODK Central"
 msgstr "ODK Central"
 
-#: app/templates/partials/project_details/style_and_scripts.html:28
+#: app/templates/partials/project_details/style_and_scripts.html:26
 msgid "QField"
 msgstr "QField"
 
-#: app/templates/partials/project_details/style_and_scripts.html:29
+#: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "the mapping tool"
 msgstr "meeshaa kaartaa"
 
-#: app/templates/partials/project_details/style_and_scripts.html:30
+#: app/templates/partials/project_details/style_and_scripts.html:28
 msgid "Project type not set. Please set the field mapping app first."
 msgstr "Gosti pirojektii hin kaa'amne. Maaloo dura appii kaartaa dirree kaa'i."
 
-#: app/templates/partials/project_details/style_and_scripts.html:31
+#: app/templates/partials/project_details/style_and_scripts.html:29
 #, python-format
 msgid ""
 "Are you sure you want to finalise this project in %(project_type)s? This "
@@ -2446,183 +2194,169 @@ msgstr ""
 "mirkanaa'oo? Kun pirojektii uuma, foormii olkaa'a, faayilii barbaachisoo "
 "hundaas uuma."
 
-#: app/templates/partials/project_details/style_and_scripts.html:32
+#: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Custom ODK Credentials"
 msgstr "Ragaa ODK dhuunfaa"
 
-#: app/templates/partials/project_details/style_and_scripts.html:33
+#: app/templates/partials/project_details/style_and_scripts.html:31
 msgid "Custom QField Credentials"
 msgstr "Ragaa QField dhuunfaa"
 
-#: app/templates/partials/project_details/style_and_scripts.html:34
+#: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Please fill in all fields."
 msgstr "Maaloo dirreewwan hunda guutaa."
 
-#: app/templates/partials/project_details/style_and_scripts.html:35
-msgid "Testing..."
-msgstr "Qorama jira..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:36
+#: app/templates/partials/project_details/style_and_scripts.html:33
 msgid "Testing credentials..."
 msgstr "Ragaan qoramaa jira..."
 
-#: app/templates/partials/project_details/style_and_scripts.html:37
+#: app/templates/partials/project_details/style_and_scripts.html:34
 msgid "✓ Credentials are valid!"
 msgstr "✓ Ragaan sirrii dha!"
 
-#: app/templates/partials/project_details/style_and_scripts.html:38
+#: app/templates/partials/project_details/style_and_scripts.html:35
 msgid "Invalid credentials. Please check and try again."
 msgstr "Ragaan sirrii miti. Maaloo ilaalaa, irra deebi'aas yaalaa."
 
-#: app/templates/partials/project_details/style_and_scripts.html:39
+#: app/templates/partials/project_details/style_and_scripts.html:36
 #, python-format
 msgid "Error testing credentials: %(message)s"
 msgstr "Ragaa qoruun dogoggora: %(message)s"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:203
-#: app/templates/partials/project_details/style_and_scripts.html:40
-msgid "Test Credentials"
-msgstr "Ragaa qori"
-
-#: app/templates/partials/project_details/style_and_scripts.html:41
+#: app/templates/partials/project_details/style_and_scripts.html:37
 msgid "Please test credentials first before continuing."
 msgstr "Maaloo itti fufuun dura ragaa qori."
 
-#: app/templates/partials/project_details/style_and_scripts.html:42
+#: app/templates/partials/project_details/style_and_scripts.html:38
 #, python-format
 msgid "Creating project in %(project_type)s... This may take a moment."
 msgstr ""
 "%(project_type)s keessatti pirojektiin uumamaa jira... yeroo muraasa "
 "fudhachuu danda'a."
 
-#: app/templates/partials/project_details/style_and_scripts.html:43
+#: app/templates/partials/project_details/style_and_scripts.html:39
 msgid "Error:"
 msgstr "Dogoggora:"
 
-#: app/templates/partials/project_details/tasks_section.html:10
+#: app/templates/partials/project_details/tasks_section.html:11
 #, python-format
 msgid "%(count)s tasks"
-msgstr ""
+msgstr "Hojiiwwan %(count)s"
 
-#: app/templates/partials/project_details/tasks_section.html:14
+#: app/templates/partials/project_details/tasks_section.html:17
 #, python-format
 msgid "%(count)s tasks, %(assigned)s assigned."
-msgstr ""
+msgstr "Hojiiwwan %(count)s, %(assigned)s ramadamaniiru."
 
-#: app/templates/partials/project_details/tasks_section.html:16
+#: app/templates/partials/project_details/tasks_section.html:19
 msgid "The whole area is one task."
-msgstr ""
+msgstr "Naannoon guutuun hojii tokko dha."
 
-#: app/templates/partials/project_details/tasks_section.html:16
+#: app/templates/partials/project_details/tasks_section.html:19
 msgid ""
-"Split the area into tasks and\n"
-"    assign them to teams or people in the task planner. Or use the whole "
-"area as one task."
+"Split the area into tasks\n"
+"      and assign them to teams or people in the task planner. Or use the "
+"whole area as one task."
 msgstr ""
+"Karoorsaa hojii keessatti naannicha hojiiwwanitti qoodii garee ykn "
+"namootaaf ramadi. Ykn naannoo guutuu akka hojii tokkootti fayyadami."
 
-#: app/templates/partials/project_details/tasks_section.html:18
+#: app/templates/partials/project_details/tasks_section.html:21
 msgid "No tasks yet."
-msgstr ""
+msgstr "Ammaaf hojiin hin jiru."
 
-#: app/templates/partials/project_details/tasks_section.html:24
+#: app/templates/partials/project_details/tasks_section.html:27
 msgid "Task map"
-msgstr ""
+msgstr "Kaartaa hojii"
 
-#: app/templates/partials/project_details/tasks_section.html:31
+#: app/templates/partials/project_details/tasks_section.html:33
 msgid "Open tasks for download and sharing (GPX, GeoJSON, QR codes)"
-msgstr ""
+msgstr "Buusuu fi qooduuf hojiiwwan bani (GPX, GeoJSON, koodii QR)"
 
-#: app/templates/partials/project_details/tasks_section.html:37
+#: app/templates/partials/project_details/tasks_section.html:50
 msgid "Edit tasks"
-msgstr ""
+msgstr "Hojiiwwan gulaali"
 
-#: app/templates/partials/project_details/tasks_section.html:37
+#: app/templates/partials/project_details/tasks_section.html:50
 msgid "Split & assign tasks"
-msgstr ""
+msgstr "Hojiiwwan qoodii ramadi"
 
-#: app/templates/partials/project_details/tasks_section.html:46
+#: app/templates/partials/project_details/tasks_section.html:59
 msgid "Use whole area as one task"
-msgstr ""
+msgstr "Naannoo guutuu akka hojii tokkootti fayyadami"
 
-#: app/templates/partials/project_details/tasks_section.html:55
-msgid "Re-sync tasks to ODK"
-msgstr ""
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:33
+#: app/templates/partials/project_details/tasks_section.html:68
+#, python-format
+msgid "Re-sync tasks to %(app)s"
+msgstr "Hojiiwwan %(app)s waliin irra deebi'ii walsimsiisi"
 
-#: app/templates/partials/project_details/tasks_section.html:66
+#: app/templates/partials/project_details/tasks_section.html:79
 msgid "Or upload a task plan file (GeoJSON):"
-msgstr ""
+msgstr "Ykn faayilii karoora hojii (GeoJSON) olkaasi:"
 
-#: app/templates/partials/project_details/tasks_section.html:72
+#: app/templates/partials/project_details/tasks_section.html:85
 msgid ""
-"Task changes after publishing are not sent to QField. They apply to new "
-"projects\n"
-"    only."
+"After editing tasks, re-sync to update them in the mapping app. Changing "
+"task areas\n"
+"      resets task progress in the app."
 msgstr ""
+"Hojiiwwan erga gulaaltee booda, appii kaartaa keessatti haaromsuuf irra "
+"deebi'ii walsimsiisi. Naannoo hojii jijjiiruun guddina hojii appii "
+"keessaa ni haaressa."
 
-#: app/templates/partials/project_details/tasks_section.html:77
-msgid ""
-"After editing tasks, re-sync to update them in ODK Central. Mapping "
-"status is kept."
-msgstr ""
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:5
+#: app/templates/partials/project_details/fragments/basemap_progress.html:4
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
-"      use. Please retry attach."
+"    use. Please retry attach."
 msgstr ""
 "Kaartaa bu'uuraa maxxansuun ammaaf hin milkoofne. Pirojektiin kee itti "
 "fayyadamuuf qophaa'eera. Maaloo irra deebi'i maxxansi."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:20
+#: app/templates/partials/project_details/fragments/basemap_progress.html:15
 msgid "Retry Attach"
 msgstr "Maxxansa irra deebiʼii yaali"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:26
+#: app/templates/partials/project_details/fragments/basemap_progress.html:20
 msgid ""
 "Basemap is attaching to the QField project. This can take a minute; click"
 " below to check\n"
-"      the latest status."
+"    the latest status."
 msgstr ""
-"Kaartaan bu’uuraa pirojektii QField waliin walitti qabsiifamaa jira. Kun "
-"daqiiqaa tokko fudhachuu danda’a; haala haaraa ilaaluuf gadi cuqaasi."
+"Kaartaan bu'uuraa pirojektii QField waliin walqabsiifamaa jira. Kun "
+"daqiiqaa tokko fudhachuu danda'a; haala haaraa ilaaluuf armaan gaditti "
+"cuqaasi."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:41
-#: app/templates/partials/project_details/fragments/basemap_progress.html:104
-msgid "Checking..."
-msgstr "Sakatta'aa jira..."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:42
-#: app/templates/partials/project_details/fragments/basemap_progress.html:45
-#: app/templates/partials/project_details/fragments/basemap_progress.html:105
-#: app/templates/partials/project_details/fragments/basemap_progress.html:108
+#: app/templates/partials/project_details/fragments/basemap_progress.html:35
+#: app/templates/partials/project_details/fragments/basemap_progress.html:82
 msgid "Check Status"
 msgstr "Haala pirojektii"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:62
+#: app/templates/partials/project_details/fragments/basemap_progress.html:40
 msgid ""
 "Basemap generation is in progress on the imagery server. Click below to "
-"check whether\n"
-"      it's ready."
+"check whether it's\n"
+"    ready."
 msgstr ""
-"Uumamni kaartaa bu’uuraa sarvarii suuraa irratti deemaa jira. Qophaa’uu "
-"isaa mirkaneessuuf gadi cuqaasi."
+"Kaartaan bu'uuraa sarvara suuraa irratti uumamaa jira. Qophaa'uu isaa "
+"ilaaluuf armaan gaditti cuqaasi."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:63
+#: app/templates/partials/project_details/fragments/basemap_progress.html:41
 msgid "STAC item"
 msgstr "Wanti STAC"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:64
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:15
+#: app/templates/partials/project_details/fragments/basemap_progress.html:42
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:12
 msgid "Zoom"
 msgstr "Guddisi"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:4
+#: app/templates/partials/project_details/fragments/basemap_ready.html:3
 msgid ""
 "Basemap attached to\n"
 "    QField project."
 msgstr "Kaartaan bu'uuraa pirojektii QField irratti maxxanfameera."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:5
+#: app/templates/partials/project_details/fragments/basemap_ready.html:4
 msgid ""
 "Basemap is\n"
 "    ready. Attaching to QField project in progress."
@@ -2630,7 +2364,7 @@ msgstr ""
 "Basemap qophaaʼeera. Pirojektii QField irratti maxxansuuf adeemsi "
 "jalqabameera."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:7
+#: app/templates/partials/project_details/fragments/basemap_ready.html:6
 msgid ""
 "Basemap is ready, but attach to the QField project failed.\n"
 "    Please retry attach."
@@ -2639,7 +2373,7 @@ msgstr ""
 "qabsiisuun hin milkoofne.\n"
 "    Mee irra deebi’i."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:8
+#: app/templates/partials/project_details/fragments/basemap_ready.html:7
 msgid ""
 "Basemap is ready. Not yet attached to QField\n"
 "    project."
@@ -2647,11 +2381,11 @@ msgstr ""
 "Kaartaan bu’uuraa qophaa’eera. Ammallee pirojektii\n"
 "    QField waliin hin qabsiifamne."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:9
+#: app/templates/partials/project_details/fragments/basemap_ready.html:8
 msgid "Basemap is ready."
 msgstr "Basemap qophaaʼeera."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:10
+#: app/templates/partials/project_details/fragments/basemap_ready.html:9
 msgid ""
 "Total\n"
 "    size"
@@ -2659,25 +2393,24 @@ msgstr ""
 "Hammamtaa\n"
 "    waliigalaa"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:12
+#: app/templates/partials/project_details/fragments/basemap_ready.html:11
 msgid "Available Zoom"
 msgstr "Zoom argamu"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:24
+#: app/templates/partials/project_details/fragments/basemap_ready.html:25
 msgid "Download MBTiles"
 msgstr "MBTiles buusi"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:33
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:26
+#: app/templates/partials/project_details/fragments/basemap_ready.html:36
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:31
 msgid "View Metadata"
 msgstr "Meetaadaataa ilaali"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:46
-#: app/templates/partials/project_details/fragments/basemap_ready.html:57
+#: app/templates/partials/project_details/fragments/basemap_ready.html:47
 msgid "Attach to QField Project"
 msgstr "Pirojektii QField irratti maxxansi"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:64
+#: app/templates/partials/project_details/fragments/basemap_ready.html:54
 msgid ""
 "Use the ODK offline maps documentation to configure this MBTiles file in "
 "Collect."
@@ -2685,161 +2418,215 @@ msgstr ""
 "Faayilii MBTiles kana Collect keessatti qindeessuuf dokumentii "
 "kaartaawwan ODK offline fayyadami."
 
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:3
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:2
 msgid "Select one imagery item to start MBTiles generation."
 msgstr "Uuminsa MBTiles jalqabuuf wanta suuraa tokko fili."
 
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:13
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:10
 msgid "Cloud"
 msgstr "Cufi"
 
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:49
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:45
 msgid "Use this image"
 msgstr "Suuraa kana fayyadami"
 
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:59
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:52
 msgid "No imagery items were found for this AOI."
 msgstr "AOI kanaaf wantoonni suuraa homtuu hin argamne."
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:21
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:16
 msgid "Accept Data Extract"
 msgstr "Baafata dataa fudhadhu"
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:29
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:25
 msgid "Discard the downloaded data extract?"
-msgstr ""
+msgstr "Baafata deetaa buufame gatuu barbaaddaa?"
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:32
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:27
 msgid "Discard"
-msgstr ""
+msgstr "Gati"
 
-#: app/templates/partials/project_details/fragments/finalize_error.html:7
+#: app/templates/partials/project_details/fragments/finalize_error.html:4
 msgid "View technical details"
 msgstr "Bal'ina teeknikaa ilaali"
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:5
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:2
 msgid "Project created in ODK Central."
 msgstr "Pirojektiin ODK Central keessatti uumameera."
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:4
 msgid "Manager Access (ODK Central UI)"
 msgstr "Seensa hogganaa (ODK Central UI)"
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:11
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:6
 msgid "Open project in ODK Central"
 msgstr "Pirojektii ODK Central keessatti bani"
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
-#: app/templates/partials/project_details/fragments/qr_panel.html:29
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
 msgid "Username:"
 msgstr "Maqaa fayyadamaa:"
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
-#: app/templates/partials/project_details/fragments/qr_panel.html:32
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:9
 msgid "Password:"
 msgstr "Jecha icciitii:"
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:21
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:22
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:10
 msgid "Save these credentials now. They will only be shown once."
 msgstr "Ragaa kana amma olkaa'i. Yeroo tokko qofa agarsiifamu."
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:14
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:15
 msgid "View FieldTM Project"
 msgstr "Pirojektii FieldTM ilaali"
 
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:2
 msgid "Project created in QFieldCloud."
 msgstr "Pirojektiin QFieldCloud keessatti uumameera."
 
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:8
-msgid "Manager Access (QFieldCloud)"
-msgstr "Seensa hogganaa (QFieldCloud)"
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:4
+msgid "QFieldCloud"
+msgstr "QFieldCloud"
 
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:11
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:6
 msgid "Open project in QFieldCloud"
 msgstr "Pirojektii QFieldCloud keessatti bani"
 
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:9
 msgid ""
-"Manager account could not be created automatically. Log in to QFieldCloud"
-" as admin to\n"
-"      manage the project."
+"The project is public: anyone logged in to QFieldCloud can open it in "
+"QField and sync\n"
+"      their data. No invites needed."
 msgstr ""
-"Akaawuntiin hogganaa ofumaan uumamuu hin dandeenye. Pirojektii bulchuuf "
-"akka adminitti QFieldCloud seenaa."
+"Pirojektiin kun uummataaf banaa dha: namni QFieldCloud seene kamiyyuu "
+"QField keessatti banee deetaa isaa walsimsiisuu danda'a. Affeerraan hin "
+"barbaachisu."
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:2
+#: app/templates/partials/project_details/fragments/qr_panel.html:3
 msgid "Scan QR Code"
 msgstr "Koodii QR skaan godhi"
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:4
+#: app/templates/partials/project_details/fragments/qr_panel.html:5
 #, python-format
 msgid "Use %(app_name)s to scan this QR code and load the project."
 msgstr ""
 "%(app_name)s fayyadamuudhaan koodii QR kana skaan godhi fi pirojektii "
 "fe'i."
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:7
+#: app/templates/partials/project_details/fragments/qr_panel.html:10
 msgid "Project QR Code"
 msgstr "Koodii QR pirojektii"
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:12
+#: app/templates/partials/project_details/fragments/qr_panel.html:17
 #, python-format
 msgid "Open in %(app_name)s"
 msgstr "%(app_name)s keessatti banaa."
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:15
+#: app/templates/partials/project_details/fragments/qr_panel.html:35
+msgid "Download QR Code"
+msgstr "Koodii QR buufadhu"
+
+#: app/templates/partials/project_details/fragments/qr_panel.html:40
 #, python-format
 msgid "If %(app_name)s is installed on this device."
 msgstr "Yoo %(app_name)s meeshaa kana irratti fe'ame."
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:19
-msgid "Download QR Code"
-msgstr "Koodii QR buufadhu"
+#: app/templates/partials/project_details/fragments/qr_panel.html:44
+msgid "Log in to QField with your own QFieldCloud account, then scan the QR code."
+msgstr "Herrega QFieldCloud keetiin QField seeni, achiis koodii QR iskaanii godhi."
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:27
-msgid "Mapper Login (QFieldCloud)"
-msgstr "Seensa kaarta hojjataa (QFieldCloud)"
+#: app/templates/partials/project_details/fragments/qr_panel.html:46
+msgid "Create a free account"
+msgstr "Herrega bilisaa uumi"
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:35
-msgid "Scan the QR code, then enter these credentials in QField."
-msgstr "Koodii QR skaan godhi, sana booda ragaa kana QField keessatti galchi."
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:10
+msgid "Task areas have changed since the last sync."
+msgstr "Walsimsiisa dhumaa booda naannoleen hojii jijjiiramaniiru."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:12
+msgid ""
+"The task entities in ODK Central will be replaced and every task status\n"
+"      reset to ready. Mapping progress in ODK Collect will be lost. "
+"Submissions are kept in ODK\n"
+"      Central."
+msgstr ""
+"Qabeenyonni hojii ODK Central keessa jiran ni bakka bu'u, haalli hojii "
+"hundaa gara qophaa'aatti ni haaraa'a. Guddinni kaartaa ODK Collect "
+"keessaa ni bada. Wanti ergame ODK Central keessatti hafa."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:14
+msgid ""
+"The task layer of the QField project will be regenerated and\n"
+"      re-uploaded to QFieldCloud. Mappers must sync or re-download the "
+"project. Task progress and\n"
+"      survey data already synced to QFieldCloud are kept."
+msgstr ""
+"Sadarkaan hojii pirojektii QField irra deebi'ee uumamee QFieldCloud-tti "
+"irra deebi'ee olkaafama. Kaartaa kaastonni pirojektii walsimsiisuu ykn "
+"irra deebi'anii buusuu qabu. Guddinni hojii fi deetaan qorannoo "
+"QFieldCloud waliin duraan walsime ni eegama."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:18
+msgid "Use with caution, after coordinating with your field mappers."
+msgstr ""
+"Kaartaa kaastota dirree kee waliin erga qindoofteen booda of eeggannoon "
+"fayyadami."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:21
+msgid "I understand that task progress in the app will be reset."
+msgstr "Guddinni hojii appii keessaa akka haaraa'u nan hubadha."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:26
+msgid ""
+"This will overwrite any assignment updates made by mappers in the app. "
+"Use with caution\n"
+"    after coordinating with your field mappers."
+msgstr ""
+"Kun jijjiirama ramaddii kaartaa kaastonni appii keessatti godhan hunda ni"
+" irra barreessa. Kaartaa kaastota dirree kee waliin erga qindoofteen "
+"booda of eeggannoon fayyadami."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:27
+msgid ""
+"Mappers must sync the\n"
+"    QField project to get the changes."
+msgstr ""
+"Jijjiirama argachuuf kaartaa kaastonni pirojektii QField walsimsiisuu "
+"qabu."
 
 #: app/templates/partials/project_details/setup_steps/step2_form.html:4
 msgid "Survey form ready"
 msgstr "Foormiin qorannoo qophaa'eera"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:9
+#: app/templates/partials/project_details/setup_steps/step2_form.html:8
 msgid "Choose Your Survey Form"
 msgstr "Gosa qorannoo filadhu:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:12
+#: app/templates/partials/project_details/setup_steps/step2_form.html:11
 msgid ""
 "Pick a ready-made survey that matches what you're mapping. You can upload"
-" your own survey\n"
-"    file if none of these fit."
+" your own\n"
+"      survey file if none of these fit."
 msgstr ""
-"Qorannoo qophaa'e kan waan ati kaartessitu wajjin walsimu fili. Yoo isaan"
-" keessaa tokko illee hin mijanne faayilii qorannoo kee olkaa'uu "
-"dandeessa."
+"Qorannoo qophaa'aa waan ati kaastu waliin walsimu filadhu. Yoo tokkollee "
+"hin taane faayilii qorannoo kee olkaasuu dandeessa."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:25
+#: app/templates/partials/project_details/setup_steps/step2_form.html:24
 msgid "Survey form"
 msgstr "Foormii qorannoo"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:28
+#: app/templates/partials/project_details/setup_steps/step2_form.html:26
 msgid "Loading survey types..."
 msgstr "Gosoonni qorannoo fe'amaa jiru..."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:36
+#: app/templates/partials/project_details/setup_steps/step2_form.html:31
+msgid "or"
+msgstr "yookaan"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
 msgid "upload your own survey file (.xls / .xlsx)"
 msgstr "faayilii qorannoo kee olkaa'i (.xls / .xlsx)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:49
+#: app/templates/partials/project_details/setup_steps/step2_form.html:40
 msgid ""
 "Heads up: Field-TM auto-adds fields for tasks and feature selection. Your"
 " form should\n"
@@ -2850,58 +2637,58 @@ msgstr ""
 "qorannoo gaafachuu barbaaddu qofa qabaachuu qaba (dirreewwan "
 "select_one_from_file hojii/amalaaf hin dabaliin)."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+#: app/templates/partials/project_details/setup_steps/step2_form.html:73
 msgid "Form language"
 msgstr "Afaan"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:100
+#: app/templates/partials/project_details/setup_steps/step2_form.html:75
 msgid "English"
 msgstr "Ingiliffa"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:101
+#: app/templates/partials/project_details/setup_steps/step2_form.html:76
 msgid "Spanish"
 msgstr "Ispeenishii"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:102
+#: app/templates/partials/project_details/setup_steps/step2_form.html:77
 msgid "French"
 msgstr "Faransaayii"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:103
+#: app/templates/partials/project_details/setup_steps/step2_form.html:78
 msgid "Portuguese"
 msgstr "Poortuugiizii"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:104
+#: app/templates/partials/project_details/setup_steps/step2_form.html:79
 msgid "Swahili"
 msgstr "Swahilii"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:105
+#: app/templates/partials/project_details/setup_steps/step2_form.html:80
 msgid "Hindi"
 msgstr "Hindii"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:109
+#: app/templates/partials/project_details/setup_steps/step2_form.html:84
 msgid "Form questions"
 msgstr "Filannoowwan unkaa:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:113
-msgid "Ask for a photo"
-msgstr "Suuraa gaafadhu"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:115
+#: app/templates/partials/project_details/setup_steps/step2_form.html:88
 msgid "Mappers will be asked to take a photo at the location."
 msgstr "Fayyadamaa bakka isaatti suuraa akka kaasu gaafata."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:128
+#: app/templates/partials/project_details/setup_steps/step2_form.html:89
+msgid "Ask for a photo"
+msgstr "Suuraa gaafadhu"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
 msgid "Make photo mandatory"
 msgstr "Suuraa dirqama godhi"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:135
-msgid "Ask to verify existing features"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:101
+msgid "Mappers confirm whether existing OSM features are correctly digitised."
 msgstr ""
 "Kaartessaa amaloonni jiran sirriitti digitise taʼanii jiru moo miti akka "
 "mirkaneessu gaafata."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:137
-msgid "Mappers confirm whether existing OSM features are correctly digitised."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:102
+msgid "Ask to verify existing features"
 msgstr ""
 "Kaartessaa amaloonni jiran sirriitti digitise taʼanii jiru moo miti akka "
 "mirkaneessu gaafata."
@@ -2910,140 +2697,147 @@ msgstr ""
 msgid "Data extract ready"
 msgstr "Baafanni data OSM qophaa'eera"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:9
+#: app/templates/partials/project_details/setup_steps/step3_data.html:8
 msgid "Add Your Data"
 msgstr "Data OSM buufadhu"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:12
+#: app/templates/partials/project_details/setup_steps/step3_data.html:11
 msgid ""
 "Pull existing features from OpenStreetMap for your project area, or start"
 " with an empty\n"
-"    map so mappers can collect everything from scratch."
+"      map so mappers can collect everything from scratch."
 msgstr ""
-"Naannoo pirojektii keetiif amaloota duraan jiran OpenStreetMap irraa "
-"harkisi, yookaan kaartessitoonni hundumaa jalqabaa irraa akka walitti "
-"qaban kaartaa duwwaa irraa jalqabi."
+"Naannoo pirojektii keetiif wantoota OpenStreetMap keessa jiran fidi, ykn "
+"kaartaa duwwaadhaan jalqabi akka kaartaa kaastonni waan hunda jalqabaa "
+"sassaaban."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:54
+#: app/templates/partials/project_details/setup_steps/step3_data.html:26
+msgid "Use OSM data"
+msgstr "Data OSM buufadhu"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:36
 msgid "Start with empty map"
 msgstr "Kaartaa duwwaa irraa jalqabi"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:62
+#: app/templates/partials/project_details/setup_steps/step3_data.html:40
 msgid "upload your own map file (GeoJSON)"
 msgstr "GeoJSON dhuunfaa olkaa'i"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:80
+#: app/templates/partials/project_details/setup_steps/step3_data.html:46
 msgid "Override the default OSM source for this project."
 msgstr "Qindaa'inni durtii gorfame pirojektii kanaaf hojiirra jira."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:86
+#: app/templates/partials/project_details/setup_steps/step3_data.html:49
 msgid "What to download"
 msgstr "Maal buusuun akka barbaachisu"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:51
 msgid "OSM Buildings"
 msgstr "Gamoo OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:90
+#: app/templates/partials/project_details/setup_steps/step3_data.html:52
 msgid "OSM Highways"
 msgstr "Daandii OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:91
+#: app/templates/partials/project_details/setup_steps/step3_data.html:53
 msgid "OSM Healthcare"
 msgstr "Fayyaa OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:92
+#: app/templates/partials/project_details/setup_steps/step3_data.html:54
 msgid "OSM Toilets"
 msgstr "Mana fincaanii OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:93
+#: app/templates/partials/project_details/setup_steps/step3_data.html:55
 msgid "OSM Religious"
 msgstr "Amantii OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:94
+#: app/templates/partials/project_details/setup_steps/step3_data.html:56
 msgid "OSM Landuse"
 msgstr "Itti fayyadama lafa OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:95
+#: app/templates/partials/project_details/setup_steps/step3_data.html:57
 msgid "OSM Waterways"
 msgstr "Daandii bishaanii OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:96
+#: app/templates/partials/project_details/setup_steps/step3_data.html:58
 msgid "OSM Water Points"
 msgstr "Bakka bishaanii OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:97
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
 msgid "OSM Waste Disposal"
 msgstr "Baduu balfaa OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:98
+#: app/templates/partials/project_details/setup_steps/step3_data.html:60
 msgid "OSM Education"
 msgstr "Barnoota OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:99
+#: app/templates/partials/project_details/setup_steps/step3_data.html:61
 msgid "OSM Cemeteries"
 msgstr "Awwaalaa OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:100
+#: app/templates/partials/project_details/setup_steps/step3_data.html:62
 msgid "OSM Amenities"
 msgstr "Tajaajila OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:105
+#: app/templates/partials/project_details/setup_steps/step3_data.html:66
 msgid "Feature shape"
 msgstr "amaloota"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:108
+#: app/templates/partials/project_details/setup_steps/step3_data.html:68
 msgid "Polygon (area)"
 msgstr "Pooleegoonii"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:109
+#: app/templates/partials/project_details/setup_steps/step3_data.html:69
 msgid "Line"
 msgstr "Pooleelaayinii"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:110
+#: app/templates/partials/project_details/setup_steps/step3_data.html:70
 msgid "Point"
 msgstr "Tuqaa"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+#: app/templates/partials/project_details/setup_steps/step3_data.html:76
 msgid "Use Centroids (For OSM Data Download)"
 msgstr "Centroid fayyadami (Buusii daataa OSM tiif)"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:121
+#: app/templates/partials/project_details/setup_steps/step3_data.html:77
 msgid "Convert polygons to single points."
 msgstr "Polygons gara tuqaalee tokko-tokkootti jijjiiri."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:143
+#: app/templates/partials/project_details/setup_steps/step3_data.html:85
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "Baafata data OSM uumamaa jira... yeroo muraasa fudhachuu danda'a."
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:4
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:19
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:20
 msgid "Publish Project"
-msgstr ""
+msgstr "Pirojektii Maxxansi"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:5
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:28
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:30
 msgid "Ready"
 msgstr "Qophaa'eera"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:8
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:9
 #, python-format
 msgid ""
 "Publish the project so your team can open the tasks, download them and "
 "share links.\n"
-"    Nothing is sent to %(app)s; your team coordinates there."
+"      Nothing is sent to %(app)s; your team coordinates there."
 msgstr ""
+"Gareen kee hojiiwwan banuu, buusuu fi liinkii qooduu akka danda'uuf "
+"pirojektii maxxansi. Gara %(app)s homtuu hin ergamu; gareen kee achitti "
+"qindaa'a."
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:10
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:11
 msgid "the app"
-msgstr ""
+msgstr "appii sana"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:27
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:42
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:29
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:45
 msgid "Finalise Project"
 msgstr "Pirojektii xumuri"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:31
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:34
 msgid ""
 "Everything's ready. Click below to create the project in your chosen "
 "mapping tool."
@@ -3051,15 +2845,15 @@ msgstr ""
 "Wanti barbaachisu hundi xumurameera! Meeshaa kaartaa filattaniin "
 "pirojektii uumaa."
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:50
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:48
 msgid "Use custom credentials"
 msgstr "Ragaa dhuunfaa"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:83
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:85
 msgid "Confirm Project Finalisation"
 msgstr "Xumura pirojektii mirkaneessi"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:87
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:86
 msgid "Are you sure you want to finalise this project?"
 msgstr "Pirojektii kana xumuruun akka barbaaddan mirkanaa'oo?"
 
@@ -3067,7 +2861,7 @@ msgstr "Pirojektii kana xumuruun akka barbaaddan mirkanaa'oo?"
 msgid "Confirm & Finalise"
 msgstr "Mirkaneessi fi xumuri"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:97
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:95
 msgid "Custom Credentials"
 msgstr "Ragaa dhuunfaa"
 
@@ -3075,43 +2869,53 @@ msgstr "Ragaa dhuunfaa"
 msgid "ODK Central URL"
 msgstr "URL ODK Central"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:108
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:103
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:141
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:108
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:138
+msgid "Username"
+msgstr "Maqaa fayyadamaa"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:114
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:144
+msgid "Password"
+msgstr "Jecha icciitii"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:121
 msgid "Where should this project live?"
 msgstr "Pirojektiin kun eessa jiraachuu qaba?"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:145
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:124
 msgid "Use my account on app.qfield.cloud"
 msgstr "Herrega koo app.qfield.cloud irratti fayyadami"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:146
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:125
 msgid "Use a custom-hosted QFieldCloud instance"
 msgstr "QFieldCloud ofiin keessummeeffame fayyadami"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:157
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:131
+msgid "QField Cloud URL"
+msgstr "URL QField Cloud"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:132
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:169
-msgid "qfield_username"
-msgstr "qfield_username"
-
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:181
-msgid "qfield_password"
-msgstr "qfield_password"
-
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:186
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:149
 msgid "Organisation name"
 msgstr "Maqaa dhaabbataa"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:191
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:150
 msgid "Optional - leave blank to create under your username"
 msgstr "Filannoo - maqaa fayyadamaa kee jalatti uumuuf duwwaa dhiisi"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:206
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:160
+msgid "Test Credentials"
+msgstr "Ragaa qori"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:163
 msgid "Save & Continue"
 msgstr "Olkaa'i fi itti fufi"
 

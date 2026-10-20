@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-10-19 20:39+0100\n"
+"POT-Creation-Date: 2026-10-20 23:29+0100\n"
 "PO-Revision-Date: 2026-03-19 22:03+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ig\n"
@@ -30,7 +30,7 @@ msgstr "Njehie a na-atụghị anya ya mere. Biko kpọtụrụ onye nchịkwa."
 msgid "Could not connect to database"
 msgstr "Enweghị ike ijikọ na nchekwa data"
 
-#: app/auth/auth_deps.py:79
+#: app/auth/auth_deps.py:81
 msgid "Authenticated user is missing a valid identifier."
 msgstr "na-efunahụ ezigbo njirimara."
 
@@ -40,29 +40,29 @@ msgstr "enweghị ikike ịnweta ọrụ a."
 
 #: app/auth/roles.py:178
 msgid "You must be logged in to view this project."
-msgstr ""
+msgstr "Ị ga-abanyerịrị iji hụ ọrụ a."
 
 #: app/auth/user_crud.py:84
 #, python-format
 msgid "User (%(user_sub)s) could not be inserted in db"
 msgstr "(%(user_sub)s) na db"
 
-#: app/central/central_crud.py:164
+#: app/central/central_crud.py:165
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
 msgstr "Njehie mere mgbe a na-emepụta ọrụ na ODK Central: %(error)s"
 
-#: app/central/central_crud.py:226
+#: app/central/central_crud.py:219
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
 msgstr "agaghị ebugo fọm na ODK Central: %(error)s"
 
-#: app/central/central_crud.py:267
+#: app/central/central_crud.py:273
 #, python-format
 msgid "Could not read XLSForm file: %(error)s"
 msgstr "Enweghị ike ịgụ faịlụ XLSForm: %(error)s"
 
-#: app/central/central_crud.py:307
+#: app/central/central_crud.py:299
 #, python-format
 msgid ""
 "XLSForm has select questions referencing lists that aren't defined in the"
@@ -71,49 +71,57 @@ msgstr ""
 "XLSForm ahọrọla ndepụta ntụaka ajụjụ na-akọwapụtaghị na mpempe nhọrọ: "
 "%(rows)s. Lelee nyocha gị na mpempe nhọrọ gị."
 
-#: app/central/central_crud.py:333
+#: app/central/central_crud.py:318
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
 msgstr "XLSForm adịghị mma: %(error)s"
 
-#: app/central/central_crud.py:427
+#: app/central/central_crud.py:400
 msgid "'geometry' data field is mandatory"
 msgstr "'jiometry' bụ iwu"
 
-#: app/central/central_crud.py:700
+#: app/central/central_crud.py:715
 msgid "ODK project_id is missing; cannot create/merge entity lists."
 msgstr "ODK project_id na-efu; enweghị ike ịmepụta/jikọta ndepụta aha."
 
-#: app/central/central_crud.py:774
+#: app/central/central_crud.py:755
 msgid "Could not generate token for app user."
 msgstr "enweghị ike iwepụta akara maka onye ọrụ ngwa."
 
-#: app/central/central_crud.py:806 app/central/central_crud.py:812
+#: app/central/central_crud.py:787 app/central/central_crud.py:793
 msgid "An error occurred while creating the app user token."
 msgstr "Njehie a na-atụghị anya ya mere mgbe a na-emepụta koodu QR."
 
-#: app/central/central_crud.py:826
+#: app/central/central_crud.py:807
 #, python-format
 msgid "Could not assign %(scope)s role to app user."
 msgstr "enweghị ike ikenye onye ọrụ ngwa ọrụ %(scope)s."
 
-#: app/central/central_crud.py:865
+#: app/central/central_crud.py:846
 msgid "Could not find 'Project Manager' role in ODK Central."
 msgstr "Mepee ọrụ na ODK Central"
 
-#: app/central/central_crud.py:890
+#: app/central/central_crud.py:871
 msgid "ODK Central returned no user ID after creation."
 msgstr "ODK Central weghachiteghị NJ onye ọrụ ka emechara ya."
 
-#: app/central/central_crud.py:1023
+#: app/central/central_crud.py:996
 msgid "Failed to create ODK Central manager user."
 msgstr "Ekpughị imepụta onye njikwa ODK Central."
 
-#: app/central/central_crud.py:1043
+#: app/central/central_crud.py:1013
+msgid "ODK credentials are invalid, or may have changed."
+msgstr "Nzere ODK ezighi ezi, ma ọ bụ ha nwere ike ịgbanwela."
+
+#: app/central/central_crud.py:1019
+msgid "Failed to connect to Central. Is the URL valid?"
+msgstr "Enweghị ike ijikọ na Central. URL ọ ziri ezi?"
+
+#: app/central/central_crud.py:1025
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "Njehie a na-atụghị anya ya mere mgbe a na-emepụta koodu QR."
 
-#: app/central/central_deps.py:163
+#: app/central/central_deps.py:144
 #: app/htmx/project_create/project_create_templates.py:104
 msgid "Provide a valid .xls or .xlsx file"
 msgstr "Nye faịlụ .xls ma ọ bụ .xlsx ziri ezi"
@@ -141,133 +149,67 @@ msgstr "weghachiri HTTP %(status_code)s."
 msgid "Failed to convert YAML form to XLSForm."
 msgstr "Ekpughị ịgbanwe ụdị YAML ka ọ bụrụ XLSForm."
 
-#: app/htmx/project_detail_routes.py:203
+#: app/htmx/project_detail_routes.py:164
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "Achọtaghị ọrụ (%(project_id)s)."
 
-#: app/htmx/project_detail_routes.py:210
+#: app/htmx/project_detail_routes.py:171
 msgid "Only the project manager can delete this project."
 msgstr "Naanị onye njikwa ọrụ nwere ike ihichapụ ọrụ a."
 
-#: app/htmx/project_detail_routes.py:254 app/templates/project_details.html:313
+#: app/htmx/project_detail_routes.py:215 app/templates/project_details.html:204
 msgid "Project not found."
 msgstr "Achọtaghị ọrụ ahụ."
 
-#: app/htmx/project_detail_routes.py:294
+#: app/htmx/project_detail_routes.py:251
 #: app/htmx/setup_steps/setup_step_responses.py:70
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Njehie: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:328
-#, python-format
-msgid "Added the following user(s) as project editors: %(names)s."
-msgstr "Agbakwunyere onye ọrụ ndị a dị ka ndị ndezi ọrụ: %(names)s."
-
-#: app/htmx/project_detail_routes.py:332
-#, python-format
-msgid "Could not add '%(username)s': %(reason)s"
-msgstr "Enweghị ike ịgbakwunye '%(username)s': %(reason)s"
-
-#: app/htmx/project_detail_routes.py:338
-msgid "Add more collaborators"
-msgstr "Tinyekwuo ndị mmekọ"
-
-#: app/htmx/project_detail_routes.py:351
-msgid "Invite QFieldCloud collaborators"
-msgstr "Kpọọ ndị mmekọ QFieldCloud"
-
-#: app/htmx/project_detail_routes.py:354
-msgid ""
-"Mappers must have an account on QFieldCloud before you can give them "
-"access to this project."
-msgstr ""
-"Ndị na-ese eserese ga-enwerịrị akaụntụ na QFieldCloud tupu ị nwee ike "
-"inye ha ohere maka ọrụ a."
-
-#: app/htmx/project_detail_routes.py:360
-msgid ""
-"Have each mapper create a free account at <a "
-"href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
-"class=\"ftm-link--brand\">app.qfield.cloud</a>."
-msgstr ""
-"Mee ka mapa ọ bụla mepụta akaụntụ efu na <a "
-"href=\"https://app.qfield.cloud\" target=\"_blank\" rel=\"noopener\" "
-"class=\"ftm-link--brand\">app.qfield.cloud</a>."
-
-#: app/htmx/project_detail_routes.py:366
-msgid ""
-"Enter their QFieldCloud usernames below (comma-separated for multiple "
-"users) and click submit. They will be added as editors and can log in to "
-"QField to start mapping."
-msgstr ""
-"Tinye aha njirimara QFieldCloud ha n'okpuru (rịkọm-iche maka ọtụtụ ndị "
-"ọrụ) wee pịa nyefee. A ga-agbakwunye ha dị ka ndị ndezi ma nwee ike "
-"ịbanye na QField ka ịmalite eserese."
-
-#: app/htmx/project_detail_routes.py:372
-msgid "e.g. alice, bob, charlie"
-msgstr "eg. Alice, Bob, charlie"
-
-#: app/htmx/project_detail_routes.py:373
-msgid "Add collaborators"
-msgstr "Tinye ndị mmekọ"
-
-#: app/htmx/project_detail_routes.py:465
-msgid "Enter at least one QFieldCloud username."
-msgstr "Tinye opekata mpe otu aha njirimara QFieldCloud."
-
-#: app/htmx/project_detail_routes.py:475
-msgid "QFieldCloud project ID not found for this project."
-msgstr "Ahụghị ID ọrụ QFieldCloud maka ọrụ a."
-
-#: app/htmx/project_detail_routes.py:481
-msgid ""
-"This project was created on a custom QFieldCloud instance. Use the "
-"QFieldCloud Admin tab to manage collaborators."
-msgstr ""
-"Emepụtara ọrụ a na ihe atụ QFieldCloud omenala. Jiri taabụ Admin "
-"QFieldCloud jikwaa ndị na-emekọ ihe."
-
-#: app/htmx/project_detail_routes.py:547
+#: app/htmx/project_detail_routes.py:292
 msgid "GeoJSON export is only available for QField projects."
 msgstr "Mbupụ GeoJSON dị naanị maka ọrụ QField."
 
-#: app/htmx/project_detail_routes.py:552
+#: app/htmx/project_detail_routes.py:297
 msgid "This project is not yet linked to a QFieldCloud project."
 msgstr "Ejikọtabeghị ọrụ a na ọrụ QFieldCloud."
 
-#: app/htmx/project_detail_routes.py:563
+#: app/htmx/project_detail_routes.py:308
 #, python-format
 msgid "Failed to export GeoJSON: %(error)s"
 msgstr "Mbupu GeoJSON agaghị eme: %(error)s"
 
 #: app/htmx/static_routes.py:140
 msgid "Not found."
-msgstr ""
+msgstr "Ahụghị ya."
 
 #: app/htmx/static_routes.py:143
 msgid ""
 "The task planner has not been built. Run `just build planner`, or set "
 "PLANNER_DIR to the planner build directory."
 msgstr ""
+"Ewubeghị onye nhazi ọrụ. Mee `just build planner`, ma ọ bụ tọọ "
+"PLANNER_DIR na nchekwa nwube nke onye nhazi."
 
-#: app/htmx/task_plan_routes.py:60
+#: app/htmx/task_plan_routes.py:62
 msgid "The file is not valid GeoJSON."
-msgstr ""
+msgstr "Faịlụ a abụghị GeoJSON ziri ezi."
 
-#: app/htmx/task_plan_routes.py:88
-msgid "Only published ODK projects can be re-synced."
-msgstr ""
+#: app/htmx/task_plan_routes.py:89
+msgid "Only published ODK and QField projects can be re-synced."
+msgstr "Ọ bụ naanị ọrụ ODK na QField ebipụtara ka enwere ike ijikọ ọzọ."
 
-#: app/htmx/task_plan_routes.py:98
-msgid "Could not update the tasks in ODK Central. Please try again."
-msgstr ""
+#: app/htmx/task_plan_routes.py:134
+#, python-format
+msgid "Could not update the tasks in %(app)s. Please try again."
+msgstr "Enweghị ike imelite ọrụ dị na %(app)s. Biko nwaa ọzọ."
 
-#: app/htmx/task_plan_routes.py:102
-msgid "Tasks updated in ODK Central."
-msgstr ""
+#: app/htmx/task_plan_routes.py:139
+#, python-format
+msgid "Tasks updated in %(app)s."
+msgstr "Emelitere ọrụ dị na %(app)s."
 
 #: app/htmx/basemap/basemap_attach_flow.py:69
 msgid ""
@@ -385,226 +327,54 @@ msgstr "Biko họrọ fọm ma ọ bụ bulite faịlụ."
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "A nyochara fọm ahụ ma bulite ya nke ọma! A na-ebulite ibe ahụ ọzọ..."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:73
-msgid "This user does not exist. Please create it first."
-msgstr "Onye ọrụ a adịghị. Biko kee ya mbụ."
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:46
+msgid ""
+"Tasks were planned with the old data. They are kept, but reopen the task "
+"planner to update feature counts."
+msgstr ""
+"E jiri data ochie hazie ọrụ ndị a. Edobere ha, mana meghee onye nhazi ọrụ"
+" ọzọ iji melite ọnụọgụ ihe ndị dị na ya."
 
-#: app/htmx/qfc_admin/qfc_admin_routes.py:75
-msgid "This user is already a collaborator on this project."
-msgstr "Onye ọrụ a abụrụla onye mmekọ na ọrụ a."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:76 app/qfield/qfield_crud.py:1404
-#, python-format
-msgid "Failed to add collaborator: %(exc)s"
-msgstr "Enweghị ike itinye onye mmekọ: %(exc)s"
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:106
-msgid "All fields are required."
-msgstr "A chọrọ mpaghara niile."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:121
-msgid "Login succeeded but no token received."
-msgstr "Nbanye gara nke ọma mana enwetaghị token."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:129
-msgid "Login failed. Check your URL and credentials."
-msgstr "Nbanye dara. Lelee URL na njirimara gị."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:168
-msgid "Session expired. Please log in again."
-msgstr "Oge njikọ ahụ agwụla. Biko banye ọzọ."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:183
-#, python-format
-msgid "Could not load collaborators: %(exc)s"
-msgstr "Enweghị ike ibubata ndị mmekọ: %(exc)s"
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:214
-msgid "Username is required."
-msgstr "Aha njirimara dị mkpa."
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:268
-#, python-format
-msgid "Failed to remove collaborator: %(exc)s"
-msgstr "Enweghị ike iwepụ onye mmekọ: %(exc)s"
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:311
-#, python-format
-msgid "Failed to update collaborator: %(exc)s"
-msgstr "Enweghị ike imelite onye mmekọ: %(exc)s"
-
-#: app/htmx/qfc_admin/qfc_admin_routes.py:338
-#, python-format
-msgid "Collaborator refresh failed: %(exc)s"
-msgstr "Mmeghari ndị mmekọ dara: %(exc)s"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:9
-msgid "Admin"
-msgstr "Onye nchịkwa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:10
-#: app/templates/project_details.html:207
-msgid "Manager"
-msgstr "Onye njikwa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:11
-msgid "Editor"
-msgstr "Onye ndezi"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:12
-msgid "Reporter"
-msgstr "Onye na-akọ akụkọ"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:13
-msgid "Reader"
-msgstr "Onye na-agụ"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:51
-msgid "QFieldCloud Projects"
-msgstr "Ọrụ QFieldCloud"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:56
-msgid "Connected as"
-msgstr "Ejikọrọ dịka"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:57
-msgid "to"
-msgstr "na"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:63
-msgid "Log Out"
-msgstr "Pụọ"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:68
-msgid "No projects found."
-msgstr "Achọtaghị ọrụ ọ bụla."
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:77
-msgid "Public"
-msgstr "Nke ọhaneze"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:79
-msgid "Private"
-msgstr "Nke nzuzo"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:93
-msgid "Manage"
-msgstr "Jikwaa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:103
-msgid "Project"
-msgstr "Ọrụ"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:103
-msgid "Owner"
-msgstr "Onye nwe ya"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:103
-msgid "Visibility"
-msgstr "Ịhụ anya"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:103
-#: app/templates/project_details.html:193
-msgid "Description"
-msgstr "Nkọwa"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:175
-msgid "Update"
-msgstr "Melite"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:178
-#: app/htmx/qfc_admin/qfc_admin_templates.py:185
-#: app/htmx/qfc_admin/qfc_admin_templates.py:193
-msgid "Remove"
-msgstr "Wepụ"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:183
-msgid "Remove Collaborator"
-msgstr "Wepụ onye mmekọ"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:185
-msgid "from this project?"
-msgstr "na ọrụ a?"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:189
-#: app/templates/new_project_custom.html:139
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:90
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:200
-msgid "Cancel"
-msgstr "Kagbuo"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:199
-msgid "User"
-msgstr "Onye ọrụ"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:199
-msgid "Role"
-msgstr "Ọrụ"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:199
-msgid "Actions"
-msgstr "Omume"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:205
-msgid "No collaborators yet."
-msgstr "Enweghị ndị mmekọ ugbu a."
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:218
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:114
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:120
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:163
-#: app/templates/qfc_admin.html:52
-msgid "Username"
-msgstr "Aha njirimara"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:228
-msgid "Add Collaborator"
-msgstr "Tinye onye mmekọ"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:236
-msgid "Close"
-msgstr "Mechie"
-
-#: app/htmx/qfc_admin/qfc_admin_templates.py:243
-msgid "Collaborators"
-msgstr "Ndị mmekọ"
-
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:67
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:79
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "A budatara data OSM nke ọma! A hụrụ njirimara %(feature_count)s."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:70
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:82
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "downloading again with different parameters."
 msgstr ""
+"Ọ bụrụ na ọ dị mma, pịa \"Nabata mgbakwunye data\". Ma ọ bụghị, nwaa "
+"ibudata ọzọ jiri parameter ndị ọzọ."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:102
-#: app/templates/partials/project_details/style_and_scripts.html:26
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:115
+#: app/templates/partials/project_details/style_and_scripts.html:24
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "Ụdị faịlụ ezighi ezi. Biko bulite faịlụ .geojson ma ọ bụ .json."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:125
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:138
 msgid "No valid geometries found in GeoJSON."
 msgstr "A hụghị geometry ziri ezi n'ime GeoJSON."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:139
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:152
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ E bulitere GeoJSON nke ọma! A hụrụ njirimara %(feature_count)s."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:142
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:155
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "uploading a different file."
 msgstr ""
+"Ọ bụrụ na ọ dị mma, pịa \"Nabata mgbakwunye data\". Ma ọ bụghị, nwaa "
+"ibulite faịlụ ọzọ."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:174
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:188
 msgid "✓ Collect-new-data mode selected. You can continue."
-msgstr ""
+msgstr "✓ Ahọrọla ụdị nchịkọta data ọhụrụ. Ị nwere ike ịga n'ihu."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:208
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:222
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -612,17 +382,19 @@ msgstr ""
 "A hụghị data GeoJSON. Biko budata data OSM ma ọ bụ bulite faịlụ GeoJSON "
 "mbụ."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:227
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:241
 msgid "✓ Data extract successfully saved! You can now continue to the Tasks step."
-msgstr ""
+msgstr "✓ Echekwara mgbakwunye data! Ugbu a ị nwere ike ịga n'ihu na nzọụkwụ Ọrụ."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:274
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:288
 msgid ""
 "No data extract is staged. Please download OSM data or upload a GeoJSON "
 "file first."
 msgstr ""
+"Enweghị mgbakwunye data a kwadebere. Buru ụzọ budata data OSM ma ọ bụ "
+"bulite faịlụ GeoJSON."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:289
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:303
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
@@ -631,9 +403,9 @@ msgstr ""
 "✓ Anabatala mwepụta data! Echekwara njirimara %(feature_count)s. Nzọụkwụ "
 "3 agwụla ugbu a."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:329
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:343
 msgid "Data extract discarded. Choose a data source above to try again."
-msgstr ""
+msgstr "Atụfuola mgbakwunye data. Họrọ isi iyi data n'elu iji nwaa ọzọ."
 
 #: app/htmx/setup_steps/setup_step_extract_helpers.py:42
 msgid "Invalid GeoJSON data in request. Please try uploading again."
@@ -671,25 +443,25 @@ msgstr ""
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:61
 msgid "Could not reach Tasking Manager. Please try again later."
-msgstr ""
+msgstr "Enweghị ike iru Tasking Manager. Biko nwaa ọzọ ma emechaa."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:66
 #, python-format
 msgid "Tasking Manager project %(id)s was not found."
-msgstr ""
+msgstr "Ahụghị ọrụ Tasking Manager %(id)s."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:71
 #, python-format
 msgid "Tasking Manager returned an error (HTTP %(status)s)."
-msgstr ""
+msgstr "Tasking Manager weghachiri njehie (HTTP %(status)s)."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:84
 msgid "Tasking Manager returned an invalid response."
-msgstr ""
+msgstr "Tasking Manager weghachiri nzaghachi na-ezighi ezi."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:94
 msgid "Tasking Manager project AOI did not contain any polygon geometries."
-msgstr ""
+msgstr "Mpaghara mmasị nke ọrụ Tasking Manager enweghị geometry polygon ọ bụla."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
@@ -719,151 +491,157 @@ msgstr "A hụghị polygon geometry. Mpaghara ọrụ ga-abụ polygon."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:206
 msgid "Tasking Manager project ID must be a positive integer."
-msgstr ""
+msgstr "ID ọrụ Tasking Manager ga-abụrịrị ọnụọgụ zuru oke dị mma."
 
 #: app/projects/mapping_apps.py:48
 msgid "GIS mapping app for Android and iOS, with our simple task plugin."
-msgstr ""
+msgstr "Ngwa maapụ GIS maka Android na iOS, ya na plugin ọrụ anyị dị mfe."
 
 #: app/projects/mapping_apps.py:49
 msgid "Drawing and editing geometry, detailed surveys"
-msgstr ""
+msgstr "Ise na idezi geometry, nyocha zuru ezu"
 
 #: app/projects/mapping_apps.py:57
 msgid "Form-based survey app for Android."
-msgstr ""
+msgstr "Ngwa nyocha na-eji fọm maka Android."
 
 #: app/projects/mapping_apps.py:58
 msgid "Form-heavy surveys, simple phones"
-msgstr ""
+msgstr "Nyocha nwere ọtụtụ fọm, ekwentị dị mfe"
 
 #: app/projects/mapping_apps.py:66
 msgid "Fast OpenStreetMap editor for shops, amenities and entrances."
-msgstr ""
+msgstr "Onye ndezi OpenStreetMap dị ngwa maka ụlọ ahịa, ọrụ obodo na ọnụ ụzọ."
 
 #: app/projects/mapping_apps.py:67
 msgid "Updating existing OSM buildings and points of interest"
-msgstr ""
+msgstr "Imelite ụlọ na ebe mmasị dị adị na OSM"
 
 #: app/projects/mapping_apps.py:75
 msgid "Answer simple quests to complete OpenStreetMap data."
-msgstr ""
+msgstr "Zaa ajụjụ dị mfe iji mezue data OpenStreetMap."
 
 #: app/projects/mapping_apps.py:76
 msgid "Quick OSM attribute quests on roads and points of interest"
-msgstr ""
+msgstr "Ajụjụ ngwa ngwa gbasara njirimara OSM n'okporo ụzọ na ebe mmasị"
 
 #: app/projects/mapping_apps.py:84
 msgid "Offline-first mapping for communities and territories."
-msgstr ""
+msgstr "Maapụ na-arụ ọrụ na-enweghị ịntanetị maka obodo na mpaghara."
 
 #: app/projects/mapping_apps.py:85
 msgid "Offline, community-led mapping"
-msgstr ""
+msgstr "Maapụ na-enweghị ịntanetị nke obodo na-edu"
 
 #: app/projects/mapping_apps.py:93
 msgid "Offline maps and navigation, with OSM editing."
-msgstr ""
+msgstr "Maapụ na nduzi na-enweghị ịntanetị, ya na ndezi OSM."
 
 #: app/projects/mapping_apps.py:94
 msgid "Navigating to tasks, editing OSM points"
-msgstr ""
+msgstr "Nduzi gaa n'ọrụ, idezi ntụpọ OSM"
 
 #: app/projects/mapping_apps.py:102
 msgid "Open street-level imagery, captured with any camera."
-msgstr ""
+msgstr "Foto ghe oghe nke okporo ụzọ, ejiri igwefoto ọ bụla see."
 
 #: app/projects/mapping_apps.py:103
 msgid "Street-level imagery along roads"
-msgstr ""
+msgstr "Foto okporo ụzọ n'akụkụ ụzọ"
 
 #: app/projects/mapping_apps.py:111
 msgid "Print paper maps, sketch on them, scan them back."
-msgstr ""
+msgstr "Bipụta maapụ akwụkwọ, see ihe n'elu ha, wee nyochaa ha ọzọ."
 
 #: app/projects/mapping_apps.py:112
 msgid "Paper maps and sketch mapping"
-msgstr ""
+msgstr "Maapụ akwụkwọ na maapụ eserese"
 
 #: app/projects/mapping_apps.py:120
 msgid "Turn locations shared in chat apps into a map."
-msgstr ""
+msgstr "Mee ka ọnọdụ e kesara na ngwa mkparịta ụka bụrụ maapụ."
 
 #: app/projects/mapping_apps.py:121
 msgid "Location sharing from chat apps"
-msgstr ""
+msgstr "Ịkesa ọnọdụ site na ngwa mkparịta ụka"
 
 #: app/projects/mapping_apps.py:125
 msgid "Other app"
-msgstr ""
+msgstr "Ngwa ọzọ"
 
 #: app/projects/mapping_apps.py:129
 msgid "Any other app. Share the tasks as files and links."
-msgstr ""
+msgstr "Ngwa ọ bụla ọzọ. Kesaa ọrụ dị ka faịlụ na njikọ."
 
 #: app/projects/mapping_apps.py:130
 msgid "Any app"
-msgstr ""
+msgstr "Ngwa ọ bụla"
 
 #: app/projects/mapping_apps.py:157
 msgid ""
 "Not for OpenStreetMap: QField for map-based capture and editing, or ODK "
 "for form-heavy surveys."
 msgstr ""
+"Ọ bụghị maka OpenStreetMap: QField maka nchịkọta na ndezi na maapụ, ma ọ "
+"bụ ODK maka nyocha nwere ọtụtụ fọm."
 
 #: app/projects/mapping_apps.py:162
 msgid "Poorly mapped: QField lets mappers draw the missing geometry."
 msgstr ""
+"Emebeghị maapụ nke ọma: QField na-enye ndị na-ese maapụ ohere ise "
+"geometry na-efu efu."
 
 #: app/projects/mapping_apps.py:166
 msgid ""
 "Already mapped: Every Door is the quickest way to update buildings and "
 "points of interest."
-msgstr ""
+msgstr "E meelarị maapụ: Every Door bụ ụzọ kacha ọsọ iji melite ụlọ na ebe mmasị."
 
 #: app/projects/mapping_apps.py:171
 msgid ""
 "Already mapped: StreetComplete for road details, or Panoramax for street-"
 "level imagery."
 msgstr ""
+"E meelarị maapụ: StreetComplete maka nkọwa okporo ụzọ, ma ọ bụ Panoramax "
+"maka foto okporo ụzọ."
 
 #: app/projects/mapping_apps.py:174
 msgid "QField handles any kind of feature."
-msgstr ""
+msgstr "QField na-ejikwa ụdị ihe ọ bụla."
 
-#: app/projects/project_crud.py:137
+#: app/projects/project_crud.py:120
 msgid "Selected area is too large. Please select an area smaller than 200 km²."
 msgstr "ahọpụtara buru oke ibu. Biko họrọ mpaghara pere mpe karịa 200 km²."
 
-#: app/projects/project_crud.py:148
+#: app/projects/project_crud.py:131
 msgid "Failed to generate data extract from the raw data API."
 msgstr "Egwughị iwepụta data sitere na API data raw."
 
-#: app/projects/project_crud.py:227
+#: app/projects/project_crud.py:206
 msgid "This job was interrupted. Please try again."
-msgstr ""
+msgstr "Ọrụ a kwụsịrị n'etiti. Biko nwaa ọzọ."
 
-#: app/projects/project_crud.py:724
+#: app/projects/project_crud.py:692
 msgid "QField project ID not found."
 msgstr "Achọtaghị ọrụ ahụ."
 
-#: app/projects/project_crud.py:757
+#: app/projects/project_crud.py:712
 msgid "Project name not found."
 msgstr "Achọtaghị ọrụ ahụ."
 
-#: app/projects/project_crud.py:764
+#: app/projects/project_crud.py:719
 msgid "ODK project ID not found."
 msgstr "Achọtaghị ọrụ ahụ."
 
-#: app/projects/project_crud.py:773
+#: app/projects/project_crud.py:728
 msgid "Appuser token not found."
 msgstr "Achọtaghị ọrụ ahụ."
 
-#: app/projects/project_crud.py:790
+#: app/projects/project_crud.py:745
 msgid "Failed to generate QR code."
 msgstr "Ebubataghị fọm ndebiri ahụ."
 
-#: app/projects/project_services.py:77
+#: app/projects/project_services.py:74
 msgid ""
 "This project was created with a simplified workflow in FieldTM and is "
 "made to collect building data to enhance OpenStreetMap."
@@ -871,93 +649,99 @@ msgstr ""
 "E kere oru a site na usoro dị mfe na FieldTM ma e mere ya iji nakọta data"
 " ụlọ iji meziwanye OpenStreetMap."
 
-#: app/projects/project_services.py:84
+#: app/projects/project_services.py:81
 msgid "Unnamed Area"
 msgstr "Mpaghara Enweghị Aha"
 
-#: app/projects/project_services.py:97
+#: app/projects/project_services.py:94
 #, python-brace-format
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "Mpaghara {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:396
+#: app/projects/project_services.py:389
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
+#: app/projects/project_services.py:1154
+msgid "Task areas changed. Confirm the reset to re-sync the tasks."
+msgstr "Mpaghara ọrụ agbanweela. Kwado nhazigharị iji jikọọ ọrụ ọzọ."
+
 #: app/projects/task_plan.py:31
 #, python-format
 msgid "Values must be %(max_length)s characters or fewer."
-msgstr ""
+msgstr "Uru ga-abụ mkpụrụedemede %(max_length)s ma ọ bụ obere."
 
 #: app/projects/task_plan.py:44
 msgid "Group labels may only contain letters, numbers, hyphens and underscores."
 msgstr ""
+"Akara otu nwere ike inwe naanị mkpụrụedemede, ọnụọgụ, hyphen na "
+"underscore."
 
 #: app/projects/task_plan.py:61
 msgid "Colours must be hex values such as #d63f3f."
-msgstr ""
+msgstr "Agba ga-abụ uru hex dị ka #d63f3f."
 
-#: app/projects/task_plan.py:120
-msgid "A task plan must be a GeoJSON FeatureCollection."
-msgstr ""
-
-#: app/projects/task_plan.py:122
-msgid "The task plan has no tasks."
-msgstr ""
-
-#: app/projects/task_plan.py:125
-#, python-format
-msgid "A task plan can have at most %(max_tasks)s tasks."
-msgstr ""
-
-#: app/projects/task_plan.py:134
+#: app/projects/task_plan.py:112
 #, python-format
 msgid "Task %(number)s must be a Polygon with WGS84 coordinates."
-msgstr ""
+msgstr "Ọrụ %(number)s ga-abụrịrị polygon nwere nhazi WGS84."
 
-#: app/projects/task_plan.py:144
+#: app/projects/task_plan.py:122
 #, python-format
 msgid "Task %(number)s: %(error)s"
-msgstr ""
+msgstr "Ọrụ %(number)s: %(error)s"
 
-#: app/qfield/qfield_crud.py:168
+#: app/projects/task_plan.py:143
+msgid "A task plan must be a GeoJSON FeatureCollection."
+msgstr "Atụmatụ ọrụ ga-abụrịrị GeoJSON FeatureCollection."
+
+#: app/projects/task_plan.py:145
+msgid "The task plan has no tasks."
+msgstr "Atụmatụ ọrụ enweghị ọrụ ọ bụla."
+
+#: app/projects/task_plan.py:148
+#, python-format
+msgid "A task plan can have at most %(max_tasks)s tasks."
+msgstr "Atụmatụ ọrụ nwere ike inwe ọrụ %(max_tasks)s kacha."
+
+#: app/qfield/qfield_crud.py:157
 msgid "Project outline is missing or has no geometry."
 msgstr "na-efu ma ọ bụ enweghị geometry."
 
-#: app/qfield/qfield_crud.py:174
+#: app/qfield/qfield_crud.py:163
 msgid "Project outline geometry has no coordinates."
 msgstr "ihe ndeputa geometry enweghị nhazi."
 
-#: app/qfield/qfield_crud.py:484
-msgid "Project outline is required for QField project creation."
-msgstr "✓ Achọghị nkewa ọrụ maka nhazi ọrụ a."
-
-#: app/qfield/qfield_crud.py:489
-msgid "XLSForm is required for QField project creation."
-msgstr "XLSForm maka imepụta ọrụ QField."
-
-#: app/qfield/qfield_crud.py:506
-msgid "Failed to modify XLSForm for QField."
-msgstr "Ekpughị ịgbanwe XLSForm maka QField."
-
-#: app/qfield/qfield_crud.py:555
+#: app/qfield/qfield_crud.py:450
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS emechara mana enweghị faịlụ mmepụta edeghị."
 
-#: app/qfield/qfield_crud.py:569
+#: app/qfield/qfield_crud.py:462
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS emechara mana enweghị faịlụ .qgz dị na mmepụta."
 
-#: app/qfield/qfield_crud.py:599
+#: app/qfield/qfield_crud.py:485
+msgid "Project outline is required for QField project creation."
+msgstr "✓ Achọghị nkewa ọrụ maka nhazi ọrụ a."
+
+#: app/qfield/qfield_crud.py:490
+msgid "XLSForm is required for QField project creation."
+msgstr "XLSForm maka imepụta ọrụ QField."
+
+#: app/qfield/qfield_crud.py:502
+msgid "Failed to modify XLSForm for QField."
+msgstr "Ekpughị ịgbanwe XLSForm maka QField."
+
+#: app/qfield/qfield_crud.py:572
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField oru ngo ID na-efu; enweghị ike itinye basemap."
 
-#: app/qfield/qfield_crud.py:636
+#: app/qfield/qfield_crud.py:609
 msgid "Basemap attach completed but produced no project files."
 msgstr "Etinyela basemap na oru QField."
 
-#: app/qfield/qfield_crud.py:824
+#: app/qfield/qfield_crud.py:794
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -966,70 +750,46 @@ msgstr ""
 "QFieldCloud emechabeghị nhazi faịlụ ọrụ mgbe nwalee %(attempts)d gasịrị "
 "(ọnọdụ ikpeazụ: %(status)s)."
 
-#: app/qfield/qfield_crud.py:882 app/qfield/qfield_crud.py:896
+#: app/qfield/qfield_crud.py:848 app/qfield/qfield_crud.py:862
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS dara: %(error)s"
 
-#: app/qfield/qfield_crud.py:889
+#: app/qfield/qfield_crud.py:855
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS weghachitere JSON adịghị mma."
 
-#: app/qfield/qfield_crud.py:913
+#: app/qfield/qfield_crud.py:879
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "Emaghị nbudata basemap MBTiles maka bulite (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:928
+#: app/qfield/qfield_crud.py:894
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "Budata koodu QR"
 
-#: app/qfield/qfield_crud.py:1055
+#: app/qfield/qfield_crud.py:969
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "agaghị ebugo faịlụ na QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1229 app/qfield/qfield_crud.py:1391
-#, python-format
-msgid "User '%(username)s' does not exist on QFieldCloud."
-msgstr "'%(username)s' adịghị na QFieldCloud."
-
-#: app/qfield/qfield_crud.py:1349
-#, python-format
-msgid "QFieldCloud project '%(project_id)s' not found."
-msgstr "Achọtaghị ọrụ (%(project_id)s)."
-
-#: app/qfield/qfield_crud.py:1373
-#, python-format
-msgid ""
-"Project belongs to organization '%(owner)s'. Could not add '%(username)s'"
-" to the organization: %(error)s"
-msgstr ""
-"Project bụ nke nzukọ '%(owner)s'. Enweghị ike ịgbakwunye '%(username)s' "
-"na nzukọ a: %(error)s"
-
-#: app/qfield/qfield_crud.py:1398
-#, python-format
-msgid "User '%(username)s' is already a collaborator on this project."
-msgstr "Onye ọrụ '%(username)s' abụrụla onye mmekọ na ọrụ a."
-
-#: app/qfield/qfield_crud.py:1439
+#: app/qfield/qfield_crud.py:1084
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Njirimara ziri ezi!"
 
-#: app/qfield/qfield_crud.py:1484
+#: app/qfield/qfield_crud.py:1115
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "Ejikọtaghị ọrụ a na ọrụ QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1491
+#: app/qfield/qfield_crud.py:1122
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "QFIELDCLOUD_QGIS_URL ahazibeghị."
 
-#: app/qfield/qfield_crud.py:1521
+#: app/qfield/qfield_crud.py:1152
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr "Enweghị faịlụ GeoPackage ahụghị na ngwugwu QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1543
+#: app/qfield/qfield_crud.py:1171
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
@@ -1037,153 +797,145 @@ msgstr ""
 "Enweghị data nyocha ahụrụ na ngwungwu QFieldCloud. Ndị na-ese mapụ nwere "
 "ike ha enyefebeghị nzaghachi ọ bụla."
 
-#: app/qfield/qfield_crud.py:1566
+#: app/qfield/qfield_crud.py:1194
 msgid "QFieldCloud did not return a package job id."
 msgstr "QFieldCloud eweghachiteghị id ọrụ ngwugwu."
 
-#: app/qfield/qfield_crud.py:1583
+#: app/qfield/qfield_crud.py:1211
 msgid "QFieldCloud failed to package the project."
 msgstr "QFieldCloud akwadoghị ọrụ a."
 
-#: app/qfield/qfield_crud.py:1589
+#: app/qfield/qfield_crud.py:1217
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
 "%(status)s)."
 msgstr "Oge agwụla echere QFieldCloud ịkwakọ ọrụ a (ọkwa ikpeazụ: %(status)s)."
 
-#: app/qfield/qfield_crud.py:1613
+#: app/qfield/qfield_crud.py:1237
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "Ntụgharị geoPackage dara: %(error)s"
 
-#: app/qfield/qfield_crud.py:1620
+#: app/qfield/qfield_crud.py:1244
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "Ihe mkpuchi QGIS weghachiri JSON ezighi ezi maka / mbupu."
 
-#: app/templates/home.html:13
-msgid "Filters"
-msgstr "Nyocha"
+#: app/templates/home.html:4 app/templates/layout.html:286
+msgid "Projects"
+msgstr "Ọrụ"
 
-#: app/templates/home.html:17
-msgid "All projects"
-msgstr "Ọrụ niile"
-
-#: app/templates/home.html:17
-msgid "Draft"
-msgstr "Nke a na-ede ede"
-
-#: app/templates/home.html:18
-msgid "Published"
-msgstr "E bipụtara"
-
-#: app/templates/home.html:18
-msgid "Completed"
-msgstr "E mechara"
-
-#: app/templates/home.html:18
-msgid "Archived"
-msgstr "E debere n’akpa nchekwa"
-
-#: app/templates/home.html:21
-msgid "Project Status"
-msgstr "Ọkwa ọrụ"
-
-#: app/templates/home.html:35
-msgid "Newest first"
-msgstr "Nke kachasị ọhụrụ mbụ"
-
-#: app/templates/home.html:35
-msgid "Oldest first"
-msgstr "Nke kacha ochie mbụ"
-
-#: app/templates/home.html:36
-msgid "Name (A-Z)"
-msgstr "Aha (A-Z)"
-
-#: app/templates/home.html:36
-msgid "Name (Z-A)"
-msgstr "Aha (Z-A)"
-
-#: app/templates/home.html:38
-msgid "Sort By"
-msgstr "Hazie dịka"
-
-#: app/templates/home.html:52
-msgid "Search"
-msgstr "Chọọ"
-
-#: app/templates/home.html:58
-msgid "Search projects…"
-msgstr "Chọọ ọrụ…"
-
-#: app/templates/home.html:68 app/templates/landing.html:441
-#: app/templates/layout.html:294 app/templates/new_project_chooser.html:1
-#: app/templates/new_project_simple.html:44
+#: app/templates/home.html:7 app/templates/landing.html:447
+#: app/templates/new_project_chooser.html:1
+#: app/templates/new_project_simple.html:42
 msgid "Create Project"
 msgstr "Mepụta ọrụ"
 
-#: app/templates/home.html:69
-msgid "+ New"
-msgstr "+ Ọhụrụ"
+#: app/templates/home.html:11
+msgid "All projects"
+msgstr "Ọrụ niile"
 
-#: app/templates/home.html:74
+#: app/templates/home.html:11
+msgid "Draft"
+msgstr "Nke a na-ede ede"
+
+#: app/templates/home.html:12
+msgid "Published"
+msgstr "E bipụtara"
+
+#: app/templates/home.html:12
+msgid "Completed"
+msgstr "E mechara"
+
+#: app/templates/home.html:12
+msgid "Archived"
+msgstr "E debere n’akpa nchekwa"
+
+#: app/templates/home.html:13
+msgid "Newest first"
+msgstr "Nke kachasị ọhụrụ mbụ"
+
+#: app/templates/home.html:13
+msgid "Oldest first"
+msgstr "Nke kacha ochie mbụ"
+
+#: app/templates/home.html:14
+msgid "Name (A-Z)"
+msgstr "Aha (A-Z)"
+
+#: app/templates/home.html:14
+msgid "Name (Z-A)"
+msgstr "Aha (Z-A)"
+
+#: app/templates/home.html:20
+msgid "Project Status"
+msgstr "Ọkwa ọrụ"
+
+#: app/templates/home.html:31
+msgid "Sort By"
+msgstr "Hazie dịka"
+
+#: app/templates/home.html:43
+msgid "Search"
+msgstr "Chọọ"
+
+#: app/templates/home.html:44
+msgid "Search projects…"
+msgstr "Chọọ ọrụ…"
+
+#: app/templates/home.html:53
 #, python-format
 msgid "Showing %(count)s project"
 msgid_plural "Showing %(count)s projects"
 msgstr[0] "Na-egosi ọrụ %(count)s"
 msgstr[1] "Na-egosi ọrụ %(count)s"
 
-#: app/templates/home.html:75
+#: app/templates/home.html:54
 #, python-format
 msgid "in %(status)s"
 msgstr "n'ime %(status)s"
 
-#: app/templates/home.html:76
+#: app/templates/home.html:55
 #, python-format
 msgid ""
 "matching\n"
-"      \"%(query)s\""
-msgstr "na-adaba na \"%(query)s\""
+"    \"%(query)s\""
+msgstr "dabara na \"%(query)s\""
 
-#: app/templates/home.html:90
+#: app/templates/home.html:70
 msgid "Private Project"
 msgstr "Ọrụ nzuzo"
 
-#: app/templates/home.html:107 app/templates/project_details.html:30
+#: app/templates/home.html:85 app/templates/project_details.html:22
 msgid "Unnamed Project"
 msgstr "Ọrụ enweghị aha"
 
-#: app/templates/home.html:116
+#: app/templates/home.html:90
 msgid "Location:"
 msgstr "Ebe:"
 
-#: app/templates/home.html:135
+#: app/templates/home.html:106
 msgid "Created:"
 msgstr "E kere:"
 
-#: app/templates/home.html:136
-msgid "N/A"
-msgstr "Adịghị mkpa"
-
-#: app/templates/home.html:146
+#: app/templates/home.html:117
 msgid "Project pages"
-msgstr ""
+msgstr "Ibe ọrụ"
 
-#: app/templates/home.html:148
+#: app/templates/home.html:121
 msgid "Previous"
-msgstr ""
+msgstr "Nke gara aga"
 
-#: app/templates/home.html:150
+#: app/templates/home.html:124
 #, python-format
 msgid "Page %(page)s"
-msgstr ""
+msgstr "Ibe %(page)s"
 
-#: app/templates/home.html:152
+#: app/templates/home.html:127
 msgid "Next"
-msgstr ""
+msgstr "Nke ọzọ"
 
-#: app/templates/home.html:158
+#: app/templates/home.html:133
 msgid "No projects found. Create your first project to get started!"
 msgstr "Achọtaghị ọrụ ọ bụla. Mepụta ọrụ mbụ gị ka ịmalite!"
 
@@ -1197,19 +949,19 @@ msgid ""
 "coordination."
 msgstr "Ịkwalite arụmọrụ na izi ezi nke ime maapụ ubi site n'ịhazi nke ọma."
 
-#: app/templates/landing.html:439
+#: app/templates/landing.html:440
 msgid "Explore Projects"
 msgstr "Lelee ọrụ"
 
-#: app/templates/landing.html:451
+#: app/templates/landing.html:457
 msgid "Loading metrics..."
 msgstr "Na-ebubata metrik..."
 
-#: app/templates/landing.html:459
+#: app/templates/landing.html:465
 msgid "What is it?"
 msgstr "Kedu ihe ọ bụ?"
 
-#: app/templates/landing.html:461
+#: app/templates/landing.html:467
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
 "map features\n"
@@ -1218,7 +970,7 @@ msgstr ""
 "Field Tasking Manager (Field-TM) na-enyere ndị otu aka itinye ihe ọmụma "
 "mpaghara na njirimara maapụ site n'ịhazi ime maapụ n'ubi."
 
-#: app/templates/landing.html:465
+#: app/templates/landing.html:471
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
 "mature tools\n"
@@ -1232,19 +984,19 @@ msgstr ""
 "ya nke na-enyere ndị otu aka ịnakọta data geospatial nke ọma site na "
 "ngwaọrụ Android a na-ahụkarị."
 
-#: app/templates/landing.html:472
+#: app/templates/landing.html:478
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr "Onye njikwa ọrụ na-egosi usoro ọrụ maapụ FieldTM na laptọọpụ"
 
-#: app/templates/landing.html:478
+#: app/templates/landing.html:484
 msgid "Main Features"
 msgstr "Njirimara bụ isi"
 
-#: app/templates/landing.html:481
+#: app/templates/landing.html:487
 msgid "Flexible Data Collection"
 msgstr "Nchịkọta data na-agbanwe agbanwe"
 
-#: app/templates/landing.html:483
+#: app/templates/landing.html:489
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
 "workflows that\n"
@@ -1253,11 +1005,11 @@ msgstr ""
 "Na-akwado ụdị fọm nyocha dị iche iche, ụdị data ọtụtụ, na usoro ọrụ "
 "enwere ike imegharị iji kwekọọ na mkpa arụmọrụ dị iche iche."
 
-#: app/templates/landing.html:488
+#: app/templates/landing.html:494
 msgid "Open Source and Customizable"
 msgstr "Isi mmalite mepere emepe ma enwere ike imegharị"
 
-#: app/templates/landing.html:490
+#: app/templates/landing.html:496
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
 "\n"
@@ -1266,11 +1018,11 @@ msgstr ""
 "Mee ka Field-TM kwekọọ na ọgụgụ isi nyocha gị, nhazi data, na ihe ndị a "
 "chọrọ maka njikọta."
 
-#: app/templates/landing.html:495
+#: app/templates/landing.html:501
 msgid "Entity-Level Tracking"
 msgstr "Nyocha n'ọkwa ihe"
 
-#: app/templates/landing.html:497
+#: app/templates/landing.html:503
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed\n"
@@ -1279,19 +1031,19 @@ msgstr ""
 "Lelee ọganihu nyocha n'ọkwa ọrụ na njirimara ka ndị njikwa nwee ike ime "
 "mkpebi mara mma ngwa ngwa."
 
-#: app/templates/landing.html:505
+#: app/templates/landing.html:511
 msgid "Who is it for?"
 msgstr "Ònye ka ọ bụ maka ya?"
 
-#: app/templates/landing.html:508
+#: app/templates/landing.html:514
 msgid "Project Manager"
 msgstr "Onye njikwa ọrụ"
 
-#: app/templates/landing.html:509
+#: app/templates/landing.html:515
 msgid "Create and coordinate field campaigns"
 msgstr "Mepụta ma hazie mkpọsa ubi"
 
-#: app/templates/landing.html:511
+#: app/templates/landing.html:517
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
 " interest,\n"
@@ -1300,31 +1052,31 @@ msgstr ""
 "Ndị njikwa ọrụ na-eji Field-TM hazie ọrụ maapụ, kọwaa mpaghara mmasị, "
 "mepụta fọm nyocha, ma kewaa ọrụ n'ime ọrụ a pụrụ ijikwa."
 
-#: app/templates/landing.html:515
+#: app/templates/landing.html:521
 msgid "Define a project area and upload or choose a survey form"
 msgstr "Kọwaa mpaghara ọrụ ma bulite ma ọ bụ họrọ fọm nyocha"
 
-#: app/templates/landing.html:516
+#: app/templates/landing.html:522
 msgid "Split the area into tasks and generate a data extract"
 msgstr "Kewaa mpaghara ahụ n'ime ọrụ ma mepụta mgbakwunye data"
 
-#: app/templates/landing.html:517
+#: app/templates/landing.html:523
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "Bipụta ọrụ ahụ na ODK Central ma ọ bụ QFieldCloud"
 
-#: app/templates/landing.html:518
+#: app/templates/landing.html:524
 msgid "Share a QR code so mappers can start collecting data"
 msgstr "Kesaa koodu QR ka ndị na-ese maapụ nwee ike ịmalite ịnakọta data"
 
-#: app/templates/landing.html:522
+#: app/templates/landing.html:528
 msgid "Field Mapper"
 msgstr "Onye na-ese maapụ ubi"
 
-#: app/templates/landing.html:523
+#: app/templates/landing.html:529
 msgid "Collect data in the field with your phone"
 msgstr "Jiri ekwentị gị nakọta data n'ubi"
 
-#: app/templates/landing.html:525
+#: app/templates/landing.html:531
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
 "publishes a\n"
@@ -1335,35 +1087,35 @@ msgstr ""
 "bipụtara ọrụ, ndị na-ese maapụ na-enweta ya ozugbo na ngwa ekwentị ha "
 "họọrọ."
 
-#: app/templates/landing.html:529
+#: app/templates/landing.html:535
 msgid "Scan the QR code shared by your project manager"
 msgstr "Skanụọ koodu QR onye njikwa ọrụ gị kesara"
 
-#: app/templates/landing.html:530
+#: app/templates/landing.html:536
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "Ọrụ ahụ na-ebubata onwe ya na ODK Collect ma ọ bụ QField"
 
-#: app/templates/landing.html:531
+#: app/templates/landing.html:537
 msgid "Navigate to your assigned task area and collect data"
 msgstr "Gaa na mpaghara ọrụ e kenyere gị ma nakọta data"
 
-#: app/templates/landing.html:532
+#: app/templates/landing.html:538
 msgid "Submit your survey, which goes straight to the server"
 msgstr "Zipu nyocha gị, nke ga-aga ozugbo na sava"
 
-#: app/templates/landing.html:539
+#: app/templates/landing.html:545
 msgid "Field-TM Use Cases"
 msgstr "Ojiji Field-TM"
 
-#: app/templates/landing.html:544
+#: app/templates/landing.html:550
 msgid "Field mapping in progress"
 msgstr "Ime maapụ ubi na-aga n'ihu"
 
-#: app/templates/landing.html:549
+#: app/templates/landing.html:555
 msgid "1. Community Mapping"
 msgstr "1. Ime maapụ obodo"
 
-#: app/templates/landing.html:551
+#: app/templates/landing.html:557
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public\n"
@@ -1373,11 +1125,11 @@ msgstr ""
 "nke nkịtị, akụrụngwa ọha, na ọrụ mpaghara maka atụmatụ na-agụnye mmadụ "
 "niile."
 
-#: app/templates/landing.html:556
+#: app/templates/landing.html:562
 msgid "2. Urban Planning and Management"
 msgstr "2. Atụmatụ obodo na njikwa"
 
-#: app/templates/landing.html:558
+#: app/templates/landing.html:564
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities\n"
@@ -1386,11 +1138,11 @@ msgstr ""
 "Wulite obodo mara ihe karịa site na nyocha ahaziri nke ụlọ, ụzọ, na "
 "akụrụngwa site na ọrụ maapụ doro anya ma a pụrụ ijikwa."
 
-#: app/templates/landing.html:563
+#: app/templates/landing.html:569
 msgid "3. Disaster Response and Recovery"
 msgstr "3. Nzaghachi ọdachi na mgbake"
 
-#: app/templates/landing.html:565
+#: app/templates/landing.html:571
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
 "volunteers, and\n"
@@ -1399,95 +1151,126 @@ msgstr ""
 "Mee ngwa ngwa maapụ akụrụngwa mebiri emebi mgbe ọdachi gasịrị, hazie ndị "
 "ọrụ afọ ofufo, ma nye data a pụrụ ịdabere na ya maka ọrụ enyemaka."
 
-#: app/templates/landing.html:574
+#: app/templates/landing.html:580
 msgid "Resources"
 msgstr "Akụrụngwa"
 
-#: app/templates/landing.html:582
+#: app/templates/landing.html:588
 msgid "Data Prep"
 msgstr "Nkwadebe data"
 
-#: app/templates/landing.html:583
+#: app/templates/landing.html:589
 msgid "HOT Export Tool"
 msgstr "Ngwa mbupụ HOT"
 
-#: app/templates/landing.html:585
+#: app/templates/landing.html:591
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr ""
 "Budata mgbakwunye data geospatial dị njikere maka ọrụ maka mpaghara ọrụ "
 "gị."
 
-#: app/templates/landing.html:594 app/templates/landing.html:606
+#: app/templates/landing.html:600 app/templates/landing.html:612
 msgid "Documentation"
 msgstr "Akwụkwọ nduzi"
 
-#: app/templates/landing.html:595
+#: app/templates/landing.html:601
 msgid "ODK Central Guide"
 msgstr "Nduzi ODK Central"
 
-#: app/templates/landing.html:597
+#: app/templates/landing.html:603
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr "Mụta otu esi ejikwa fọm, ndị ọrụ ngwa, na ntinye ubi na ODK."
 
-#: app/templates/landing.html:607
+#: app/templates/landing.html:613
 msgid "QField Guide"
 msgstr "Nduzi QField"
 
-#: app/templates/landing.html:609
+#: app/templates/landing.html:615
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "Hazie ọrụ QFieldCloud na usoro ọrụ ekwentị maka ime maapụ na-enweghị "
 "njikọ."
 
-#: app/templates/layout.html:13
+#: app/templates/layout.html:14
 msgid "Coordinated field mapping for Open Mapping campaigns."
 msgstr "Ime maapụ ubi a haziri nke ọma maka mkpọsa Open Mapping."
 
-#: app/templates/layout.html:173
-msgid "Need help or have a request?"
-msgstr ""
+#: app/templates/layout.html:125
+msgid "Login off (dev)"
+msgstr "Agbanyụrụ nbanye (dev)"
 
-#: app/templates/layout.html:175
+#: app/templates/layout.html:151
+msgid "Please confirm"
+msgstr "Biko kwado"
+
+#: app/templates/layout.html:154 app/templates/new_project_custom.html:147
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:36
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:88
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:157
+msgid "Cancel"
+msgstr "Kagbuo"
+
+#: app/templates/layout.html:156
+msgid "Confirm"
+msgstr "Kwado"
+
+#: app/templates/layout.html:161
+msgid "Need help or have a request?"
+msgstr "Ị chọrọ enyemaka ma ọ bụ nwee arịrịọ?"
+
+#: app/templates/layout.html:163
 msgid "Submit a tech request"
-msgstr ""
+msgstr "Zipu arịrịọ teknụzụ"
+
+#: app/templates/layout.html:167 app/templates/layout.html:289
+msgid "Docs"
+msgstr "Akwụkwọ ntụziaka"
 
 #: app/templates/layout.html:287
-msgid "Projects"
-msgstr "Ọrụ"
+msgid "Create project"
+msgstr "Mepụta ọrụ"
 
-#: app/templates/layout.html:301
-msgid "QField Admin"
-msgstr "Onye nchịkwa QField"
+#: app/templates/layout.html:288
+msgid "Task planner"
+msgstr "Onye nhazi ọrụ"
+
+#: app/templates/layout.html:291
+msgid "Report a bug"
+msgstr "Kọọ njehie"
 
 #: app/templates/login.html:1
 msgid "Login"
 msgstr "Banye"
 
-#: app/templates/login.html:5
+#: app/templates/login.html:7
 msgid "Sign in to Field-TM"
 msgstr "Banye na Field-TM"
 
-#: app/templates/login.html:17
+#: app/templates/login.html:18
 msgid "Redirecting to the centralized login service."
 msgstr "A na-eziga gị na ọrụ nbanye etiti."
 
-#: app/templates/login.html:18
+#: app/templates/login.html:20
 msgid "Continue to login"
 msgstr "Gaa n'ihu na nbanye"
 
-#: app/templates/login.html:26
+#: app/templates/login.html:30
 msgid "Authentication is disabled on this deployment."
 msgstr "A gbanyụrụ nkwenye na ntinye a."
 
-#: app/templates/login.html:29
+#: app/templates/login.html:34
 msgid "Back to home"
 msgstr "Laghachi n'ulo"
 
-#: app/templates/new_project_chooser.html:4
+#: app/templates/new_project_chooser.html:7
+msgid "More details about this option"
+msgstr "Nkọwa ndị ọzọ gbasara nhọrọ a"
+
+#: app/templates/new_project_chooser.html:12
 msgid "What do you want to map?"
 msgstr "Kedu ihe ịchọrọ ime maapụ?"
 
-#: app/templates/new_project_chooser.html:6
+#: app/templates/new_project_chooser.html:14
 msgid ""
 "Pick the option that fits your project. You can change your mind later by"
 " starting over."
@@ -1495,66 +1278,32 @@ msgstr ""
 "Họrọ nhọrọ kwekọrọ na oru ngo gị. Ị nwere ike ịgbanwe uche gị ma emechaa "
 "site n'ịmalite ọzọ."
 
-#: app/templates/new_project_chooser.html:20
-#: app/templates/new_project_chooser.html:32
+#: app/templates/new_project_chooser.html:27
+#: app/templates/new_project_chooser.html:44
 msgid "Add tags to OSM buildings"
 msgstr "Tinye mkpado na ụlọ OSM"
 
-#: app/templates/new_project_chooser.html:23
+#: app/templates/new_project_chooser.html:33
 msgid "Quickest way to start. Just draw your area on the map and you're done."
 msgstr "Ụzọ kacha ọsọ iji bido. See naanị mpaghara gị na maapụ, ọ gwụla."
 
-#: app/templates/new_project_chooser.html:27
+#: app/templates/new_project_chooser.html:37
 msgid "Use building outlines already in OpenStreetMap"
 msgstr "Jiri nkọwapụta ụlọ dị na OpenStreetMap"
 
-#: app/templates/new_project_chooser.html:28
+#: app/templates/new_project_chooser.html:38
 msgid "Includes a ready-made survey to add OSM tags to existing buildings"
 msgstr "Gụnyere nyocha emebere ka ịgbakwunye mkpado OSM na ụlọ ndị dị adị"
 
-#: app/templates/new_project_chooser.html:29
+#: app/templates/new_project_chooser.html:39
 msgid "Fill in gaps for unmapped buildings during digitisation"
 msgstr "Dejupụta oghere maka ụlọ ndị na-enweghị nkewa n'oge a na-eji digitization"
 
-#: app/templates/new_project_chooser.html:38
-#: app/templates/new_project_chooser.html:98
-msgid "More details about this option"
-msgstr "Nkọwa ndị ọzọ gbasara nhọrọ a"
-
-#: app/templates/new_project_chooser.html:44
-msgid "How this option is set up"
-msgstr "Otu esi edozi nhọrọ a"
-
-#: app/templates/new_project_chooser.html:46
-msgid "Mapping happens in QField on Android."
-msgstr "Maapụ na-eme na QField na gam akporo."
-
-#: app/templates/new_project_chooser.html:48
-msgid ""
-"The area is split into tasks of ~10 buildings each, using roads, rivers,\n"
-"              railways and airstrips as boundaries."
-msgstr ""
-"A na-ekewa mpaghara ahụ n'ime ọrụ ~ 10 ụlọ nke ọ bụla, na-eji okporo ụzọ,"
-" osimiri,\n"
-"              okporo ụzọ ụgbọ oloko na ọdụ ụgbọ elu dị ka oke."
-
 #: app/templates/new_project_chooser.html:51
-msgid "Photo upload is enabled but optional."
-msgstr "Agbanyere nbulite foto mana ọ bụghị nhọrọ."
-
-#: app/templates/new_project_chooser.html:52
-msgid "A basemap is generated automatically for offline use (if available)."
-msgstr "A na-emepụta maapụ na-akpaghị aka maka iji offline (ọ bụrụ na ọ dị)."
-
-#: app/templates/new_project_chooser.html:55
-msgid "Preview the building survey in XLSForm Editor →"
-msgstr "Lelee nyocha ụlọ na XLSForm Editor →"
-
-#: app/templates/new_project_chooser.html:71
 msgid "Something else"
 msgstr "Ihe ọzọ"
 
-#: app/templates/new_project_chooser.html:74
+#: app/templates/new_project_chooser.html:57
 msgid ""
 "For anything that isn't tagging OSM buildings - bring your own survey, or"
 " use one\n"
@@ -1564,7 +1313,7 @@ msgstr ""
 "jiri otu\n"
 "          ndị obodo nyere aka."
 
-#: app/templates/new_project_chooser.html:80
+#: app/templates/new_project_chooser.html:63
 msgid ""
 "Other OpenStreetMap features - roads, water points, schools, healthcare, "
 "and\n"
@@ -1574,7 +1323,7 @@ msgstr ""
 "ahụike, na\n"
 "            ọzọ"
 
-#: app/templates/new_project_chooser.html:84
+#: app/templates/new_project_chooser.html:67
 msgid ""
 "Non-OSM surveys - vaccination campaigns, census mapping, healthcare "
 "facility\n"
@@ -1584,66 +1333,99 @@ msgstr ""
 "ọgụgụ, ebe nlekọta ahụike\n"
 "            nyocha, nyocha akụrụngwa"
 
-#: app/templates/new_project_chooser.html:87
+#: app/templates/new_project_chooser.html:70
 msgid "Bring your own map data, or start with an empty map"
 msgstr "Weta data maapụ nke gị, ma ọ bụ bido na maapụ efu"
 
-#: app/templates/new_project_chooser.html:88
+#: app/templates/new_project_chooser.html:71
 msgid "Control how the area is divided up for mappers"
 msgstr "Jikwaa otú a ga-esi kee mpaghara ahụ maka ndị na-eme maapụ"
 
-#: app/templates/new_project_chooser.html:89
+#: app/templates/new_project_chooser.html:72
 msgid "Use QField, ODK or another app such as Every Door or StreetComplete"
-msgstr ""
+msgstr "Jiri QField, ODK ma ọ bụ ngwa ọzọ dị ka Every Door ma ọ bụ StreetComplete"
 
-#: app/templates/new_project_chooser.html:92
+#: app/templates/new_project_chooser.html:82
 msgid "Set up a custom project"
 msgstr "Chọọ ọrụ…"
 
-#: app/templates/new_project_chooser.html:104
+#: app/templates/new_project_chooser.html:89
+msgid "How this option is set up"
+msgstr "Otu esi edozi nhọrọ a"
+
+#: app/templates/new_project_chooser.html:91
+msgid "Mapping happens in QField on Android."
+msgstr "Maapụ na-eme na QField na gam akporo."
+
+#: app/templates/new_project_chooser.html:93
+msgid ""
+"The area is split into tasks of ~10 buildings each, using roads, rivers, "
+"railways\n"
+"          and airstrips as boundaries."
+msgstr ""
+"E kewara mpaghara ahụ n'ọrụ nwere ihe dị ka ụlọ 10 nke ọ bụla, na-eji "
+"okporo ụzọ, osimiri, ụzọ ụgbọ oloko na ọdụ ụgbọ elu dị ka oke."
+
+#: app/templates/new_project_chooser.html:96
+msgid "Photo upload is enabled but optional."
+msgstr "Agbanyere nbulite foto mana ọ bụghị nhọrọ."
+
+#: app/templates/new_project_chooser.html:97
+msgid "A basemap is generated automatically for offline use (if available)."
+msgstr "A na-emepụta maapụ na-akpaghị aka maka iji offline (ọ bụrụ na ọ dị)."
+
+#: app/templates/new_project_chooser.html:100
+msgid "Preview the building survey in XLSForm Editor →"
+msgstr "Lelee nyocha ụlọ na XLSForm Editor →"
+
+#: app/templates/new_project_chooser.html:108
 msgid "Where to find a survey"
 msgstr "Ebe ịchọta nyocha"
 
-#: app/templates/new_project_chooser.html:106
+#: app/templates/new_project_chooser.html:110
 msgid "Upload your own XLSForm, or"
 msgstr "Bulite XLSForm nke gị, ma ọ bụ"
 
-#: app/templates/new_project_chooser.html:109
+#: app/templates/new_project_chooser.html:113
 msgid "Browse the community XLSForm gallery →"
 msgstr "Chọgharịa obodo XLSForm gallery →"
 
-#: app/templates/new_project_chooser.html:113
+#: app/templates/new_project_chooser.html:117
 msgid ""
 "Pick from QField, ODK Collect and other apps. We recommend one based on "
 "what you\n"
-"              map."
+"          map."
 msgstr ""
+"Họrọ site na QField, ODK Collect na ngwa ndị ọzọ. Anyị na-atụ aro otu "
+"dabere n'ihe ị na-ese maapụ ya."
 
 #: app/templates/new_project_custom.html:1
 msgid "Create Custom Project"
 msgstr "Mepụta ọrụ"
 
-#: app/templates/new_project_custom.html:6
-#: app/templates/new_project_simple.html:6
+#: app/templates/new_project_custom.html:5
+#: app/templates/new_project_simple.html:5
 msgid "Back"
 msgstr "Laghachi"
 
-#: app/templates/new_project_custom.html:8
+#: app/templates/new_project_custom.html:6
 msgid "Set up your project"
 msgstr "Lelee ọrụ"
 
-#: app/templates/new_project_custom.html:10
+#: app/templates/new_project_custom.html:8
 msgid ""
 "Just the basics on this page: what you're mapping, where, and which app "
 "mappers will use.\n"
 "    You'll set up the survey, map data and tasks on the next page."
 msgstr ""
+"Naanị ihe ndị bụ isi na ibe a: ihe ị na-ese maapụ ya, ebe, na ngwa ndị "
+"na-ese maapụ ga-eji. Ị ga-ahazi nyocha, data maapụ na ọrụ n'ibe na-esote."
 
-#: app/templates/new_project_custom.html:33
+#: app/templates/new_project_custom.html:32
 msgid "About your project"
 msgstr "Laghachi na ọrụ"
 
-#: app/templates/new_project_custom.html:35
+#: app/templates/new_project_custom.html:34
 msgid ""
 "Give your project a clear name and a short summary so mappers know what "
 "it's\n"
@@ -1652,20 +1434,20 @@ msgstr ""
 "Nye oru ngo gị aha doro anya na nchịkọta mkpirikpi ka ndị na-eme maapụ "
 "mara ihe ọ gbasara."
 
-#: app/templates/new_project_custom.html:41
+#: app/templates/new_project_custom.html:43
 msgid "Project name"
 msgstr "Aha ọrụ"
 
-#: app/templates/new_project_custom.html:46
+#: app/templates/new_project_custom.html:44
 msgid "e.g. Buildings in West Nairobi"
 msgstr "dịka: Ụlọ dị na West Nairobi"
 
-#: app/templates/new_project_custom.html:54
-#: app/templates/new_project_custom.html:81
+#: app/templates/new_project_custom.html:53
+#: app/templates/new_project_custom.html:82
 msgid "What are you mapping?"
 msgstr "Dị njikere maka ime maapụ"
 
-#: app/templates/new_project_custom.html:59
+#: app/templates/new_project_custom.html:54
 msgid ""
 "A short description. e.g. Mapping water points and toilets in informal "
 "settlements."
@@ -1673,73 +1455,75 @@ msgstr ""
 "Nkọwa mkpirikpi. dịka: Ime maapụ ebe mmiri na ụlọ mposi n'obodo ndị na-"
 "abụghị nke gọọmentị."
 
-#: app/templates/new_project_custom.html:68
+#: app/templates/new_project_custom.html:65
 msgid "Which app will mappers use?"
 msgstr "Kedu ngwa ndị na-eme maapụ ga-eji?"
 
-#: app/templates/new_project_custom.html:70
+#: app/templates/new_project_custom.html:67
 msgid "Answer three quick questions for a recommendation, or pick any app below."
 msgstr ""
+"Zaa ajụjụ atọ dị mkpụmkpụ iji nweta ndụmọdụ, ma ọ bụ họrọ ngwa ọ bụla "
+"n'okpuru."
 
-#: app/templates/new_project_custom.html:82
+#: app/templates/new_project_custom.html:85
 msgid "Buildings"
-msgstr ""
+msgstr "Ụlọ"
 
-#: app/templates/new_project_custom.html:82
+#: app/templates/new_project_custom.html:85
 msgid "Roads"
-msgstr ""
+msgstr "Okporo ụzọ"
 
-#: app/templates/new_project_custom.html:83
+#: app/templates/new_project_custom.html:86
 msgid "Rivers"
-msgstr ""
+msgstr "Osimiri"
 
-#: app/templates/new_project_custom.html:83
+#: app/templates/new_project_custom.html:86
 msgid "Points of interest"
-msgstr ""
+msgstr "Ebe mmasị"
 
-#: app/templates/new_project_custom.html:83
+#: app/templates/new_project_custom.html:86
 msgid "Other"
-msgstr ""
-
-#: app/templates/new_project_custom.html:88
-msgid "Will the data go into OpenStreetMap?"
-msgstr ""
-
-#: app/templates/new_project_custom.html:89
-#: app/templates/new_project_custom.html:94
-msgid "Yes"
-msgstr ""
-
-#: app/templates/new_project_custom.html:90
-#: app/templates/new_project_custom.html:95
-msgid "No"
-msgstr ""
+msgstr "Ndị ọzọ"
 
 #: app/templates/new_project_custom.html:93
-msgid "Is it already well mapped in OpenStreetMap?"
-msgstr ""
+msgid "Will the data go into OpenStreetMap?"
+msgstr "Data ga-abanye na OpenStreetMap?"
 
 #: app/templates/new_project_custom.html:96
-msgid "Not sure"
-msgstr ""
+#: app/templates/new_project_custom.html:105
+msgid "Yes"
+msgstr "Ee"
 
-#: app/templates/new_project_custom.html:103
+#: app/templates/new_project_custom.html:97
+#: app/templates/new_project_custom.html:106
+msgid "No"
+msgstr "Mba"
+
+#: app/templates/new_project_custom.html:102
+msgid "Is it already well mapped in OpenStreetMap?"
+msgstr "E meelarị ya maapụ nke ọma na OpenStreetMap?"
+
+#: app/templates/new_project_custom.html:107
+msgid "Not sure"
+msgstr "Ejighị m n'aka"
+
+#: app/templates/new_project_custom.html:116
 msgid "Where are you mapping?"
 msgstr "Dị njikere maka ime maapụ"
 
-#: app/templates/new_project_custom.html:105
+#: app/templates/new_project_custom.html:118
 msgid "Draw the area mappers will cover. Smaller areas are easier to coordinate."
 msgstr "See mpaghara ndị na-eme maapụ ga-ekpuchi. Mpaghara pere mpe dị mfe ịhazi."
 
-#: app/templates/new_project_custom.html:112
+#: app/templates/new_project_custom.html:126
 msgid "Tags"
 msgstr "Hashtag"
 
-#: app/templates/new_project_custom.html:114
+#: app/templates/new_project_custom.html:126
 msgid "optional"
 msgstr "nhọrọ"
 
-#: app/templates/new_project_custom.html:118
+#: app/templates/new_project_custom.html:128
 msgid ""
 "Add tags so other people can find your project. Tags are like #buildings "
 "or\n"
@@ -1748,34 +1532,38 @@ msgstr ""
 "Tinye tag ka ndị ọzọ nwee ike ịchọta oru ngo gị. Tag dị ka #buildings ma "
 "ọ bụ #campaign-2026."
 
-#: app/templates/new_project_custom.html:124
+#: app/templates/new_project_custom.html:135
 msgid "Type a tag and press Enter"
 msgstr "Pịnye hashtag ma pịa Enter ma ọ bụ comma"
 
-#: app/templates/new_project_custom.html:129
+#: app/templates/new_project_custom.html:136
 msgid "Press Enter or comma after each tag. Click × on a tag to remove it."
 msgstr ""
 "Pịnye hashtag ma pịa Enter ma ọ bụ comma iji tinye ha. Pịa × na tag iji "
 "wepu ya."
 
-#: app/templates/new_project_custom.html:135
-#: app/templates/partials/project_details/setup_steps/step2_form.html:82
+#: app/templates/new_project_custom.html:144
+#: app/templates/partials/project_details/setup_steps/step2_form.html:116
 msgid "Continue"
 msgstr "Gaa n'ihu"
 
-#: app/templates/new_project_custom.html:137
+#: app/templates/new_project_custom.html:150
 msgid "Creating..."
 msgstr "Na-emepụta..."
 
-#: app/templates/new_project_custom.html:147
+#: app/templates/new_project_custom.html:158
 msgid "Something went wrong. Please try again."
 msgstr "Ihe na-ezighi ezi mere. Biko nwaa ọzọ."
 
-#: app/templates/new_project_custom.html:301
+#: app/templates/new_project_custom.html:312
 msgid "A project with this name already exists. Please choose a different name."
 msgstr "Ọrụ nwere aha a adịla. Biko họrọ aha ọzọ."
 
-#: app/templates/new_project_custom.html:374
+#: app/templates/new_project_custom.html:386
+msgid "Project name is required."
+msgstr "Achọrọ aha ọrụ."
+
+#: app/templates/new_project_custom.html:396
 msgid "Description is required."
 msgstr "A chọrọ nkọwa."
 
@@ -1783,11 +1571,11 @@ msgstr "A chọrọ nkọwa."
 msgid "Quick Setup - OSM Buildings"
 msgstr "Ntọala ngwa ngwa - Ụlọ OSM"
 
-#: app/templates/new_project_simple.html:8
+#: app/templates/new_project_simple.html:6
 msgid "Map buildings"
 msgstr "Ụlọ OSM"
 
-#: app/templates/new_project_simple.html:10
+#: app/templates/new_project_simple.html:8
 msgid ""
 "Just draw the area you want to map. We'll set everything up for you using"
 " building\n"
@@ -1796,11 +1584,11 @@ msgstr ""
 "See naanị mpaghara ịchọrọ ime maapụ. Anyị ga-ahazi ihe niile site n'iji "
 "ahịrị ụlọ si OpenStreetMap na nnyocha emere njikere maka ụlọ."
 
-#: app/templates/new_project_simple.html:15
+#: app/templates/new_project_simple.html:13
 msgid "This is only for mapping buildings."
 msgstr "Nke a bụ naanị maka ime maapụ ụlọ."
 
-#: app/templates/new_project_simple.html:16
+#: app/templates/new_project_simple.html:14
 msgid ""
 "If you want to map something else (like roads or water points), use your "
 "own survey\n"
@@ -1809,15 +1597,15 @@ msgstr ""
 "Ọ bụrụ na ịchọrọ ime maapụ ihe ọzọ (dịka ụzọ ma ọ bụ ebe mmiri), iji "
 "ajụjụ nnyocha nke gị, ma ọ bụ weta data maapụ nke gị,"
 
-#: app/templates/new_project_simple.html:18
+#: app/templates/new_project_simple.html:16
 msgid "set up a custom project instead"
 msgstr "hazie oru ngo ahaziri iche kama"
 
-#: app/templates/new_project_simple.html:47
+#: app/templates/new_project_simple.html:45
 msgid "Switch to Custom Project"
 msgstr "Tinye na Oru QField"
 
-#: app/templates/new_project_simple.html:56
+#: app/templates/new_project_simple.html:48
 msgid "Creating project and preparing map..."
 msgstr "A na-emepụta oru ma na-akwadebe maapụ..."
 
@@ -1825,13 +1613,12 @@ msgstr "A na-emepụta oru ma na-akwadebe maapụ..."
 msgid "Creating Project"
 msgstr "Na-emepụta ọrụ"
 
-#: app/templates/partials/new_project/creating_fragment.html:11
-#: app/templates/project_details.html:6 app/templates/project_details.html:307
-#: app/templates/project_details.html:318
+#: app/templates/partials/new_project/creating_fragment.html:10
+#: app/templates/project_details.html:4
 msgid "Back to Projects"
 msgstr "Laghachi na ọrụ"
 
-#: app/templates/project_details.html:42
+#: app/templates/project_details.html:34
 msgid ""
 "Trigger a fresh QFieldCloud package and download the project data as a "
 "single GeoJSON file."
@@ -1839,29 +1626,31 @@ msgstr ""
 "Kpalite ngwungwu QFieldCloud ọhụrụ wee budata data oru ngo dị ka otu "
 "faịlụ GeoJSON."
 
-#: app/templates/project_details.html:45
+#: app/templates/project_details.html:38
 msgid "Export Data"
 msgstr "Mbupu data"
 
-#: app/templates/project_details.html:53
+#: app/templates/project_details.html:45
 msgid "This project is still being created. Refresh the page in a minute or two."
-msgstr ""
+msgstr "A ka na-emepụta ọrụ a. Megharịa ibe ahụ n'ime otu nkeji ma ọ bụ abụọ."
 
 #: app/templates/partials/new_project/creating_fragment.html:4
-#: app/templates/project_details.html:57
+#: app/templates/project_details.html:49
 msgid "Project creation failed."
 msgstr "Ịmepụta ọrụ dara."
 
-#: app/templates/partials/new_project/creating_fragment.html:6
-#: app/templates/project_details.html:58
+#: app/templates/partials/new_project/creating_fragment.html:5
+#: app/templates/project_details.html:50
 msgid "An unexpected error occurred."
 msgstr "Njehie a na-atụghị anya ya mere."
 
-#: app/templates/project_details.html:59
+#: app/templates/project_details.html:51
 msgid "Create the project again, or contact an admin if this keeps happening."
 msgstr ""
+"Mepụta ọrụ ahụ ọzọ, ma ọ bụ kpọtụrụ onye nchịkwa ma ọ bụrụ na nke a na-"
+"aga n'ihu."
 
-#: app/templates/project_details.html:93 app/templates/project_details.html:101
+#: app/templates/project_details.html:61
 msgid ""
 "Packaging project on QFieldCloud - this may take a minute, please be "
 "patient..."
@@ -1869,119 +1658,90 @@ msgstr ""
 "Ọrụ nkwakọ ngwaahịa na QFieldCloud - nke a nwere ike were nkeji, biko "
 "nwee ndidi..."
 
-#: app/templates/project_details.html:102
+#: app/templates/project_details.html:62
 msgid "✓ Download started."
 msgstr "✓ Nbudata malitere."
 
-#: app/templates/project_details.html:103
+#: app/templates/project_details.html:63
 msgid "Export failed:"
 msgstr "Mbupu adaghị:"
 
-#: app/templates/project_details.html:104
+#: app/templates/project_details.html:64
 msgid "Network error while exporting. Please try again."
 msgstr "Njehie netwọkụ mgbe ị na-ebupụ. Biko nwaa ọzọ."
 
-#: app/templates/project_details.html:181
-msgid "Project Metadata"
-msgstr "Metadata ọrụ"
-
-#: app/templates/project_details.html:183
-msgid "Project metadata and setup information for managers."
-msgstr "Metadata ọrụ na ozi nhazi maka ndị njikwa."
-
-#: app/templates/project_details.html:201
+#: app/templates/project_details.html:123
 msgid "Project ID"
 msgstr "ID ọrụ"
 
-#: app/templates/project_details.html:212
+#: app/templates/project_details.html:128
+msgid "Manager"
+msgstr "Onye njikwa"
+
+#: app/templates/project_details.html:133
 msgid "Created"
 msgstr "E kere"
 
-#: app/templates/project_details.html:219
+#: app/templates/project_details.html:138
 msgid "Last Updated"
 msgstr "Emelitere ikpeazụ"
 
-#: app/templates/project_details.html:230
-msgid "Hashtags"
-msgstr "Hashtag"
-
-#: app/templates/project_details.html:242
+#: app/templates/project_details.html:143
 msgid "External Project"
 msgstr "Ọrụ mpụga"
 
-#: app/templates/project_details.html:244
-msgid "Instance:"
-msgstr "Instans:"
-
-#: app/templates/project_details.html:246
-msgid "Project ID:"
-msgstr "ID ọrụ:"
-
-#: app/templates/project_details.html:256
-#: app/templates/project_details.html:264
+#: app/templates/project_details.html:150
 msgid "View Project in ODK Central →"
 msgstr "Lee ọrụ na ODK Central →"
 
-#: app/templates/project_details.html:271
-msgid "Manage QFieldCloud Project →"
-msgstr "Jikwaa ọrụ QFieldCloud →"
+#: app/templates/project_details.html:153
+msgid "View Project in QFieldCloud →"
+msgstr "Lee Ọrụ na QFieldCloud →"
 
-#: app/templates/project_details.html:279
+#: app/templates/project_details.html:157
 msgid "View Project Externally →"
 msgstr "Lee ọrụ na mpụga →"
 
-#: app/templates/project_details.html:286
+#: app/templates/project_details.html:175
 msgid "This project is not ready for mapping yet."
-msgstr ""
+msgstr "Ọrụ a adịbeghị njikere maka ise maapụ."
 
-#: app/templates/project_details.html:315
+#: app/templates/project_details.html:180
+#: app/templates/project_details.html:198
+msgid "Delete project"
+msgstr "Hichapụ ọrụ"
+
+#: app/templates/project_details.html:183
+msgid ""
+"Deletes the project here and in the mapping app (ODK Central or "
+"QFieldCloud), including\n"
+"      data collected there. This cannot be undone."
+msgstr ""
+"Na-ehichapụ ọrụ ahụ ebe a na na ngwa maapụ (ODK Central ma ọ bụ "
+"QFieldCloud), gụnyere data a chịkọtara n'ebe ahụ. Enweghị ike imeghachi "
+"nke a."
+
+#: app/templates/project_details.html:186
+msgid ""
+"Delete this project in Field-TM and in the mapping app, including\n"
+"    collected data? This cannot be undone."
+msgstr ""
+"Hichapụ ọrụ a na Field-TM na na ngwa maapụ, gụnyere data a chịkọtara? "
+"Enweghị ike imeghachi nke a."
+
+#: app/templates/project_details.html:188
+msgid "Deletes the project and its tasks. This cannot be undone."
+msgstr "Na-ehichapụ ọrụ ahụ na ọrụ ya niile. Enweghị ike imeghachi nke a."
+
+#: app/templates/project_details.html:189
+msgid "Delete this project and its tasks? This cannot be undone."
+msgstr "Hichapụ ọrụ a na ọrụ ya niile? Enweghị ike imeghachi nke a."
+
+#: app/templates/project_details.html:205
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
-" to view\n"
-"        it."
-msgstr "Ọrụ ị na-achọ adịghị ma ọ bụ na ịnweghị ikike ile ya."
-
-#: app/templates/qfc_admin.html:1 app/templates/qfc_admin.html:15
-msgid "QFieldCloud Admin"
-msgstr "Onye nchịkwa QFieldCloud"
-
-#: app/templates/qfc_admin.html:21
-msgid ""
-"This page is for managing the users in your QField project, after "
-"creation."
-msgstr "Ibe a bụ maka ijikwa ndị ọrụ nọ na ọrụ QField gị, mgbe emechara ya."
-
-#: app/templates/qfc_admin.html:25
-msgid "Enter your QFieldCloud credentials to manage collaborators."
-msgstr "Tinye njirimara QFieldCloud gị iji jikwaa ndị mmekọ."
-
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:151
-#: app/templates/qfc_admin.html:36
-msgid "QField Cloud URL"
-msgstr "URL QField Cloud"
-
-#: app/templates/qfc_admin.html:46
-msgid "The base URL of your QFieldCloud instance (without /api/v1)."
-msgstr "Isi URL nke instans QFieldCloud gị (na-enweghị /api/v1)."
-
-#: app/templates/qfc_admin.html:54
-msgid "admin"
-msgstr "admin"
-
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:126
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:132
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:175
-#: app/templates/qfc_admin.html:59
-msgid "Password"
-msgstr "Okwuntughe"
-
-#: app/templates/qfc_admin.html:70
-msgid "Connect"
-msgstr "Jikọọ"
-
-#: app/templates/qfc_admin.html:76
-msgid "Connecting…"
-msgstr "Na-ejikọ…"
+" to view it."
+msgstr "Ọrụ ị na-achọ adịghị ma ọ bụ ị nweghị ikike ịhụ ya."
 
 #: app/templates/partials/metrics.html:5
 msgid "Features Surveyed (Approximate)"
@@ -2005,23 +1765,23 @@ msgstr "Ngwa maapụ akwadoro"
 
 #: app/templates/partials/new_project/app_picker.html:20
 msgid "Recommended"
-msgstr ""
+msgstr "A tụrụ aro"
 
 #: app/templates/partials/new_project/app_picker.html:24
 msgid "Good for:"
-msgstr ""
+msgstr "Ọ dị mma maka:"
 
-#: app/templates/partials/new_project/app_picker.html:27
+#: app/templates/partials/new_project/app_picker.html:26
 msgid "Tasks sync to the app."
-msgstr ""
+msgstr "Ọrụ na-ejikọ na ngwa ahụ."
 
-#: app/templates/partials/new_project/app_picker.html:27
+#: app/templates/partials/new_project/app_picker.html:26
 msgid ""
 "Mappers download task\n"
 "          files."
-msgstr ""
+msgstr "Ndị na-ese maapụ na-ebudata faịlụ ọrụ."
 
-#: app/templates/partials/new_project/creating_fragment.html:10
+#: app/templates/partials/new_project/creating_fragment.html:8
 msgid "Try Again"
 msgstr "Gbalịa ọzọ"
 
@@ -2077,77 +1837,74 @@ msgstr "Ị ga-adọ ma ọ bụ bulite Area of Interest (AOI) n'elu maapụ tup
 
 #: app/templates/partials/new_project/map_script.html:12
 msgid "Enter a Tasking Manager project ID first."
-msgstr ""
+msgstr "Buru ụzọ tinye ID ọrụ Tasking Manager."
 
 #: app/templates/partials/new_project/map_script.html:13
 msgid "Could not load AOI from Tasking Manager."
-msgstr ""
+msgstr "Enweghị ike ibunye mpaghara mmasị site na Tasking Manager."
 
-#: app/templates/partials/new_project/map_section.html:3
-msgid "Project Area"
-msgstr "Mpaghara ọrụ"
-
-#: app/templates/partials/new_project/map_section.html:6
-msgid "Draw the area you want to map on the map below."
-msgstr "See mpaghara ịchọrọ ime maapụ na maapụ dị n'okpuru."
-
-#: app/templates/partials/new_project/map_section.html:15
+#: app/templates/partials/new_project/map_section.html:5
 msgid "Draw Area"
 msgstr "Dọkpụ mpaghara"
 
-#: app/templates/partials/new_project/map_section.html:18
+#: app/templates/partials/new_project/map_section.html:8
 msgid "Clear"
 msgstr "Kpochapụ"
 
-#: app/templates/partials/new_project/map_section.html:32
-#: app/templates/partials/project_details/setup_steps/step2_form.html:89
-#: app/templates/partials/project_details/setup_steps/step3_data.html:73
+#: app/templates/partials/new_project/map_section.html:11
+msgid "Project Area"
+msgstr "Mpaghara ọrụ"
+
+#: app/templates/partials/new_project/map_section.html:11
+msgid ""
+"Draw the area you want to\n"
+"      map on the map below."
+msgstr "See mpaghara ị chọrọ ise maapụ ya na maapụ dị n'okpuru."
+
+#: app/templates/partials/new_project/map_section.html:20
+#: app/templates/partials/project_details/setup_steps/step2_form.html:70
+#: app/templates/partials/project_details/setup_steps/step3_data.html:44
 msgid "More options"
 msgstr "Nhọrọ fọm:"
 
-#: app/templates/partials/new_project/map_section.html:38
+#: app/templates/partials/new_project/map_section.html:23
 msgid "Upload a GeoJSON file"
-msgstr ""
+msgstr "Bulite faịlụ GeoJSON"
 
-#: app/templates/partials/new_project/map_section.html:40
+#: app/templates/partials/new_project/map_section.html:25
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
 "          drawing."
 msgstr ""
+"Ọ bụrụ na i nweelarị faịlụ maapụ nwere oke mpaghara gị, bulite ya ebe a "
+"kama ise ya."
 
-#: app/templates/partials/new_project/map_section.html:50
+#: app/templates/partials/new_project/map_section.html:31
 msgid "Upload your own map file (GeoJSON)"
 msgstr "Bulite GeoJSON omenala"
 
-#: app/templates/partials/new_project/map_section.html:55
-#: app/templates/partials/new_project/map_section.html:56
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
-#: app/templates/partials/project_details/setup_steps/step3_data.html:60
-msgid "or"
-msgstr "ma ọ bụ"
+#: app/templates/partials/new_project/map_section.html:39
+msgid "Load from a HOT Tasking Manager project"
+msgstr "Bunye site na ọrụ HOT Tasking Manager"
+
+#: app/templates/partials/new_project/map_section.html:41
+msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
+msgstr "Tinye ID ọrụ HOT Tasking Manager iji bunye mpaghara mmasị ya."
+
+#: app/templates/partials/new_project/map_section.html:50
+msgid "Tasking Manager project ID"
+msgstr "ID ọrụ Tasking Manager"
+
+#: app/templates/partials/new_project/map_section.html:53
+msgid "Load AOI"
+msgstr "Bunye mpaghara"
 
 #: app/templates/partials/new_project/map_section.html:60
-msgid "Load from a HOT Tasking Manager project"
-msgstr ""
-
-#: app/templates/partials/new_project/map_section.html:62
-msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
-msgstr ""
-
-#: app/templates/partials/new_project/map_section.html:71
-msgid "Tasking Manager project ID"
-msgstr ""
-
-#: app/templates/partials/new_project/map_section.html:75
-msgid "Load AOI"
-msgstr ""
-
-#: app/templates/partials/new_project/map_section.html:84
 msgid "Combine multiple shapes into one"
 msgstr "Jikọta ọtụtụ ụdị ka ọ bụrụ otu"
 
-#: app/templates/partials/new_project/map_section.html:89
+#: app/templates/partials/new_project/map_section.html:64
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2157,125 +1914,107 @@ msgstr ""
 " nke ukwuu (karịa 200 km²) nwere ike ghara ibudata data maapụ niile na-"
 "akpaghị aka."
 
-#: app/templates/partials/project_details/basemap_section.html:2
+#: app/templates/partials/project_details/basemap_section.html:13
 msgid "Offline Basemap"
 msgstr "Basemap na-anọghị n’ịntanetị"
 
-#: app/templates/partials/project_details/basemap_section.html:4
+#: app/templates/partials/project_details/basemap_section.html:15
 msgid ""
 "Search HOT OpenAerialMap imagery for this AOI and generate an MBTiles "
 "basemap."
 msgstr "Chọọ onyonyo HOT OpenAerialMap maka AOI a ma mepụta basemap MBTiles."
 
-#: app/templates/partials/project_details/basemap_section.html:32
-msgid ""
-"A basemap job is currently in progress. Wait for it to finish before "
-"starting a new search."
-msgstr "Ọrụ basemap na-aga ugbu a. Chere ka ọ gwụchaa tupu ịmalite ọchụchọ ọhụrụ."
-
-#: app/templates/partials/project_details/basemap_section.html:37
+#: app/templates/partials/project_details/basemap_section.html:27
 msgid "Search OAM Imagery"
 msgstr "Chọọ Onyonyo OAM"
 
-#: app/templates/partials/project_details/basemap_section.html:41
+#: app/templates/partials/project_details/basemap_section.html:30
 msgid "Search is disabled while a basemap job is running."
 msgstr "Emechiela ọchụchọ mgbe ọrụ basemap na-aga."
 
-#: app/templates/partials/project_details/basemap_section.html:56
+#: app/templates/partials/project_details/basemap_section.html:44
 msgid "Basemap generation previously failed. Please search again and retry."
 msgstr "Imepụta basemap dara na mbụ. Biko chọọ ọzọ ma nwalee ọzọ."
 
-#: app/templates/partials/project_details/basemap_section.html:60
+#: app/templates/partials/project_details/basemap_section.html:47
 msgid "No basemap selected yet."
 msgstr "A họrọbeghị basemap ọ bụla."
 
-#: app/templates/partials/project_details/manager_setup_summary.html:3
+#: app/templates/partials/project_details/manager_setup_summary.html:1
 msgid "Manager Setup Summary"
 msgstr "Nchịkọta nhazi onye njikwa"
 
-#: app/templates/partials/project_details/manager_setup_summary.html:6
+#: app/templates/partials/project_details/manager_setup_summary.html:4
 msgid "The project setup flow is complete and shown below for reference."
 msgstr "Usoro nhazi ọrụ zuru ezu ma egosiri ya n'okpuru maka ntụaka."
 
-#: app/templates/partials/project_details/manager_setup_summary.html:14
-msgid "Project Location"
-msgstr "Ebe ọrụ"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:25
-#: app/templates/partials/project_details/setup_steps.html:61
+#: app/templates/partials/project_details/manager_setup_summary.html:7
+#: app/templates/partials/project_details/setup_steps.html:44
 msgid "Survey Form"
 msgstr "Fọm Nnyocha"
 
-#: app/templates/partials/project_details/manager_setup_summary.html:28
-#: app/templates/partials/project_details/manager_setup_summary.html:39
-#: app/templates/partials/project_details/manager_setup_summary.html:50
-#: app/templates/partials/project_details/manager_setup_summary.html:61
-msgid "Complete"
-msgstr "Zuru ezu"
-
-#: app/templates/partials/project_details/manager_setup_summary.html:36
+#: app/templates/partials/project_details/manager_setup_summary.html:7
 msgid "Map Data"
 msgstr "Data Maapụ"
 
-#: app/templates/partials/project_details/manager_setup_summary.html:47
-#: app/templates/partials/project_details/setup_steps.html:62
-#: app/templates/partials/project_details/setup_steps.html:63
+#: app/templates/partials/project_details/manager_setup_summary.html:7
+#: app/templates/partials/project_details/setup_steps.html:45
+#: app/templates/partials/project_details/setup_steps.html:46
 #: app/templates/partials/project_details/tasks_section.html:8
 msgid "Tasks"
-msgstr "ID Ọrụ"
+msgstr "Ọrụ"
 
-#: app/templates/partials/project_details/manager_setup_summary.html:58
+#: app/templates/partials/project_details/manager_setup_summary.html:7
 msgid "Project Created"
 msgstr "Ọrụ e kere"
 
-#: app/templates/partials/project_details/manager_setup_summary.html:69
+#: app/templates/partials/project_details/manager_setup_summary.html:10
+msgid "Complete"
+msgstr "Zuru ezu"
+
+#: app/templates/partials/project_details/manager_setup_summary.html:16
 msgid ""
 "If you need to upload additional media files to this project, such as "
-"images and\n"
-"          videos, log into ODK Central and upload them in the form "
-"settings."
+"images and videos,\n"
+"      log into ODK Central and upload them in the form settings."
 msgstr ""
-"Ọ bụrụ na ịchọrọ ibulite faịlụ mgbasa ozi ọzọ na ọrụ a, dịka onyonyo na "
-"vidiyo, banye na ODK Central ma bulite ha na ntọala fọm."
+"Ọ bụrụ na ịchọrọ ibulite faịlụ mgbasa ozi ndị ọzọ na ọrụ a, dị ka foto na"
+" vidiyo, banye na ODK Central wee bulite ha na ntọala fọm."
 
 #: app/templates/partials/project_details/setup_steps.html:14
 msgid "Ready for Mapping"
 msgstr "Dị njikere maka ime maapụ"
 
-#: app/templates/partials/project_details/setup_steps.html:26
+#: app/templates/partials/project_details/setup_steps.html:23
 msgid "Loading QR code..."
 msgstr "Na-ebubata koodu QR..."
 
-#: app/templates/partials/project_details/setup_steps.html:39
+#: app/templates/partials/project_details/setup_steps.html:33
 msgid "Get the app"
-msgstr ""
+msgstr "Nweta ngwa ahụ"
 
-#: app/templates/partials/project_details/setup_steps.html:52
-msgid "Loading collaborator form..."
-msgstr "Na-ebu ụdị onye mmekọ..."
-
-#: app/templates/partials/project_details/setup_steps.html:59
+#: app/templates/partials/project_details/setup_steps.html:42
 msgid "Project Setup"
 msgstr "Nhazi ọrụ"
 
-#: app/templates/partials/project_details/setup_steps.html:61
-#: app/templates/partials/project_details/setup_steps.html:63
+#: app/templates/partials/project_details/setup_steps.html:44
+#: app/templates/partials/project_details/setup_steps.html:46
 msgid "Project Details"
 msgstr "AOI ọrụ"
 
-#: app/templates/partials/project_details/setup_steps.html:62
+#: app/templates/partials/project_details/setup_steps.html:45
 msgid "Get Data"
 msgstr "Nzọụkwụ 3: Nweta data"
 
-#: app/templates/partials/project_details/setup_steps.html:62
+#: app/templates/partials/project_details/setup_steps.html:45
 msgid "Finalise"
 msgstr "Mechaa ọrụ"
 
-#: app/templates/partials/project_details/setup_steps.html:64
+#: app/templates/partials/project_details/setup_steps.html:47
 msgid "Publish"
-msgstr ""
+msgstr "Bipụta"
 
-#: app/templates/partials/project_details/setup_steps.html:65
+#: app/templates/partials/project_details/setup_steps.html:48
 msgid "Project setup progress"
 msgstr "Nhazi ọrụ"
 
@@ -2357,32 +2096,23 @@ msgstr ""
 "E melitela isi iyi a tụrụ aro (%(geom_label)s). Nyochaa data na maapụ, "
 "wee gaa n'ihu."
 
-#: app/templates/partials/project_details/style_and_scripts.html:24
-msgid "Downloading..."
-msgstr "Na-ebudata..."
-
-#: app/templates/partials/project_details/setup_steps/step3_data.html:28
 #: app/templates/partials/project_details/style_and_scripts.html:25
-msgid "Use OSM data"
-msgstr "Budata data OSM"
-
-#: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "ODK Central"
 msgstr "ODK Central"
 
-#: app/templates/partials/project_details/style_and_scripts.html:28
+#: app/templates/partials/project_details/style_and_scripts.html:26
 msgid "QField"
 msgstr "QField"
 
-#: app/templates/partials/project_details/style_and_scripts.html:29
+#: app/templates/partials/project_details/style_and_scripts.html:27
 msgid "the mapping tool"
 msgstr "ngwaọrụ maapụ"
 
-#: app/templates/partials/project_details/style_and_scripts.html:30
+#: app/templates/partials/project_details/style_and_scripts.html:28
 msgid "Project type not set. Please set the field mapping app first."
 msgstr "A ka etinyeghị ụdị ọrụ. Biko tọọ ngwa ime maapụ ubi mbụ."
 
-#: app/templates/partials/project_details/style_and_scripts.html:31
+#: app/templates/partials/project_details/style_and_scripts.html:29
 #, python-format
 msgid ""
 "Are you sure you want to finalise this project in %(project_type)s? This "
@@ -2391,187 +2121,169 @@ msgstr ""
 "Ị ji n'aka na ịchọrọ imechi ọrụ a na %(project_type)s? Nke a ga-emepụta "
 "ọrụ ahụ, bulite fọm, ma mepụta faịlụ niile achọrọ."
 
-#: app/templates/partials/project_details/style_and_scripts.html:32
+#: app/templates/partials/project_details/style_and_scripts.html:30
 msgid "Custom ODK Credentials"
 msgstr "Njirimara ODK omenala"
 
-#: app/templates/partials/project_details/style_and_scripts.html:33
+#: app/templates/partials/project_details/style_and_scripts.html:31
 msgid "Custom QField Credentials"
 msgstr "Njirimara QField omenala"
 
-#: app/templates/partials/project_details/style_and_scripts.html:34
+#: app/templates/partials/project_details/style_and_scripts.html:32
 msgid "Please fill in all fields."
 msgstr "Biko dejupụta mpaghara niile."
 
-#: app/templates/partials/project_details/style_and_scripts.html:35
-msgid "Testing..."
-msgstr "Na-anwale..."
-
-#: app/templates/partials/project_details/style_and_scripts.html:36
+#: app/templates/partials/project_details/style_and_scripts.html:33
 msgid "Testing credentials..."
 msgstr "Na-anwale njirimara..."
 
-#: app/templates/partials/project_details/style_and_scripts.html:37
+#: app/templates/partials/project_details/style_and_scripts.html:34
 msgid "✓ Credentials are valid!"
 msgstr "✓ Njirimara ziri ezi!"
 
-#: app/templates/partials/project_details/style_and_scripts.html:38
+#: app/templates/partials/project_details/style_and_scripts.html:35
 msgid "Invalid credentials. Please check and try again."
 msgstr "Njirimara ezighi ezi. Biko lelee ma nwaa ọzọ."
 
-#: app/templates/partials/project_details/style_and_scripts.html:39
+#: app/templates/partials/project_details/style_and_scripts.html:36
 #, python-format
 msgid "Error testing credentials: %(message)s"
 msgstr "Njehie n'ịnwale njirimara: %(message)s"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:203
-#: app/templates/partials/project_details/style_and_scripts.html:40
-msgid "Test Credentials"
-msgstr "Nwale njirimara"
-
-#: app/templates/partials/project_details/style_and_scripts.html:41
+#: app/templates/partials/project_details/style_and_scripts.html:37
 msgid "Please test credentials first before continuing."
 msgstr "Biko nwalee njirimara mbụ tupu ịga n'ihu."
 
-#: app/templates/partials/project_details/style_and_scripts.html:42
+#: app/templates/partials/project_details/style_and_scripts.html:38
 #, python-format
 msgid "Creating project in %(project_type)s... This may take a moment."
 msgstr "Na-emepụta ọrụ na %(project_type)s... Nke a nwere ike iwe obere oge."
 
-#: app/templates/partials/project_details/style_and_scripts.html:43
+#: app/templates/partials/project_details/style_and_scripts.html:39
 msgid "Error:"
 msgstr "Njehie:"
 
-#: app/templates/partials/project_details/tasks_section.html:10
+#: app/templates/partials/project_details/tasks_section.html:11
 #, python-format
 msgid "%(count)s tasks"
-msgstr ""
+msgstr "Ọrụ %(count)s"
 
-#: app/templates/partials/project_details/tasks_section.html:14
+#: app/templates/partials/project_details/tasks_section.html:17
 #, python-format
 msgid "%(count)s tasks, %(assigned)s assigned."
-msgstr ""
+msgstr "Ọrụ %(count)s, %(assigned)s ekenyere."
 
-#: app/templates/partials/project_details/tasks_section.html:16
+#: app/templates/partials/project_details/tasks_section.html:19
 msgid "The whole area is one task."
-msgstr ""
+msgstr "Mpaghara niile bụ otu ọrụ."
 
-#: app/templates/partials/project_details/tasks_section.html:16
+#: app/templates/partials/project_details/tasks_section.html:19
 msgid ""
-"Split the area into tasks and\n"
-"    assign them to teams or people in the task planner. Or use the whole "
-"area as one task."
+"Split the area into tasks\n"
+"      and assign them to teams or people in the task planner. Or use the "
+"whole area as one task."
 msgstr ""
+"Kewaa mpaghara ahụ n'ọrụ wee kenye ha otu ma ọ bụ ndị mmadụ n'onye nhazi "
+"ọrụ. Ma ọ bụ jiri mpaghara niile dị ka otu ọrụ."
 
-#: app/templates/partials/project_details/tasks_section.html:18
+#: app/templates/partials/project_details/tasks_section.html:21
 msgid "No tasks yet."
-msgstr ""
+msgstr "Enwebeghị ọrụ."
 
-#: app/templates/partials/project_details/tasks_section.html:24
+#: app/templates/partials/project_details/tasks_section.html:27
 msgid "Task map"
-msgstr ""
+msgstr "Maapụ ọrụ"
 
-#: app/templates/partials/project_details/tasks_section.html:31
+#: app/templates/partials/project_details/tasks_section.html:33
 msgid "Open tasks for download and sharing (GPX, GeoJSON, QR codes)"
-msgstr ""
+msgstr "Mepee ọrụ maka ibudata na ịkesa (GPX, GeoJSON, koodu QR)"
 
-#: app/templates/partials/project_details/tasks_section.html:37
+#: app/templates/partials/project_details/tasks_section.html:50
 msgid "Edit tasks"
-msgstr ""
+msgstr "Dezie ọrụ"
 
-#: app/templates/partials/project_details/tasks_section.html:37
+#: app/templates/partials/project_details/tasks_section.html:50
 msgid "Split & assign tasks"
-msgstr ""
+msgstr "Kewaa ma kenye ọrụ"
 
-#: app/templates/partials/project_details/tasks_section.html:46
+#: app/templates/partials/project_details/tasks_section.html:59
 msgid "Use whole area as one task"
-msgstr ""
+msgstr "Jiri mpaghara niile dị ka otu ọrụ"
 
-#: app/templates/partials/project_details/tasks_section.html:55
-msgid "Re-sync tasks to ODK"
-msgstr ""
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:33
+#: app/templates/partials/project_details/tasks_section.html:68
+#, python-format
+msgid "Re-sync tasks to %(app)s"
+msgstr "Jikọọ ọrụ ọzọ na %(app)s"
 
-#: app/templates/partials/project_details/tasks_section.html:66
+#: app/templates/partials/project_details/tasks_section.html:79
 msgid "Or upload a task plan file (GeoJSON):"
-msgstr ""
+msgstr "Ma ọ bụ bulite faịlụ atụmatụ ọrụ (GeoJSON):"
 
-#: app/templates/partials/project_details/tasks_section.html:72
+#: app/templates/partials/project_details/tasks_section.html:85
 msgid ""
-"Task changes after publishing are not sent to QField. They apply to new "
-"projects\n"
-"    only."
+"After editing tasks, re-sync to update them in the mapping app. Changing "
+"task areas\n"
+"      resets task progress in the app."
 msgstr ""
+"Mgbe ị dezichara ọrụ, jikọọ ọzọ iji melite ha na ngwa maapụ. Ịgbanwe "
+"mpaghara ọrụ na-ahazigharị ọganihu ọrụ na ngwa ahụ."
 
-#: app/templates/partials/project_details/tasks_section.html:77
-msgid ""
-"After editing tasks, re-sync to update them in ODK Central. Mapping "
-"status is kept."
-msgstr ""
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:5
+#: app/templates/partials/project_details/fragments/basemap_progress.html:4
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
-"      use. Please retry attach."
+"    use. Please retry attach."
 msgstr ""
 "Ijikọ basemap adaala ugbu a. Ọrụ gị dị njikere iji ya. Biko nwaa ijikọ "
 "ọzọ."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:20
+#: app/templates/partials/project_details/fragments/basemap_progress.html:15
 msgid "Retry Attach"
 msgstr "Nwalee itinye ọzọ"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:26
+#: app/templates/partials/project_details/fragments/basemap_progress.html:20
 msgid ""
 "Basemap is attaching to the QField project. This can take a minute; click"
 " below to check\n"
-"      the latest status."
+"    the latest status."
 msgstr ""
-"A na-ejikọ basemap na ọrụ QField. Nke a nwere ike iwe otu nkeji; pịa "
-"n’okpuru iji lelee ọnọdụ ọhụrụ."
+"A na-ejikọ basemap na ọrụ QField. Nke a nwere ike were otu nkeji; pịa "
+"n'okpuru ka ịhụ ọnọdụ ọhụrụ."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:41
-#: app/templates/partials/project_details/fragments/basemap_progress.html:104
-msgid "Checking..."
-msgstr "Na-enyocha..."
-
-#: app/templates/partials/project_details/fragments/basemap_progress.html:42
-#: app/templates/partials/project_details/fragments/basemap_progress.html:45
-#: app/templates/partials/project_details/fragments/basemap_progress.html:105
-#: app/templates/partials/project_details/fragments/basemap_progress.html:108
+#: app/templates/partials/project_details/fragments/basemap_progress.html:35
+#: app/templates/partials/project_details/fragments/basemap_progress.html:82
 msgid "Check Status"
 msgstr "Ọkwa ọrụ"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:62
+#: app/templates/partials/project_details/fragments/basemap_progress.html:40
 msgid ""
 "Basemap generation is in progress on the imagery server. Click below to "
-"check whether\n"
-"      it's ready."
-msgstr ""
-"Ịmepụta basemap na-aga na sava onyonyo. Pịa n’okpuru iji hụ ma ọ dị "
-"njikere."
+"check whether it's\n"
+"    ready."
+msgstr "A na-emepụta basemap na sava foto. Pịa n'okpuru ka ịlele ma ọ dị njikere."
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:63
+#: app/templates/partials/project_details/fragments/basemap_progress.html:41
 msgid "STAC item"
 msgstr "Ihe STAC"
 
-#: app/templates/partials/project_details/fragments/basemap_progress.html:64
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:15
+#: app/templates/partials/project_details/fragments/basemap_progress.html:42
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:12
 msgid "Zoom"
 msgstr "Nkwalite"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:4
+#: app/templates/partials/project_details/fragments/basemap_ready.html:3
 msgid ""
 "Basemap attached to\n"
 "    QField project."
 msgstr "Ejikọrọ basemap na ọrụ QField."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:5
+#: app/templates/partials/project_details/fragments/basemap_ready.html:4
 msgid ""
 "Basemap is\n"
 "    ready. Attaching to QField project in progress."
 msgstr "Basemap adịla njikere. A na-etinye ya na oru QField ugbu a."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:7
+#: app/templates/partials/project_details/fragments/basemap_ready.html:6
 msgid ""
 "Basemap is ready, but attach to the QField project failed.\n"
 "    Please retry attach."
@@ -2579,7 +2291,7 @@ msgstr ""
 "Basemap adịla njikere, mana ijikọ ya na ọrụ QField dara.\n"
 "    Biko nwaa ijikọ ọzọ."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:8
+#: app/templates/partials/project_details/fragments/basemap_ready.html:7
 msgid ""
 "Basemap is ready. Not yet attached to QField\n"
 "    project."
@@ -2587,11 +2299,11 @@ msgstr ""
 "Basemap adịla njikere. Ejikọbeghị ya na ọrụ\n"
 "    QField."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:9
+#: app/templates/partials/project_details/fragments/basemap_ready.html:8
 msgid "Basemap is ready."
 msgstr "Basemap adịla njikere."
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:10
+#: app/templates/partials/project_details/fragments/basemap_ready.html:9
 msgid ""
 "Total\n"
 "    size"
@@ -2599,182 +2311,230 @@ msgstr ""
 "Nha\n"
 "    niile"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:12
+#: app/templates/partials/project_details/fragments/basemap_ready.html:11
 msgid "Available Zoom"
 msgstr "Zoom dị"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:24
+#: app/templates/partials/project_details/fragments/basemap_ready.html:25
 msgid "Download MBTiles"
 msgstr "Budata MBTiles"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:33
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:26
+#: app/templates/partials/project_details/fragments/basemap_ready.html:36
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:31
 msgid "View Metadata"
 msgstr "Lelee metadata"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:46
-#: app/templates/partials/project_details/fragments/basemap_ready.html:57
+#: app/templates/partials/project_details/fragments/basemap_ready.html:47
 msgid "Attach to QField Project"
 msgstr "Tinye na Oru QField"
 
-#: app/templates/partials/project_details/fragments/basemap_ready.html:64
+#: app/templates/partials/project_details/fragments/basemap_ready.html:54
 msgid ""
 "Use the ODK offline maps documentation to configure this MBTiles file in "
 "Collect."
 msgstr "Jiri akwụkwọ ndu maapụ ODK offline hazie faịlụ MBTiles a na Collect."
 
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:3
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:2
 msgid "Select one imagery item to start MBTiles generation."
 msgstr "Họrọ otu ihe onyonyo iji malite imepụta MBTiles."
 
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:13
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:10
 msgid "Cloud"
 msgstr "Mechie"
 
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:49
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:45
 msgid "Use this image"
 msgstr "Jiri onyonyo a"
 
-#: app/templates/partials/project_details/fragments/basemap_search_results.html:59
+#: app/templates/partials/project_details/fragments/basemap_search_results.html:52
 msgid "No imagery items were found for this AOI."
 msgstr "Achọtaghị ihe onyonyo ọ bụla maka AOI a."
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:21
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:16
 msgid "Accept Data Extract"
 msgstr "Nabata mgbakwunye data"
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:29
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:25
 msgid "Discard the downloaded data extract?"
-msgstr ""
+msgstr "Tụfuo mgbakwunye data ebudatara?"
 
-#: app/templates/partials/project_details/fragments/data_extract_preview.html:32
+#: app/templates/partials/project_details/fragments/data_extract_preview.html:27
 msgid "Discard"
-msgstr ""
+msgstr "Tụfuo"
 
-#: app/templates/partials/project_details/fragments/finalize_error.html:7
+#: app/templates/partials/project_details/fragments/finalize_error.html:4
 msgid "View technical details"
 msgstr "Lee nkọwa teknụzụ"
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:5
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:2
 msgid "Project created in ODK Central."
 msgstr "E mepụtara ọrụ ahụ na ODK Central."
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:4
 msgid "Manager Access (ODK Central UI)"
 msgstr "Ịnweta onye njikwa (ODK Central UI)"
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:11
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:6
 msgid "Open project in ODK Central"
 msgstr "Mepee ọrụ na ODK Central"
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:15
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:16
-#: app/templates/partials/project_details/fragments/qr_panel.html:29
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:8
 msgid "Username:"
 msgstr "Aha njirimara:"
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:18
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:19
-#: app/templates/partials/project_details/fragments/qr_panel.html:32
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:9
 msgid "Password:"
 msgstr "Okwuntughe:"
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:21
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:22
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:10
 msgid "Save these credentials now. They will only be shown once."
 msgstr "Chekwaa njirimara ndị a ugbu a. A ga-egosi ha naanị otu ugboro."
 
-#: app/templates/partials/project_details/fragments/finalize_success_odk.html:26
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:33
+#: app/templates/partials/project_details/fragments/finalize_success_odk.html:14
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:15
 msgid "View FieldTM Project"
 msgstr "Lelee ọrụ FieldTM"
 
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:5
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:2
 msgid "Project created in QFieldCloud."
 msgstr "E mepụtara ọrụ ahụ na QFieldCloud."
 
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:8
-msgid "Manager Access (QFieldCloud)"
-msgstr "Ịnweta onye njikwa (QFieldCloud)"
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:4
+msgid "QFieldCloud"
+msgstr "QFieldCloud"
 
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:11
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:6
 msgid "Open project in QFieldCloud"
 msgstr "Mepee ọrụ na QFieldCloud"
 
-#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:26
+#: app/templates/partials/project_details/fragments/finalize_success_qfield.html:9
 msgid ""
-"Manager account could not be created automatically. Log in to QFieldCloud"
-" as admin to\n"
-"      manage the project."
+"The project is public: anyone logged in to QFieldCloud can open it in "
+"QField and sync\n"
+"      their data. No invites needed."
 msgstr ""
-"Enweghị ike ịmepụta akaụntụ onye njikwa na-akpaghị aka. Banye na "
-"QFieldCloud dịka admin iji jikwaa ọrụ ahụ."
+"Ọrụ a bụ nke ọha: onye ọ bụla banyere na QFieldCloud nwere ike imeghe ya "
+"na QField wee jikọọ data ya. Ọ dịghị mkpa òkù."
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:2
+#: app/templates/partials/project_details/fragments/qr_panel.html:3
 msgid "Scan QR Code"
 msgstr "Skanụọ koodu QR"
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:4
+#: app/templates/partials/project_details/fragments/qr_panel.html:5
 #, python-format
 msgid "Use %(app_name)s to scan this QR code and load the project."
 msgstr "Jiri %(app_name)s skanụọ koodu QR a ma bubata ọrụ ahụ."
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:7
+#: app/templates/partials/project_details/fragments/qr_panel.html:10
 msgid "Project QR Code"
 msgstr "Koodu QR ọrụ"
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:12
+#: app/templates/partials/project_details/fragments/qr_panel.html:17
 #, python-format
 msgid "Open in %(app_name)s"
 msgstr "Mepee na %(app_name)s"
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:15
+#: app/templates/partials/project_details/fragments/qr_panel.html:35
+msgid "Download QR Code"
+msgstr "Budata koodu QR"
+
+#: app/templates/partials/project_details/fragments/qr_panel.html:40
 #, python-format
 msgid "If %(app_name)s is installed on this device."
 msgstr "Ọ bụrụ na arụnyere %(app_name)s na ngwaọrụ a."
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:19
-msgid "Download QR Code"
-msgstr "Budata koodu QR"
+#: app/templates/partials/project_details/fragments/qr_panel.html:44
+msgid "Log in to QField with your own QFieldCloud account, then scan the QR code."
+msgstr "Banye na QField jiri akaụntụ QFieldCloud nke gị, wee nyochaa koodu QR."
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:27
-msgid "Mapper Login (QFieldCloud)"
-msgstr "Nbanye onye na-ese maapụ (QFieldCloud)"
+#: app/templates/partials/project_details/fragments/qr_panel.html:46
+msgid "Create a free account"
+msgstr "Mepụta akaụntụ n'efu"
 
-#: app/templates/partials/project_details/fragments/qr_panel.html:35
-msgid "Scan the QR code, then enter these credentials in QField."
-msgstr "Skanụọ koodu QR, wee tinye njirimara ndị a na QField."
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:10
+msgid "Task areas have changed since the last sync."
+msgstr "Mpaghara ọrụ agbanweela kemgbe njikọ ikpeazụ."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:12
+msgid ""
+"The task entities in ODK Central will be replaced and every task status\n"
+"      reset to ready. Mapping progress in ODK Collect will be lost. "
+"Submissions are kept in ODK\n"
+"      Central."
+msgstr ""
+"A ga-edochi ihe ọrụ dị na ODK Central, a ga-ahazigharịkwa ọnọdụ ọrụ ọ "
+"bụla ka ọ bụrụ njikere. Ọganihu maapụ na ODK Collect ga-efu. Ihe ezitere "
+"ka ga-adị na ODK Central."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:14
+msgid ""
+"The task layer of the QField project will be regenerated and\n"
+"      re-uploaded to QFieldCloud. Mappers must sync or re-download the "
+"project. Task progress and\n"
+"      survey data already synced to QFieldCloud are kept."
+msgstr ""
+"A ga-emepụta ọzọ layer ọrụ nke ọrụ QField wee bulite ya ọzọ na "
+"QFieldCloud. Ndị na-ese maapụ ga-ejikọ ma ọ bụ budata ọrụ ahụ ọzọ. A na-"
+"edobe ọganihu ọrụ na data nyocha ejikọrọ na QFieldCloud."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:18
+msgid "Use with caution, after coordinating with your field mappers."
+msgstr "Jiri nlezianya mee ya, mgbe gị na ndị na-ese maapụ n'ọhịa gị kwekọrịtara."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:21
+msgid "I understand that task progress in the app will be reset."
+msgstr "Aghọtara m na a ga-ahazigharị ọganihu ọrụ na ngwa ahụ."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:26
+msgid ""
+"This will overwrite any assignment updates made by mappers in the app. "
+"Use with caution\n"
+"    after coordinating with your field mappers."
+msgstr ""
+"Nke a ga-edegharị mgbanwe nkenye ọ bụla ndị na-ese maapụ mere na ngwa "
+"ahụ. Jiri nlezianya mee ya, mgbe gị na ndị na-ese maapụ n'ọhịa gị "
+"kwekọrịtara."
+
+#: app/templates/partials/project_details/fragments/task_sync_confirm.html:27
+msgid ""
+"Mappers must sync the\n"
+"    QField project to get the changes."
+msgstr "Ndị na-ese maapụ ga-ejikọ ọrụ QField iji nweta mgbanwe ndị ahụ."
 
 #: app/templates/partials/project_details/setup_steps/step2_form.html:4
 msgid "Survey form ready"
 msgstr "Fọm nnyocha dị njikere"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:9
+#: app/templates/partials/project_details/setup_steps/step2_form.html:8
 msgid "Choose Your Survey Form"
 msgstr "Họrọ ụdị nyocha:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:12
+#: app/templates/partials/project_details/setup_steps/step2_form.html:11
 msgid ""
 "Pick a ready-made survey that matches what you're mapping. You can upload"
-" your own survey\n"
-"    file if none of these fit."
+" your own\n"
+"      survey file if none of these fit."
 msgstr ""
-"Họrọ nnyocha emere njikere kwekọrọ n'ihe ị na-eme maapụ. Ị nwere ike "
-"bulite faịlụ nnyocha nke gị ma ọ bụrụ na nke ọ bụla adabaghị."
+"Họrọ nyocha dị njikere dabara n'ihe ị na-ese maapụ ya. Ị nwere ike "
+"ibulite faịlụ nyocha nke gị ma ọ bụrụ na ọ nweghị nke dabara."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:25
+#: app/templates/partials/project_details/setup_steps/step2_form.html:24
 msgid "Survey form"
 msgstr "Fọm nnyocha"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:28
+#: app/templates/partials/project_details/setup_steps/step2_form.html:26
 msgid "Loading survey types..."
 msgstr "Na-ebubata ụdị nyocha..."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:36
+#: app/templates/partials/project_details/setup_steps/step2_form.html:31
+msgid "or"
+msgstr "ma ọ bụ"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
 msgid "upload your own survey file (.xls / .xlsx)"
 msgstr "bulite faịlụ nnyocha nke gị (.xls / .xlsx)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:49
+#: app/templates/partials/project_details/setup_steps/step2_form.html:40
 msgid ""
 "Heads up: Field-TM auto-adds fields for tasks and feature selection. Your"
 " form should\n"
@@ -2784,58 +2544,58 @@ msgstr ""
 "nkewa ọrụ na nhọrọ njirimara. Ụdị gị kwesịrị ịnwe naanị ajụjụ nyocha "
 "ịchọrọ ịjụ (etinyela ubi select_one_from_file maka ọrụ/njirimara)."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+#: app/templates/partials/project_details/setup_steps/step2_form.html:73
 msgid "Form language"
 msgstr "Asụsụ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:100
+#: app/templates/partials/project_details/setup_steps/step2_form.html:75
 msgid "English"
 msgstr "Bekee"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:101
+#: app/templates/partials/project_details/setup_steps/step2_form.html:76
 msgid "Spanish"
 msgstr "Asụsụ Spanish"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:102
+#: app/templates/partials/project_details/setup_steps/step2_form.html:77
 msgid "French"
 msgstr "Asụsụ French"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:103
+#: app/templates/partials/project_details/setup_steps/step2_form.html:78
 msgid "Portuguese"
 msgstr "Asụsụ Portuguese"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:104
+#: app/templates/partials/project_details/setup_steps/step2_form.html:79
 msgid "Swahili"
 msgstr "Asụsụ Swahili"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:105
+#: app/templates/partials/project_details/setup_steps/step2_form.html:80
 msgid "Hindi"
 msgstr "Asụsụ Hindi"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:109
+#: app/templates/partials/project_details/setup_steps/step2_form.html:84
 msgid "Form questions"
 msgstr "Nhọrọ fọm:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:113
-msgid "Ask for a photo"
-msgstr "Rịọ foto"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:115
+#: app/templates/partials/project_details/setup_steps/step2_form.html:88
 msgid "Mappers will be asked to take a photo at the location."
 msgstr "Na-arịọ onye ọrụ ka o were foto n’ebe ọ nọ."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:128
+#: app/templates/partials/project_details/setup_steps/step2_form.html:89
+msgid "Ask for a photo"
+msgstr "Rịọ foto"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
 msgid "Make photo mandatory"
 msgstr "Mee ka foto bụrụ iwu"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:135
-msgid "Ask to verify existing features"
+#: app/templates/partials/project_details/setup_steps/step2_form.html:101
+msgid "Mappers confirm whether existing OSM features are correctly digitised."
 msgstr ""
 "Na-arịọ onye maapụ ka o nyochaa ma e digitiseela atụmatụ ndị dị ugbu a "
 "nke ọma."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:137
-msgid "Mappers confirm whether existing OSM features are correctly digitised."
+#: app/templates/partials/project_details/setup_steps/step2_form.html:102
+msgid "Ask to verify existing features"
 msgstr ""
 "Na-arịọ onye maapụ ka o nyochaa ma e digitiseela atụmatụ ndị dị ugbu a "
 "nke ọma."
@@ -2844,153 +2604,159 @@ msgstr ""
 msgid "Data extract ready"
 msgstr "Mgbakwunye data OSM dị njikere"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:9
+#: app/templates/partials/project_details/setup_steps/step3_data.html:8
 msgid "Add Your Data"
 msgstr "Budata data OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:12
+#: app/templates/partials/project_details/setup_steps/step3_data.html:11
 msgid ""
 "Pull existing features from OpenStreetMap for your project area, or start"
 " with an empty\n"
-"    map so mappers can collect everything from scratch."
+"      map so mappers can collect everything from scratch."
 msgstr ""
-"Weta atụmatụ ndị dịbu na OpenStreetMap maka mpaghara oru ngo gị, ma ọ bụ "
-"bido na maapụ efu ka ndị na-eme maapụ chịkọta ihe niile site na mmalite."
+"Wete ihe ndị dị adị site na OpenStreetMap maka mpaghara ọrụ gị, ma ọ bụ "
+"bido na maapụ efu ka ndị na-ese maapụ chịkọta ihe niile site na mmalite."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:54
+#: app/templates/partials/project_details/setup_steps/step3_data.html:26
+msgid "Use OSM data"
+msgstr "Budata data OSM"
+
+#: app/templates/partials/project_details/setup_steps/step3_data.html:36
 msgid "Start with empty map"
 msgstr "Bido na maapụ efu"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:62
+#: app/templates/partials/project_details/setup_steps/step3_data.html:40
 msgid "upload your own map file (GeoJSON)"
 msgstr "Bulite GeoJSON omenala"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:80
+#: app/templates/partials/project_details/setup_steps/step3_data.html:46
 msgid "Override the default OSM source for this project."
 msgstr "Ndabara a tụrụ aro na-arụ ọrụ maka ọrụ a."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:86
+#: app/templates/partials/project_details/setup_steps/step3_data.html:49
 msgid "What to download"
 msgstr "Ihe a ga-ebudata"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:89
+#: app/templates/partials/project_details/setup_steps/step3_data.html:51
 msgid "OSM Buildings"
 msgstr "Ụlọ OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:90
+#: app/templates/partials/project_details/setup_steps/step3_data.html:52
 msgid "OSM Highways"
 msgstr "Ụzọ OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:91
+#: app/templates/partials/project_details/setup_steps/step3_data.html:53
 msgid "OSM Healthcare"
 msgstr "Ahụike OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:92
+#: app/templates/partials/project_details/setup_steps/step3_data.html:54
 msgid "OSM Toilets"
 msgstr "Ụlọ ịsa ahụ OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:93
+#: app/templates/partials/project_details/setup_steps/step3_data.html:55
 msgid "OSM Religious"
 msgstr "Okpukpe OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:94
+#: app/templates/partials/project_details/setup_steps/step3_data.html:56
 msgid "OSM Landuse"
 msgstr "Ojiji ala OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:95
+#: app/templates/partials/project_details/setup_steps/step3_data.html:57
 msgid "OSM Waterways"
 msgstr "Ụzọ mmiri OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:96
+#: app/templates/partials/project_details/setup_steps/step3_data.html:58
 msgid "OSM Water Points"
 msgstr "Ebe mmiri OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:97
+#: app/templates/partials/project_details/setup_steps/step3_data.html:59
 msgid "OSM Waste Disposal"
 msgstr "Ntụfu ahịhịa OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:98
+#: app/templates/partials/project_details/setup_steps/step3_data.html:60
 msgid "OSM Education"
 msgstr "Mmụta OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:99
+#: app/templates/partials/project_details/setup_steps/step3_data.html:61
 msgid "OSM Cemeteries"
 msgstr "Ebe a na-eli ozu OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:100
+#: app/templates/partials/project_details/setup_steps/step3_data.html:62
 msgid "OSM Amenities"
 msgstr "Akụrụngwa OSM"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:105
+#: app/templates/partials/project_details/setup_steps/step3_data.html:66
 msgid "Feature shape"
 msgstr "njirimara"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:108
+#: app/templates/partials/project_details/setup_steps/step3_data.html:68
 msgid "Polygon (area)"
 msgstr "Poligon"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:109
+#: app/templates/partials/project_details/setup_steps/step3_data.html:69
 msgid "Line"
 msgstr "Polilaini"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:110
+#: app/templates/partials/project_details/setup_steps/step3_data.html:70
 msgid "Point"
 msgstr "Isi ihe"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:118
+#: app/templates/partials/project_details/setup_steps/step3_data.html:76
 msgid "Use Centroids (For OSM Data Download)"
 msgstr "Jiri centroid (Maka mbudata data OSM)"
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:121
+#: app/templates/partials/project_details/setup_steps/step3_data.html:77
 msgid "Convert polygons to single points."
 msgstr "Gbanwee polygons ka ha bụrụ isi ihe otu otu."
 
-#: app/templates/partials/project_details/setup_steps/step3_data.html:143
+#: app/templates/partials/project_details/setup_steps/step3_data.html:85
 msgid "Generating OSM data extract... This may take a moment."
 msgstr "Na-emepụta mgbakwunye data OSM... Nke a nwere ike iwe obere oge."
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:4
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:19
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:20
 msgid "Publish Project"
-msgstr ""
+msgstr "Bipụta Ọrụ"
 
 #: app/templates/partials/project_details/setup_steps/step5_finalize.html:5
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:28
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:30
 msgid "Ready"
 msgstr "Njikere"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:8
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:9
 #, python-format
 msgid ""
 "Publish the project so your team can open the tasks, download them and "
 "share links.\n"
-"    Nothing is sent to %(app)s; your team coordinates there."
+"      Nothing is sent to %(app)s; your team coordinates there."
 msgstr ""
+"Bipụta ọrụ ahụ ka otu gị nwee ike imeghe ọrụ, budata ha ma kesaa njikọ. Ọ"
+" dịghị ihe a na-eziga na %(app)s; otu gị na-ahazi n'ebe ahụ."
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:10
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:11
 msgid "the app"
-msgstr ""
+msgstr "ngwa ahụ"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:27
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:42
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:29
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:45
 msgid "Finalise Project"
 msgstr "Mechaa ọrụ"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:31
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:34
 msgid ""
 "Everything's ready. Click below to create the project in your chosen "
 "mapping tool."
 msgstr "Ihe niile achọrọ emezuola! Mepụta ọrụ ahụ na ngwaọrụ maapụ ị họrọ."
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:50
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:48
 msgid "Use custom credentials"
 msgstr "Njirimara omenala"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:83
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:85
 msgid "Confirm Project Finalisation"
 msgstr "Kwenye mmechi ọrụ"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:87
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:86
 msgid "Are you sure you want to finalise this project?"
 msgstr "Ị ji n'aka na ịchọrọ imechi ọrụ a?"
 
@@ -2998,7 +2764,7 @@ msgstr "Ị ji n'aka na ịchọrọ imechi ọrụ a?"
 msgid "Confirm & Finalise"
 msgstr "Kwenye ma mechaa"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:97
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:95
 msgid "Custom Credentials"
 msgstr "Njirimara omenala"
 
@@ -3006,43 +2772,53 @@ msgstr "Njirimara omenala"
 msgid "ODK Central URL"
 msgstr "URL ODK Central"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:108
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:103
 msgid "https://your-odk-central.com"
 msgstr "https://your-odk-central.com"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:141
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:108
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:138
+msgid "Username"
+msgstr "Aha njirimara"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:114
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:144
+msgid "Password"
+msgstr "Okwuntughe"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:121
 msgid "Where should this project live?"
 msgstr "Ebee ka ọrụ a kwesịrị ịdị?"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:145
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:124
 msgid "Use my account on app.qfield.cloud"
 msgstr "Jiri akaụntụ m na app.qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:146
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:125
 msgid "Use a custom-hosted QFieldCloud instance"
 msgstr "Jiri QFieldCloud ị na-akwado n’onwe gị"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:157
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:131
+msgid "QField Cloud URL"
+msgstr "URL QField Cloud"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:132
 msgid "https://qfield.cloud"
 msgstr "https://qfield.cloud"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:169
-msgid "qfield_username"
-msgstr "qfield_username"
-
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:181
-msgid "qfield_password"
-msgstr "qfield_password"
-
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:186
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:149
 msgid "Organisation name"
 msgstr "Aha òtù"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:191
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:150
 msgid "Optional - leave blank to create under your username"
 msgstr "Nhọrọ - hapụ oghere iji mepụta n’okpuru aha njirimara gị"
 
-#: app/templates/partials/project_details/setup_steps/step5_finalize.html:206
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:160
+msgid "Test Credentials"
+msgstr "Nwale njirimara"
+
+#: app/templates/partials/project_details/setup_steps/step5_finalize.html:163
 msgid "Save & Continue"
 msgstr "Chekwaa ma gaa n'ihu"
 
