@@ -23,7 +23,7 @@ from SQL statements. Sometimes we only need a subset of the fields.
 
 import json
 import logging
-from dataclasses import asdict, dataclass, is_dataclass
+from dataclasses import asdict, dataclass, fields, is_dataclass
 from datetime import date
 from re import sub
 from typing import Any, Mapping, Optional, Self
@@ -48,7 +48,7 @@ from app.i18n import _
 log = logging.getLogger(__name__)
 
 
-def dump_and_check_model(db_model: Any) -> dict:
+def dump_and_check_model(db_model: Any, allow_empty: bool = False) -> dict:
     """Dump the Pydantic model, removing None and default values.
 
     Also validates to check the model is not empty for insert / update.
@@ -68,7 +68,7 @@ def dump_and_check_model(db_model: Any) -> dict:
             f"Unsupported model type for dump_and_check_model: {type(db_model)!r}"
         )
 
-    if not model_dump:
+    if not model_dump and not allow_empty:
         log.error("Attempted create or update with no data.")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -661,12 +661,23 @@ class DbProject:
         db: AsyncConnection,
         project_id: int,
         project_update: Self,
+        set_null: frozenset[str] = frozenset(),
     ) -> Self:
-        """Update values for project."""
-        model_dump = dump_and_check_model(project_update)
+        """Update values for project.
+
+        None values are skipped, so name columns to clear in ``set_null``.
+        """
+        unknown = set_null - {f.name for f in fields(cls)}
+        if unknown:
+            raise ValueError(f"Unknown project columns: {sorted(unknown)}")
+        model_dump = dump_and_check_model(project_update, allow_empty=bool(set_null))
         _add_encrypted_odk_credentials(project_update, model_dump)
         _normalize_project_jsonb_fields(model_dump)
         placeholders = _project_update_placeholders(model_dump)
+        placeholders.extend(
+            sql.SQL("{} = NULL").format(sql.Identifier(column))
+            for column in sorted(set_null - model_dump.keys())
+        )
         _ensure_ftm_project_hashtag(model_dump, project_id)
 
         query = sql.SQL(

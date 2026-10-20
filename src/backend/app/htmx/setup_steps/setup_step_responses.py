@@ -229,6 +229,7 @@ def build_data_extract_preview_response(
     status_message: str,
     preview_message: str,
     project_id: int,
+    warning_message: str | None = None,
 ) -> Template:
     return Template(
         template_name="partials/project_details/fragments/data_extract_preview.html",
@@ -236,6 +237,7 @@ def build_data_extract_preview_response(
             "status_variant": "success",
             "status_message": status_message,
             "preview_message": preview_message,
+            "warning_message": warning_message,
             "project_id": project_id,
         },
         media_type="text/html",

@@ -2,6 +2,9 @@
   <wa-callout variant="{{ status_variant }}">{{ status_message }}</wa-callout>
   <div id="geojson-preview-container" class="wa-stack">
     <wa-callout variant="neutral">{{ preview_message }}</wa-callout>
+    {% if warning_message %}
+    <wa-callout variant="warning">{{ warning_message }}</wa-callout>
+    {% endif %}
     <div class="wa-cluster wa-gap-s">
       <wa-button
         id="accept-data-extract-btn"

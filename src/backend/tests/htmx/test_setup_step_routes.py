@@ -310,10 +310,16 @@ async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypat
         async def read(self):
             return uploaded_bytes
 
+    async def fake_db_project_one(_db, _project_id):
+        return SimpleNamespace(task_areas_geojson=None)
+
     monkeypatch.setattr(setup_step_extract_handlers, "parse_aoi", fake_parse_aoi)
     monkeypatch.setattr(setup_step_extract_handlers, "check_crs", fake_check_crs)
     monkeypatch.setattr(
         setup_step_extract_handlers, "save_data_extract", fake_save_data_extract
+    )
+    monkeypatch.setattr(
+        setup_step_extract_handlers.DbProject, "one", fake_db_project_one
     )
 
     response = await upload_geojson_htmx.fn(
@@ -333,10 +339,49 @@ async def test_upload_geojson_htmx_accepts_multipolygon_with_utf8_tags(monkeypat
         in response.context["status_message"]
     )
     assert "Accept Data Extract" in response.context["preview_message"]
+    assert response.context["warning_message"] is None
     assert captured["payload"] == uploaded_bytes
     assert captured["merge"] is False
     assert saved["project_id"] == project.id
     assert saved["geojson_data"] == uploaded_geojson
+
+
+async def test_download_osm_data_warns_when_tasks_exist(monkeypatch):
+    """A new extract keeps planned tasks but warns that they are stale."""
+    featcol = {
+        "type": "FeatureCollection",
+        "features": [{"type": "Feature", "geometry": None, "properties": {}}],
+    }
+
+    async def fake_download_osm_data(**_kwargs):
+        return featcol
+
+    async def fake_save_data_extract(**_kwargs):
+        return 1
+
+    async def fake_db_project_one(_db, _project_id):
+        return SimpleNamespace(task_areas_geojson=featcol)
+
+    monkeypatch.setattr(
+        setup_step_extract_handlers, "download_osm_data", fake_download_osm_data
+    )
+    monkeypatch.setattr(
+        setup_step_extract_handlers, "save_data_extract", fake_save_data_extract
+    )
+    monkeypatch.setattr(
+        setup_step_extract_handlers.DbProject, "one", fake_db_project_one
+    )
+
+    response = await setup_step_extract_handlers.handle_download_osm_data(
+        db=Mock(),
+        project_id=42,
+        osm_category="buildings",
+        geom_type="POLYGON",
+        centroid=False,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "reopen the task planner" in response.context["warning_message"]
 
 
 async def test_accept_data_extract_htmx_confirms_staged_extract(monkeypatch):

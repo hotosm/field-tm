@@ -36,6 +36,18 @@ from .setup_step_responses import (
 log = logging.getLogger(__name__)
 
 
+async def _stale_tasks_warning(db: AsyncConnection, project_id: int) -> str | None:
+    """Warn when tasks were already planned against an older extract."""
+    project = await DbProject.one(db, project_id)
+    tasks = project.task_areas_geojson
+    if not (isinstance(tasks, dict) and tasks.get("features")):
+        return None
+    return _(
+        "Tasks were planned with the old data. They are kept, but reopen "
+        "the task planner to update feature counts."
+    )
+
+
 async def handle_download_osm_data(
     db: AsyncConnection,
     project_id: int,
@@ -74,6 +86,7 @@ async def handle_download_osm_data(
             status_message=status_message,
             preview_message=preview_message,
             project_id=project_id,
+            warning_message=await _stale_tasks_warning(db, project_id),
         )
     except (SvcValidationError, ServiceError) as e:
         return _service_error_response(e)
@@ -146,6 +159,7 @@ async def handle_upload_geojson(
             status_message=upload_success_msg,
             preview_message=upload_preview_msg,
             project_id=project_id,
+            warning_message=await _stale_tasks_warning(db, project_id),
         )
 
     except SvcValidationError as e:
@@ -315,12 +329,12 @@ async def handle_discard_data_extract(
     Called when the user clicks "Discard" on the preview.
     """
     try:
-        # Raw SQL: DbProject.update drops None values.
-        async with db.cursor() as cur:
-            await cur.execute(
-                "UPDATE projects SET data_extract_geojson = NULL WHERE id = %(id)s",
-                {"id": project_id},
-            )
+        await DbProject.update(
+            db,
+            project_id,
+            project_schemas.ProjectUpdate(),
+            set_null=frozenset({"data_extract_geojson"}),
+        )
         await db.commit()
         log.info(f"Discarded staged data extract for project {project_id}")
         return Response(
