@@ -14,7 +14,7 @@
   } from 'terra-draw';
   import type { Area } from '../lib/geo';
   import { bbox } from '../lib/geo';
-  import { taskColour } from '../lib/colours';
+  import { taskColour, UNASSIGNED } from '../lib/colours';
   import { addBlankImage, loadBasemap } from '../lib/basemap';
   import type { Task } from '../lib/taskPlan';
 
@@ -144,7 +144,7 @@
     <FillLayer id="features-fill" filter={['==', ['geometry-type'], 'Polygon']} paint={{ 'fill-color': '#555', 'fill-opacity': 0.35 }} />
   </GeoJSONSource>
   <GeoJSONSource id="roads" data={roads ?? EMPTY}>
-    <LineLayer id="roads-line" paint={{ 'line-color': '#333', 'line-width': 2, 'line-opacity': 0.6 }} />
+    <LineLayer id="roads-line" paint={{ 'line-color': '#777', 'line-width': 1.5, 'line-opacity': 0.6 }} />
   </GeoJSONSource>
   <GeoJSONSource id="aoi" data={aoiData}>
     <LineLayer id="aoi-line" paint={{ 'line-color': HOT_RED, 'line-width': 3, 'line-dasharray': [2, 1] }} />
@@ -154,11 +154,16 @@
       id="tasks-fill"
       paint={{ 'fill-color': ['get', '_colour'], 'fill-opacity': ['case', ['get', '_selected'], 0.55, 0.25] }}
     />
+    <!-- White casing keeps boundaries distinct from roads. -->
+    <LineLayer
+      id="tasks-casing"
+      paint={{ 'line-color': '#fff', 'line-width': ['case', ['get', '_selected'], 6, 4.5], 'line-opacity': 0.9 }}
+    />
     <LineLayer
       id="tasks-line"
       paint={{
-        'line-color': ['case', ['get', '_selected'], '#111', ['get', '_colour']],
-        'line-width': ['case', ['get', '_selected'], 3, 1.5],
+        'line-color': ['case', ['get', '_selected'], '#111', ['==', ['get', '_colour'], UNASSIGNED], '#222', ['get', '_colour']],
+        'line-width': ['case', ['get', '_selected'], 3, 2.5],
       }}
     />
     <SymbolLayer
