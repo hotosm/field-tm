@@ -542,8 +542,8 @@ choices:
       each with their own shorter driveways)
 settings:
   - form_id: highways
-    version: 2024-12-25 11:35:47.433000
-    form_title: buildings
+    version: "2026.10.1"
+    form_title: OSM Highways
     allow_choice_duplicates: yes
 yxf:
   headers:

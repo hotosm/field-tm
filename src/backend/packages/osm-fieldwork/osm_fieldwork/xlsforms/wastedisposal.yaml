@@ -137,9 +137,9 @@ choices:
     name: landfill
     label::English(en): Landfill
 settings:
-  - form_title: Waste Management
+  - form_title: OSM Waste Disposal
     form_id: waste
-    version: =NOW()
+    version: "2026.10.1"
     allow_choice_duplicates: yes
 yxf:
   headers:

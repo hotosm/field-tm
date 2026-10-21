@@ -303,9 +303,9 @@ choices:
     name: 6
     label::English(en): Second stage of tertiary education
 settings:
-  - form_title: Educational Facilities
+  - form_title: OSM Education
     form_id: education
-    version: =NOW()
+    version: "2026.10.1"
     allow_choice_duplicates: yes
 yxf:
   headers:

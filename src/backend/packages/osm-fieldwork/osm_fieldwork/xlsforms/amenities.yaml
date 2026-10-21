@@ -875,7 +875,8 @@ choices:
     label::English(en): By Appointment Only
 settings:
   - form_id: Amenities
-    version: =NOW()
+    version: "2026.10.1"
+    form_title: OSM Amenities
 yxf:
   headers:
     survey:

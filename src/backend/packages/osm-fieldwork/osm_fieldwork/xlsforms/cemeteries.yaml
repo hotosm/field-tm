@@ -94,9 +94,9 @@ choices:
     label::English(en): Operated by a community based organization
     label::French(fr): Géré par une organisation communautaire
 settings:
-  - form_title: Cemetery or Grave Yard
+  - form_title: OSM Cemeteries
     form_id: cemeteries
-    version: =NOW()
+    version: "2026.10.1"
     allow_choice_duplicates: yes
 yxf:
   headers:

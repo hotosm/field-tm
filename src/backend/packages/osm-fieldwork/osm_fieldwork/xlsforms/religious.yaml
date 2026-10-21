@@ -80,9 +80,9 @@ choices:
     label::English(en): Mosque
     label::French(fr): Mosquée
 settings:
-  - form_title: Religious Facility
+  - form_title: OSM Religious
     form_id: relgious
-    version: =NOW()
+    version: "2026.10.1"
     allow_choice_duplicates: yes
 yxf:
   headers:

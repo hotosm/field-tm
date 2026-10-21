@@ -419,9 +419,9 @@ choices:
     name: PHP
     label::English(en): Philippines
 settings:
-  - form_title: Waterpoints
+  - form_title: OSM Water Points
     form_id: waterpoints
-    version: =NOW()
+    version: "2026.10.1"
     allow_choice_duplicates: yes
 yxf:
   headers:

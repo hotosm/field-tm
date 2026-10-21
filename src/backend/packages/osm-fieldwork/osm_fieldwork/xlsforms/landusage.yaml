@@ -273,8 +273,8 @@ choices:
     label::English(en): Dam
 settings:
   - form_id: landuse
-    version: =NOW()
-    form_title: Landuse
+    version: "2026.10.1"
+    form_title: OSM Landuse
     allow_choice_duplicates: yes
 yxf:
   headers:

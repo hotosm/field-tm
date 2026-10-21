@@ -371,9 +371,9 @@ choices:
     label::English(en): By Appointment Only
     label::French(fr): Sur rendez-vous uniquement
 settings:
-  - form_title: Toilets and Sanitation
+  - form_title: OSM Toilets
     form_id: toilets
-    version: =NOW()
+    version: "2026.10.1"
     allow_choice_duplicates: yes
 yxf:
   headers:

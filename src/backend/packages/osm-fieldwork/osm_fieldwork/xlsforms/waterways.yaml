@@ -83,9 +83,9 @@ choices:
     label::French(fr): Toutes les saisons
     label::English(en): All seasons
 settings:
-  - form_title: HOT Waterways
+  - form_title: OSM Waterways
     form_id: waterways
-    version: 09012022_v1
+    version: "2026.10.1"
     allow_choice_duplicates: yes
 yxf:
   headers:
