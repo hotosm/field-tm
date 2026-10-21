@@ -209,7 +209,6 @@ survey:
     label::nepali(ne): यो कस्तो ऐतिहासिक भवन हो ?
     appearance: minimal
     relevant: ${category}='historic'
-    choice_filter: category=${category}
     required: yes
     label::swahili(sw): Jengo hili la kihistoria ni la aina gani?
     label::french(fr): De quel type de bâtiment historique s'agit-il ?
@@ -229,7 +228,7 @@ survey:
     label::english(en): What is the name of the operator ?
     label::nepali(ne): अपरेटर को नाम के हो?
     appearance: minimal
-    relevant: ${category}='historic' or ${housing}='apartment'
+    relevant: ${category}='historic' or ${housing}='apartments'
     required: yes
     label::swahili(sw): opereta anaitwaje?
     label::french(fr): Quel est le nom de l'opérateur ?
@@ -267,7 +266,7 @@ survey:
     label::english(en): How many rooms are available ?
     label::nepali(ne): कति कोठा उपलब्ध छन्?
     appearance: minimal
-    relevant: ${housing}='hotel' or ${housing}='hostel'
+    relevant: ${housing}='hotel'
     label::swahili(sw): Vyumba vingapi vinapatikana?
     label::french(fr): Combien de chambers sont disponibles ?
     label::spanish(es): ¿Cuántas habitaciones hay disponibles?
@@ -485,6 +484,13 @@ choices:
     label::french(fr): Ce bâtiment est-il à des fins culturelles ou touristiques?
     label::spanish(es): ¿Es este edificio para fines culturales o turísticos?
     label::nepali(ne): यो भवन सांस्कृतिक वा पर्यटन उद्देश्यका लागि हो?
+  - list_name: category
+    name: historic
+    label::english(en): Is this a historic building or monument ?
+    label::swahili(sw): Je, hili ni jengo la kihistoria au mnara?
+    label::french(fr): S'agit-il d'un bâtiment historique ou d'un monument ?
+    label::spanish(es): ¿Es este un edificio histórico o un monumento?
+    label::nepali(ne): के यो ऐतिहासिक भवन वा स्मारक हो?
   - list_name: category
     name: government
     label::english(en): Is this a public government building ?

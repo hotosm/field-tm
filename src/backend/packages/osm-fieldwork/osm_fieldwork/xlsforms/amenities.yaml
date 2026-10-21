@@ -198,6 +198,9 @@ choices:
   - list_name: building_menu
     name: industry
     label::English(en): Does this building make something ?
+  - list_name: building_menu
+    name: historic
+    label::English(en): Is this a historic building or monument ?
   - list_name: food_menu
     name: cafe
     label::English(en):
