@@ -24,7 +24,7 @@ survey:
     label::english(en): What is the name if there is one ?
     label::nepali(ne): छ भने नाम के हो ?
     appearance: minimal
-    relevant: ${category}!=’’
+    relevant: ${category}!=''
     label::swahili(sw): Je, linaitwaje, kama lipo moja?
     label::french(fr): Quel est le nom s'il y en a un ?
     label::spanish(es): ¿Cuál es el nombre si hay uno?
@@ -33,7 +33,7 @@ survey:
     label::english(en): What are the walls made of ?
     label::nepali(ne): पर्खालहरू कुन सामग्रीबाट बनेका छन्?
     appearance: minimal
-    relevant: ${category}!=’’
+    relevant: ${category}!=''
     default: ${last-saved#building_material}
     label::swahili(sw): Kuta zimetengenezwa na nini?
     label::french(fr): De quoi sont faits les murs ?
@@ -43,7 +43,7 @@ survey:
     label::english(en): How many levels are in the building ?
     label::nepali(ne): भवनमा कति स्तरहरू छन्?
     appearance: minimal
-    relevant: ${category}!=’’
+    relevant: ${category}!=''
     label::swahili(sw): Je! kuna ngazi ngapi katika hili jengo?
     label::french(fr): Combien y a-t-il de niveaux dans le bâtiment ?
     label::spanish(es): ¿Cuántos niveles hay en el edificio?
@@ -52,7 +52,7 @@ survey:
     label::english(en): What religion is practiced here ?
     label::nepali(ne): यहाँ कुन धर्म मानिन्छ ?
     appearance: minimal
-    relevant: ${category}=’religious’
+    relevant: ${category}='religious'
     trigger: ${feature}
     required: yes
     label::swahili(sw): Ni dini gani inatumika hapa?
@@ -63,7 +63,7 @@ survey:
     label::english(en): What is the denomination ?
     label::nepali(ne): सम्प्रदाय के हो?
     appearance: minimal
-    relevant: ${religion}=’christian’
+    relevant: ${religion}='christian'
     label::swahili(sw): Dhehebu gani?
     label::french(fr): Quelle est la dénomination ?
     label::spanish(es): ¿Cuál es la denominación?
@@ -72,7 +72,7 @@ survey:
     label::english(en): What is the Muslim Sect ?
     label::nepali(ne): यहाँ कुन मुस्लिम सम्प्रदाय चल्छ ?
     appearance: minimal
-    relevant: ${religion}=’muslim’
+    relevant: ${religion}='muslim'
     label::swahili(sw): Madhehebu gani ya kiislam?
     label::french(fr): Qu'est-ce que la secte musulmane ?
     label::spanish(es): ¿Qué es la secta musulmana?
@@ -81,7 +81,7 @@ survey:
     label::english(en): What is the Hindu Sect ?
     label::nepali(ne): यहाँ कुन हिन्दू सम्प्रदाय चल्छ ?
     appearance: minimal
-    relevant: ${religion}=’hindu’
+    relevant: ${religion}='hindu'
     label::swahili(sw): Madhehebu gani ya kihindu?
     label::french(fr): Qu'est-ce que la secte hindoue ?
     label::spanish(es): ¿Qué es la secta hindú?
@@ -90,7 +90,7 @@ survey:
     label::english(en): What type of religious building is this ?
     label::nepali(ne): यो कस्तो प्रकारको धार्मिक भवन हो?
     appearance: minimal
-    relevant: ${category}=’religious’
+    relevant: ${category}='religious'
     trigger: ${feature}
     label::swahili(sw): Je, hili ni jengo la kidini la aina gani?
     label::french(fr): De quel type d'édifice religieux s'agit-il ?
@@ -100,7 +100,7 @@ survey:
     label::english(en): What type of services are available here ?
     label::nepali(ne): यहाँ कस्ता प्रकारका सेवाहरू उपलब्ध छन्?
     appearance: minimal
-    relevant: ${category}=’service’
+    relevant: ${category}='service'
     required: yes
     label::swahili(sw): Ni aina gani za huduma zinazopatikana hapa?
     label::french(fr): Quels types de services sont disponibles ici ?
@@ -110,7 +110,7 @@ survey:
     label::english(en): What type of retail shop is this ?
     label::nepali(ne): यो कस्तो प्रकारको खुद्रा पसल हो?
     appearance: minimal
-    relevant: ${category}=’retail’
+    relevant: ${category}='retail'
     required: yes
     label::swahili(sw): Hili ni duka la aina gani la rejareja?
     label::french(fr): De quel type de magasin s'agit-il ?
@@ -120,7 +120,7 @@ survey:
     label::english(en): What type of tourist building is this ?
     label::nepali(ne): यो कस्तो प्रकारको पर्यटक भवन हो?
     appearance: minimal
-    relevant: ${category}=’tourism’
+    relevant: ${category}='tourism'
     choice_filter: category=${category}
     default: ${last-saved#tourism}
     required: yes
@@ -132,7 +132,7 @@ survey:
     label::english(en): What type of educational building is this ?
     label::nepali(ne): यो कस्तो शैक्षिक भवन हो ?
     appearance: minimal
-    relevant: ${category}=’education’
+    relevant: ${category}='education'
     choice_filter: category=${category}
     trigger: ${feature}
     required: yes
@@ -147,7 +147,7 @@ survey:
     label::nepali(ne):
       विद्यालयहरूको बारेमा थप विवरणहरूको लागि, कृपया शिक्षा XForm प्रयोग
       गर्नुहोस्।
-    relevant: ${category}=’education’
+    relevant: ${category}='education'
     trigger: ${feature}
     label::swahili(sw):
       Kwa maelezo zaidi kuhusu skuli, tafadhali tumia XForm ya elimu
@@ -163,7 +163,7 @@ survey:
     label::english(en): What type of public building is this ?
     label::nepali(ne): यो कस्तो प्रकारको सार्वजनिक भवन हो?
     appearance: minimal
-    relevant: ${category}=’government’
+    relevant: ${category}='government'
     choice_filter: category=${category}
     trigger: ${feature}
     required: yes
@@ -175,7 +175,7 @@ survey:
     label::english(en): What type of medical facility is this ?
     label::nepali(ne): यो कस्तो प्रकारको चिकित्सा सुविधा हो?
     appearance: minimal
-    relevant: ${category}=’medical’
+    relevant: ${category}='medical'
     choice_filter: category=${category}
     trigger: ${feature}
     required: yes
@@ -187,7 +187,7 @@ survey:
     label::english(en): What type of food is available here ?
     label::nepali(ne): यहाँ कस्तो प्रकारको खाना उपलब्ध छ?
     appearance: minimal
-    relevant: ${category}=’food’
+    relevant: ${category}='food'
     choice_filter: category=${category}
     trigger: ${feature}
     required: yes
@@ -199,7 +199,7 @@ survey:
     label::english(en): What type of cuisine is served here ?
     label::nepali(ne): यहाँ कस्तो प्रकारको खाना पाइन्छ?
     appearance: minimal
-    relevant: ${category}=’food’ and ${food}=’restaurant'
+    relevant: ${category}='food' and ${food}='restaurant'
     label::swahili(sw): Ni aina gani ya vyakula vinavyotolewa hapa?
     label::french(fr): Quel type de cuisine est servi ici ?
     label::spanish(es): ¿Qué tipo de cocina se sirve aquí?
@@ -208,7 +208,7 @@ survey:
     label::english(en): What type of historical building is this ?
     label::nepali(ne): यो कस्तो ऐतिहासिक भवन हो ?
     appearance: minimal
-    relevant: ${category}=’historic’
+    relevant: ${category}='historic'
     choice_filter: category=${category}
     required: yes
     label::swahili(sw): Jengo hili la kihistoria ni la aina gani?
@@ -219,7 +219,7 @@ survey:
     label::english(en): What type of emergency services can you get here ?
     label::nepali(ne): तपाईं यहाँ कस्तो प्रकारको आपतकालीन सेवाहरू पाउन सक्नुहुन्छ?
     appearance: minimal
-    relevant: ${category}=’emergency’
+    relevant: ${category}='emergency'
     choice_filter: category=${category}
     label::swahili(sw): Ni aina gani ya huduma za dharura unaweza kupata hapa?
     label::french(fr): Quel type de services d'urgence pouvez-vous obtenir ici ?
@@ -229,7 +229,7 @@ survey:
     label::english(en): What is the name of the operator ?
     label::nepali(ne): अपरेटर को नाम के हो?
     appearance: minimal
-    relevant: ${category}=’historic’ or ${housing}=’apartment'
+    relevant: ${category}='historic' or ${housing}='apartment'
     required: yes
     label::swahili(sw): opereta anaitwaje?
     label::french(fr): Quel est le nom de l'opérateur ?
@@ -239,7 +239,7 @@ survey:
     label::english(en): What is the date on the inscription ?
     label::nepali(ne): शिलालेखमा मिति के हो?
     appearance: minimal
-    relevant: ${category}=’historic’
+    relevant: ${category}='historic'
     label::swahili(sw): Je, ni taarifa gani zilizo kwenye maandishi?
     label::french(fr): Quelles sont les données sur l'inscription ?
     label::spanish(es): ¿Cuáles son los datos sobre la inscripción?
@@ -248,7 +248,7 @@ survey:
     label::english(en): What type of living space is here ?
     label::nepali(ne): यहाँ कस्तो प्रकारको बस्ने ठाउँ छ?
     appearance: minimal
-    relevant: ${category}=’housing’
+    relevant: ${category}='housing'
     label::swahili(sw): Ni aina gani ya nafasi ya kuishi hapa?
     label::french(fr): Quel type d'espace de via est ici?
     label::spanish(es): ¿Qué tipo de espacio vital está aquí?
@@ -257,7 +257,7 @@ survey:
     label::english(en): What is the name of the operator ?
     label::nepali(ne): अपरेटर को नाम के हो?
     appearance: minimal
-    relevant: ${housing}!=’residential’ and ${category}=’housing'
+    relevant: ${housing}!='residential' and ${category}='housing'
     trigger: ${feature}
     label::swahili(sw): Jina la opereta ni nani?
     label::french(fr): Quel est le nom de l'opérateur ?
@@ -267,7 +267,7 @@ survey:
     label::english(en): How many rooms are available ?
     label::nepali(ne): कति कोठा उपलब्ध छन्?
     appearance: minimal
-    relevant: ${housing}=’hotel’ or ${housing}=’hostel’
+    relevant: ${housing}='hotel' or ${housing}='hostel'
     label::swahili(sw): Vyumba vingapi vinapatikana?
     label::french(fr): Combien de chambers sont disponibles ?
     label::spanish(es): ¿Cuántas habitaciones hay disponibles?
@@ -276,7 +276,7 @@ survey:
     label::english(en): What is the reference number for this camp site ?
     label::nepali(ne): यस शिविर साइटको लागि सन्दर्भ नम्बर के हो?
     appearance: minimal
-    relevant: ${housing}=’camp_pitch’
+    relevant: ${housing}='camp_pitch'
     label::swahili(sw): Je, ni nambari gani ya marejeleo ya kwa eneo hili la kambi?
     label::french(fr): Quelle est la référence de ce camping ?
     label::spanish(es): ¿Cuál es el número de referencia para este campamento?
@@ -285,7 +285,7 @@ survey:
     label::english(en): How many people are in the neighborhood ?
     label::nepali(ne): छिमेकमा कति जना छन् ?
     appearance: minimal
-    relevant: ${housing}=’residential’
+    relevant: ${housing}='residential'
     label::swahili(sw): Je, una majirani wangapi?
     label::french(fr): Combien y a-t-il de personnes dans le quartier ?
     label::spanish(es): ¿Cuántas personas hay en el vecindario?
@@ -312,7 +312,7 @@ survey:
     label::english(en): What is the primary power source ?
     label::nepali(ne): प्राथमिक शक्ति स्रोत के हो?
     appearance: minimal
-    relevant: ${power}=’yes’
+    relevant: ${power}='yes'
     default: ${last-saved#generator_source}
     label::swahili(sw): kipi ni chanzo kikuu cha umeme?
     label::french(fr): Quelle est la source d'alimentation primaire ?
@@ -322,7 +322,7 @@ survey:
     label::english(en): Does this building have a backup generator ?
     label::nepali(ne): के यो भवनमा ब्याकअप जेनेरेटर छ?
     appearance: minimal
-    relevant: ${category}=’medical’ or ${category}=’food'
+    relevant: ${category}='medical' or ${category}='food'
     label::swahili(sw): Jengo hili lina jenereta mbadala?
     label::french(fr): Ce bâtiment dispose-t-il d'un générateur de secours ?
     label::spanish(es): ¿Este edificio tiene un generador de respaldo?
@@ -340,7 +340,7 @@ survey:
     label::english(en): What type of water source ?
     label::nepali(ne): कस्तो प्रकारको पानीको स्रोत छ?
     appearance: minimal
-    relevant: ${water}=’yes’
+    relevant: ${water}='yes'
     default: ${last-saved#water_source}
     label::swahili(sw): Kuna aina gani ya chanzo cha maji?
     label::french(fr): Quel type de source d'eau ?
@@ -350,7 +350,7 @@ survey:
     label::english(en): What is the pump unit number ?
     label::nepali(ne): पम्प एकाइ नम्बर के हो?
     appearance: minimal
-    relevant: ${water}=’yes’
+    relevant: ${water}='yes'
     label::swahili(sw): Nambari ya kitengo cha pampu ni nini?
     label::french(fr): Quel est le numéro de la pompe ?
     label::spanish(es): ¿Cuál es el número de la unidad de la bomba?
@@ -359,7 +359,7 @@ survey:
     label::english(en): What is the capacity of the pump ?
     label::nepali(ne): पम्पको क्षमता कति छ ?
     appearance: minimal
-    relevant: ${water}=’yes’
+    relevant: ${water}='yes'
     label::swahili(sw): Pampu hii ina uwezo gani?
     label::french(fr): Quelle est la capacité de la pompe ?
     label::spanish(es): ¿Cuál es la capacidad de la bomba?

@@ -2,100 +2,10 @@ survey:
   - "#":
       Converted by yxf, from amenities.xlsx. Edit the YAML file instead of the Excel
       file.
-  - type: start
-    name: start
-  - type: end
-    name: end
-  - type: today
-    name: today
-  - type: phonenumber
-    name: phonenumber
-  - type: deviceid
-    name: deviceid
-  - type: username
-    name: username
-  - type: email
-    name: email
-  - type: note
-    label::English(en):
-      "This Xform is for mapping Amenities. The source file is at:  https://gitlab.com/rsavoye/xforms/-/blob/main/Amenities.xls.
-      Improvements are appreciated."
-    relevant: ${username}!=’rsavoye’
-  - type: start-geopoint
-    name: warmup
   - type: begin_group
     name: buildings
     label::English(en): Buildings
     appearance: field-list
-  - type: select_one_from_file Amenities.geojson
-    name: existing
-    label::English(en): Existing OSM Amenities
-    appearance: map
-  - type: calculate
-    name: xlabel
-    label::English(en): Get the label
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/label
-  - type: calculate
-    name: xlocation
-    label::English(en): Amenity location
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/geometry
-  - type: calculate
-    name: xid
-    label::English(en): OSM ID
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/id
-  - type: calculate
-    name: xamenity
-    label::English(en): OSM Amenity
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/amenity
-  - type: calculate
-    name: xcuisine
-    label::English(en): OSM Cuisine
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/cuisine
-  - type: calculate
-    name: xhours
-    label::English(en): OSM Opening Hours
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/opening_hours
-  - type: calculate
-    name: xcraft
-    label::English(en): OSM Craft
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/craft
-  - type: calculate
-    name: xaddr
-    label::English(en): Building address
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/addr_housenumber
-  - type: calculate
-    name: xstreet
-    label::English(en): Building Street
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/addr_street
-  - type: calculate
-    name: xwheelchair
-    label::English(en): Wheelchair accessible
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/wheelchair
-  - type: calculate
-    name: xshelter
-    label::English(en): Shelter Type
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/shelter_type
-  - type: calculate
-    name: xshop
-    label::English(en): Shop Type
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/shop
-  - type: calculate
-    name: xdiesel
-    label::English(en): Diesel Fuel available
-    appearance: minimal
-    calculation: instance(“Amenities”)/root/item[id=${existing}]/fuel:diesel
   - type: select_one yes_no
     name: detail
     label::English(en): Do you want more detailed questions ?
@@ -104,81 +14,80 @@ survey:
   - type: select_one building_menu
     name: building_menu
     label::English(en): What type of building is this ?
-    relevant: ${detail}=’no’ and ${xamenity}!=”"
+    relevant: ${detail}='no'
     required: yes
     appearance: minimal
   - type: select_one food_menu
     name: food_menu
     label::English(en): What type of food or alcohol is available ?
     hint::English(en): .
-    relevant: ${building_menu}=’food’
+    relevant: ${building_menu}='food'
     appearance: minimal
   - type: select_one retail_menu
     name: retail_menu
     label::English(en): What type of products are for sale ?
     hint::English(en): .
-    relevant: ${building_menu}=’retail’
+    relevant: ${building_menu}='retail'
     appearance: minimal
   - type: select_one housing_menu
     name: housing_menu
     label::English(en): What type of housing is this building ?
     hint::English(en): .
-    relevant: ${building_menu}=’housing’
+    relevant: ${building_menu}='housing'
     appearance: minimal
   - type: select_one government_menu
     name: government_menu
     label::English(en): What type of public government building is this ?
     hint::English(en): .
-    relevant: ${building_menu}=’government’
+    relevant: ${building_menu}='government'
     appearance: minimal
   - type: select_one medical_menu
     name: medical_menu
     label::English(en): What type of medical care is available ?
     hint::English(en): .
-    relevant: ${building_menu}=’medical’
+    relevant: ${building_menu}='medical'
     appearance: minimal
   - type: select_one service_menu
     name: service_menu
     label::English(en): What type of service is available ?
     hint::English(en): .
-    relevant: ${building_menu}=’service’
+    relevant: ${building_menu}='service'
     appearance: minimal
   - type: select_one religious_menu
     name: religious_menu
     label::English(en): What type of religious building is this ?
     hint::English(en): .
-    relevant: ${building_menu}=’religious’ or ${xamenity}=’religious’
+    relevant: ${building_menu}='religious'
     appearance: minimal
   - type: select_one amenity
     name: amenity
     label::English(en): Type of Amenity
-    relevant: ${detail}=’yes’
+    relevant: ${detail}='yes'
     default: fuel
     appearance: minimal
   - type: select_one shop
     name: shop
     label::English(en): Type of Retail Shop
-    relevant: ${building_menu}=’retail’ or ${xamenity}=’retail'
+    relevant: ${building_menu}='retail'
     appearance: minimal
   - type: select_one historic
     name: historic
     label::English(en): Type of Historical building
-    relevant: ${building_menu}=’historic’
+    relevant: ${building_menu}='historic'
     appearance: minimal
   - type: select_one denomination
     name: religious
     label::English(en): Type of Religious building
-    relevant: ${building_menu}=”religious” or ${xamenity}=’religious’
+    relevant: ${building_menu}='religious'
     appearance: minimal
   - type: select_one yes_no
     name: wheelchair
     label::English(en): Is it wheelchair accessible ?
-    relevant: ${detail}=’yes’
-    calculation: ${xwheelchair}
+    relevant: ${detail}='yes'
   - type: begin_group
     name: fuel
     label::English(en): Fuel Group
-    relevant: ${xamenity}=’fuel’ or ${building_menu}=’fuel’
+    relevant: ${building_menu}='fuel'
     appearance: field-list
   - type: select_one yes_no
     name: food
@@ -198,27 +107,25 @@ survey:
   - type: begin_group
     name: restaurant
     label::English(en): Restaurant data
-    relevant: ${xamenity}=’restaurant' or ${building_menu}=’food'
+    relevant: ${building_menu}='food'
     appearance: field-list
   - type: select_one cuisine
     name: cuisine
     label::English(en): What type of food is available here ?
     appearance: minimal
-    calculation: ${xcuisine}
   - type: select_one opening_hours
     name: opening_hours
     label::English(en): Opening Hours
     appearance: minimal
-    calculation: ${xhours}
   - type: select_one yes_no
     name: takeaway
     label::English(en): Take away food only ?
-    relevant: ${detail}=’yes’
+    relevant: ${detail}='yes'
     appearance: minimal
   - type: select_one yes_no
     name: delivery
     label::English(en): Do they deliver ?
-    relevant: ${detail}=’yes’
+    relevant: ${detail}='yes'
     appearance: minimal
   - type: select_one yes_no
     name: internet
@@ -238,56 +145,31 @@ survey:
     name: name
     label::English(en): Name of building (if present)
     appearance: minimal
-    calculation: ${xlabel}
   - type: text
     name: operator
     label::English(en): Name of operator (if a formal market structure)
-    relevant: ${detail}=’yes’
+    relevant: ${detail}='yes'
     appearance: minimal
-    calculation: ${xlabel}
   - type: text
     name: street
     label::English(en): Street Name
     appearance: minimal
-    calculation: ${xstreet}
   - type: integer
     name: housenumber
     label::English(en): Address number (house number if present)
     appearance: minimal
-    calculation: ${xaddr}
   - type: select_one building:age
     name: age
     label::English(en): Age of building
-    relevant: ${detail}=’yes’
+    relevant: ${detail}='yes'
     appearance: minimal
   - type: end_group
     name: more
     label::English(en): End of more group
-  - type: begin_group
-    name: gps
-    label::English(en): GPS Coordinates
-    relevant: ${xlocation}=””
-    appearance: field-list
-  - type: geopoint
-    name: location
-    label::English(en): Please take a GPS point at the feature location.
-    hint::English(en): Where are we ?
-    appearance: Placement-map
   - type: text
     name: comment
     label::English(en): Any other comments about this feature
     appearance: minimal
-  - type: audio
-    name: audio
-    label::English(en): Audio Note
-    appearance: minimal
-  - type: image
-    name: image
-    label::English(en): Take A Picture
-    parameters: max-pixels=1000
-    appearance: minimal
-  - type: end_group
-    name: end of gps
 choices:
   - list_name: building_menu
     name: housing

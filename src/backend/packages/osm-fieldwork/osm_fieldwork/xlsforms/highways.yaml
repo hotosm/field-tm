@@ -134,15 +134,10 @@ survey:
     relevant: ${barrier} = 'swing_gate'
     appearance: minimal
   - type: end_group
-  - type: begin_group
-    name: comments
-    label::English(en): Comments
-    appearance: field-list
   - type: text
     name: comment
     label::English(en): Any other comments about this feature
     appearance: minimal
-  - type: end_group
 choices:
   - list_name: feature
     name: highway

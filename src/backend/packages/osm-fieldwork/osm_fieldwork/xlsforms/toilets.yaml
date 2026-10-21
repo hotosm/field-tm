@@ -2,53 +2,10 @@ survey:
   - "#":
       Converted by yxf, from toilets.xlsx. Edit the YAML file instead of the Excel
       file.
-  - type: start
-    name: start
-  - type: end
-    name: end
-  - type: today
-    name: today
-  - type: deviceid
-    name: deviceid
-  - type: phonenumber
-    name: phonenumber
-  - type: username
-    name: username
-  - type: email
-    name: email
-  - type: note
-    name: instructions
-    label::English(en):
-      "This is a data and mapping project that will provide national
-      government and development actors with reliable open datasets for decision-making
-      and designing of interventions. The project is maintained by the Humanitarian
-      OpenStreetMapTeam (HOT). The source for this XLSForm is at: https://github.com/hotosm/osm-fieldwork/osm-fieldwork/xlsforms"
-    relevant: ${username}!=’rsavoye’
   - type: begin group
     name: toiletprofile
     label::English(en): Toilet profile Details
     appearance: Field-list
-  - type: select_one_from_file toilets.geojson
-    name: existing
-    label::English(en): Existing OSM data
-    appearance: map
-  - type: calculate
-    name: xid
-    label::English(en): OSM ID
-    appearance: minimal
-    calculation: instance('toilets')/root/item[id=${existing}]/id
-    trigger: ${existing}
-  - type: calculate
-    name: xlocation
-    label::English(en): Location
-    appearance: minimal
-    calculation: instance('toilets')/root/item[name=${existing}]/geometry
-    trigger: ${existing}
-  - type: select_one model
-    name: model
-    label::English(en): Data Model Level
-    appearance: select_one yes_no
-    default: basic
   - type: select_one operational_status
     name: operational_status
     label::English(en): What is the operational status of this toilet?
@@ -70,9 +27,7 @@ survey:
       Indicate if this toilet has a separate chamber for Female and
       Male.
     appearance: minimal
-    calculation: instance('toilets')/root/item[id=${existing}]/unisex
     default: unisex
-    trigger: ${existing}
     required_message::French(fr): Désolé, la réponse est obligatoire
     label::French(fr):
       Ces toilettes ont-elles des chambers séparées pour les femmes
@@ -85,9 +40,7 @@ survey:
     label::English(en): What type of toilet disposal does this toilet has?
     hint::English(en): Indicate the disposal type of this toilet.
     appearance: minimal
-    calculation: instance('toilets')/root/item[id=${existing}]/disposal
     default: pitlatrine
-    trigger: ${existing}
     required_message::French(fr): Désolé, la réponse est obligatoire
     label::French(fr): Quel type d'élimination des toilettes ces toilettes ont-elles ?
     hint::French(fr): Indiquez le type d'élimination de cette toilette.
@@ -96,9 +49,7 @@ survey:
     label::English(en): What is the toilet position of this toilet?
     hint::English(en): Indicate the toilet position at this toilet.
     appearance: minimal
-    calculation: instance('toilets')/root/item[id=${existing}]/position
     default: seated
-    trigger: ${existing}
     required_message::French(fr): Désolé, la réponse est obligatoire
     label::French(fr): "Quelle est la position des toilettes de ces toilettes ? "
     hint::French(fr): Indiquez la position des toilettes à ces toilettes.
@@ -107,9 +58,7 @@ survey:
     label::English(en): Who can access this toilet?
     hint::English(en): Indicate who can access this toilet
     appearance: minimal
-    calculation: instance('toilets')/root/item[id=${existing}]/access
     default: public
-    trigger: ${existing}
     required_message::French(fr): Désolé, la réponse est obligatoire
     label::French(fr): Qui peut accéder à ces toilettes ?
     hint::French(fr): Indiquez qui peut accéder à ces toilettes
@@ -118,9 +67,7 @@ survey:
     label::English(en): Is fee charged to access this toilet?
     hint::English(en): Indicate if a fee is required to access this toilet
     appearance: minimal
-    calculation: instance('toilets')/root/item[id=${existing}]/fee
     default: ${last-saved#fee}
-    trigger: ${existing}
     required_message::French(fr): Désolé, la réponse est obligatoire
     label::French(fr): Des frais sont-ils facturés pour accéder à ces toilettes ?
     hint::French(fr): Indiquez si des frais sont exigés pour accéder à ces toilettes
@@ -129,8 +76,6 @@ survey:
     label::English(en): Enter the name of this toilet
     hint::English(en): Enter this toilet name if it has one
     appearance: quickcompact
-    calculation: instance('toilets')/root/item[id=${existing}]/label
-    trigger: ${existing}
     required_message::French(fr): Désolé, la réponse est obligatoire
     label::French(fr): Entrez le nom de cette toilette
     hint::French(fr): Entrez ce nom de toilette
@@ -144,7 +89,7 @@ survey:
     appearance: Field-list
     relevant:
       (${operational_status} = 'operational' or ${operational_status} = 'needs_maintenance')
-      and ${model}=’extended'
+     
   - type: select_one yes_no
     name: lit
     label::English(en): Does this toilet have lighting ?
@@ -162,8 +107,6 @@ survey:
     label::English(en): Select the operating hours of this toilet
     hint::English(en): Indicate the operating hours and days of this toilet
     appearance: minimal
-    calculation: instance('toilets')/root/item[id=${existing}]/opening_hours
-    trigger: ${existing}
     required_message::French(fr): Désolé, la réponse est obligatoire
     label::French(fr): Sélectionnez les heures de fonctionnement de cette toilette
     hint::French(fr): Indiquez les heures et les jours de fonctionnement de cette toilette
@@ -184,8 +127,6 @@ survey:
     label::English(en): Is this toilet accessible by a Wheelchair?
     hint::English(en): Indicate if this toilet is accessible by a wheelchair
     appearance: minimal
-    calculation: instance('toilets')/root/item[id=${existing}]/wheelchair
-    trigger: ${existing}
     required_message::French(fr): Désolé, la réponse est obligatoire
     label::French(fr): Ces toilettes sont-elles accessibles en fauteuil roulant ?
     hint::French(fr): Indiquez si cette toilette est accessible en fauteuil roulant
@@ -213,7 +154,7 @@ survey:
     appearance: Field-list
     relevant:
       (${operational_status} = 'operational' or ${operational_status} = 'needs_maintenance')
-      and ${model}=’extended'
+     
   - type: select_one operator:type
     name: operator_type
     label::English(en): Who operates this toilet?
@@ -255,67 +196,30 @@ survey:
     name: manager
     label::English(en): What is the name of the manager ?
     appearance: minimal
-    relevant: ${emptier} = ‘yes’
+    relevant: ${emptier} = 'yes'
   - type: text
     name: phone
     label::English(en): What is the manager’s phone number ?
     appearance: minimal
-    relevant: ${emptier} = ‘yes’
+    relevant: ${emptier} = 'yes'
   - type: text
     name: parking_name
     label::English(en): What is the name of the parking place for the emptier ?
     appearance: minimal
-    relevant: ${emptier} = ‘yes’ and ${management} = 'yes'
+    relevant: ${emptier} = 'yes' and ${management} = 'yes'
   - type: select_one yes_no
     name: noname
     label::English(en):
       Is there really no name for the person that empties the toilet
       ?
     appearance: quickcompact
-    relevant: ${manager}=”” and ${management} = 'yes'
+    relevant: ${manager}="" and ${management} = 'yes'
   - type: end group
-  - type: begin group
-    name: location_details
-    label::English(en): Location Details
-    appearance: Field-list
-  - type: geopoint
-    name: location
-    label::English(en): Capture the location of this Toilet
-    hint::English(en):
-      Using the GPS, capture the location. Please stand very close
-      to the toilet as possible
-    appearance: Placement-map
-    relevant: ${xlocation}=”"
-    trigger: ${existing}
-    required_message::French(fr): Désolé, la réponse est obligatoire
-    label::French(fr): Capturez l'emplacement de cette toilette
-    hint::French(fr):
-      À l'aide du GPS, capturez l'emplacement. Veuillez vous tenir le
-      plus près possible des toilettes
   - type: text
     name: comment
     label::English(en): Any other comments about this feature
     appearance: minimal
-  - type: image
-    name: image
-    label::English(en): Take a photo of this Toilet
-    hint::English(en):
-      "Take a photo of this public toilet. Make sure the entire toilet
-      entrance, and roof are captured in the photo:"
-    appearance: minimal
-    parameters: max-pixels=1000
-    label::French(fr): Prenez une photo de cette toilette
-    hint::French(fr):
-      "Prenez une photo de ces toilettes publiques. Assurez-vous que\
-      \ toute l'entrée des toilettes et le toit sont capturés sur la photo :"
-  - type: end group
 choices:
-  - list_name: model
-    name: basic
-    label::English(en): Basic Model
-  - list_name: model
-    name: extended
-    label::English(en): Extended Model
   - list_name: yes_no
     name: yes
     label::English(en): Yes

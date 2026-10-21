@@ -2,54 +2,10 @@ survey:
   - "#":
       Converted by yxf, from landusage.xlsx. Edit the YAML file instead of the Excel
       file.
-  - type: start
-    name: start
-  - type: end
-    name: end
-  - type: today
-    name: today
-  - type: phonenumber
-    name: phonenumber
-  - type: deviceid
-    name: deviceid
-  - type: username
-    name: username
-  - type: email
-    name: email
-  - type: note
-    name: instructions
-    label::English(en):
-      "This is a data and mapping project that will provide national
-      government and development actors with reliable open datasets for decision-making
-      and designing of interventions. The project is maintained by the Humanitarian
-      OpenStreetMapTeam (HOT). The source for this XLSForm is at: https://github.com/hotosm/osm-fieldwork/tree/main/osm-field-work/xlsforms"
-    relevant: ${username}!=’rsavoye’
   - type: begin_group
     name: first_screen
     label::English(en): First Screen
     appearance: field-list
-  - type: select_one model
-    name: model
-    label::English(en): Data Model Level
-    appearance: minimal
-    default: basic
-  - type: select_one_from_file landusage.geojson
-    name: existing
-    label::English(en): Existing OSM Data
-    appearance: map
-    choice_filter: true()
-  - type: calculate
-    name: xid
-    label::English(en): OSM ID
-    appearance: minimal
-    calculation: instance('landusage’)/root/item[id=${existing}]/id
-    trigger: ${existing}
-  - type: calculate
-    name: xlocation
-    label::English(en): Location
-    appearance: minimal
-    calculation: instance('landusage’)/root/item[id=${existing}]/geometry
-    trigger: ${existing}
   - type: select_one landuse
     name: landuse
     label::English(en): What type of landuse ?
@@ -62,7 +18,7 @@ survey:
     name: leisure
     label::English(en): What type of leisure activity can be done here ?
     appearance: minimal
-    relevant: ${type}=’leisure’
+    relevant: ${type}='leisure'
   - type: text
     name: operator
     label::English(en): What is the name of this operator ?
@@ -71,63 +27,39 @@ survey:
     name: tourism
     label::English(en): What type of tourist site is this ?
     appearance: minimal
-    relevant: ${type}=’tourism’
+    relevant: ${type}='tourism'
   - type: select_one historic
     name: historic
     label::English(en): What type of historical site is this ?
     appearance: minimal
-    relevant: ${type}=’historic’
+    relevant: ${type}='historic'
   - type: date
     name: date
     label::English(en): What is the inscription date ?
     appearance: minimal
-    relevant: ${type}=’historic’
+    relevant: ${type}='historic'
   - type: integer
     name: rooms
     label::English(en): How many rooms are here ?
     appearance: minimal
-    relevant: ${tourism}=’hotel’ or ${tourism}=’hostel' or ${tourism}=’guest_house'
+    relevant: ${tourism}='hotel' or ${tourism}='hostel' or ${tourism}='guest_house'
   - type: select_one access
     name: access
     label::English(en): Is this accessible to the public ?
     appearance: minimal
-    relevant: "${type}=’leisure’ or ${leisure}=’garden’ "
+    relevant: "${type}='leisure' or ${leisure}='garden' "
   - type: select_one garden:type
     name: garden_type
     label::English(en): What type of garden is this ?
     appearance: minimal
-    relevant: ${leisure}=’garden’
-  - type: begin group
-    name: gps
-    label::English(en): Location Details
-    appearance: Field-list
-  - type: geopoint
-    name: location
-    label::English(en): Please take a GPS point at the feature location.
-    hint::English(en): Where are we ?
-    appearance: Placement-map
-    relevant: ${xlocation}=””
+    relevant: ${leisure}='garden'
   - type: text
     name: comment
     label::English(en): Any other comments about this feature
     appearance: minimal
-  - type: image
-    name: image
-    label::English(en): Take A Picture
-    appearance: minimal
-    relevant: ${model}=”extended”
-    parameters: max-pixels=1000
-  - type: end group
-    name: end of gps
   - type: end_group
     name: end of first_screen
 choices:
-  - list_name: model
-    name: basic
-    label::English(en): Basic Model
-  - list_name: model
-    name: extended
-    label::English(en): Extended Model
   - list_name: leisure
     name: park
     label::English(en): park
