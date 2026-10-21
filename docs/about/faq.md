@@ -102,6 +102,13 @@ Field survey-based data collection:
   Despite this we will definitely look for opportunities to learn from /
   collaborate into the future.
 
+- **DHIS2**: open-source health management information system, used by
+  Ministries of Health in 70+ countries. Not a general field mapping tool:
+  it's built around health programme reporting, with its own Android app.
+  If you work with a health ministry, its facility data likely lives here,
+  so plan to match your Field-TM data to it. We are exploring integrations
+  in [#3134](https://github.com/hotosm/field-tm/issues/3134).
+
 OpenStreetMap tagging:
 
 - **StreetComplete**: a super simple and intuitive mobile app for improving
@@ -468,6 +475,23 @@ help with your contributions.
 ---
 
 ## Advanced Use Cases
+
+### Does Field-TM work offline?
+
+- Use ODK Collect or QField as the mapping app: both work fully offline,
+  with Field-TM coordinating tasks.
+- The browser-based mapping app (WebForms) needs an internet connection.
+  Its offline mode was removed in late 2025, as it failed on around 20%
+  of devices
+  ([announcement](https://github.com/hotosm/field-tm/discussions/2878)).
+
+### How large can a project be?
+
+- Up to 1,000 km² per project.
+- OSM data is downloaded automatically for areas up to 200 km². For larger
+  areas, upload your own data extract.
+- For very large areas, split the work into several smaller projects
+  ([discussion](https://github.com/hotosm/field-tm/discussions/1732)).
 
 ### How can I work with an offline basemap?
 
