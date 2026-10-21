@@ -630,7 +630,10 @@ async def modify_form_for_qfield(
     if start_geopoint_mask.any():
         qf_survey_df = qf_survey_df[~start_geopoint_mask].reset_index(drop=True)
 
-    # 4. Update survey sheet in updated_form
+    # 4. QField has no ODK Entities, and the sheet references rows removed above
+    custom_sheets.pop("entities", None)
+
+    # 5. Update survey sheet in updated_form
     custom_sheets["survey"] = qf_survey_df
 
     return (form_language, await write_xlsform(custom_sheets))

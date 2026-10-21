@@ -22,6 +22,7 @@ from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
+import pytest
 from openpyxl import Workbook, load_workbook, worksheet
 from pyxform.xls2xform import convert as xform_convert
 
@@ -33,7 +34,7 @@ from osm_fieldwork.update_xlsform import (
     append_field_mapping_fields,
     modify_form_for_qfield,
 )
-from osm_fieldwork.xlsforms import buildings, healthcare
+from osm_fieldwork.xlsforms import buildings, healthcare, xlsforms_path
 
 
 async def test_merge_mandatory_fields(tmp_path):
@@ -109,6 +110,31 @@ async def test_healthcare_xlsform():
     xformid, updated_form = await append_field_mapping_fields(form_bytes, "healthcare")
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)
+
+
+BUNDLED_FORMS = sorted(Path(xlsforms_path).glob("*.yaml"))
+
+
+@pytest.mark.parametrize("form", BUNDLED_FORMS, ids=lambda p: p.stem)
+@pytest.mark.parametrize("use_odk_collect", [True, False])
+@pytest.mark.parametrize("optional_fields", [True, False])
+async def test_bundled_forms_valid_everywhere(form, use_odk_collect, optional_fields):
+    """Bundled forms are valid standalone, after Field-TM processing, and for QField."""
+    raw = convert_to_xlsform(str(form))
+    xform_convert(BytesIO(raw))
+
+    _, updated_form = await append_field_mapping_fields(
+        BytesIO(raw),
+        form.stem,
+        need_verification_fields=optional_fields,
+        include_photo_upload=optional_fields,
+        use_odk_collect=use_odk_collect,
+    )
+    xform_convert(BytesIO(updated_form.getvalue()))
+
+    if not use_odk_collect:
+        _, qfield_form = await modify_form_for_qfield(updated_form)
+        xform_convert(qfield_form)
 
 
 async def test_qfield_form_removes_odk_bookkeeping_fields():
