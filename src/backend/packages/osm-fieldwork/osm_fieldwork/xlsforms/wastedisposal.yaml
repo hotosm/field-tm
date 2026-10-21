@@ -2,6 +2,10 @@ survey:
   - "#":
       Converted by yxf, from wastedisposal.xlsx. Edit the YAML file instead of the
       Excel file.
+  - type: geopoint
+    name: new_feature
+    label::English(en): Where is this feature?
+    required: yes
   - type: begin group
     name: location_details
     label::English(en): Location Details
@@ -153,6 +157,7 @@ yxf:
       - default
       - trigger
       - parameters
+      - required
     choices:
       - list_name
       - name

@@ -2,6 +2,11 @@ survey:
   - "#":
       Converted by yxf, from cemeteries.xlsx. Edit the YAML file instead of the Excel
       file.
+  - type: geoshape
+    name: new_feature
+    label::English(en): Trace the outline of this feature
+    label::French(fr): Tracez le contour de cet élément
+    required: yes
   - type: begin group
     name: first_screen
     label::English(en): First Screen

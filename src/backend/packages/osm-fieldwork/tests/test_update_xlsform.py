@@ -113,6 +113,13 @@ async def test_healthcare_xlsform():
 
 
 BUNDLED_FORMS = sorted(Path(xlsforms_path).glob("*.yaml"))
+GEOMETRY_TYPES = {"geopoint", "geotrace", "geoshape"}
+
+
+def geometry_questions(form: bytes) -> list[str]:
+    """Names of geometry questions in an XLSForm survey sheet."""
+    survey = pd.read_excel(BytesIO(form), sheet_name="survey")
+    return survey.loc[survey["type"].isin(GEOMETRY_TYPES), "name"].tolist()
 
 
 @pytest.mark.parametrize("form", BUNDLED_FORMS, ids=lambda p: p.stem)
@@ -122,6 +129,7 @@ async def test_bundled_forms_valid_everywhere(form, use_odk_collect, optional_fi
     """Bundled forms are valid standalone, after Field-TM processing, and for QField."""
     raw = convert_to_xlsform(str(form))
     xform_convert(BytesIO(raw))
+    assert geometry_questions(raw) == ["new_feature"]
 
     _, updated_form = await append_field_mapping_fields(
         BytesIO(raw),
@@ -131,9 +139,12 @@ async def test_bundled_forms_valid_everywhere(form, use_odk_collect, optional_fi
         use_odk_collect=use_odk_collect,
     )
     xform_convert(BytesIO(updated_form.getvalue()))
+    # The template geometry is replaced by the injected one (ODK) or map selection
+    assert geometry_questions(updated_form.getvalue()) == (["new_feature"] if use_odk_collect else [])
 
     if not use_odk_collect:
         _, qfield_form = await modify_form_for_qfield(updated_form)
+        assert geometry_questions(qfield_form.getvalue()) == ["feature"]
         xform_convert(qfield_form)
 
 

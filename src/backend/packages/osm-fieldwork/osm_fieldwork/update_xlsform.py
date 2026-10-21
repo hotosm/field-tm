@@ -58,6 +58,8 @@ pandas_monkeypatch()
 FEATURE_COLUMN = "feature"
 NAME_COLUMN = "name"
 TYPE_COLUMN = "type"
+# Standalone geometry question in templates, replaced by the injected geometry
+TEMPLATE_GEOMETRY_NAME = "new_feature"
 DEFAULT_LANGUAGE_NAME = "english"
 DEFAULT_LANGUAGE_TOKEN = (
     f"{DEFAULT_LANGUAGE_NAME}({INCLUDED_LANGUAGES[DEFAULT_LANGUAGE_NAME]})"
@@ -323,7 +325,9 @@ def merge_dataframes(
     # Find duplicate fields
     digitisation_names = set() if digitisation_df is None else set(digitisation_df[NAME_COLUMN])
     photo_collection_names = set() if photo_collection_df is None else set(photo_collection_df[NAME_COLUMN])
-    all_existing_names = set(mandatory_df[NAME_COLUMN]).union(digitisation_names).union(photo_collection_names)
+    all_existing_names = set(mandatory_df[NAME_COLUMN]).union(
+        digitisation_names, photo_collection_names, {TEMPLATE_GEOMETRY_NAME}
+    )
     duplicate_fields = set(user_question_df[NAME_COLUMN]).intersection(all_existing_names)
     
     # Filter out duplicates but keep end group rows

@@ -2,6 +2,11 @@ survey:
   - "#":
       Converted by yxf, from waterpoints.xlsx. Edit the YAML file instead of the
       Excel file.
+  - type: geopoint
+    name: new_feature
+    label::English(en): Where is this feature?
+    label::French(fr): Où se trouve cet élément ?
+    required: yes
   - type: begin_group
     name: first_screen
     label::English(en): First Screen

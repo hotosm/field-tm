@@ -2,6 +2,10 @@ survey:
   - "#":
       Converted by yxf, from amenities.xlsx. Edit the YAML file instead of the Excel
       file.
+  - type: geopoint
+    name: new_feature
+    label::English(en): Where is this feature?
+    required: yes
   - type: begin_group
     name: buildings
     label::English(en): Buildings

@@ -2,6 +2,11 @@ survey:
   - "#":
       Converted by yxf, from waterways.xlsx. Edit the YAML file instead of the Excel
       file.
+  - type: geotrace
+    name: new_feature
+    label::English(en): Trace the line of this feature
+    label::French(fr): Tracez la ligne de cet élément
+    required: yes
   - type: begin group
     name: waterway_details
     label::French(fr): Détails de la voie navigable

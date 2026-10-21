@@ -2,6 +2,10 @@ survey:
   - "#":
       Converted by yxf, from highways.xlsx. Edit the YAML file instead of the Excel
       file.
+  - type: geotrace
+    name: new_feature
+    label::English(en): Trace the line of this feature
+    required: yes
   - type: begin_group
     name: Roads
     label::English(en): Roads

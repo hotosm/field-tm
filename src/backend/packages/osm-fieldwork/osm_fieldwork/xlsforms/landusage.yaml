@@ -2,6 +2,10 @@ survey:
   - "#":
       Converted by yxf, from landusage.xlsx. Edit the YAML file instead of the Excel
       file.
+  - type: geoshape
+    name: new_feature
+    label::English(en): Trace the outline of this feature
+    required: yes
   - type: begin_group
     name: first_screen
     label::English(en): First Screen
