@@ -73,6 +73,31 @@ QFIELD_METADATA_NAMES_TO_REMOVE = {
 }
 
 
+def _language_token(name: str) -> str:
+    return f"{name}({INCLUDED_LANGUAGES[name]})"
+
+
+def _language_name_for_code(code: str) -> Optional[str]:
+    return next((name for name, lang_code in INCLUDED_LANGUAGES.items() if lang_code == code), None)
+
+
+def _language_name_for_base(base: str) -> Optional[str]:
+    return next(
+        (name for name, code in INCLUDED_LANGUAGES.items() if code.split("_", maxsplit=1)[0] == base),
+        None,
+    )
+
+
+def _normalize_name_code_token(candidate: str) -> Optional[str]:
+    """Normalize a ``name(code)`` candidate, matching by name then by code."""
+    lang_name, rest = candidate.split("(", maxsplit=1)
+    lang_name = lang_name.strip()
+    if lang_name in INCLUDED_LANGUAGES:
+        return _language_token(lang_name)
+    name = _language_name_for_code(rest.split(")", maxsplit=1)[0].strip())
+    return _language_token(name) if name else None
+
+
 def _normalize_language_token(value: object) -> Optional[str]:
     """Normalize language values to the canonical ``name(code)`` format."""
     if isinstance(value, (list, tuple)):
@@ -89,45 +114,16 @@ def _normalize_language_token(value: object) -> Optional[str]:
         candidate = candidate.split("::", maxsplit=1)[1].strip()
 
     if "(" in candidate and ")" in candidate:
-        lang_name = candidate.split("(", maxsplit=1)[0].strip()
-        lang_code = candidate.split("(", maxsplit=1)[1].split(")", maxsplit=1)[0].strip()
-
-        if lang_name in INCLUDED_LANGUAGES:
-            return f"{lang_name}({INCLUDED_LANGUAGES[lang_name]})"
-
-        normalized_by_code = next(
-            (name for name, code in INCLUDED_LANGUAGES.items() if code == lang_code),
-            None,
-        )
-        if normalized_by_code:
-            return f"{normalized_by_code}({lang_code})"
-        return None
+        return _normalize_name_code_token(candidate)
 
     if candidate in INCLUDED_LANGUAGES:
-        return f"{candidate}({INCLUDED_LANGUAGES[candidate]})"
-
-    normalized_by_code = next(
-        (name for name, code in INCLUDED_LANGUAGES.items() if code == candidate),
-        None,
-    )
-    if normalized_by_code:
-        return f"{normalized_by_code}({candidate})"
+        return _language_token(candidate)
 
     # Base-language fallback: "pt" → "portuguese(pt_br)", "es_mx" → "spanish(es)".
-    candidate_base = candidate.split("_", maxsplit=1)[0]
-    normalized_by_base = next(
-        (
-            (name, code)
-            for name, code in INCLUDED_LANGUAGES.items()
-            if code.split("_", maxsplit=1)[0] == candidate_base
-        ),
-        None,
+    name = _language_name_for_code(candidate) or _language_name_for_base(
+        candidate.split("_", maxsplit=1)[0]
     )
-    if normalized_by_base:
-        name, code = normalized_by_base
-        return f"{name}({code})"
-
-    return None
+    return _language_token(name) if name else None
 
 
 def _extract_language_from_survey_column(column_name: str) -> Optional[str]:
@@ -424,42 +420,16 @@ async def _process_all_form_tabs(
     label_cols: list[str] = [],
     default_language: str | None = None,
 ) -> tuple[str, pd.DataFrame]:
-    if "label" in label_cols:
-        add_label = False
-        digitisation_df = pd.DataFrame([
-            add_label_translations(field, label_cols)
-            for field in digitisation_fields
-        ])
-        digitisation_choices_df = pd.DataFrame([
-            add_label_translations(choice)
-            for choice in digitisation_choices
-        ])
-        choices_df = pd.DataFrame([
-            add_label_translations(choice, label_cols)
-            for choice in get_choice_fields(use_odk_collect)
-        ])
-        photo_collection_df = pd.DataFrame([
-            add_label_translations(field, label_cols)
-            for field in get_photo_fields(mandatory_photo_upload)
-        ])
-    else:
-        add_label = True
-        digitisation_df = pd.DataFrame([
-            add_label_translations(field)
-            for field in digitisation_fields
-        ])
-        digitisation_choices_df = pd.DataFrame([
-            add_label_translations(choice)
-            for choice in digitisation_choices
-        ])
-        choices_df = pd.DataFrame([
-            add_label_translations(choice)
-            for choice in get_choice_fields(use_odk_collect)
-        ])
-        photo_collection_df = pd.DataFrame([
-            add_label_translations(field)
-            for field in get_photo_fields(mandatory_photo_upload)
-        ])
+    add_label = "label" not in label_cols
+    field_label_cols = None if add_label else label_cols
+
+    def translated_df(rows: list[dict], cols: Optional[list[str]] = None) -> pd.DataFrame:
+        return pd.DataFrame([add_label_translations(row, cols) for row in rows])
+
+    digitisation_df = translated_df(digitisation_fields, field_label_cols)
+    digitisation_choices_df = translated_df(digitisation_choices)
+    choices_df = translated_df(get_choice_fields(use_odk_collect), field_label_cols)
+    photo_collection_df = translated_df(get_photo_fields(mandatory_photo_upload), field_label_cols)
 
     # Configure form settings
     xform_id = _configure_form_settings(custom_sheets, form_name, default_language)
