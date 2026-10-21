@@ -53,7 +53,6 @@ survey:
     label::nepali(ne): यहाँ कुन धर्म मानिन्छ ?
     appearance: minimal
     relevant: ${category}='religious'
-    trigger: ${feature}
     required: yes
     label::swahili(sw): Ni dini gani inatumika hapa?
     label::french(fr): Quelle religion est pratiquée ici ?
@@ -91,7 +90,6 @@ survey:
     label::nepali(ne): यो कस्तो प्रकारको धार्मिक भवन हो?
     appearance: minimal
     relevant: ${category}='religious'
-    trigger: ${feature}
     label::swahili(sw): Je, hili ni jengo la kidini la aina gani?
     label::french(fr): De quel type d'édifice religieux s'agit-il ?
     label::spanish(es): ¿Qué tipo de edificio religioso es este?
@@ -134,7 +132,6 @@ survey:
     appearance: minimal
     relevant: ${category}='education'
     choice_filter: category=${category}
-    trigger: ${feature}
     required: yes
     label::swahili(sw): Jengo hili la elimu ni la aina gani?
     label::french(fr): De quel type de bâtiment scolaire s'agit-il ?
@@ -148,7 +145,6 @@ survey:
       विद्यालयहरूको बारेमा थप विवरणहरूको लागि, कृपया शिक्षा XForm प्रयोग
       गर्नुहोस्।
     relevant: ${category}='education'
-    trigger: ${feature}
     label::swahili(sw):
       Kwa maelezo zaidi kuhusu skuli, tafadhali tumia XForm ya elimu
       badala yake.
@@ -165,7 +161,6 @@ survey:
     appearance: minimal
     relevant: ${category}='government'
     choice_filter: category=${category}
-    trigger: ${feature}
     required: yes
     label::swahili(sw): Je, hili ni jengo la umma la aina gani?
     label::french(fr): De quel type de bâtiment public s'agit-il ?
@@ -177,7 +172,6 @@ survey:
     appearance: minimal
     relevant: ${category}='medical'
     choice_filter: category=${category}
-    trigger: ${feature}
     required: yes
     label::swahili(sw): Hiki ni kituo cha matibabu cha aina gani?
     label::french(fr): De quel type d'établissement médical s'agit-il ?
@@ -189,7 +183,6 @@ survey:
     appearance: minimal
     relevant: ${category}='food'
     choice_filter: category=${category}
-    trigger: ${feature}
     required: yes
     label::swahili(sw): Ni aina gani ya chakula kinapatikana hapa?
     label::french(fr): Quel type de nourriture est disponible ici ?
@@ -257,7 +250,6 @@ survey:
     label::nepali(ne): अपरेटर को नाम के हो?
     appearance: minimal
     relevant: ${housing}!='residential' and ${category}='housing'
-    trigger: ${feature}
     label::swahili(sw): Jina la opereta ni nani?
     label::french(fr): Quel est le nom de l'opérateur ?
     label::spanish(es): ¿Cuál es el nombre del operador?
@@ -375,7 +367,6 @@ survey:
     label::english(en): Is this a prefabricated building ?
     label::nepali(ne): के यो पूर्वनिर्मित भवन हो?
     appearance: minimal
-    trigger: ${feature}
     label::swahili(sw): Je, hili ni jengo lililojengwa tayari?
     label::french(fr): Est-ce un bâtiment préfabriqué ?
     label::spanish(es): ¿Es este un edificio prefabricado?
@@ -403,7 +394,6 @@ survey:
     label::nepali(ne): भवनको अवस्था कस्तो छ ?
     appearance: minimal
     default: ${last-saved#condition}
-    trigger: ${feature}
     label::swahili(sw): Je, hali ya jengo ikoje?
     label::french(fr): Quel est l'état du bâtiment ?
     label::spanish(es): ¿Cuál es la condición del edificio?
@@ -2155,6 +2145,20 @@ choices:
     name: by_appointment
     label::english(en): By Appointment Only
     label::nepali(ne): नियुक्ति द्वारा मात्र
+  - list_name: yes_no
+    name: yes
+    label::english(en): Yes
+    label::swahili(sw): Ndiyo
+    label::french(fr): Oui
+    label::spanish(es): Sí
+    label::nepali(ne): हो
+  - list_name: yes_no
+    name: no
+    label::english(en): No
+    label::swahili(sw): Hapana
+    label::french(fr): Non
+    label::spanish(es): No
+    label::nepali(ne): होइन
 settings:
   - form_id: buildings
     version: =NOW()

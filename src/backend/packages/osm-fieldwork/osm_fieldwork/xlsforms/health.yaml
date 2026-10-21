@@ -13,8 +13,6 @@ survey:
     name: healthcare_type
     label::English(en): What type of healthcare is provided ?
     appearance: minimal
-    calculation: instance('features')/root/item[name=${feature}]/healthcare
-    trigger: ${feature}
     required: yes
     label::Swahili(sw): Jengo hili ni la aina gani?
     label::French(fr): De quel type de bâtiment s'agit-il ?
@@ -81,8 +79,6 @@ survey:
     name: wheelchair
     label::English(en): Is this facility wheelchair accessible ?
     appearance: minimal
-    calculation: instance('features')/root/item[name=${feature}]/wheelchair
-    trigger: ${feature}
     label::Swahili(sw): Hili ni duka la aina gani la rejareja?
     label::French(fr): De quel type de magasin s'agit-il ?
     label::Spanish(es): ¿Qué tipo de tienda minorista es este?
@@ -363,6 +359,12 @@ choices:
   - list_name: operator:type
     name: combination
     label: Combination
+  - list_name: yes_no
+    name: yes
+    label: Yes
+  - list_name: yes_no
+    name: no
+    label: No
 settings:
   - form_id: healthcare
     version: =NOW()

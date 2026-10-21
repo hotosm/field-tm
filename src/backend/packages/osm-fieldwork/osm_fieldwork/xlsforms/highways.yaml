@@ -17,7 +17,6 @@ survey:
     default: residential
     required: yes
     relevant: ${highway_type} = 'highway'
-    trigger: ${feature}
     appearance: minimal
   - type: text
     name: name
@@ -29,21 +28,18 @@ survey:
     name: Highway
     label::English(en): Highway
     relevant: ${highway_type} = 'highway'
-    trigger: ${feature}
     appearance: field-list
   - type: select_one surface
     name: surface
     label::English(en): What is the surface of this road?
     default: unpaved
     required: yes
-    trigger: ${feature}
     appearance: minimal
   - type: select_one smoothness
     name: smoothness
     label::English(en): How smooth is this road?
     default: good
     required: yes
-    trigger: ${feature}
     appearance: minimal
   - type: select_one oneway
     name: oneway
@@ -80,7 +76,6 @@ survey:
     name: sac_scale
     label::English(en): What is the difficulty of this path ?
     default: hiking
-    trigger: ${feature}
     appearance: minimal
   - type: select_one trail_visibility
     name: visibility

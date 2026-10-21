@@ -278,7 +278,8 @@ choices:
     name: separated
     label::English(en): Both but separate
   - list_name: isced:level
-    label::English(en): "Pre-primary education "
+    name: 0
+    label::English(en): Pre-primary education
   - list_name: isced:level
     name: 1
     label::English(en): Primary education

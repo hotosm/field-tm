@@ -19,10 +19,8 @@ survey:
     label::English(en): What is the elevation of the waterway ?
     hint::English(en): Select the elevation level of this waterway
     required: yes
-    required_message::French(fr)required_message::English(en):
-      Désolé, la réponse est
-      obligatoire
-    "": Sorry, this question is required
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    required_message::English(en): Sorry, this question is required
     appearance: minimal
   - type: select_one waterway_type or_other
     name: waterway_type
@@ -31,10 +29,8 @@ survey:
     label::English(en): What is the type of waterway ?
     hint::English(en): Select the type of this waterway
     required: yes
-    required_message::French(fr)required_message::English(en):
-      Désolé, la réponse est
-      obligatoire
-    "": Sorry, this question is required
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    required_message::English(en): Sorry, this question is required
     appearance: minimal
   - type: select_one seasonal
     name: waterway_seasonal
@@ -43,10 +39,8 @@ survey:
     label::English(en): In what season is this waterway accessible?
     hint::English(en): Indicate the season during which this waterway is accessible.
     required: yes
-    required_message::French(fr)required_message::English(en):
-      Désolé, la réponse est
-      obligatoire
-    "": Sorry, this question is required
+    required_message::French(fr): Désolé, la réponse est obligatoire
+    required_message::English(en): Sorry, this question is required
     appearance: minimal
   - type: end group
 choices:
@@ -99,8 +93,8 @@ yxf:
       - label::English(en)
       - hint::English(en)
       - required
-      - required_message::French(fr)required_message::English(en)
-      -
+      - required_message::French(fr)
+      - required_message::English(en)
       - appearance
       - body::accuracyThreshold
       - default
