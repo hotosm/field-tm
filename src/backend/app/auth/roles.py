@@ -178,3 +178,12 @@ async def ensure_project_viewable(
             detail=_("You must be logged in to view this project."),
         )
     await wrap_check_access(project, db, auth_user, ProjectRole.MAPPER)
+
+
+async def viewable_project(
+    project_id: int, db: AsyncConnection, auth_user: object | None
+) -> DbProject:
+    """Dependency: the project, if the current user may view it."""
+    project = await get_project_by_id(db, project_id)
+    await ensure_project_viewable(db, project, auth_user)
+    return project

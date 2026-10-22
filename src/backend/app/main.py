@@ -56,6 +56,7 @@ from app.monitoring import (
 )
 from app.projects.mapping_apps import get_mapping_app
 from app.projects.project_crud import fail_stale_jobs, read_and_insert_xlsforms
+from app.projects.project_routes import project_router
 from app.projects.task_plan_routes import task_plan_router
 from app.qfield.qfield_routes import qfield_router
 
@@ -407,6 +408,7 @@ def create_app() -> Litestar:
         qfield_router,
         helper_router,
         central_router,
+        project_router,
         task_plan_router,
         htmx_router,
     ]

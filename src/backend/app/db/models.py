@@ -435,6 +435,7 @@ class DbProject:
 
     # Computed
     manager_username: Optional[str] = None
+    centroid: Optional[dict] = None
 
     @classmethod
     async def one(
@@ -449,7 +450,8 @@ class DbProject:
             SELECT
                 p.*,
                 u.username AS manager_username,
-                ST_AsGeoJSON(p.outline)::jsonb AS outline
+                ST_AsGeoJSON(p.outline)::jsonb AS outline,
+                ST_AsGeoJSON(ST_Centroid(p.outline))::jsonb AS centroid
             FROM
                 projects p
             LEFT JOIN users u ON u.sub = p.created_by_sub
@@ -488,7 +490,18 @@ class DbProject:
         params = {}
 
         if user_sub:
-            filters.append("created_by_sub = %(user_sub)s")
+            # Projects the user created or has a role on
+            filters.append(
+                """
+                (
+                    created_by_sub = %(user_sub)s
+                    OR EXISTS (
+                        SELECT 1 FROM user_roles ur
+                        WHERE ur.project_id = p.id AND ur.user_sub = %(user_sub)s
+                    )
+                )
+                """
+            )
             params["user_sub"] = user_sub
 
         if hashtags:
@@ -533,7 +546,8 @@ class DbProject:
             """
             SELECT
                 p.*,
-                ST_AsGeoJSON(p.outline)::jsonb AS outline
+                ST_AsGeoJSON(p.outline)::jsonb AS outline,
+                ST_AsGeoJSON(ST_Centroid(p.outline))::jsonb AS centroid
             FROM projects p
         """
         )

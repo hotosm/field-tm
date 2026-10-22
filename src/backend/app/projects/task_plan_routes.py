@@ -14,11 +14,10 @@ from psycopg import AsyncConnection
 
 from app.auth.auth_deps import get_optional_auth_user, login_required
 from app.auth.auth_schemas import ProjectUserDict
-from app.auth.roles import check_access, ensure_project_viewable, project_manager
+from app.auth.roles import check_access, project_manager, viewable_project
 from app.db.database import db_conn
 from app.db.enums import ProjectRole
 from app.db.models import DbProject
-from app.projects.project_deps import get_project_by_id
 from app.projects.project_services import ServiceError
 from app.projects.task_plan import save_task_plan
 
@@ -30,20 +29,12 @@ def _featcol_or_none(value: object) -> dict | None:
     return None
 
 
-async def _viewable_project(
-    project_id: int, db: AsyncConnection, auth_user: object | None
-) -> DbProject:
-    project = await get_project_by_id(db, project_id)
-    await ensure_project_viewable(db, project, auth_user)
-    return project
-
-
 @get(
     "/{project_id:int}/planner-input",
     dependencies={
         "db": Provide(db_conn),
         "auth_user": Provide(get_optional_auth_user),
-        "project": Provide(_viewable_project),
+        "project": Provide(viewable_project),
     },
 )
 async def planner_input(
