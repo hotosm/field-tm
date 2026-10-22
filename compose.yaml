@@ -25,7 +25,7 @@ volumes:
   qfield_db_data:
   qfield_static:
   qfield_transformation_grids:
-  garage_data:
+  rustfs_data:
 
 networks:
   ftm-net:
@@ -51,20 +51,20 @@ x-qfield-common-env: &qfield-common-env
   QFIELDCLOUD_ADMIN_URI: admin/
   CORS_ALLOWED_ORIGINS: "http://qfield.field.localhost,http://qfield.field.localhost:7050"
   CORS_ALLOW_CREDENTIALS: 1
-  # TODO fix injecting S3 vars into STORAGES (Garage is our local S3-compatible provider)
-  # STORAGE_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-GK3515373e4c851ebaad366558}
-  # STORAGE_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-7d37d093435a41f2aab8f13c19ba067d9776c90215f56614adad6ece597dbb34}
+  # TODO fix injecting S3 vars into STORAGES (RustFS is our local S3-compatible provider)
+  # STORAGE_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-fieldtm}
+  # STORAGE_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-fieldtm-secret}
   # STORAGE_BUCKET_NAME: ${S3_QFIELD_BUCKET_NAME:-"qfield-cloud"}
-  # STORAGE_ENDPOINT_URL: http://s3:3900
+  # STORAGE_ENDPOINT_URL: http://s3:9000
   STORAGES: '{
     "default": {
     "BACKEND": "qfieldcloud.filestorage.backend.QfcS3Boto3Storage",
     "OPTIONS": {
-    "access_key": "${GARAGE_ACCESS_KEY:-GK3515373e4c851ebaad366558}",
-    "secret_key": "${GARAGE_SECRET_KEY:-7d37d093435a41f2aab8f13c19ba067d9776c90215f56614adad6ece597dbb34}",
+    "access_key": "${S3_ACCESS_KEY:-fieldtm}",
+    "secret_key": "${S3_SECRET_KEY:-fieldtm-secret}",
     "bucket_name": "qfield-cloud",
-    "region_name": "garage",
-    "endpoint_url": "http://s3:3900"
+    "region_name": "us-east-1",
+    "endpoint_url": "http://s3:9000"
     },
     "QFC_IS_LEGACY": false
     }
@@ -615,63 +615,40 @@ services:
 
   s3:
     profiles: ["qfield"]
-    image: docker.io/dxflrs/garage:v1.3.1
+    image: docker.io/rustfs/rustfs:1.0.0-rc.3
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY:-fieldtm}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_KEY:-fieldtm-secret}
+    command: server /data --console-address ":9001"
+    ports:
+      - "9001:9001" # web console
     volumes:
-      - ./deploy/garage.toml:/etc/garage.toml:ro
-      - garage_data:/var/lib/garage
+      - rustfs_data:/data
     networks:
       - ftm-net
     restart: unless-stopped
-    # https://git.deuxfleurs.fr/Deuxfleurs/garage/issues/1354
-    # healthcheck:
-    #   test: ["CMD-SHELL", "/garage node health-check"]
-    #   start_period: 5s
-    #   interval: 5s
-    #   timeout: 5s
-    #   retries: 10
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      start_period: 5s
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   s3-init:
     profiles: ["qfield"]
-    image: docker.io/alpine:3.23
+    image: docker.io/amazon/aws-cli:2.38.0
     depends_on:
       s3:
-        condition: service_started
-    network_mode: service:s3
-    pid: service:s3
+        condition: service_healthy
+    networks:
+      - ftm-net
     environment:
-      GARAGE_ADMIN_TOKEN: garage-admin-token
-      GARAGE_ACCESS_KEY: ${GARAGE_ACCESS_KEY:-GK3515373e4c851ebaad366558}
-      GARAGE_SECRET_KEY: ${GARAGE_SECRET_KEY:-7d37d093435a41f2aab8f13c19ba067d9776c90215f56614adad6ece597dbb34}
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY:-fieldtm}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY:-fieldtm-secret}
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_ENDPOINT_URL: http://s3:9000
     restart: "on-failure:2"
     entrypoint:
       - /bin/sh
-      - -eu
       - -c
-      - |
-        # chroot into the s3 container's filesystem so the garage binary runs
-        # with its own libs/linker, while the shared network namespace keeps
-        # 127.0.0.1:3901 pointing at the live Garage server
-        G="chroot /proc/1/root /garage -c /etc/garage.toml"
-
-        # Wait for server
-        for i in $$(seq 1 20); do
-          if $$G node id -q 2>/dev/null; then break; fi
-          echo "Waiting for Garage RPC... ($$i/20)"
-          sleep 3
-        done
-        $$G node id -q || { echo "Garage RPC not ready"; exit 1; }
-
-        # Init garage nodes
-        if $$G status 2>&1 | grep -q 'NO ROLE ASSIGNED'; then
-          NODE_ID=$$($$G node id -q | cut -c1-16)
-          $$G layout assign "$$NODE_ID" -z local -c 1G
-          $$G layout apply --version 1
-        fi
-
-        # Create S3 bucket
-        $$G key import --yes -n fieldtm-qfield \
-          "$$GARAGE_ACCESS_KEY" "$$GARAGE_SECRET_KEY" || true
-        $$G bucket create qfield-cloud || true
-        $$G bucket allow qfield-cloud --key fieldtm-qfield --read --write --owner || true
-
-        echo "Garage initialized."
+      - aws s3api head-bucket --bucket qfield-cloud || aws s3api create-bucket --bucket qfield-cloud

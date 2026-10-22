@@ -225,24 +225,6 @@ josm:
   @echo "\033[0;33m ############################################### \033[0m"
   @echo
 
-# Start S3 browser
-[no-cd]
-s3-browser:
-  {{docker}} compose \
-    -f contrib/s3_browser/compose.yaml \
-    up -d
-  
-  @echo
-  @echo "\033[0;33m ############################################### \033[0m"
-  @echo
-  @echo " Access the S3 Browser at:    http://localhost:8334"
-  @echo ""
-  @echo " Access Minio S3 buckets at:  http://localhost:9000"
-  @echo
-  @echo "\033[0;33m ############################################### \033[0m"
-  @echo
-
-
 # Externally accessible ODK Central & QFieldCloud for tests
 [no-cd]
 tunnel:

@@ -124,7 +124,7 @@ backup:
   s3:
     # e.g. s3://my-bucket/field-tm (use bucket lifecycle rules for retention)
     bucket: ""
-    # Leave empty for AWS; set for MinIO/Garage/etc.
+    # Leave empty for AWS; set for RustFS/MinIO/etc.
     endpoint: ""
     region: us-east-1
     # Secret with keys AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY.
