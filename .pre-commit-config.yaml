@@ -1,7 +1,7 @@
 repos:
   # Versioning: Commit messages & changelog
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.19.2
+    rev: v4.19.3
     hooks:
       - id: commitizen
         stages: [commit-msg]
@@ -9,7 +9,7 @@ repos:
   # Lint / autoformat: Python code
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: "v0.17.0"
+    rev: "v0.17.2"
     hooks:
       # Run the linter
       - id: ruff
@@ -21,7 +21,7 @@ repos:
 
   # Deps: ensure Python uv lockfile is up to date
   - repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.13.0
+    rev: 0.13.5
     hooks:
       - id: uv-lock
         files: src/backend/pyproject.toml
@@ -35,7 +35,7 @@ repos:
 
   # Lint: code cognitive complexity
   - repo: https://github.com/rohaquinlop/complexipy-pre-commit
-    rev: v8.0.1
+    rev: v8.2.0
     hooks:
       - id: complexipy
 
@@ -146,7 +146,7 @@ repos:
 
   # Lint: Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli
-    rev: v0.49.1
+    rev: v0.50.0
     hooks:
       - id: markdownlint
         args:
@@ -173,6 +173,6 @@ repos:
           ]
 
   - repo: https://github.com/betterleaks/betterleaks
-    rev: v2.0.0-rc.2
+    rev: v2.0.0-rc.3
     hooks:
       - id: betterleaks
