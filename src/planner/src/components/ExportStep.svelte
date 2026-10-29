@@ -50,10 +50,11 @@
       <wa-callout variant="warning" size="s"><a href={loginUrl(location.pathname + location.search)} target="_top">Log in to Field-TM</a>, then save again. Your work is kept in this browser.</wa-callout>
     {/if}
   {/if}
-  {#if returnTo && !project}
+  {#if !project}
     <wa-callout variant="brand" size="s">
-      <strong>Tip:</strong> download your task plan, then upload the file in the Tasks section of
-      your Field-TM project page ("Or upload a task plan file").
+      <strong>To use this in Field-TM:</strong> create a project for the same area, then upload this file
+      in the Tasks section of the project page ("Or upload a task plan file"). Or open the task planner
+      from the project, import this file in step 1, and save.
     </wa-callout>
   {/if}
   <div>

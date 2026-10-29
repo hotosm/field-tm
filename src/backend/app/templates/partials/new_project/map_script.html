@@ -11,6 +11,7 @@
     mustDrawAOI: {{ _("You must draw or upload a project area on the map before submitting.")|tojson }},
     tmProjectIdRequired: {{ _("Enter a Tasking Manager project ID first.")|tojson }},
     tmAoiLoadFailed: {{ _("Could not load AOI from Tasking Manager.")|tojson }},
+    taskPlanUploaded: {{ _("This looks like a task plan. After the project is created, upload the same file in the Tasks section to keep your tasks and assignments.")|tojson }},
   };
 
   // Stash drawn AOI in sessionStorage so users don't lose work if they
@@ -374,8 +375,11 @@
         const geojsonData = JSON.parse(e.target.result);
         setMapError("");
 
+        // A task plan's project area is the union of its tasks.
+        const isTaskPlan = geojsonData.features?.some((f) => Number.isInteger(f?.properties?.task_id));
         const mergeGeometriesCheckbox = document.getElementById("merge-geometries-checkbox");
-        const mergeGeometries = mergeGeometriesCheckbox ? mergeGeometriesCheckbox.checked : false;
+        const mergeGeometries = isTaskPlan || Boolean(mergeGeometriesCheckbox?.checked);
+        renderCallout(document.getElementById("task-plan-info"), "brand", isTaskPlan ? MAP_I18N.taskPlanUploaded : "");
 
         const response = await fetch("/validate-geojson", {
           method: "POST",
@@ -476,6 +480,7 @@
       updateGeoJSON();
       showAreaInfo(null);
       setMapError("");
+      renderCallout(document.getElementById("task-plan-info"), "brand", "");
     }
   });
 
