@@ -62,7 +62,7 @@ test = [
     "asgi-lifespan==2.1.0",
 ]
 debug = [
-    "debugpy==1.8.21",
+    "debugpy==1.8.22",
 ]
 docs = [
     "mkdocs==1.6.1",
