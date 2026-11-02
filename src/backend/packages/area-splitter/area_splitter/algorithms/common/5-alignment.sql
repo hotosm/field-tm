@@ -74,8 +74,11 @@ BEGIN
             WHERE ST_Contains(t.geom, ST_PointOnSurface(b.geom))) AS n
         FROM taskpolygons t;
       DROP TABLE IF EXISTS pg_temp.splitline_buffer;
+      -- quad_segs=1: round caps on many road segments make the in-browser
+      -- planner's GEOS (PGlite) fail silently; the shape of a ~1 cm zone is irrelevant.
       CREATE TEMP TABLE splitline_buffer AS
-        SELECT ST_SetSRID(ST_Buffer(geom, 0.0000001), 4326) AS geom FROM splitline_union;
+        SELECT ST_SetSRID(ST_Buffer(geom, 0.0000001, 'quad_segs=1'), 4326) AS geom
+        FROM splitline_union;
 
       WHILE (SELECT COUNT(*) FROM taskpolygons) > num_enumerators LOOP
         merged := FALSE;

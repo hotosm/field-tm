@@ -218,6 +218,18 @@ describe("voronoi with OSM roads", () => {
     }
   }, 300_000);
 
+  it("makes a fixed number of skeleton tasks with many split lines", async () => {
+    // Buffering this many split lines used to break PGlite's GEOS, giving "no tasks".
+    const tasks = await split(await createDb(), {
+      aoi,
+      algorithm: "AVG_BUILDING_SKELETON",
+      params: { num_enumerators: 12 },
+      features: extract,
+      roads,
+    });
+    expect(tasks).toHaveLength(12);
+  }, 120_000);
+
   it("refuses more tasks than features", async () => {
     await expect(
       split(db, {
@@ -281,6 +293,30 @@ describe("straight skeleton", () => {
       features: extract,
     });
     expect(tasks.length).toBeGreaterThanOrEqual(4);
+  });
+
+  it("makes a fixed number of tasks where the hull overlap union fails (GEOS workaround)", async () => {
+    // The Kathmandu AOI with rounded coordinates; 12 tasks broke PGlite's GEOS.
+    const rounded = {
+      type: "Polygon" as const,
+      coordinates: [
+        [
+          [85.2999891, 27.714008],
+          [85.2999891, 27.714008043],
+          [85.3047831, 27.714008],
+          [85.3047831, 27.7108923],
+          [85.2999891, 27.710892],
+          [85.2999891, 27.714008],
+        ],
+      ],
+    };
+    const tasks = await split(await createDb(), {
+      aoi: rounded,
+      algorithm: "AVG_BUILDING_SKELETON",
+      params: { num_enumerators: 12 },
+      features: extract,
+    });
+    expect(tasks).toHaveLength(12);
   });
 
   it("refuses inputs that would be too slow", async () => {

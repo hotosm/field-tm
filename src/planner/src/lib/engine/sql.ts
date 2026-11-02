@@ -41,17 +41,17 @@ export const SKELETON_ANCHORS = {
   cteEnd: "\n  skeleton_polygons as",
   call: "ST_Union(CG_StraightSkeleton(geom),",
   clip: "ST_Union(ST_Difference(h.geom, iu.geom), h.buildings_union)",
+  overlaps: "ST_Union(intersection)",
 } as const;
 
 function skeletonSql(original: string) {
   for (const a of Object.values(SKELETON_ANCHORS))
     if (!original.includes(a)) throw new Error(`Skeleton SQL changed: missing "${a.trim()}"`);
-  // This union hangs in PGlite's GEOS on some inputs (e.g. Kathmandu, 100/task);
-  // a 1e-9 degree grid size makes it robust.
-  const sql = original.replace(
-    SKELETON_ANCHORS.clip,
-    SKELETON_ANCHORS.clip.replace(/\)$/, ", 1e-9)"),
-  );
+  // These unions hang or silently return nothing in PGlite's GEOS on some inputs
+  // (e.g. Kathmandu at 100 per task, or 12 tasks); a 1e-9 degree grid size makes them robust.
+  const sql = original
+    .replace(SKELETON_ANCHORS.clip, SKELETON_ANCHORS.clip.replace(/\)$/, ", 1e-9)"))
+    .replaceAll(SKELETON_ANCHORS.overlaps, "ST_Union(intersection, 1e-9)");
   const prefix = sql.slice(0, sql.indexOf(SKELETON_ANCHORS.cteEnd));
   return {
     input:
