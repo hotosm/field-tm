@@ -31,7 +31,7 @@ dependencies = [
     "pydantic-settings==2.6.0",
     "geojson-pydantic==1.1.2",
     "python-multipart==0.0.32",
-    "psycopg[c,pool]==3.3.5",
+    "psycopg[c,pool]==3.3.6",
     "cryptography==46.0.7",
     "pyxform==4.0.0",
     "pyodk==1.3.0",
@@ -61,7 +61,7 @@ test = [
     "asgi-lifespan==2.1.0",
 ]
 debug = [
-    "debugpy==1.8.21",
+    "debugpy==1.8.22",
 ]
 docs = [
     "mkdocs==1.6.1",
