@@ -5,12 +5,17 @@ plan as files only; Field-TM just stores and shares it.
 """
 
 from dataclasses import dataclass
+from enum import StrEnum
 
 from app.db.enums import FieldMappingApp
 from app.i18n import _
 
-SYNC = "A"
-FILES = "B"
+
+class AppType(StrEnum):
+    """Type A syncs tasks through an API, Type B only shares files."""
+
+    SYNC = "A"
+    FILES = "B"
 
 
 @dataclass(frozen=True)
@@ -19,7 +24,7 @@ class MappingApp:
 
     key: FieldMappingApp
     name: str
-    type: str
+    type: AppType
     logo: str | None
     url: str
     description: str
@@ -28,7 +33,7 @@ class MappingApp:
     @property
     def syncs(self) -> bool:
         """Whether Field-TM pushes tasks to the app (Type A)."""
-        return self.type == SYNC
+        return self.type == AppType.SYNC
 
 
 def _logo(filename: str) -> str:
@@ -42,7 +47,7 @@ def mapping_apps() -> list[MappingApp]:
         MappingApp(
             app.QFIELD,
             "QField",
-            SYNC,
+            AppType.SYNC,
             _logo("qfield.svg"),
             "https://qfield.org",
             _("GIS mapping app for Android and iOS, with our simple task plugin."),
@@ -51,7 +56,7 @@ def mapping_apps() -> list[MappingApp]:
         MappingApp(
             app.ODK,
             "ODK Collect",
-            SYNC,
+            AppType.SYNC,
             _logo("odk.svg"),
             "https://getodk.org",
             _("Form-based survey app for Android."),
@@ -60,7 +65,7 @@ def mapping_apps() -> list[MappingApp]:
         MappingApp(
             app.EVERYDOOR,
             "Every Door",
-            FILES,
+            AppType.FILES,
             _logo("everydoor.png"),
             "https://every-door.app",
             _("Fast OpenStreetMap editor for shops, amenities and entrances."),
@@ -69,7 +74,7 @@ def mapping_apps() -> list[MappingApp]:
         MappingApp(
             app.STREETCOMPLETE,
             "StreetComplete",
-            FILES,
+            AppType.FILES,
             _logo("streetcomplete.svg"),
             "https://streetcomplete.app",
             _("Answer simple quests to complete OpenStreetMap data."),
@@ -78,7 +83,7 @@ def mapping_apps() -> list[MappingApp]:
         MappingApp(
             app.COMAPEO,
             "CoMapeo",
-            FILES,
+            AppType.FILES,
             _logo("comapeo.png"),
             "https://comapeo.app",
             _("Offline-first mapping for communities and territories."),
@@ -87,7 +92,7 @@ def mapping_apps() -> list[MappingApp]:
         MappingApp(
             app.COMAPS,
             "CoMaps",
-            FILES,
+            AppType.FILES,
             _logo("comaps.png"),
             "https://comaps.app",
             _("Offline maps and navigation, with OSM editing."),
@@ -96,7 +101,7 @@ def mapping_apps() -> list[MappingApp]:
         MappingApp(
             app.PANORAMAX,
             "Panoramax",
-            FILES,
+            AppType.FILES,
             _logo("panoramax.svg"),
             "https://panoramax.fr",
             _("Open street-level imagery, captured with any camera."),
@@ -105,7 +110,7 @@ def mapping_apps() -> list[MappingApp]:
         MappingApp(
             app.SKETCHMAP,
             "SketchMap",
-            FILES,
+            AppType.FILES,
             _logo("sketchmap.svg"),
             "https://sketch-map-tool.heigit.org",
             _("Print paper maps, sketch on them, scan them back."),
@@ -114,7 +119,7 @@ def mapping_apps() -> list[MappingApp]:
         MappingApp(
             app.CHATMAP,
             "ChatMap",
-            FILES,
+            AppType.FILES,
             _logo("chatmap.svg"),
             "https://chatmap.hotosm.org",
             _("Turn locations shared in chat apps into a map."),
@@ -123,7 +128,7 @@ def mapping_apps() -> list[MappingApp]:
         MappingApp(
             app.OTHER,
             _("Other app"),
-            FILES,
+            AppType.FILES,
             None,
             "",
             _("Any other app. Share the tasks as files and links."),
