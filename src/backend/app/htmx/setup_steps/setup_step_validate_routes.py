@@ -29,7 +29,7 @@ from app.helpers.geometry_utils import (
 from app.i18n import _
 
 from ..setup_steps.setup_step_responses import (
-    json_error_response as _json_error_response,
+    json_error_response,
 )
 
 log = logging.getLogger(__name__)
@@ -54,17 +54,17 @@ async def _fetch_tasking_manager_aoi(
             )
     except httpx.HTTPError as exc:
         log.error(f"Failed to reach Tasking Manager API: {exc}", exc_info=True)
-        return _json_error_response(
+        return json_error_response(
             _("Could not reach Tasking Manager. Please try again later."), 502
         )
 
     if tm_response.status_code == status.HTTP_404_NOT_FOUND:
-        return _json_error_response(
+        return json_error_response(
             _("Tasking Manager project %(id)s was not found.") % {"id": project_id},
             404,
         )
     if tm_response.status_code >= status.HTTP_400_BAD_REQUEST:
-        return _json_error_response(
+        return json_error_response(
             _("Tasking Manager returned an error (HTTP %(status)s).")
             % {"status": tm_response.status_code},
             502,
@@ -77,17 +77,17 @@ def _parse_tasking_manager_aoi_response(tm_response: httpx.Response) -> dict | R
     try:
         tm_geojson = tm_response.json()
     except ValueError:
-        return _json_error_response(
+        return json_error_response(
             _("Tasking Manager returned an invalid response."), 502
         )
 
     try:
         merged_featcol = parse_aoi(settings.FTM_DB_URL, tm_geojson, merge=False)
     except ValueError as exc:
-        return _json_error_response(str(exc), 422)
+        return json_error_response(str(exc), 422)
 
     if not merged_featcol.get("features", []):
-        return _json_error_response(
+        return json_error_response(
             _("Tasking Manager project AOI did not contain any polygon geometries."),
             422,
         )
@@ -142,7 +142,7 @@ async def validate_geojson(
         merge_geometries = data.get("merge_geometries", False)
 
         if not geojson_input:
-            return _json_error_response(_("GeoJSON is required"), 400)
+            return json_error_response(_("GeoJSON is required"), 400)
 
         merged_featcol = parse_aoi(
             settings.FTM_DB_URL,
@@ -151,7 +151,7 @@ async def validate_geojson(
         )
 
         if not merged_featcol.get("features", []):
-            return _json_error_response(
+            return json_error_response(
                 _("No polygon geometries found. Project area must be a polygon."),
                 422,
             )
@@ -176,13 +176,13 @@ async def validate_geojson(
         )
 
     except HTTPException as e:
-        return _json_error_response(str(e.detail), e.status_code)
+        return json_error_response(str(e.detail), e.status_code)
     except ValueError as e:
-        return _json_error_response(str(e), 422)
+        return json_error_response(str(e), 422)
     except Exception as e:
         log.error(f"Error validating GeoJSON: {e}", exc_info=True)
         error_msg = str(e)
-        return _json_error_response(error_msg, 500)
+        return json_error_response(error_msg, 500)
 
 
 @get(
@@ -199,7 +199,7 @@ async def load_tasking_manager_aoi(
     project_id: int,
 ) -> Response:
     if project_id <= 0:
-        return _json_error_response(
+        return json_error_response(
             _("Tasking Manager project ID must be a positive integer."), 400
         )
 

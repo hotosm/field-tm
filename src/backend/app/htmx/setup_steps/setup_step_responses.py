@@ -17,7 +17,7 @@ from app.projects.project_services import (
 )
 from app.projects.project_services import ValidationError as SvcValidationError
 
-from ..htmx_helpers import callout as _callout
+from ..htmx_helpers import callout
 
 if TYPE_CHECKING:
     from app.auth.auth_schemas import ProjectUserDict
@@ -87,7 +87,7 @@ def unexpected_error_message() -> str:
 
 def project_not_found_response() -> Response:
     return Response(
-        content=_callout("danger", _("Project not found or access denied.")),
+        content=callout("danger", _("Project not found or access denied.")),
         media_type="text/html",
         status_code=status.HTTP_404_NOT_FOUND,
     )
@@ -95,7 +95,7 @@ def project_not_found_response() -> Response:
 
 def html_error_response(message: str, status_code: int) -> Response:
     return Response(
-        content=_callout("danger", message),
+        content=callout("danger", message),
         media_type="text/html",
         status_code=status_code,
         headers={"Vary": "HX-Request"},
@@ -118,7 +118,7 @@ def service_error_response(error: ServiceError) -> Response:
         else status.HTTP_500_INTERNAL_SERVER_ERROR
     )
     return Response(
-        content=_callout("danger", error.message),
+        content=callout("danger", error.message),
         media_type="text/html",
         status_code=status_code,
         headers={"Vary": "HX-Request"},

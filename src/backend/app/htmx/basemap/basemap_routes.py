@@ -44,7 +44,7 @@ from app.helpers.geometry_utils import outline_bbox
 from app.i18n import _
 from app.projects.project_schemas import ProjectUpdate
 
-from ..htmx_helpers import callout as _callout
+from ..htmx_helpers import callout
 from .basemap_attach_flow import (
     attach_precondition_response,
     enqueue_autostart_attach,
@@ -109,7 +109,7 @@ async def basemap_search_htmx(
 
     if project.status != ProjectStatus.PUBLISHED:
         return Response(
-            content=_callout(
+            content=callout(
                 "warning", _("Basemap tools are available after publication.")
             ),
             media_type="text/html",
@@ -270,7 +270,7 @@ async def basemap_status_htmx(
 
     if not project.basemap_stac_item_id:
         return Response(
-            content=_callout("warning", _("No basemap generation in progress.")),
+            content=callout("warning", _("No basemap generation in progress.")),
             media_type="text/html",
             status_code=status.HTTP_400_BAD_REQUEST,
         )

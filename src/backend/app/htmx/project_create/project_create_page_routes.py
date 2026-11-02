@@ -13,9 +13,9 @@ from app.config import AuthProvider, settings
 from app.projects.mapping_apps import app_picker_context
 
 from ..setup_steps.setup_step_responses import (
-    hx_redirect_response as _hx_redirect_response,
+    hx_redirect_response,
 )
-from .project_create_parsing import login_prompt_path as _login_prompt_path
+from .project_create_parsing import login_prompt_path
 
 
 async def redirect_to_login_if_needed(
@@ -23,10 +23,10 @@ async def redirect_to_login_if_needed(
 ) -> Response | None:
     if settings.AUTH_PROVIDER == AuthProvider.DISABLED or auth_user is not None:
         return None
-    login_path = _login_prompt_path(str(request.url.path))
+    login_path = login_prompt_path(str(request.url.path))
     if request.headers.get("HX-Request") == "true":
-        return _hx_redirect_response(login_path)
-    return _hx_redirect_response(
+        return hx_redirect_response(login_path)
+    return hx_redirect_response(
         login_path,
         status_code=status.HTTP_307_TEMPORARY_REDIRECT,
         header_name="Location",

@@ -12,7 +12,7 @@ from psycopg import AsyncConnection
 from app.config import settings
 from app.db.enums import FieldMappingApp, ProjectStatus
 from app.db.models import DbProject
-from app.helpers.background_tasks import spawn as _spawn_bg_task
+from app.helpers.background_tasks import spawn
 from app.helpers.basemap_services import check_tilepack_status
 from app.i18n import _
 from app.projects.project_schemas import ProjectUpdate
@@ -21,7 +21,7 @@ from app.qfield.qfield_crud import (
     get_missing_basemap_attach_config,
 )
 
-from ..htmx_helpers import callout as _callout
+from ..htmx_helpers import callout
 from .basemap_fragments import progress_fragment
 
 log = logging.getLogger(__name__)
@@ -119,7 +119,7 @@ async def attach_precondition_response(
     """
     if project.status != ProjectStatus.PUBLISHED:
         return Response(
-            content=_callout(
+            content=callout(
                 "warning", _("Basemap attach is available after publication.")
             ),
             media_type="text/html",
@@ -128,7 +128,7 @@ async def attach_precondition_response(
 
     if project.field_mapping_app != FieldMappingApp.QFIELD:
         return Response(
-            content=_callout(
+            content=callout(
                 "warning", _("Basemap attach is only available for QField projects.")
             ),
             media_type="text/html",
@@ -137,7 +137,7 @@ async def attach_precondition_response(
 
     if project.basemap_status != "ready":
         return Response(
-            content=_callout(
+            content=callout(
                 "warning",
                 _("Basemap is not ready yet. Please wait for generation to complete."),
             ),
@@ -151,7 +151,7 @@ async def attach_precondition_response(
             project.basemap_url = recovered_url
         else:
             return Response(
-                content=_callout(
+                content=callout(
                     "warning",
                     _(
                         "Basemap download URL is not available yet. "
@@ -167,7 +167,7 @@ async def attach_precondition_response(
         return None
 
     return Response(
-        content=_callout(
+        content=callout(
             "warning",
             _(
                 "QField basemap attach is not configured on this deployment. "
@@ -243,7 +243,7 @@ async def start_basemap_attach(
     )
     await db.commit()
 
-    _spawn_bg_task(
+    spawn(
         run_basemap_attach_background(project_id, basemap_url),
         name=f"basemap-attach:{project_id}",
     )
@@ -271,7 +271,7 @@ async def enqueue_autostart_attach(
     )
     await db.commit()
 
-    _spawn_bg_task(
+    spawn(
         run_basemap_attach_background(project_id, basemap_url),
         name=f"basemap-attach:{project_id}",
     )

@@ -13,7 +13,7 @@ from app.auth.auth_deps import get_user_sub
 from app.config import settings
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
-from app.helpers.background_tasks import spawn as _spawn_bg_task
+from app.helpers.background_tasks import spawn
 from app.i18n import _
 from app.projects import project_schemas
 from app.projects.project_crud import claim_simple_project_basemap_generation
@@ -235,7 +235,7 @@ async def finalize_simple_project_creation(
         db=db, project_id=project_id
     )
     if claimed:
-        _spawn_bg_task(
+        spawn(
             autostart_callback(project_id, outline),
             name=f"basemap-autostart:{project_id}",
         )

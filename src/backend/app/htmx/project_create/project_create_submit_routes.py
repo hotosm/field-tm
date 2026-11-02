@@ -18,7 +18,7 @@ from psycopg import AsyncConnection
 from app.auth.auth_deps import get_user_sub, login_required
 from app.db.database import db_conn
 from app.db.models import DbProject
-from app.helpers.background_tasks import spawn as _spawn_bg_task
+from app.helpers.background_tasks import spawn
 from app.i18n import _, get_current_locale
 from app.projects import project_schemas
 from app.projects.project_services import (
@@ -30,22 +30,18 @@ from app.projects.project_services import (
 from app.projects.project_services import ValidationError as SvcValidationError
 
 from ..setup_steps.setup_step_responses import (
-    hx_redirect_response as _hx_redirect_response,
+    hx_redirect_response,
+    unexpected_error_response,
 )
-from ..setup_steps.setup_step_responses import (
-    unexpected_error_response as _unexpected_error_response,
-)
-from .project_create_parsing import outline_json_error as _outline_json_error
-from .project_create_parsing import parse_outline_payload as _parse_outline_payload
 from .project_create_parsing import (
-    parse_project_create_form as _parse_project_create_form,
+    outline_json_error,
+    parse_outline_payload,
+    parse_project_create_form,
+    project_form_error,
 )
-from .project_create_parsing import project_form_error as _project_form_error
 from .project_create_simple_flow import (
-    create_simple_project_stub as _create_simple_project_stub,
-)
-from .project_create_simple_flow import (
-    run_simple_project_creation_background as _run_simple_project_creation_background,
+    create_simple_project_stub,
+    run_simple_project_creation_background,
 )
 
 log = logging.getLogger(__name__)
@@ -63,7 +59,7 @@ def _validation_error_response(message: str) -> Response:
     if "Area of Interest" in message or "too large" in message:
         headers["HX-Trigger"] = json.dumps({"missingOutline": message})
     return Response(
-        content=_project_form_error(message),
+        content=project_form_error(message),
         media_type="text/html",
         status_code=status.HTTP_200_OK,
         headers=headers,
@@ -73,7 +69,7 @@ def _validation_error_response(message: str) -> Response:
 def _conflict_error_response(message: str) -> Response:
     hx_trigger = json.dumps({"duplicateProjectName": message})
     return Response(
-        content=_project_form_error(message),
+        content=project_form_error(message),
         media_type="text/html",
         status_code=status.HTTP_200_OK,
         headers={"HX-Trigger": hx_trigger},
@@ -82,7 +78,7 @@ def _conflict_error_response(message: str) -> Response:
 
 def _service_error_response(message: str) -> Response:
     return Response(
-        content=_project_form_error(message),
+        content=project_form_error(message),
         media_type="text/html",
         status_code=status.HTTP_200_OK,
     )
@@ -104,11 +100,11 @@ async def create_project_htmx(
     try:
         try:
             project_name, description, field_mapping_app, hashtags, outline = (
-                _parse_project_create_form(data)
+                parse_project_create_form(data)
             )
         except ValueError:
             return Response(
-                content=_project_form_error(_outline_json_error()),
+                content=project_form_error(outline_json_error()),
                 media_type="text/html",
                 status_code=status.HTTP_200_OK,
             )
@@ -124,7 +120,7 @@ async def create_project_htmx(
         )
         await db.commit()
 
-        return _hx_redirect_response(f"/projects/{project.id}")
+        return hx_redirect_response(f"/projects/{project.id}")
     except SvcValidationError as e:
         return _validation_error_response(e.message)
     except ConflictError as e:
@@ -136,7 +132,7 @@ async def create_project_htmx(
             f"Error creating project via HTMX: {e}",
             exc_info=True,
         )
-        return _unexpected_error_response(
+        return unexpected_error_response(
             _("An unexpected error occurred. Please try again.")
         )
 
@@ -156,10 +152,10 @@ async def create_simple_project_htmx(
 ) -> Response:
     try:
         try:
-            outline = _parse_outline_payload(data.get("outline", ""))
+            outline = parse_outline_payload(data.get("outline", ""))
         except ValueError:
             return Response(
-                content=_project_form_error(_outline_json_error()),
+                content=project_form_error(outline_json_error()),
                 media_type="text/html",
                 status_code=status.HTTP_200_OK,
             )
@@ -170,7 +166,7 @@ async def create_simple_project_htmx(
             hashtags,
             _location_str,
         ) = await derive_simple_project_metadata(db=db, outline=outline)
-        project = await _create_simple_project_stub(
+        project = await create_simple_project_stub(
             db=db,
             auth_user=auth_user,
             project_name=project_name,
@@ -189,8 +185,8 @@ async def create_simple_project_htmx(
         )
         await db.commit()
 
-        _spawn_bg_task(
-            _run_simple_project_creation_background(
+        spawn(
+            run_simple_project_creation_background(
                 project.id,
                 outline,
                 get_current_locale(),
@@ -198,7 +194,7 @@ async def create_simple_project_htmx(
             name=f"simple-project-create:{project.id}",
         )
 
-        return _hx_redirect_response(f"/projects/{project.id}/creating")
+        return hx_redirect_response(f"/projects/{project.id}/creating")
     except SvcValidationError as e:
         return _validation_error_response(e.message)
     except ConflictError as e:
@@ -210,7 +206,7 @@ async def create_simple_project_htmx(
             f"Error creating simple project via HTMX: {e}",
             exc_info=True,
         )
-        return _unexpected_error_response(
+        return unexpected_error_response(
             _("An unexpected error occurred. Please try again.")
         )
 
@@ -231,7 +227,7 @@ async def project_creating_page(
     """Full-page placeholder while async creation finalizes in the background."""
     project = await DbProject.one(db, project_id)
     if project and project.creation_status == "ready":
-        return _hx_redirect_response(
+        return hx_redirect_response(
             f"/projects/{project_id}",
             status_code=status.HTTP_303_SEE_OTHER,
             header_name="Location",
@@ -258,7 +254,7 @@ async def project_creation_status(
     """Polling fragment for /projects/{id}/creating; redirects when ready."""
     project = await DbProject.one(db, project_id)
     if project and project.creation_status == "ready":
-        return _hx_redirect_response(f"/projects/{project_id}")
+        return hx_redirect_response(f"/projects/{project_id}")
     return HTMXTemplate(
         template_name="partials/new_project/creating_fragment.html",
         context={"project": project},

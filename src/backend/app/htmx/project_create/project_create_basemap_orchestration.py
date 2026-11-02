@@ -8,7 +8,7 @@ from psycopg import AsyncConnection
 from app.config import settings
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
-from app.helpers.background_tasks import spawn as _spawn_bg_task
+from app.helpers.background_tasks import spawn
 from app.helpers.basemap_services import (
     check_tilepack_status,
     search_oam_imagery,
@@ -77,7 +77,7 @@ async def resume_simple_project_tilepack_if_needed(
     await bg_db.commit()
 
     if is_ready_with_url:
-        _spawn_bg_task(
+        spawn(
             run_basemap_attach_background(project.id, resolved_url),
             name=f"basemap-attach:{project.id}",
         )
@@ -202,7 +202,7 @@ def enqueue_simple_project_basemap_attach(
     if not download_url:
         return
 
-    _spawn_bg_task(
+    spawn(
         run_basemap_attach_background(project_id, download_url),
         name=f"basemap-attach:{project_id}",
     )

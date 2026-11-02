@@ -22,22 +22,16 @@ from app.i18n import _
 from app.projects.project_services import ServiceError, process_xlsform
 from app.projects.project_services import ValidationError as SvcValidationError
 
-from ..htmx_helpers import callout as _callout
+from ..htmx_helpers import callout
 from ..setup_steps.setup_step_responses import (
-    authorized_project_or_response as _authorized_project_or_response,
+    authorized_project_or_response,
+    service_error_response,
+    unexpected_error_response,
 )
-from ..setup_steps.setup_step_responses import (
-    service_error_response as _service_error_response,
-)
-from ..setup_steps.setup_step_responses import (
-    unexpected_error_response as _unexpected_error_response,
-)
-from .project_create_parsing import to_bool_form_value as _to_bool_form_value
+from .project_create_parsing import to_bool_form_value
 from .project_create_templates import (
-    get_template_xlsform_bytes as _get_template_xlsform_bytes,
-)
-from .project_create_templates import (
-    resolve_uploaded_xlsform_bytes as _resolve_uploaded_xlsform_bytes,
+    get_template_xlsform_bytes,
+    resolve_uploaded_xlsform_bytes,
 )
 
 log = logging.getLogger(__name__)
@@ -54,7 +48,7 @@ async def get_template_xlsform(
     form_id: int,
     db: AsyncConnection,
 ) -> Response:
-    xlsx_bytes = await _get_template_xlsform_bytes(form_id, db)
+    xlsx_bytes = await get_template_xlsform_bytes(form_id, db)
 
     if not xlsx_bytes:
         return Response(
@@ -87,7 +81,7 @@ async def upload_xlsform_htmx(
     data: XLSFormUploadData = Body(media_type=RequestEncodingType.MULTI_PART),
     project_id: int = Parameter(),
 ) -> Response:
-    project, not_found_response = _authorized_project_or_response(
+    project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
@@ -95,23 +89,23 @@ async def upload_xlsform_htmx(
 
     project_id = project.id
 
-    need_verification_fields_bool = _to_bool_form_value(
+    need_verification_fields_bool = to_bool_form_value(
         data.need_verification_fields, default=True
     )
-    include_photo_upload_bool = _to_bool_form_value(
+    include_photo_upload_bool = to_bool_form_value(
         data.include_photo_upload, default=True
     )
-    mandatory_photo_upload_bool = _to_bool_form_value(
+    mandatory_photo_upload_bool = to_bool_form_value(
         data.mandatory_photo_upload, default=False
     )
-    use_odk_collect_bool = _to_bool_form_value(data.use_odk_collect, default=False)
-    default_language_explicit = _to_bool_form_value(
+    use_odk_collect_bool = to_bool_form_value(data.use_odk_collect, default=False)
+    default_language_explicit = to_bool_form_value(
         data.default_language_explicit, default=False
     )
     default_language = data.default_language if default_language_explicit else None
 
     try:
-        xlsform_bytes, error_response = await _resolve_uploaded_xlsform_bytes(data, db)
+        xlsform_bytes, error_response = await resolve_uploaded_xlsform_bytes(data, db)
         if error_response:
             return error_response
 
@@ -127,7 +121,7 @@ async def upload_xlsform_htmx(
         )
 
         return Response(
-            content=_callout(
+            content=callout(
                 "success",
                 _("Form validated and uploaded successfully! Reloading page..."),
             ),
@@ -137,12 +131,12 @@ async def upload_xlsform_htmx(
         )
 
     except SvcValidationError as e:
-        return _service_error_response(e)
+        return service_error_response(e)
     except ServiceError as e:
-        return _service_error_response(e)
+        return service_error_response(e)
     except Exception as e:
         log.error(f"Error uploading XLSForm via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e))
+        return unexpected_error_response(str(e))
 
 
 ROUTE_HANDLERS = [

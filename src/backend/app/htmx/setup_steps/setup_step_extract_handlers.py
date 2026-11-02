@@ -20,17 +20,15 @@ from app.projects.project_services import (
 )
 from app.projects.project_services import ValidationError as SvcValidationError
 
-from ..htmx_helpers import callout as _callout
+from ..htmx_helpers import callout
 from .setup_step_extract_helpers import (
-    get_submitted_geojson_data as _get_submitted_geojson_data,
+    get_submitted_geojson_data,
 )
 from .setup_step_responses import (
-    build_data_extract_preview_response as _build_data_extract_preview_response,
-)
-from .setup_step_responses import hx_trigger_response as _hx_trigger_response
-from .setup_step_responses import service_error_response as _service_error_response
-from .setup_step_responses import (
-    unexpected_error_response as _unexpected_error_response,
+    build_data_extract_preview_response,
+    hx_trigger_response,
+    service_error_response,
+    unexpected_error_response,
 )
 
 log = logging.getLogger(__name__)
@@ -82,17 +80,17 @@ async def handle_download_osm_data(
             'If this looks right, click "Accept Data Extract". '
             "Otherwise, try downloading again with different parameters."
         )
-        return _build_data_extract_preview_response(
+        return build_data_extract_preview_response(
             status_message=status_message,
             preview_message=preview_message,
             project_id=project_id,
             warning_message=await _stale_tasks_warning(db, project_id),
         )
     except (SvcValidationError, ServiceError) as e:
-        return _service_error_response(e)
+        return service_error_response(e)
     except Exception as e:
         log.error(f"Error downloading OSM data via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e))
+        return unexpected_error_response(str(e))
 
 
 async def handle_upload_geojson(
@@ -110,7 +108,7 @@ async def handle_upload_geojson(
 
         if not data.filename.lower().endswith((".geojson", ".json")):
             return Response(
-                content=_callout(
+                content=callout(
                     "danger",
                     _("Invalid file type. Please upload a .geojson or .json file."),
                 ),
@@ -126,14 +124,14 @@ async def handle_upload_geojson(
             )
         except ValueError as e:
             return Response(
-                content=_callout("danger", str(e)),
+                content=callout("danger", str(e)),
                 media_type="text/html",
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
 
         if not featcol.get("features", []):
             return Response(
-                content=_callout(
+                content=callout(
                     "danger",
                     _("No valid geometries found in GeoJSON."),
                 ),
@@ -155,7 +153,7 @@ async def handle_upload_geojson(
             'If this looks right, click "Accept Data Extract". '
             "Otherwise, try uploading a different file."
         )
-        return _build_data_extract_preview_response(
+        return build_data_extract_preview_response(
             status_message=upload_success_msg,
             preview_message=upload_preview_msg,
             project_id=project_id,
@@ -163,10 +161,10 @@ async def handle_upload_geojson(
         )
 
     except SvcValidationError as e:
-        return _service_error_response(e)
+        return service_error_response(e)
     except Exception as e:
         log.error(f"Error uploading GeoJSON via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e))
+        return unexpected_error_response(str(e))
 
 
 async def handle_collect_new_data_only(
@@ -182,8 +180,8 @@ async def handle_collect_new_data_only(
             ),
         )
         await db.commit()
-        return _hx_trigger_response(
-            _callout(
+        return hx_trigger_response(
+            callout(
                 "success",
                 _("✓ Collect-new-data mode selected. You can continue."),
             ),
@@ -197,7 +195,7 @@ async def handle_collect_new_data_only(
         )
     except Exception as e:
         log.error(f"Error enabling collect-new-data mode via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e))
+        return unexpected_error_response(str(e))
 
 
 async def handle_submit_geojson_data_extract(
@@ -209,14 +207,14 @@ async def handle_submit_geojson_data_extract(
     try:
         request_keys = list(data.keys()) if data else "None"
         log.debug(f"Submit data extract request received. Keys in data: {request_keys}")
-        geojson_data, error_response = await _get_submitted_geojson_data(
+        geojson_data, error_response = await get_submitted_geojson_data(
             db,
             project_id,
             data or {},
         )
         if error_response or not geojson_data:
             return error_response or Response(
-                content=_callout(
+                content=callout(
                     "warning",
                     _(
                         "No GeoJSON data found. Please download OSM data or "
@@ -240,8 +238,8 @@ async def handle_submit_geojson_data_extract(
         saved_message = _(
             "✓ Data extract successfully saved! You can now continue to the Tasks step."
         )
-        return _hx_trigger_response(
-            _callout("success", saved_message),
+        return hx_trigger_response(
+            callout("success", saved_message),
             event="project-setup:step3-complete",
             payload={
                 "projectId": project_id,
@@ -252,15 +250,15 @@ async def handle_submit_geojson_data_extract(
         )
 
     except SvcValidationError as e:
-        return _service_error_response(e)
+        return service_error_response(e)
     except ServiceError as e:
-        return _service_error_response(e)
+        return service_error_response(e)
     except Exception as e:
         log.error(
             f"Error submitting GeoJSON data extract via HTMX: {e}",
             exc_info=True,
         )
-        return _unexpected_error_response(str(e))
+        return unexpected_error_response(str(e))
 
 
 async def handle_accept_data_extract(
@@ -282,7 +280,7 @@ async def handle_accept_data_extract(
 
         if not features:
             return Response(
-                content=_callout(
+                content=callout(
                     "warning",
                     _(
                         "No data extract is staged. Please download OSM data "
@@ -303,8 +301,8 @@ async def handle_accept_data_extract(
             "✓ Data extract accepted! Saved %(feature_count)s features. Step "
             "3 is now complete."
         ) % {"feature_count": feature_count}
-        return _hx_trigger_response(
-            _callout("success", accepted_msg),
+        return hx_trigger_response(
+            callout("success", accepted_msg),
             event="project-setup:step3-complete",
             payload={
                 "projectId": project_id,
@@ -317,7 +315,7 @@ async def handle_accept_data_extract(
 
     except Exception as e:
         log.error(f"Error accepting data extract via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e))
+        return unexpected_error_response(str(e))
 
 
 async def handle_discard_data_extract(
@@ -338,7 +336,7 @@ async def handle_discard_data_extract(
         await db.commit()
         log.info(f"Discarded staged data extract for project {project_id}")
         return Response(
-            content=_callout(
+            content=callout(
                 "info",
                 _("Data extract discarded. Choose a data source above to try again."),
             ),
@@ -347,4 +345,4 @@ async def handle_discard_data_extract(
         )
     except Exception as e:
         log.error(f"Error discarding data extract via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e))
+        return unexpected_error_response(str(e))

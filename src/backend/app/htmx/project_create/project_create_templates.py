@@ -18,7 +18,7 @@ from app.db.enums import XLSFormType
 from app.htmx.htmx_schemas import XLSFormUploadData
 from app.i18n import _
 
-from ..htmx_helpers import callout as _callout
+from ..htmx_helpers import callout
 
 log = logging.getLogger(__name__)
 
@@ -116,7 +116,7 @@ async def resolve_uploaded_xlsform_bytes(
         template_bytes = await get_template_xlsform_bytes(int(template_form_id_str), db)
         if not template_bytes:
             return None, Response(
-                content=_callout("danger", _("Failed to load template form.")),
+                content=callout("danger", _("Failed to load template form.")),
                 media_type="text/html",
                 status_code=status.HTTP_404_NOT_FOUND,
             )
@@ -124,7 +124,7 @@ async def resolve_uploaded_xlsform_bytes(
 
     if not data.xlsform:
         return None, Response(
-            content=_callout("danger", _("Please select a form or upload a file.")),
+            content=callout("danger", _("Please select a form or upload a file.")),
             media_type="text/html",
             status_code=status.HTTP_400_BAD_REQUEST,
         )

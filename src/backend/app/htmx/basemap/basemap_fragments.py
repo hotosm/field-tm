@@ -7,14 +7,14 @@ from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
 from app.i18n import _
 
-from ..htmx_helpers import callout as _callout
+from ..htmx_helpers import callout
 from .basemap_formatting import basemap_metadata_url, format_bytes, format_zoom_range
 
 
 def project_not_found_response() -> Response:
     """Return a consistent 404 response when project context is missing."""
     return Response(
-        content=_callout("danger", _("Project not found or access denied.")),
+        content=callout("danger", _("Project not found or access denied.")),
         media_type="text/html",
         status_code=status.HTTP_404_NOT_FOUND,
     )
@@ -101,7 +101,7 @@ def attach_status_fragment(project: DbProject) -> Response | Template:
 
     if attach_status == "ready":
         return Response(
-            content=_callout(
+            content=callout(
                 "success", _("Basemap attached to QField project successfully.")
             ),
             media_type="text/html",
@@ -112,7 +112,7 @@ def attach_status_fragment(project: DbProject) -> Response | Template:
         return progress_fragment(project, progress_scope="attach")
 
     return Response(
-        content=_callout("neutral", _("Basemap attach has not started yet.")),
+        content=callout("neutral", _("Basemap attach has not started yet.")),
         media_type="text/html",
         status_code=status.HTTP_200_OK,
     )
@@ -121,7 +121,7 @@ def attach_status_fragment(project: DbProject) -> Response | Template:
 def search_failure_response() -> Response:
     """Return a sanitized search failure response."""
     return Response(
-        content=_callout(
+        content=callout(
             "danger",
             _("Failed to search imagery right now. Please try again shortly."),
         ),
@@ -133,7 +133,7 @@ def search_failure_response() -> Response:
 def generation_failure_response() -> Response:
     """Return a sanitized generation failure response."""
     return Response(
-        content=_callout(
+        content=callout(
             "danger",
             _(
                 "Failed to start basemap generation right now. "
@@ -148,7 +148,7 @@ def generation_failure_response() -> Response:
 def status_failure_response() -> Response:
     """Return a sanitized status failure response."""
     return Response(
-        content=_callout(
+        content=callout(
             "danger",
             _("Failed to refresh basemap status right now. Please try again shortly."),
         ),

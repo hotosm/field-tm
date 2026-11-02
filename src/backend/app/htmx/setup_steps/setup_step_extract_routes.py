@@ -25,7 +25,7 @@ from .setup_step_extract_handlers import (
     handle_upload_geojson,
 )
 from .setup_step_responses import (
-    authorized_project_or_response as _authorized_project_or_response,
+    authorized_project_or_response,
 )
 
 
@@ -73,7 +73,7 @@ async def download_osm_data_htmx(  # noqa: PLR0913, PLR0917
         media_type=RequestEncodingType.URL_ENCODED,
     ),
 ) -> Response:
-    _project, not_found_response = _authorized_project_or_response(
+    _project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
@@ -102,7 +102,7 @@ async def upload_geojson_htmx(
     data: UploadFile = Body(media_type=RequestEncodingType.MULTI_PART),
     project_id: int = Parameter(),
 ) -> Response:
-    _project, not_found_response = _authorized_project_or_response(
+    _project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
@@ -125,7 +125,7 @@ async def collect_new_data_only_htmx(
     auth_user: object,
     project_id: int = Parameter(),
 ) -> Response:
-    _project, not_found_response = _authorized_project_or_response(
+    _project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
@@ -149,7 +149,7 @@ async def submit_geojson_data_extract_htmx(
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
     project_id: int = Parameter(),
 ) -> Response:
-    _project, not_found_response = _authorized_project_or_response(
+    _project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
@@ -172,7 +172,7 @@ async def accept_data_extract_htmx(
     auth_user: object,
     project_id: int = Parameter(),
 ) -> Response:
-    _project, not_found_response = _authorized_project_or_response(
+    _project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
@@ -195,7 +195,7 @@ async def discard_data_extract_htmx(
     auth_user: object,
     project_id: int = Parameter(),
 ) -> Response:
-    _project, not_found_response = _authorized_project_or_response(
+    _project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:

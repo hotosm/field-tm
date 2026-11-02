@@ -53,15 +53,11 @@ from app.projects.project_services import (
 from app.qfield.qfield_crud import export_qfield_project_geojson
 from app.qfield.qfield_utils import strip_qfc_api_suffix
 
-from .htmx_helpers import callout as _callout
+from .htmx_helpers import callout
 from .setup_steps.setup_step_responses import (
-    authorized_project_or_response as _authorized_project_or_response,
-)
-from .setup_steps.setup_step_responses import (
-    html_error_response as _html_error_response,
-)
-from .setup_steps.setup_step_responses import (
-    hx_redirect_response as _hx_redirect_response,
+    authorized_project_or_response,
+    html_error_response,
+    hx_redirect_response,
 )
 
 log = logging.getLogger(__name__)
@@ -180,13 +176,13 @@ async def delete_project_htmx(
         ) from exc
     except DownstreamDeleteError as exc:
         return Response(
-            content=_callout("danger", exc.message),
+            content=callout("danger", exc.message),
             media_type="text/html",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
 
     await db.commit()
-    return _hx_redirect_response("/projects")
+    return hx_redirect_response("/projects")
 
 
 @get(
@@ -212,7 +208,7 @@ async def project_qrcode_htmx(
         project = await DbProject.one(db, project_id)
     except KeyError:
         return Response(
-            content=_callout("danger", _("Project not found.")),
+            content=callout("danger", _("Project not found.")),
             media_type="text/html",
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -246,7 +242,7 @@ async def project_qrcode_htmx(
     except HTTPException as e:
         error_msg = str(e.detail)
         return Response(
-            content=_callout(
+            content=callout(
                 "danger",
                 _("Error: %(error_msg)s") % {"error_msg": error_msg},
             ),
@@ -281,19 +277,19 @@ async def export_project_geojson_htmx(
     project_id: int = Parameter(),
 ) -> Response:
     """Trigger a QFieldCloud package, .gpkg --> GeoJSON, then download."""
-    project, not_found_response = _authorized_project_or_response(
+    project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
         return not_found_response
 
     if project.field_mapping_app != FieldMappingApp.QFIELD:
-        return _html_error_response(
+        return html_error_response(
             _("GeoJSON export is only available for QField projects."),
             status.HTTP_400_BAD_REQUEST,
         )
     if not project.external_project_id:
-        return _html_error_response(
+        return html_error_response(
             _("This project is not yet linked to a QFieldCloud project."),
             status.HTTP_400_BAD_REQUEST,
         )
@@ -301,10 +297,10 @@ async def export_project_geojson_htmx(
     try:
         feature_collection = await export_qfield_project_geojson(db, project)
     except HTTPException as exc:
-        return _html_error_response(str(exc.detail), exc.status_code)
+        return html_error_response(str(exc.detail), exc.status_code)
     except Exception as exc:
         log.exception("GeoJSON export failed for project %s: %s", project_id, exc)
-        return _html_error_response(
+        return html_error_response(
             _("Failed to export GeoJSON: %(error)s") % {"error": exc},
             status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

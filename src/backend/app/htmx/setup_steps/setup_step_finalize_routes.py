@@ -31,24 +31,14 @@ from app.projects.project_services import (
 from app.projects.project_services import ValidationError as SvcValidationError
 from app.qfield.qfield_schemas import QFieldCloud
 
-from ..htmx_helpers import callout as _callout
+from ..htmx_helpers import callout
 from ..setup_steps.setup_step_responses import (
-    authorized_project_or_response as _authorized_project_or_response,
-)
-from ..setup_steps.setup_step_responses import (
-    build_odk_finalize_success_html as _build_odk_finalize_success_html,
-)
-from ..setup_steps.setup_step_responses import (
-    build_qfield_finalize_success_html as _build_qfield_finalize_success_html,
-)
-from ..setup_steps.setup_step_responses import (
-    finalize_error_response as _finalize_error_response,
-)
-from ..setup_steps.setup_step_responses import (
-    html_error_response as _html_error_response,
-)
-from ..setup_steps.setup_step_responses import (
-    hx_redirect_response as _hx_redirect_response,
+    authorized_project_or_response,
+    build_odk_finalize_success_html,
+    build_qfield_finalize_success_html,
+    finalize_error_response,
+    html_error_response,
+    hx_redirect_response,
 )
 
 log = logging.getLogger(__name__)
@@ -70,7 +60,7 @@ async def create_project_htmx(
     project_id: int = Parameter(),
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
 ) -> Response:
-    project, not_found_response = _authorized_project_or_response(
+    project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
@@ -98,9 +88,9 @@ async def create_project_htmx(
 
     if project_type and not is_sync_app(project_type):
         await publish_project(db, project_id)
-        return _hx_redirect_response(f"/projects/{project_id}")
+        return hx_redirect_response(f"/projects/{project_id}")
 
-    return _html_error_response(
+    return html_error_response(
         _("Project mapping app is not configured for finalisation."),
         status.HTTP_400_BAD_REQUEST,
     )
@@ -122,7 +112,7 @@ async def create_project_odk_htmx(
     project_id: int = Parameter(),
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
 ) -> Response:
-    project, not_found_response = _authorized_project_or_response(
+    project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
@@ -143,7 +133,7 @@ async def create_project_odk_htmx(
                 "them all blank to use server defaults."
             )
             return Response(
-                content=_callout("warning", custom_creds_msg),
+                content=callout("warning", custom_creds_msg),
                 media_type="text/html",
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
@@ -159,20 +149,18 @@ async def create_project_odk_htmx(
             db=db, project_id=project_id, custom_odk_creds=custom_odk_creds
         )
 
-        return _build_odk_finalize_success_html(odk_result, project_id=project_id)
+        return build_odk_finalize_success_html(odk_result, project_id=project_id)
     except ServiceError as e:
         status_code = (
             status.HTTP_400_BAD_REQUEST
             if isinstance(e, SvcValidationError)
             else status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-        return _finalize_error_response(e.message, status_code)
+        return finalize_error_response(e.message, status_code)
     except Exception as e:
         log.error(f"Error creating ODK project via HTMX: {e}", exc_info=True)
         error_msg = str(e)
-        return _finalize_error_response(
-            error_msg, status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return finalize_error_response(error_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @post(
@@ -191,7 +179,7 @@ async def create_project_qfield_htmx(
     project_id: int = Parameter(),
     data: dict = Body(media_type=RequestEncodingType.URL_ENCODED),
 ) -> Response:
-    project, not_found_response = _authorized_project_or_response(
+    project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
@@ -215,21 +203,17 @@ async def create_project_qfield_htmx(
             db=db, project_id=project_id, custom_qfield_creds=custom_qfield_creds
         )
 
-        return _build_qfield_finalize_success_html(qfield_result, project_id=project_id)
+        return build_qfield_finalize_success_html(qfield_result, project_id=project_id)
     except SvcValidationError as e:
-        return _finalize_error_response(e.message, status.HTTP_400_BAD_REQUEST)
+        return finalize_error_response(e.message, status.HTTP_400_BAD_REQUEST)
     except ServiceError as e:
-        return _finalize_error_response(
-            e.message, status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return finalize_error_response(e.message, status.HTTP_500_INTERNAL_SERVER_ERROR)
     except HTTPException as e:
-        return _finalize_error_response(e.detail, e.status_code)
+        return finalize_error_response(e.detail, e.status_code)
     except Exception as e:
         log.error(f"Error creating QField project via HTMX: {e}", exc_info=True)
         error_msg = str(e)
-        return _finalize_error_response(
-            error_msg, status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        return finalize_error_response(error_msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 ROUTE_HANDLERS = [

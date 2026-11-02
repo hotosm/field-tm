@@ -138,7 +138,7 @@ async def test_create_simple_project_htmx_success(monkeypatch):
         fake_derive_simple_project_metadata,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._create_simple_project_stub",
+        "app.htmx.project_create.project_create_submit_routes.create_simple_project_stub",
         fake_create_project_stub,
     )
     monkeypatch.setattr(
@@ -146,11 +146,11 @@ async def test_create_simple_project_htmx_success(monkeypatch):
         update_mock,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._run_simple_project_creation_background",
+        "app.htmx.project_create.project_create_submit_routes.run_simple_project_creation_background",
         fake_run_background,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._spawn_bg_task",
+        "app.htmx.project_create.project_create_submit_routes.spawn",
         fake_create_task,
     )
 
@@ -252,11 +252,11 @@ async def test_create_simple_project_htmx_handles_conflict(monkeypatch):
         AsyncMock(),
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._run_simple_project_creation_background",
+        "app.htmx.project_create.project_create_submit_routes.run_simple_project_creation_background",
         AsyncMock(),
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._spawn_bg_task",
+        "app.htmx.project_create.project_create_submit_routes.spawn",
         lambda coro, *, name=None: (coro.close(), Mock())[1],
     )
 
@@ -314,11 +314,11 @@ async def test_create_simple_project_htmx_uses_deterministic_fallback_name(monke
         AsyncMock(),
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._run_simple_project_creation_background",
+        "app.htmx.project_create.project_create_submit_routes.run_simple_project_creation_background",
         AsyncMock(),
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_submit_routes._spawn_bg_task",
+        "app.htmx.project_create.project_create_submit_routes.spawn",
         lambda coro, *, name=None: (coro.close(), Mock())[1],
     )
 
@@ -641,7 +641,7 @@ async def test_resume_simple_project_tilepack_if_needed_updates_status(
 
     create_task_mock = Mock()
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration._spawn_bg_task",
+        "app.htmx.project_create.project_create_basemap_orchestration.spawn",
         create_task_mock,
     )
 
@@ -710,7 +710,7 @@ async def test_resume_simple_project_tilepack_if_needed_starts_attach_when_ready
         return Mock()
 
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration._spawn_bg_task",
+        "app.htmx.project_create.project_create_basemap_orchestration.spawn",
         fake_create_task,
     )
 
@@ -947,7 +947,7 @@ async def test_upload_xlsform_htmx_passes_none_default_language_when_not_explici
         captured.update(kwargs)
 
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_xlsform_routes._resolve_uploaded_xlsform_bytes",
+        "app.htmx.project_create.project_create_xlsform_routes.resolve_uploaded_xlsform_bytes",
         fake_resolve_uploaded_xlsform_bytes,
     )
     monkeypatch.setattr(
@@ -990,7 +990,7 @@ async def test_upload_xlsform_htmx_passes_selected_default_language_when_explici
         captured.update(kwargs)
 
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_xlsform_routes._resolve_uploaded_xlsform_bytes",
+        "app.htmx.project_create.project_create_xlsform_routes.resolve_uploaded_xlsform_bytes",
         fake_resolve_uploaded_xlsform_bytes,
     )
     monkeypatch.setattr(

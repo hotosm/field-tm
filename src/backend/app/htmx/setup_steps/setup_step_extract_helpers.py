@@ -10,7 +10,7 @@ from psycopg import AsyncConnection
 from app.db.models import DbProject
 from app.i18n import _
 
-from ..htmx_helpers import callout as _callout
+from ..htmx_helpers import callout
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ async def get_submitted_geojson_data(
     except json.JSONDecodeError as exc:
         log.error("Failed to parse GeoJSON from request: %s", exc)
         return None, Response(
-            content=_callout(
+            content=callout(
                 "danger",
                 _("Invalid GeoJSON data in request. Please try uploading again."),
             ),
@@ -47,7 +47,7 @@ async def get_submitted_geojson_data(
     except (TypeError, KeyError) as exc:
         log.error("Error accessing geojson-data from request: %s", exc)
         return None, Response(
-            content=_callout("danger", _("Error reading GeoJSON data from request.")),
+            content=callout("danger", _("Error reading GeoJSON data from request.")),
             media_type="text/html",
             status_code=status.HTTP_400_BAD_REQUEST,
         )
