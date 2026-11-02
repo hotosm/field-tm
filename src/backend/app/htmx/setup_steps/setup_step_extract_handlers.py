@@ -92,7 +92,7 @@ async def handle_download_osm_data(
         return _service_error_response(e)
     except Exception as e:
         log.error(f"Error downloading OSM data via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)
+        return _unexpected_error_response(str(e))
 
 
 async def handle_upload_geojson(
@@ -166,7 +166,7 @@ async def handle_upload_geojson(
         return _service_error_response(e)
     except Exception as e:
         log.error(f"Error uploading GeoJSON via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)
+        return _unexpected_error_response(str(e))
 
 
 async def handle_collect_new_data_only(
@@ -197,7 +197,7 @@ async def handle_collect_new_data_only(
         )
     except Exception as e:
         log.error(f"Error enabling collect-new-data mode via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)
+        return _unexpected_error_response(str(e))
 
 
 async def handle_submit_geojson_data_extract(
@@ -260,7 +260,7 @@ async def handle_submit_geojson_data_extract(
             f"Error submitting GeoJSON data extract via HTMX: {e}",
             exc_info=True,
         )
-        return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)
+        return _unexpected_error_response(str(e))
 
 
 async def handle_accept_data_extract(
@@ -317,7 +317,7 @@ async def handle_accept_data_extract(
 
     except Exception as e:
         log.error(f"Error accepting data extract via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)
+        return _unexpected_error_response(str(e))
 
 
 async def handle_discard_data_extract(
@@ -347,4 +347,4 @@ async def handle_discard_data_extract(
         )
     except Exception as e:
         log.error(f"Error discarding data extract via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)
+        return _unexpected_error_response(str(e))

@@ -28,7 +28,7 @@ from psycopg import AsyncConnection
 
 from app.auth.auth_deps import get_optional_auth_user
 from app.db.database import db_conn
-from app.htmx.project_list_routes import _create_project_href
+from app.htmx.project_list_routes import create_project_href
 
 
 def _safe_return_path(return_to: str | None, host: str | None) -> str:
@@ -78,7 +78,7 @@ async def landing(
     """Render public landing page."""
     return HTMXTemplate(
         template_name="landing.html",
-        context={"create_project_href": _create_project_href(auth_user)},
+        context={"create_project_href": create_project_href(auth_user)},
     )
 
 

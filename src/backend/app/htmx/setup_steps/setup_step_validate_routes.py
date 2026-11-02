@@ -31,9 +31,6 @@ from app.i18n import _
 from ..setup_steps.setup_step_responses import (
     json_error_response as _json_error_response,
 )
-from ..setup_steps.setup_step_responses import (
-    unexpected_error_message as _unexpected_error_message,
-)
 
 log = logging.getLogger(__name__)
 
@@ -184,7 +181,7 @@ async def validate_geojson(
         return _json_error_response(str(e), 422)
     except Exception as e:
         log.error(f"Error validating GeoJSON: {e}", exc_info=True)
-        error_msg = str(e) if hasattr(e, "__str__") else _unexpected_error_message()
+        error_msg = str(e)
         return _json_error_response(error_msg, 500)
 
 

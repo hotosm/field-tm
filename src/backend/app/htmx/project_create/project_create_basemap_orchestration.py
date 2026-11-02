@@ -14,6 +14,7 @@ from app.helpers.basemap_services import (
     search_oam_imagery,
     trigger_tilepack_generation,
 )
+from app.helpers.geometry_utils import outline_bbox
 from app.htmx.basemap.basemap_attach_flow import run_basemap_attach_background
 from app.projects import project_schemas
 
@@ -106,9 +107,7 @@ def basemap_autostart_skipped(project: DbProject | None) -> bool:
 
 async def select_simple_project_basemap(outline: dict) -> dict | None:
     """Pick the best available imagery candidate for a simple-project outline."""
-    from app.qfield.qfield_crud import _outline_to_bbox_str
-
-    bbox = [float(v) for v in _outline_to_bbox_str(outline).split(",")]
+    bbox = [float(v) for v in outline_bbox(outline)]
     items = await search_oam_imagery(bbox)
     if not items:
         return None

@@ -26,6 +26,8 @@ from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from psycopg import AsyncConnection, Connection
 
+from app.i18n import _
+
 log = logging.getLogger(__name__)
 
 MIN_LONGITUDE = -180
@@ -40,6 +42,70 @@ POLYGON_AREA_EPSILON = 1e-10
 # Project area limits (km²)
 AREA_WARN_KM2 = 100
 AREA_LIMIT_KM2 = 1000
+
+
+_COORD_NESTING = {
+    "Point": 0,
+    "LineString": 1,
+    "MultiPoint": 1,
+    "Polygon": 2,
+    "MultiLineString": 2,
+    "MultiPolygon": 3,
+}
+
+
+def _flatten_geom_coords(geom: dict) -> list:
+    """Flatten all coordinates in a GeoJSON geometry to a list of [lon, lat] pairs."""
+    geom_type = geom.get("type", "")
+    if geom_type == "GeometryCollection":
+        return [
+            c for sub in geom.get("geometries", []) for c in _flatten_geom_coords(sub)
+        ]
+    if geom_type not in _COORD_NESTING:
+        return []
+    coords = [geom.get("coordinates", [])]
+    for _level in range(_COORD_NESTING[geom_type]):
+        coords = [c for part in coords for c in part]
+    return coords
+
+
+def outline_bbox(outline: dict) -> tuple[float, float, float, float]:
+    """Compute the bbox (xmin, ymin, xmax, ymax) of a project outline.
+
+    The outline may be a raw GeoJSON geometry, a Feature, or a FeatureCollection.
+    """
+    geometry = extract_geometry(outline)
+    if not geometry:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=_("Project outline is missing or has no geometry."),
+        )
+    coords = _flatten_geom_coords(geometry)
+    if not coords:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=_("Project outline geometry has no coordinates."),
+        )
+    lons = [c[0] for c in coords]
+    lats = [c[1] for c in coords]
+    return min(lons), min(lats), max(lons), max(lats)
+
+
+def extract_geometry(geojson_obj: dict) -> Optional[dict]:
+    """Extract the geometry dict from a GeoJSON object of any type."""
+    if not geojson_obj or not isinstance(geojson_obj, dict):
+        return None
+    obj_type = geojson_obj.get("type", "")
+    if obj_type == "FeatureCollection":
+        features = geojson_obj.get("features", [])
+        if features and isinstance(features[0], dict):
+            return features[0].get("geometry", features[0])
+        return None
+    if obj_type == "Feature":
+        return geojson_obj.get("geometry")
+    if "coordinates" in geojson_obj:
+        return geojson_obj
+    return None
 
 
 async def geojson_area_km2(db: AsyncConnection, geojson_geom: dict) -> float:

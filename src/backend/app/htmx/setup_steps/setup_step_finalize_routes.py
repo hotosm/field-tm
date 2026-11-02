@@ -169,7 +169,7 @@ async def create_project_odk_htmx(
         return _finalize_error_response(e.message, status_code)
     except Exception as e:
         log.error(f"Error creating ODK project via HTMX: {e}", exc_info=True)
-        error_msg = str(e) if hasattr(e, "__str__") else e
+        error_msg = str(e)
         return _finalize_error_response(
             error_msg, status.HTTP_500_INTERNAL_SERVER_ERROR
         )
@@ -226,7 +226,7 @@ async def create_project_qfield_htmx(
         return _finalize_error_response(e.detail, e.status_code)
     except Exception as e:
         log.error(f"Error creating QField project via HTMX: {e}", exc_info=True)
-        error_msg = str(e) if hasattr(e, "__str__") else e
+        error_msg = str(e)
         return _finalize_error_response(
             error_msg, status.HTTP_500_INTERNAL_SERVER_ERROR
         )

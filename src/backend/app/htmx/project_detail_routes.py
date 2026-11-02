@@ -244,7 +244,7 @@ async def project_qrcode_htmx(
         )
 
     except HTTPException as e:
-        error_msg = str(e.detail) if hasattr(e, "detail") else str(e)
+        error_msg = str(e.detail)
         return Response(
             content=_callout(
                 "danger",

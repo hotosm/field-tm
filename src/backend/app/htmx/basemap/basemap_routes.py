@@ -40,9 +40,9 @@ from app.helpers.basemap_services import (
     search_oam_imagery,
     trigger_tilepack_generation,
 )
+from app.helpers.geometry_utils import outline_bbox
 from app.i18n import _
 from app.projects.project_schemas import ProjectUpdate
-from app.qfield.qfield_crud import _outline_to_bbox_str
 
 from ..htmx_helpers import callout as _callout
 from .basemap_attach_flow import (
@@ -117,7 +117,7 @@ async def basemap_search_htmx(
         )
 
     try:
-        bbox = [float(v) for v in _outline_to_bbox_str(project.outline).split(",")]
+        bbox = [float(v) for v in outline_bbox(project.outline)]
         items = await search_oam_imagery(bbox)
         await DbProject.update(
             db,

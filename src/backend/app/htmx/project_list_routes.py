@@ -41,7 +41,7 @@ PROJECT_SORT_OPTIONS = {
 }
 
 
-def _create_project_href(auth_user: object | None) -> str:
+def create_project_href(auth_user: object | None) -> str:
     """Return the correct create-project target for the current auth state."""
     if settings.AUTH_PROVIDER == AuthProvider.DISABLED or auth_user is not None:
         return "/new"
@@ -114,6 +114,6 @@ async def project_listing(
             "selected_status": selected_status.value if selected_status else "",
             "search_query": search_query,
             "selected_sort": selected_sort,
-            "create_project_href": _create_project_href(auth_user),
+            "create_project_href": create_project_href(auth_user),
         },
     )

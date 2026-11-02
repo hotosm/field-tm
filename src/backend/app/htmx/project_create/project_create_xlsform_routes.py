@@ -142,7 +142,7 @@ async def upload_xlsform_htmx(
         return _service_error_response(e)
     except Exception as e:
         log.error(f"Error uploading XLSForm via HTMX: {e}", exc_info=True)
-        return _unexpected_error_response(str(e) if hasattr(e, "__str__") else None)
+        return _unexpected_error_response(str(e))
 
 
 ROUTE_HANDLERS = [

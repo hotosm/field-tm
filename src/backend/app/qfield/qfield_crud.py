@@ -50,7 +50,11 @@ from qfieldcloud_sdk.sdk import (
 
 from app.config import decrypt_value, encrypt_value, settings
 from app.db.models import DbProject
-from app.helpers.geometry_utils import stamp_missing_task_ids
+from app.helpers.geometry_utils import (
+    extract_geometry,
+    outline_bbox,
+    stamp_missing_task_ids,
+)
 from app.i18n import _
 from app.projects.project_schemas import ProjectUpdate
 from app.qfield.qfield_deps import qfield_client
@@ -115,73 +119,6 @@ def _build_qfield_plugin_zip_b64() -> Optional[str]:
         len(_qfield_plugin_zip_b64),
     )
     return _qfield_plugin_zip_b64
-
-
-# Geometry helpers
-
-
-_COORD_NESTING = {
-    "Point": 0,
-    "LineString": 1,
-    "MultiPoint": 1,
-    "Polygon": 2,
-    "MultiLineString": 2,
-    "MultiPolygon": 3,
-}
-
-
-def _flatten_geom_coords(geom: dict) -> list:
-    """Flatten all coordinates in a GeoJSON geometry to a list of [lon, lat] pairs."""
-    geom_type = geom.get("type", "")
-    if geom_type == "GeometryCollection":
-        return [
-            c for sub in geom.get("geometries", []) for c in _flatten_geom_coords(sub)
-        ]
-    if geom_type not in _COORD_NESTING:
-        return []
-    coords = [geom.get("coordinates", [])]
-    for _level in range(_COORD_NESTING[geom_type]):
-        coords = [c for part in coords for c in part]
-    return coords
-
-
-def _outline_to_bbox_str(outline: dict) -> str:
-    """Compute a comma-separated bbox string (xmin,ymin,xmax,ymax) from outline.
-
-    The outline may be a raw GeoJSON geometry, a Feature, or a FeatureCollection.
-    """
-    geometry = _extract_geometry(outline)
-    if not geometry:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("Project outline is missing or has no geometry."),
-        )
-    coords = _flatten_geom_coords(geometry)
-    if not coords:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("Project outline geometry has no coordinates."),
-        )
-    lons = [c[0] for c in coords]
-    lats = [c[1] for c in coords]
-    return f"{min(lons)},{min(lats)},{max(lons)},{max(lats)}"
-
-
-def _extract_geometry(geojson_obj: dict) -> Optional[dict]:
-    """Extract the geometry dict from a GeoJSON object of any type."""
-    if not geojson_obj or not isinstance(geojson_obj, dict):
-        return None
-    obj_type = geojson_obj.get("type", "")
-    if obj_type == "FeatureCollection":
-        features = geojson_obj.get("features", [])
-        if features and isinstance(features[0], dict):
-            return features[0].get("geometry", features[0])
-        return None
-    if obj_type == "Feature":
-        return geojson_obj.get("geometry")
-    if "coordinates" in geojson_obj:
-        return geojson_obj
-    return None
 
 
 def _dominant_geom_type(data_extract: Optional[dict]) -> DbGeomType:
@@ -288,7 +225,7 @@ def _build_tasks_geojson(project: DbProject) -> dict:
         # Stored ids are authoritative; stamping covers legacy rows in memory.
         features = stamp_missing_task_ids(task_areas)["features"]
     else:
-        geometry = _extract_geometry(project.outline)
+        geometry = extract_geometry(project.outline)
         if not geometry:
             return {"type": "FeatureCollection", "features": []}
         features = [{"type": "Feature", "geometry": geometry, "properties": {}}]
@@ -352,11 +289,6 @@ def _should_open_in_edit_mode(data_extract: Optional[dict]) -> bool:
     return not isinstance(features, list) or len(features) == 0
 
 
-def _resolve_backend_qfc_url(url: str) -> str:
-    """Use the internal QFieldCloud URL for browser-facing *.localhost hosts."""
-    return resolve_backend_qfc_url(url)
-
-
 def _resolve_project_qfield_credentials(project: DbProject) -> QFieldCloud | None:
     """Return stored project credentials, or None to use deployment defaults."""
     if not all(
@@ -378,7 +310,7 @@ def _resolve_project_qfield_credentials(project: DbProject) -> QFieldCloud | Non
         )
         return None
 
-    backend_url = _resolve_backend_qfc_url(project.external_project_instance_url)
+    backend_url = resolve_backend_qfc_url(project.external_project_instance_url)
 
     return QFieldCloud(
         qfield_cloud_url=backend_url,
@@ -438,7 +370,7 @@ async def _generate_qgis_project(
             description=project.description or "Created by the Field Tasking Manager",
             author=project.created_by_sub or "Field Tasking Manager",
             language=form_language,
-            extent=_outline_to_bbox_str(project.outline),
+            extent=",".join(str(v) for v in outline_bbox(project.outline)),
             open_in_edit_mode=_should_open_in_edit_mode(project.data_extract_geojson),
         )
 

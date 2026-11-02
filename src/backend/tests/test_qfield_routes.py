@@ -29,7 +29,6 @@ import pytest
 from app.qfield import qfield_crud
 from app.qfield.qfield_crud import (
     _build_tasks_geojson,
-    _resolve_backend_qfc_url,
     _resolve_qfield_project_url,
     _sanitize_qfc_project_name,
     _should_open_in_edit_mode,
@@ -38,7 +37,7 @@ from app.qfield.qfield_crud import (
 )
 from app.qfield.qfield_routes import qfield_router
 from app.qfield.qfield_schemas import QFieldCloud
-from app.qfield.qfield_utils import normalise_qfc_url
+from app.qfield.qfield_utils import normalise_qfc_url, resolve_backend_qfc_url
 
 
 async def test_qfield_creds_test_invalid_credentials_returns_400(client):
@@ -230,7 +229,7 @@ def test_resolve_backend_qfc_url_prefers_internal_url_for_local_public_hostname(
         "http://qfield-app:8000",
     )
 
-    resolved = _resolve_backend_qfc_url("http://qfield.field.localhost:7050")
+    resolved = resolve_backend_qfc_url("http://qfield.field.localhost:7050")
 
     assert resolved == "http://qfield-app:8000/api/v1/"
 
@@ -242,7 +241,7 @@ def test_resolve_backend_qfc_url_prefers_internal_for_dev_test_hostname(monkeypa
         "http://qfield-app:8000/api/v1/",
     )
 
-    resolved = _resolve_backend_qfc_url("https://qfield.field-tm.dev.test")
+    resolved = resolve_backend_qfc_url("https://qfield.field-tm.dev.test")
 
     assert resolved == "http://qfield-app:8000/api/v1/"
 
@@ -254,7 +253,7 @@ def test_resolve_backend_qfc_url_keeps_remote_custom_url(monkeypatch):
         "http://qfield-app:8000/api/v1/",
     )
 
-    resolved = _resolve_backend_qfc_url("https://app.qfield.cloud")
+    resolved = resolve_backend_qfc_url("https://app.qfield.cloud")
 
     assert resolved == "https://app.qfield.cloud/api/v1/"
 
