@@ -103,11 +103,12 @@ See a detailed guide on documentation contributions
 - Markdown files are formatted using `markdownlint`.
 - Raq SQL is formatted using `sqlfluff`.
 
-Please install the pre-commit hooks before contributing:
+Please install the hooks with [prek][11] (a drop-in pre-commit replacement)
+before contributing:
 
 ```bash
-pip install pre-commit
-pre-commit install
+uv tool install prek
+prek install
 ```
 
 ### How We Handle Contributions
@@ -159,3 +160,4 @@ please visit [this page](https://docs.hotosm.org/dev-practices)
 [8]: https://docs.hotosm.org/dev-guide/repo-management/git/#git-flow "Git Flow"
 [9]: https://slack.hotosm.org "HOT Slack"
 [10]: mailto:sysadmin@hotosm.org "Sysadmin email"
+[11]: https://github.com/j178/prek "prek"

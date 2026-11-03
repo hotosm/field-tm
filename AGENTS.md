@@ -15,7 +15,7 @@ projects via a web UI. The backend handles task splitting, ODK/QFieldCloud
 integration, data conflation, and submission tracking.
 
 **Stack:** Python 3.13 / LiteStar / HTMX / PostgreSQL 18 + PostGIS 3.6 /
-Docker Compose (dev + prod) / Helm (k8s) / uv / Ruff / pre-commit
+Docker Compose (dev + prod) / Helm (k8s) / uv / Ruff / prek (pre-commit hooks)
 
 ---
 
@@ -45,7 +45,7 @@ chart/                   # Helm chart
 ```bash
 just test backend-routes                   # app tests
 just test backend                          # all tests (inc. packages)
-just lint                                  # pre-commit hooks
+just lint                                  # pre-commit hooks (via prek)
 just start dev                             # core docker stack (dev-full: + ODK, QField)
 just start backend-no-docker               # backend only (no docker)
 just test backend                          # docker test stack

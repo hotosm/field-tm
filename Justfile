@@ -58,11 +58,11 @@ chart *args:
 clean:
   {{docker}} compose --profile "*" down -v
 
-# Run pre-commit hooks
+# Run pre-commit hooks (via prek)
 lint:
   #!/usr/bin/env sh
   cd {{justfile_directory()}}/src/backend
-  uv run pre-commit run --all-files
+  uvx prek run --all-files
 
 # Increment field-tm
 bump:
