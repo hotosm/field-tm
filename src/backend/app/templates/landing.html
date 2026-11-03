@@ -365,6 +365,31 @@ extra_head %}
     line-height: 1.5;
   }
 
+  .landing-community {
+    margin-bottom: 68px;
+    padding: 40px 36px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, var(--landing-brand-red) 0%, var(--hot-color-red-800) 100%);
+    color: white;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .landing-community h2 {
+    margin: 0 0 10px 0;
+    font-size: clamp(1.5rem, 2.8vw, 2.35rem);
+  }
+
+  .landing-community p {
+    margin: 0;
+    max-width: 640px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.92);
+  }
+
   @keyframes landing-fade-up {
     from {
       opacity: 0;
@@ -616,6 +641,25 @@ extra_head %}
         </p>
       </a>
     </div>
+  </section>
+
+  <section class="landing-shell landing-community">
+    <div>
+      <h2>{{ _("Join the Community") }}</h2>
+      <p>
+        {{ _("Field-TM is built in the open with mappers, developers and partners around the world.
+        Come and say hello on the HOTOSM Slack.") }}
+      </p>
+    </div>
+    <wa-button
+      href="https://slack.hotosm.org"
+      target="_blank"
+      rel="noopener"
+      variant="neutral"
+      appearance="filled"
+      size="l"
+      >{{ _("Join the Community") }}</wa-button
+    >
   </section>
 </div>
 {% endblock %}
