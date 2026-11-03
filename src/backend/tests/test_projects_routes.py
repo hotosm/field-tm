@@ -28,12 +28,13 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import httpx
 import pytest
-from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 
 from app.central.central_crud import create_odk_project
 from app.central.central_schemas import ODKCentral
 from app.db.enums import FieldMappingApp, ProjectStatus
+from app.errors import (
+    UpstreamError,
+)
 from app.helpers.geometry_utils import check_crs, featcol_polygons_to_centroids
 from app.projects import project_crud, project_services
 from app.projects.project_schemas import ProjectUpdate
@@ -336,10 +337,7 @@ async def test_download_osm_data_maps_extract_generation_failure(monkeypatch):
         )
 
     async def fake_generate_data_extract(*_args, **_kwargs):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Failed to generate data extract from the raw data API.",
-        )
+        raise UpstreamError("Failed to generate data extract from the raw data API.")
 
     monkeypatch.setattr(
         project_services.project_deps,

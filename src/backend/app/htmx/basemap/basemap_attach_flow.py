@@ -5,7 +5,6 @@ import logging
 from datetime import datetime, timezone
 
 from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 from litestar.response import Response, Template
 from psycopg import AsyncConnection
 
@@ -52,11 +51,6 @@ def is_transient_attach_exception(exc: Exception) -> bool:
         visited.add(id(current))
         if contains_transient_attach_fragment(str(current)):
             return True
-
-        if isinstance(current, HTTPException):
-            detail = current.detail if isinstance(current.detail, str) else ""
-            if contains_transient_attach_fragment(detail):
-                return True
 
         current = next_exception(current)
 

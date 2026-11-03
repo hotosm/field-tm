@@ -29,8 +29,6 @@ from pathlib import Path
 from traceback import format_exc
 from typing import Optional
 
-from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 from osm_data_client import (
     RawDataClient,
     RawDataClientConfig,
@@ -49,6 +47,12 @@ from app.db.models import (
 )
 from app.db.postgis_utils import (
     split_geojson_by_task_areas,
+)
+from app.errors import (
+    ServiceError,
+    UnprocessableError,
+    UpstreamError,
+    ValidationError,
 )
 from app.helpers.geometry_utils import (
     get_featcol_dominant_geom_type,
@@ -71,15 +75,12 @@ async def generate_data_extract(
     """Request an OSM extract and return its download URL.
 
     geom_types selects raw-data-api tables via point, line, and polygon;
-    multiple types union their results. Raises HTTPException on invalid
+    multiple types union their results. Raises ServiceError on invalid
     parameters or extraction failure.
     """
     if not config_json:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=(
-                "To generate a new data extract a extract_config must be specified."
-            ),
+        raise ValidationError(
+            "To generate a new data extract a extract_config must be specified."
         )
     config = RawDataClientConfig(
         access_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
@@ -121,14 +122,10 @@ async def generate_data_extract(
                     "Please select an area smaller than 200 km²."
                 )
 
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=msg,
-            ) from e
+            raise UnprocessableError(msg) from e
 
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=_("Failed to generate data extract from the raw data API."),
+        raise UpstreamError(
+            _("Failed to generate data extract from the raw data API.")
         ) from e
 
 
@@ -489,10 +486,7 @@ async def _resolve_project_form_upload(
     if not project.xlsform_content:
         msg = f"No XLSForm content found for project ({project.id})"
         log.error(msg)
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=msg,
-        )
+        raise UnprocessableError(msg)
 
     xlsform_bytes = BytesIO(project.xlsform_content)
     project_odk_form_id, _ = await central_crud.append_fields_to_user_xlsform(
@@ -687,10 +681,7 @@ def _odk_qr_data(
 def _qfield_qr_data(project: DbProject) -> str:
     """Build the QField project QR payload."""
     if not project.external_project_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=_("QField project ID not found."),
-        )
+        raise ValidationError(_("QField project ID not found."))
 
     return f"qfield://cloud?project={project.external_project_id}"
 
@@ -702,31 +693,22 @@ async def get_project_qr_data(
 ) -> str:
     """Return the published project's QR payload for the browser to render.
 
-    Raises HTTPException if the project or required data is missing.
+    Raises ServiceError if the project or required data is missing.
     """
     project = await project_deps.get_project_by_id(db, project_id)
 
     if not project.project_name:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=_("Project name not found."),
-        )
+        raise ValidationError(_("Project name not found."))
 
     if project.field_mapping_app == FieldMappingApp.ODK:
         if not project.external_project_id:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=_("ODK project ID not found."),
-            )
+            raise ValidationError(_("ODK project ID not found."))
 
         odk_central = _project_odk_qr_credentials(project)
         appuser_token = await _get_or_create_appuser_token(project, odk_central)
 
         if not appuser_token:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=_("Appuser token not found."),
-            )
+            raise ValidationError(_("Appuser token not found."))
 
         qr_data = _odk_qr_data(
             project,
@@ -740,9 +722,6 @@ async def get_project_qr_data(
         qr_data = None
 
     if not qr_data:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("Failed to generate QR code."),
-        )
+        raise ServiceError(_("Failed to generate QR code."))
 
     return qr_data

@@ -18,9 +18,11 @@ from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import project_manager
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp, ProjectStatus
+from app.errors import (
+    ServiceError,
+)
 from app.i18n import _
 from app.projects.project_services import (
-    ServiceError,
     resync_tasks,
     save_task_areas,
     tasks_geometry_changed,

@@ -11,7 +11,6 @@ from litestar import get, post
 from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
-from litestar.exceptions import HTTPException
 from litestar.params import Body
 from litestar.plugins.htmx import HTMXRequest
 from litestar.response import Response
@@ -20,6 +19,9 @@ from psycopg import AsyncConnection
 from app.auth.auth_deps import login_required
 from app.config import settings
 from app.db.database import db_conn
+from app.errors import (
+    ServiceError,
+)
 from app.helpers.geometry_utils import (
     AREA_LIMIT_KM2,
     AREA_WARN_KM2,
@@ -175,8 +177,8 @@ async def validate_geojson(
             status_code=200,
         )
 
-    except HTTPException as e:
-        return json_error_response(str(e.detail), e.status_code)
+    except ServiceError as e:
+        return json_error_response(e.message, e.status_code)
     except ValueError as e:
         return json_error_response(str(e), 422)
     except Exception as e:

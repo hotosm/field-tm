@@ -13,13 +13,18 @@ from app.auth.auth_deps import get_user_sub
 from app.config import settings
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
+from app.errors import (
+    ConflictError,
+    ServiceError,
+)
+from app.errors import (
+    ValidationError as SvcValidationError,
+)
 from app.helpers.background_tasks import spawn
 from app.i18n import _
 from app.projects import project_schemas
 from app.projects.project_crud import claim_simple_project_basemap_generation
 from app.projects.project_services import (
-    ConflictError,
-    ServiceError,
     create_project_stub,
     download_osm_data,
     finalize_qfield_project,
@@ -28,7 +33,6 @@ from app.projects.project_services import (
     save_task_areas,
     split_aoi,
 )
-from app.projects.project_services import ValidationError as SvcValidationError
 
 from .project_create_basemap_orchestration import (
     autostart_basemap_for_simple_project,
@@ -305,7 +309,7 @@ async def run_simple_project_creation_background(
             )
             await db.commit()
             return
-    except (SvcValidationError, ConflictError, ServiceError) as exc:
+    except ServiceError as exc:
         error_message = exc.message
     except Exception:
         log.exception("Unexpected error finalizing simple project %s", project_id)

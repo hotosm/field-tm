@@ -6,9 +6,14 @@ import unicodedata
 
 from psycopg import AsyncConnection
 
+from app.errors import (
+    ValidationError,
+)
 from app.helpers.geometry_utils import stamp_missing_task_ids
 from app.i18n import _
-from app.projects.project_services import ValidationError, save_task_areas
+from app.projects.project_services import (
+    save_task_areas,
+)
 
 MAX_TASKS = 5000
 MAX_NAME_LENGTH = 100

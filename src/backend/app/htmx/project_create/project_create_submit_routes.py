@@ -18,16 +18,20 @@ from psycopg import AsyncConnection
 from app.auth.auth_deps import get_user_sub, login_required
 from app.db.database import db_conn
 from app.db.models import DbProject
+from app.errors import (
+    ConflictError,
+    ServiceError,
+)
+from app.errors import (
+    ValidationError as SvcValidationError,
+)
 from app.helpers.background_tasks import spawn
 from app.i18n import _, get_current_locale
 from app.projects import project_schemas
 from app.projects.project_services import (
-    ConflictError,
-    ServiceError,
     create_project_stub,
     derive_simple_project_metadata,
 )
-from app.projects.project_services import ValidationError as SvcValidationError
 
 from ..setup_steps.setup_step_responses import (
     hx_redirect_response,

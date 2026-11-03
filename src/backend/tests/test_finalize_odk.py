@@ -18,11 +18,13 @@ import pytest
 from app.central import central_crud
 from app.central.central_schemas import ODKCentral
 from app.db.models import DbProject
+from app.errors import (
+    ServiceError,
+    ValidationError,
+)
 from app.projects import project_services
 from app.projects.project_services import (
     ODKFinalizeResult,
-    ServiceError,
-    ValidationError,
     _build_feature_dataset_payload,
     _build_task_entities,
     derive_simple_project_metadata,

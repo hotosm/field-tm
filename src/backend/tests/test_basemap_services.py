@@ -7,8 +7,8 @@ from unittest.mock import Mock
 import httpx
 import pytest
 from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 
+from app.errors import UpstreamError
 from app.helpers import basemap_services
 
 
@@ -233,7 +233,7 @@ def test_parse_tilepack_status_200_with_url_is_ready():
 
 def test_parse_tilepack_status_raises_for_upstream_http_failure():
     """Tilepack parsing should map upstream HTTP failures to a gateway error."""
-    with pytest.raises(HTTPException) as exc:
+    with pytest.raises(UpstreamError) as exc:
         basemap_services._parse_tilepack_status(500, {"status": "failed"})
 
     assert exc.value.status_code == status.HTTP_502_BAD_GATEWAY
@@ -317,7 +317,7 @@ async def test_search_oam_imagery_maps_http_status_error(monkeypatch):
         lambda **_kwargs: _DummyAsyncClient(response=response),
     )
 
-    with pytest.raises(HTTPException) as exc:
+    with pytest.raises(UpstreamError) as exc:
         await basemap_services.search_oam_imagery([85.0, 27.0, 86.0, 28.0])
 
     assert exc.value.status_code == status.HTTP_502_BAD_GATEWAY
@@ -331,7 +331,7 @@ async def test_search_oam_imagery_maps_transport_error(monkeypatch):
         lambda **_kwargs: _DummyAsyncClient(post_exc=httpx.ConnectError("boom")),
     )
 
-    with pytest.raises(HTTPException) as exc:
+    with pytest.raises(UpstreamError) as exc:
         await basemap_services.search_oam_imagery([85.0, 27.0, 86.0, 28.0])
 
     assert exc.value.status_code == status.HTTP_502_BAD_GATEWAY
@@ -418,7 +418,7 @@ async def test_check_tilepack_status_raises_on_upstream_4xx(monkeypatch):
         lambda **_kwargs: _DummyAsyncClient(response=response),
     )
 
-    with pytest.raises(HTTPException) as exc:
+    with pytest.raises(UpstreamError) as exc:
         await basemap_services.check_tilepack_status("item")
 
     assert exc.value.status_code == status.HTTP_502_BAD_GATEWAY

@@ -8,10 +8,12 @@ from litestar import status_codes as status
 
 from app.config import settings
 from app.db.models import DbProject
+from app.errors import (
+    ValidationError,
+)
 from app.projects import task_plan
 from app.projects.mapping_apps import FieldMappingApp, recommend_apps
 from app.projects.project_services import (
-    ValidationError,
     tasks_geometry_changed,
     tasks_geometry_hash,
 )

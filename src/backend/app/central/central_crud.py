@@ -29,7 +29,6 @@ from uuid import uuid4
 
 import pandas as pd
 from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
 from psycopg import AsyncConnection
 from pyodk.errors import PyODKError
@@ -40,6 +39,11 @@ from app.central import central_deps, central_schemas
 from app.config import settings
 from app.db.enums import DbGeomType
 from app.db.models import DbTemplateXLSForm
+from app.errors import (
+    ServiceError,
+    UnprocessableError,
+    ValidationError,
+)
 from app.helpers.geometry_utils import (
     geojson_to_javarosa_geom,
 )
@@ -149,10 +153,7 @@ async def create_odk_project(
             response = client.session.post("projects", json={"name": project_name})
             if not response.ok:
                 detail = response.text or "Could not authenticate to ODK Central."
-                raise HTTPException(
-                    status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=detail,
-                )
+                raise ServiceError(detail)
             result = response.json()
 
         log.debug(f"ODK Central response: {result}")
@@ -160,9 +161,8 @@ async def create_odk_project(
         return result
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("Error creating project on ODK Central: %(error)s") % {"error": e},
+        raise ServiceError(
+            _("Error creating project on ODK Central: %(error)s") % {"error": e}
         ) from e
 
 
@@ -213,12 +213,8 @@ async def create_odk_xform(
                 raise
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
-        raise HTTPException(
-            status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={
-                "message": _("Failed to upload form to ODK Central: %(error)s")
-                % {"error": e}
-            },
+        raise ServiceError(
+            _("Failed to upload form to ODK Central: %(error)s") % {"error": e}
         ) from e
 
 
@@ -228,10 +224,7 @@ async def get_form_list(db: AsyncConnection) -> list:
         return await DbTemplateXLSForm.all(db)
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e),
-        ) from e
+        raise ServiceError(str(e)) from e
 
 
 # Lists Field-TM injects during the merge - users don't have to define
@@ -261,16 +254,15 @@ def _missing_choice_lists(
 def _validate_user_xlsform_choices(xlsform: BytesIO) -> None:
     """Reject select_one/select_multiple references missing from the choices sheet.
 
-    Raises HTTPException(422) with the original survey row numbers. Skips
+    Raises UnprocessableError with the original survey row numbers. Skips
     select_one_from_file (CSV references) and rewinds xlsform before returning.
     """
     try:
         xlsform.seek(0)
         sheets = pd.read_excel(xlsform, sheet_name=None, engine="calamine")
     except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("Could not read XLSForm file: %(error)s") % {"error": exc},
+        raise UnprocessableError(
+            _("Could not read XLSForm file: %(error)s") % {"error": exc}
         ) from exc
     finally:
         xlsform.seek(0)
@@ -293,14 +285,13 @@ def _validate_user_xlsform_choices(xlsform: BytesIO) -> None:
         return
 
     parts = ", ".join(f"row {row} references list '{name}'" for row, name in invalid)
-    raise HTTPException(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        detail=_(
+    raise UnprocessableError(
+        _(
             "XLSForm has select questions referencing lists that aren't "
             "defined in the choices sheet: %(rows)s. Check your survey "
             "and choices sheets."
         )
-        % {"rows": parts},
+        % {"rows": parts}
     )
 
 
@@ -316,10 +307,7 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
     except Exception as e:
         log.exception(f"Error: {e}", stack_info=True)
         msg = _("XLSForm is invalid: %(error)s") % {"error": e}
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=msg,
-        ) from e
+        raise UnprocessableError(msg) from e
 
 
 async def append_fields_to_user_xlsform(
@@ -710,9 +698,8 @@ async def create_entity_list(  # noqa: PLR0913
     With `delete_missing`, entities not in `entities_list` are deleted.
     """
     if odk_id is None:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=_("ODK project_id is missing; cannot create/merge entity lists."),
+        raise ValidationError(
+            _("ODK project_id is missing; cannot create/merge entity lists.")
         )
 
     properties = central_schemas.entity_fields_to_list(properties)
@@ -753,10 +740,7 @@ async def get_appuser_token(
 
             if not appuser_token or not appuser_sub:
                 msg = _("Could not generate token for app user.")
-                raise HTTPException(
-                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                    detail=msg,
-                )
+                raise UnprocessableError(msg)
 
             _assign_appuser_role(
                 client,
@@ -782,15 +766,13 @@ async def get_appuser_token(
 
     except PyODKError as e:
         log.exception(f"PyODK error while creating app user token: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("An error occurred while creating the app user token."),
+        raise ServiceError(
+            _("An error occurred while creating the app user token.")
         ) from e
     except Exception as e:
         log.exception(f"An error occurred: {str(e)}", stack_info=True)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("An error occurred while creating the app user token."),
+        raise ServiceError(
+            _("An error occurred while creating the app user token.")
         ) from e
 
 
@@ -802,9 +784,8 @@ def _assign_appuser_role(client, path: str, scope: str) -> None:
     if assignment_result.get("success"):
         return
 
-    raise HTTPException(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        detail=_("Could not assign %(scope)s role to app user.") % {"scope": scope},
+    raise UnprocessableError(
+        _("Could not assign %(scope)s role to app user.") % {"scope": scope}
     )
 
 
@@ -841,10 +822,7 @@ def _get_project_manager_role_id(client) -> int:
         None,
     )
     if not project_manager_role or "id" not in project_manager_role:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("Could not find 'Project Manager' role in ODK Central."),
-        )
+        raise ServiceError(_("Could not find 'Project Manager' role in ODK Central."))
 
     return int(project_manager_role["id"])
 
@@ -866,10 +844,7 @@ def _create_manager_user(client, project_odk_id: int) -> tuple[object, str, str]
             created_user = create_response.json() or {}
             created_user_id = created_user.get("id")
             if not created_user_id:
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=_("ODK Central returned no user ID after creation."),
-                )
+                raise ServiceError(_("ODK Central returned no user ID after creation."))
             return created_user_id, candidate_email, candidate_password
 
         if create_status == status.HTTP_409_CONFLICT:
@@ -881,20 +856,14 @@ def _create_manager_user(client, project_odk_id: int) -> tuple[object, str, str]
             continue
 
         body = getattr(create_response, "text", "")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=(
-                f"ODK Central returned {create_status} when creating "
-                f"manager user. Body: {body}"
-            ),
+        raise ServiceError(
+            f"ODK Central returned {create_status} when creating "
+            f"manager user. Body: {body}"
         )
 
-    raise HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail=(
-            "Could not create an ODK Central manager user: "
-            "both primary and fallback email addresses are already taken."
-        ),
+    raise ServiceError(
+        "Could not create an ODK Central manager user: "
+        "both primary and fallback email addresses are already taken."
     )
 
 
@@ -983,7 +952,7 @@ async def create_project_manager_user(
             )
             return manager_email, manager_password
 
-    except HTTPException:
+    except ServiceError:
         raise
     except Exception as e:
         log.exception(
@@ -991,16 +960,13 @@ async def create_project_manager_user(
             project_odk_id,
             stack_info=True,
         )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("Failed to create ODK Central manager user."),
-        ) from e
+        raise ServiceError(_("Failed to create ODK Central manager user.")) from e
 
 
 async def odk_credentials_test(odk_creds: central_schemas.ODKCentral):
     """Test ODK Central credentials by attempting to open a session.
 
-    Returns status 200 if credentials are valid, otherwise raises HTTPException.
+    Returns status 200 if credentials are valid, otherwise raises ServiceError.
     """
     try:
         async with central_deps.pyodk_client(odk_creds):
@@ -1008,19 +974,16 @@ async def odk_credentials_test(odk_creds: central_schemas.ODKCentral):
         return status.HTTP_200_OK
     except PyODKError as e:
         log.error(f"ODK Central credential test failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=_("ODK credentials are invalid, or may have changed."),
+        raise ValidationError(
+            _("ODK credentials are invalid, or may have changed.")
         ) from e
     except RequestException as e:
         log.error(f"ODK Central credential test failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=_("Failed to connect to Central. Is the URL valid?"),
+        raise ValidationError(
+            _("Failed to connect to Central. Is the URL valid?")
         ) from e
     except Exception as e:
         log.error(f"Unexpected error during ODK Central credential test: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("Unexpected error while testing ODK Central credentials."),
+        raise ServiceError(
+            _("Unexpected error while testing ODK Central credentials.")
         ) from e

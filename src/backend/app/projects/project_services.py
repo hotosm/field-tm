@@ -32,8 +32,6 @@ from anyio import to_thread
 from area_splitter import SplittingAlgorithm
 from area_splitter.splitter import split_by_sql
 from geojson_aoi import parse_aoi
-from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 from osm_fieldwork.json_data_models import data_models_path
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
@@ -45,6 +43,14 @@ from app.config import settings
 from app.db.enums import FieldMappingApp, ProjectStatus, XLSFormType
 from app.db.languages_and_countries import countries
 from app.db.models import DbProject
+from app.errors import (
+    ConflictError,
+    DownstreamDeleteError,
+    NotFoundError,
+    ServiceError,
+    UpstreamError,
+    ValidationError,
+)
 from app.helpers.geometry_utils import (
     AREA_LIMIT_KM2,
     check_crs,
@@ -92,51 +98,6 @@ def _format_simple_fallback_city(centroid) -> str:
         return _simple_project_fallback_city()
 
     return _("Area {latitude:.4f}_{longitude:.4f}").format(latitude=lat, longitude=lon)
-
-
-# Domain exceptions (no HTTP concepts)
-
-
-class ServiceError(Exception):
-    """Base exception for service layer errors."""
-
-    def __init__(self, message: str, code: str = "error"):
-        """Initialize with message and error code."""
-        self.message = message
-        self.code = code
-        super().__init__(message)
-
-
-class ValidationError(ServiceError):
-    """Input validation failed."""
-
-    def __init__(self, message: str):
-        """Initialize with message."""
-        super().__init__(message, code="validation_error")
-
-
-class NotFoundError(ServiceError):
-    """Resource not found."""
-
-    def __init__(self, message: str):
-        """Initialize with message."""
-        super().__init__(message, code="not_found")
-
-
-class ConflictError(ServiceError):
-    """Resource conflict (e.g. duplicate name)."""
-
-    def __init__(self, message: str):
-        """Initialize with message."""
-        super().__init__(message, code="conflict")
-
-
-class DownstreamDeleteError(ServiceError):
-    """Failed to delete downstream project, so local project must be kept."""
-
-    def __init__(self, message: str):
-        """Initialize with message."""
-        super().__init__(message, code="downstream_delete_failed")
 
 
 @dataclass(slots=True)
@@ -674,17 +635,11 @@ async def _request_osm_data_extract(
             centroid=False,
             use_st_within=True,
         )
-    except HTTPException as exc:
-        if (
-            exc.status_code == status.HTTP_400_BAD_REQUEST
-            and "Failed to generate data extract from the raw data API."
-            in str(exc.detail)
-        ):
-            raise ServiceError(
-                "OSM data extraction timed out or failed upstream. "
-                "Please reduce the AOI size or choose Collect New Data Only."
-            ) from exc
-        raise
+    except UpstreamError as exc:
+        raise ServiceError(
+            "OSM data extraction timed out or failed upstream. "
+            "Please reduce the AOI size or choose Collect New Data Only."
+        ) from exc
     except AsyncTimeoutError as exc:
         raise ServiceError(
             "OSM data extraction timed out. "

@@ -38,7 +38,6 @@ from uuid import uuid4
 
 import httpx
 from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 from osm_fieldwork.enums import DbGeomType
 from osm_fieldwork.update_xlsform import modify_form_for_qfield
 from psycopg import AsyncConnection
@@ -50,6 +49,13 @@ from qfieldcloud_sdk.sdk import (
 
 from app.config import decrypt_value, encrypt_value, settings
 from app.db.models import DbProject
+from app.errors import (
+    NotFoundError,
+    ServiceError,
+    UnprocessableError,
+    UpstreamTimeoutError,
+    ValidationError,
+)
 from app.helpers.geometry_utils import (
     extract_geometry,
     outline_bbox,
@@ -377,10 +383,7 @@ async def _generate_qgis_project(
         output_files = await _read_qgis_job_outputs(db, job_id)
         await db.commit()
         if not output_files:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=_("QGIS wrapper completed but wrote no output files."),
-            )
+            raise ServiceError(_("QGIS wrapper completed but wrote no output files."))
 
         for filename, b64_content in output_files.items():
             target = Path(tmp_dir) / filename
@@ -389,10 +392,7 @@ async def _generate_qgis_project(
 
         qgz_files = list(Path(tmp_dir).glob("*.qgz"))
         if not qgz_files:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=_("QGIS wrapper completed but no .qgz file in output."),
-            )
+            raise ServiceError(_("QGIS wrapper completed but no .qgz file in output."))
         log.info("QGIS project generated: %s", qgz_files[0].name)
         yield tmp_dir
     finally:
@@ -409,18 +409,14 @@ async def create_qfield_project(
 ) -> str:
     """Generate a QGIS project, upload it, and return its QFieldCloud URL.
 
-    Raises HTTPException on failure.
+    Raises ServiceError on failure.
     """
     if not project.outline:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("Project outline is required for QField project creation."),
+        raise UnprocessableError(
+            _("Project outline is required for QField project creation.")
         )
     if not project.xlsform_content:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("XLSForm is required for QField project creation."),
-        )
+        raise UnprocessableError(_("XLSForm is required for QField project creation."))
 
     form_language, final_form = await modify_form_for_qfield(
         BytesIO(project.xlsform_content),
@@ -429,10 +425,7 @@ async def create_qfield_project(
     )
     xlsform_bytes = final_form.getvalue()
     if not xlsform_bytes:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("Failed to modify XLSForm for QField."),
-        )
+        raise UnprocessableError(_("Failed to modify XLSForm for QField."))
 
     log.debug("Saving QField XLSForm to DB for project %s", project.id)
     await DbProject.update(
@@ -499,9 +492,8 @@ async def attach_basemap_to_qfield_project(
 ) -> None:
     """Attach an MBTiles basemap to an existing QField project via QGIS wrapper."""
     if not project.external_project_id:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("QField project ID is missing; cannot attach basemap."),
+        raise UnprocessableError(
+            _("QField project ID is missing; cannot attach basemap.")
         )
 
     custom_qfield_creds = _resolve_project_qfield_credentials(project)
@@ -536,9 +528,8 @@ async def attach_basemap_to_qfield_project(
         output_files = await _read_qgis_job_outputs(db, job_id)
         await db.commit()
         if not output_files:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=_("Basemap attach completed but produced no project files."),
+            raise ServiceError(
+                _("Basemap attach completed but produced no project files.")
             )
 
         upload_dir = tempfile.mkdtemp(prefix="qfield_basemap_upload_")
@@ -720,13 +711,12 @@ async def _wait_for_projectfile_processing(
                 last_status,
             )
 
-    raise HTTPException(
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail=_(
+    raise ServiceError(
+        _(
             "QFieldCloud did not finish processing the project file after "
             "%(attempts)d attempts (last status: %(status)s)."
         )
-        % {"attempts": attempts, "status": last_status or "unknown"},
+        % {"attempts": attempts, "status": last_status or "unknown"}
     )
 
 
@@ -775,23 +765,18 @@ async def _call_qgis_wrapper(  # noqa: PLR0913
     body = response.text
     if response.status_code != status.HTTP_200_OK:
         log.error("QGIS wrapper returned %s: %s", response.status_code, body)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("QGIS project generation failed: %(error)s") % {"error": body},
+        raise ServiceError(
+            _("QGIS project generation failed: %(error)s") % {"error": body}
         )
     try:
         result = json.loads(body)
     except json.JSONDecodeError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("QGIS wrapper returned invalid JSON."),
-        ) from exc
+        raise ServiceError(_("QGIS wrapper returned invalid JSON.")) from exc
     if result.get("status") != "success":
         msg = result.get("message", "Unknown error")
         log.error("QGIS wrapper reported failure: %s", msg)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("QGIS project generation failed: %(error)s") % {"error": msg},
+        raise ServiceError(
+            _("QGIS project generation failed: %(error)s") % {"error": msg}
         )
 
     log.debug("QGIS wrapper call succeeded for job %s", job_id)
@@ -804,15 +789,9 @@ async def _download_file_for_qfield_upload(url: str, destination: Path) -> None:
         client.stream("GET", url) as response,
     ):
         if response.status_code != status.HTTP_200_OK:
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=(
-                    _(
-                        "Failed to download basemap MBTiles for upload "
-                        "(HTTP %(status)s)."
-                    )
-                    % {"status": response.status_code}
-                ),
+            raise ServiceError(
+                _("Failed to download basemap MBTiles for upload (HTTP %(status)s).")
+                % {"status": response.status_code}
             )
 
         with destination.open("wb") as output:
@@ -821,10 +800,7 @@ async def _download_file_for_qfield_upload(url: str, destination: Path) -> None:
                     output.write(chunk)
 
     if not destination.exists() or destination.stat().st_size == 0:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("Downloaded basemap MBTiles is empty."),
-        )
+        raise ServiceError(_("Downloaded basemap MBTiles is empty."))
 
 
 async def _upload_to_qfieldcloud(
@@ -896,10 +872,8 @@ async def _upload_to_qfieldcloud(
                 )
             except Exception:
                 log.warning("Failed to clean up QFieldCloud project %s", api_project_id)
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail=_("Failed to upload files to QFieldCloud: %(error)s")
-                % {"error": e},
+            raise UnprocessableError(
+                _("Failed to upload files to QFieldCloud: %(error)s") % {"error": e}
             ) from e
 
     # Prefer a canonical URL returned by QFieldCloud, otherwise fall back to
@@ -997,7 +971,7 @@ def _resolve_qfield_project_url(
 async def qfc_credentials_test(qfc_creds: QFieldCloud):
     """Test QFieldCloud credentials by attempting to open a session.
 
-    Returns HTTP 200 if credentials are valid, otherwise raises HTTPException.
+    Returns HTTP 200 if credentials are valid, otherwise raises ServiceError.
     """
     try:
         creds = QFieldCloud(
@@ -1011,10 +985,7 @@ async def qfc_credentials_test(qfc_creds: QFieldCloud):
     except Exception as e:
         msg = f"QFieldCloud credential test failed: {e}"
         log.debug(msg)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=_("QFieldCloud credentials are invalid."),
-        ) from e
+        raise ValidationError(_("QFieldCloud credentials are invalid.")) from e
 
 
 # Export project data as GeoJSON
@@ -1042,17 +1013,13 @@ async def export_qfield_project_geojson(
     FeatureCollection with a _layer property identifying each source layer.
     """
     if not project.external_project_id:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("This project is not linked to a QFieldCloud project."),
+        raise UnprocessableError(
+            _("This project is not linked to a QFieldCloud project.")
         )
 
     qgis_url = (settings.QFIELDCLOUD_QGIS_URL or "").strip()
     if not qgis_url:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("QFIELDCLOUD_QGIS_URL is not configured."),
-        )
+        raise ServiceError(_("QFIELDCLOUD_QGIS_URL is not configured."))
 
     custom_creds = _resolve_project_qfield_credentials(project)
     api_project_id = str(project.external_project_id)
@@ -1078,11 +1045,8 @@ async def export_qfield_project_geojson(
 
             gpkg_paths = sorted(Path(download_dir).rglob("*.gpkg"))
             if not gpkg_paths:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=_(
-                        "No GeoPackage files were found in the QFieldCloud package."
-                    ),
+                raise NotFoundError(
+                    _("No GeoPackage files were found in the QFieldCloud package.")
                 )
 
             survey_features: list[dict] = []
@@ -1097,12 +1061,11 @@ async def export_qfield_project_geojson(
             shutil.rmtree(download_dir, ignore_errors=True)
 
     if not survey_features:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=_(
+        raise NotFoundError(
+            _(
                 "No survey data found in the QFieldCloud package. "
                 "Mappers may not have submitted any responses yet."
-            ),
+            )
         )
 
     return {"type": "FeatureCollection", "features": survey_features}
@@ -1121,10 +1084,7 @@ async def _wait_for_package_job(
     )
     job_id = job.get("id")
     if not job_id:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("QFieldCloud did not return a package job id."),
-        )
+        raise ServiceError(_("QFieldCloud did not return a package job id."))
 
     elapsed = 0.0
     last_status: Optional[str] = None
@@ -1138,18 +1098,14 @@ async def _wait_for_package_job(
         if last_status == "finished":
             return
         if last_status == "failed":
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=_("QFieldCloud failed to package the project."),
-            )
+            raise ServiceError(_("QFieldCloud failed to package the project."))
 
-    raise HTTPException(
-        status_code=status.HTTP_504_GATEWAY_TIMEOUT,
-        detail=_(
+    raise UpstreamTimeoutError(
+        _(
             "Timed out waiting for QFieldCloud to package the project "
             "(last status: %(status)s)."
         )
-        % {"status": last_status or "unknown"},
+        % {"status": last_status or "unknown"}
     )
 
 
@@ -1164,15 +1120,13 @@ async def _convert_gpkg_via_wrapper(qgis_url: str, gpkg_path: Path) -> dict:
     body = response.text
     if response.status_code != status.HTTP_200_OK:
         log.error("QGIS wrapper /export returned %s: %s", response.status_code, body)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("GeoPackage conversion failed: %(error)s") % {"error": body},
+        raise ServiceError(
+            _("GeoPackage conversion failed: %(error)s") % {"error": body}
         )
     try:
         payload = json.loads(body)
     except json.JSONDecodeError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=_("QGIS wrapper returned invalid JSON for /export."),
+        raise ServiceError(
+            _("QGIS wrapper returned invalid JSON for /export.")
         ) from exc
     return payload.get("layers", {}) or {}

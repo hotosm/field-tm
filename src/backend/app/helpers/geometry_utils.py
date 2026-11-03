@@ -22,10 +22,12 @@ import logging
 import types
 from typing import Optional
 
-from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 from psycopg import AsyncConnection, Connection
 
+from app.errors import (
+    UnprocessableError,
+    ValidationError,
+)
 from app.i18n import _
 
 log = logging.getLogger(__name__)
@@ -76,16 +78,10 @@ def outline_bbox(outline: dict) -> tuple[float, float, float, float]:
     """
     geometry = extract_geometry(outline)
     if not geometry:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("Project outline is missing or has no geometry."),
-        )
+        raise UnprocessableError(_("Project outline is missing or has no geometry."))
     coords = _flatten_geom_coords(geometry)
     if not coords:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=_("Project outline geometry has no coordinates."),
-        )
+        raise UnprocessableError(_("Project outline geometry has no coordinates."))
     lons = [c[0] for c in coords]
     lats = [c[1] for c in coords]
     return min(lons), min(lats), max(lons), max(lats)
@@ -316,10 +312,7 @@ async def check_crs(  # noqa: C901
         crs = input_geojson.get("crs", {}).get("properties", {}).get("name")
         if not is_valid_crs(crs):
             log.error(error_message)
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail=error_message,
-            )
+            raise ValidationError(error_message)
         return
 
     if (input_geojson_type := input_geojson.get("type")) == "FeatureCollection":
@@ -344,10 +337,7 @@ async def check_crs(  # noqa: C901
     )
     if not is_valid_coordinate(first_coordinate):
         log.error(error_message)
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST,
-            detail=error_message,
-        )
+        raise ValidationError(error_message)
 
 
 async def geojson_to_javarosa_geom(geojson_geometry: dict) -> str:

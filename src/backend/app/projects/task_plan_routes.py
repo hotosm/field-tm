@@ -18,7 +18,9 @@ from app.auth.roles import check_access, project_manager, viewable_project
 from app.db.database import db_conn
 from app.db.enums import ProjectRole
 from app.db.models import DbProject
-from app.projects.project_services import ServiceError
+from app.errors import (
+    ServiceError,
+)
 from app.projects.task_plan import save_task_plan
 
 

@@ -23,7 +23,6 @@ import logging
 from litestar import get, post
 from litestar import status_codes as status
 from litestar.di import Provide
-from litestar.exceptions import HTTPException
 from litestar.params import Parameter
 from litestar.plugins.htmx import HTMXRequest
 from litestar.response import Response, Template
@@ -35,6 +34,9 @@ from app.auth.roles import project_manager
 from app.db.database import db_conn
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
+from app.errors import (
+    ServiceError,
+)
 from app.helpers.basemap_services import (
     check_tilepack_status,
     search_oam_imagery,
@@ -136,7 +138,7 @@ async def basemap_search_htmx(
             media_type="text/html",
             status_code=status.HTTP_200_OK,
         )
-    except HTTPException:
+    except ServiceError:
         raise
     except Exception:
         log.exception("Basemap search failed for project %s", project_id)

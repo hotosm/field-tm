@@ -7,9 +7,11 @@ from typing import Any
 
 import httpx
 from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 
 from app.config import settings
+from app.errors import (
+    UpstreamError,
+)
 from app.i18n import _
 
 REQUEST_TIMEOUT_SECONDS = 30
@@ -21,24 +23,19 @@ WORLD_LAT_MAX = 90
 
 
 def _raise_remote_http_error(exc: httpx.HTTPStatusError, action: str) -> None:
-    """Raise a consistent HTTPException for upstream HTTP failures."""
+    """Raise a consistent UpstreamError for upstream HTTP failures."""
     response = exc.response
     detail = _("%(action)s failed with HTTP %(status_code)s.") % {
         "action": action,
         "status_code": response.status_code,
     }
-    raise HTTPException(
-        status_code=status.HTTP_502_BAD_GATEWAY,
-        detail=detail,
-    ) from exc
+    raise UpstreamError(detail) from exc
 
 
 def _raise_remote_request_error(exc: httpx.HTTPError, action: str) -> None:
-    """Raise a consistent HTTPException for upstream transport failures."""
-    raise HTTPException(
-        status_code=status.HTTP_502_BAD_GATEWAY,
-        detail=_("%(action)s failed due to upstream connection error.")
-        % {"action": action},
+    """Raise a consistent UpstreamError for upstream transport failures."""
+    raise UpstreamError(
+        _("%(action)s failed due to upstream connection error.") % {"action": action}
     ) from exc
 
 
@@ -176,10 +173,9 @@ def _parse_tilepack_status(
         return "generating", None
 
     if status_code >= status.HTTP_400_BAD_REQUEST:
-        raise HTTPException(
-            status_code=status.HTTP_502_BAD_GATEWAY,
-            detail=_("Tilepack API returned HTTP %(status_code)s.")
-            % {"status_code": status_code},
+        raise UpstreamError(
+            _("Tilepack API returned HTTP %(status_code)s.")
+            % {"status_code": status_code}
         )
 
     if state in {"ready", "completed", "success"}:

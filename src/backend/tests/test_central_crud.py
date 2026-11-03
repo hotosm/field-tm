@@ -7,11 +7,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from litestar.exceptions import HTTPException
 
 from app.central import central_crud
 from app.config import encrypt_value
 from app.db.models import DbProject
+from app.errors import ServiceError
 
 TEST_DATA_DIR = Path(__file__).parent / "test_data"
 
@@ -346,7 +346,7 @@ async def test_create_project_manager_user_missing_role():
         "app.central.central_deps.pyodk_client",
         lambda _: _fake_pyodk(MissingRoleClient()),
     ):
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(ServiceError) as exc_info:
             await central_crud.create_project_manager_user(
                 project_odk_id=17,
                 project_name="My Test Project",
@@ -354,7 +354,7 @@ async def test_create_project_manager_user_missing_role():
             )
 
     assert exc_info.value.status_code == 500
-    assert "Project Manager" in str(exc_info.value.detail)
+    assert "Project Manager" in str(exc_info.value.message)
 
 
 async def test_create_project_manager_user_all_candidates_exhausted():
@@ -390,7 +390,7 @@ async def test_create_project_manager_user_all_candidates_exhausted():
         "app.central.central_deps.pyodk_client",
         lambda _: _fake_pyodk(fake_client),
     ):
-        with pytest.raises(HTTPException) as exc_info:
+        with pytest.raises(ServiceError) as exc_info:
             await central_crud.create_project_manager_user(
                 project_odk_id=17,
                 project_name="My Test Project",
@@ -398,7 +398,7 @@ async def test_create_project_manager_user_all_candidates_exhausted():
             )
 
     assert exc_info.value.status_code == 500
-    assert "Could not create" in str(exc_info.value.detail)
+    assert "Could not create" in str(exc_info.value.message)
     user_posts = [c for c in fake_client.session.post_calls if c[0] == "users"]
     assert len(user_posts) == 2
 

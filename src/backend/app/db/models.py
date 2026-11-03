@@ -28,8 +28,6 @@ from datetime import date
 from re import sub
 from typing import Any, Mapping, Optional, Self
 
-from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 from psycopg import AsyncConnection, sql
 from psycopg.rows import class_row
 from pydantic import AwareDatetime, BaseModel
@@ -42,6 +40,10 @@ from app.db.enums import (
     ProjectStatus,
     ProjectVisibility,
     XLSFormType,
+)
+from app.errors import (
+    ServiceError,
+    ValidationError,
 )
 from app.i18n import _
 
@@ -70,10 +72,7 @@ def dump_and_check_model(db_model: Any, allow_empty: bool = False) -> dict:
 
     if not model_dump and not allow_empty:
         log.error("Attempted create or update with no data.")
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=_("No data provided."),
-        )
+        raise ValidationError(_("No data provided."))
 
     return model_dump
 
@@ -294,10 +293,7 @@ class DbUser:
         if new_user is None:
             msg = f"Unknown SQL error for data: {model_dump}"
             log.error(f"Failed user creation: {model_dump}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=msg,
-            )
+            raise ServiceError(msg)
 
         return new_user
 
@@ -328,10 +324,7 @@ class DbUser:
         if updated_user is None:
             msg = f"Failed to update user: {user_sub}"
             log.error(msg)
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=msg,
-            )
+            raise ServiceError(msg)
 
         return updated_user
 
@@ -638,10 +631,7 @@ class DbProject:
             if new_project is None:
                 msg = f"Unknown SQL error for data: {model_dump}"
                 log.error(f"Project creation failed: {msg}")
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=msg,
-                )
+                raise ServiceError(msg)
 
             # NOTE we want a trackable hashtag DOMAIN-PROJECT_ID
             new_project.hashtags.append(f"#{settings.FTM_DOMAIN}-{new_project.id}")
@@ -662,10 +652,7 @@ class DbProject:
         if updated_project is None:
             msg = f"Failed to update hashtags for project ID: {new_project.id}"
             log.error(msg)
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=msg,
-            )
+            raise ServiceError(msg)
 
         return updated_project
 
@@ -712,10 +699,7 @@ class DbProject:
         if updated_project is None:
             msg = f"Failed to update project with ID: {project_id}"
             log.error(msg)
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail=msg,
-            )
+            raise ServiceError(msg)
 
         return updated_project
 

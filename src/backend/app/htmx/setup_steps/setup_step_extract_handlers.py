@@ -10,15 +10,19 @@ from psycopg import AsyncConnection
 
 from app.config import settings
 from app.db.models import DbProject
+from app.errors import (
+    ServiceError,
+)
+from app.errors import (
+    ValidationError as SvcValidationError,
+)
 from app.helpers.geometry_utils import check_crs
 from app.i18n import _
 from app.projects import project_schemas
 from app.projects.project_services import (
-    ServiceError,
     download_osm_data,
     save_data_extract,
 )
-from app.projects.project_services import ValidationError as SvcValidationError
 
 from ..htmx_helpers import callout
 from .setup_step_extract_helpers import (

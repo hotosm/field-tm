@@ -43,11 +43,14 @@ from app.central import central_crud
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp, ProjectRole
 from app.db.models import DbProject
+from app.errors import (
+    DownstreamDeleteError,
+    NotFoundError,
+    ServiceError,
+)
 from app.i18n import _
 from app.projects import project_crud
 from app.projects.project_services import (
-    DownstreamDeleteError,
-    NotFoundError,
     delete_project_with_downstream,
 )
 from app.qfield.qfield_crud import export_qfield_project_geojson
@@ -239,12 +242,11 @@ async def project_qrcode_htmx(
             },
         )
 
-    except HTTPException as e:
-        error_msg = str(e.detail)
+    except ServiceError as e:
         return Response(
             content=callout(
                 "danger",
-                _("Error: %(error_msg)s") % {"error_msg": error_msg},
+                _("Error: %(error_msg)s") % {"error_msg": e.message},
             ),
             media_type="text/html",
             status_code=e.status_code,
@@ -296,8 +298,8 @@ async def export_project_geojson_htmx(
 
     try:
         feature_collection = await export_qfield_project_geojson(db, project)
-    except HTTPException as exc:
-        return html_error_response(str(exc.detail), exc.status_code)
+    except ServiceError as exc:
+        return html_error_response(exc.message, exc.status_code)
     except Exception as exc:
         log.exception("GeoJSON export failed for project %s: %s", project_id, exc)
         return html_error_response(

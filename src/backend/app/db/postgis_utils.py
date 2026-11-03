@@ -21,13 +21,14 @@ import json
 import logging
 from typing import Optional
 
-from litestar import status_codes as status
-from litestar.exceptions import HTTPException
 from psycopg import AsyncConnection, ProgrammingError, sql
 from psycopg.rows import dict_row
 from psycopg.types.json import Json
 
 from app.db.enums import DbGeomType
+from app.errors import (
+    ServiceError,
+)
 
 log = logging.getLogger(__name__)
 
@@ -207,8 +208,5 @@ def _split_records_to_feature_collections(
     if not result_dict:
         msg = f"Failed to split project ({project_id}) geojson by task areas."
         log.exception(msg)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=msg,
-        )
+        raise ServiceError(msg)
     return result_dict

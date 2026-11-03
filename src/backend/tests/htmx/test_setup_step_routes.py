@@ -8,6 +8,9 @@ from litestar import Router
 from litestar import status_codes as status
 
 from app.db.models import DbProject
+from app.errors import (
+    ValidationError as SvcValidationError,
+)
 from app.htmx.setup_steps import (
     setup_step_extract_handlers,
     setup_step_extract_routes,
@@ -29,7 +32,6 @@ from app.htmx.setup_steps.setup_step_responses import (
 from app.projects.project_services import (
     ODKFinalizeResult,
 )
-from app.projects.project_services import ValidationError as SvcValidationError
 
 # We patch where project_crud is used/defined.
 # htmx_routes imports `from app.projects import project_crud`

@@ -26,6 +26,8 @@ from litestar import status_codes as status
 from litestar.exceptions import HTTPException
 from litestar.types import ASGIApp, Receive, Scope, Send
 
+from app.errors import ServiceError
+
 log = logging.getLogger(__name__)
 
 
@@ -137,11 +139,14 @@ def set_otel_tracer(app: Litestar, endpoint: str):
         span_processor,
     )
 
-    async def http_exception_handler(request: Request, exc: HTTPException) -> Response:
+    async def http_exception_handler(
+        request: Request, exc: HTTPException | ServiceError
+    ) -> Response:
+        detail = exc.detail if isinstance(exc, HTTPException) else exc.message
         current_span = trace.get_current_span()
         current_span.set_attributes(
             {
-                "http.status_text": str(exc.detail),
+                "http.status_text": str(detail),
             }
         )
         current_span.record_exception(exc)
@@ -150,7 +155,7 @@ def set_otel_tracer(app: Litestar, endpoint: str):
         is_htmx = request.headers.get("HX-Request") == "true"
         if is_htmx:
             escaped_msg = html.escape(
-                str(exc.detail) if exc.detail else "An unexpected error occurred"
+                str(detail) if detail else "An unexpected error occurred"
             )
             error_html = (
                 f'<wa-callout variant="danger"><span>{escaped_msg}</span></wa-callout>'
@@ -162,11 +167,12 @@ def set_otel_tracer(app: Litestar, endpoint: str):
             )
 
         return Response(
-            content={"detail": str(exc.detail)},
+            content={"detail": str(detail)},
             status_code=exc.status_code,
         )
 
     app.exception_handlers[HTTPException] = http_exception_handler
+    app.exception_handlers[ServiceError] = http_exception_handler
 
 
 def set_otel_logger(endpoint: str):

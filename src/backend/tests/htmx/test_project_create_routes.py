@@ -11,6 +11,13 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from litestar import status_codes as status
 
 from app.config import AuthProvider, settings
+from app.errors import (
+    ConflictError,
+    ServiceError,
+)
+from app.errors import (
+    ValidationError as SvcValidationError,
+)
 from app.htmx.project_create import project_create_simple_flow
 from app.htmx.project_create.project_create_page_routes import (
     new_project_chooser,
@@ -30,11 +37,6 @@ from app.htmx.project_create.project_create_submit_routes import (
 )
 from app.htmx.project_create.project_create_xlsform_routes import upload_xlsform_htmx
 from app.i18n import _current_locale
-from app.projects.project_services import (
-    ConflictError,
-    ServiceError,
-)
-from app.projects.project_services import ValidationError as SvcValidationError
 
 # We patch where project_crud is used/defined.
 # htmx_routes imports `from app.projects import project_crud`

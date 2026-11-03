@@ -34,6 +34,7 @@ from app.central.central_routes import central_router
 from app.config import AuthProvider, MonitoringTypes, settings
 from app.db.database import close_db_connection_pool, db_conn, get_db_connection_pool
 from app.db.models import DbUser
+from app.errors import ServiceError
 from app.helpers.helper_routes import helper_router
 from app.htmx.htmx_routes import htmx_router
 from app.i18n import (
@@ -180,10 +181,11 @@ def _htmx_exception_handler(request: Request, exc: Exception) -> Response:
 
     # Determine error message
     user_msg = _("An unexpected error occurred. Please contact an admin.")
-    if isinstance(exc, HTTPException):
+    if isinstance(exc, HTTPException | ServiceError):
+        detail = exc.detail if isinstance(exc, HTTPException) else exc.message
         if exc.status_code < HTTP_500_INTERNAL_SERVER_ERROR:
             # Show specific details for client errors (4xx)
-            user_msg = str(exc.detail) if exc.detail else user_msg
+            user_msg = str(detail) if detail else user_msg
         status_code = exc.status_code
     else:
         status_code = status.HTTP_500_INTERNAL_SERVER_ERROR

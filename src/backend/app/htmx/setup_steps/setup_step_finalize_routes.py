@@ -8,7 +8,6 @@ from litestar import post
 from litestar import status_codes as status
 from litestar.di import Provide
 from litestar.enums import RequestEncodingType
-from litestar.exceptions import HTTPException
 from litestar.params import Body, Parameter
 from litestar.plugins.htmx import HTMXRequest
 from litestar.response import Response
@@ -20,15 +19,16 @@ from app.auth.roles import project_manager
 from app.central.central_schemas import ODKCentral
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp
+from app.errors import (
+    ServiceError,
+)
 from app.i18n import _
 from app.projects.mapping_apps import is_sync_app
 from app.projects.project_services import (
-    ServiceError,
     finalize_odk_project,
     finalize_qfield_project,
     publish_project,
 )
-from app.projects.project_services import ValidationError as SvcValidationError
 from app.qfield.qfield_schemas import QFieldCloud
 
 from ..htmx_helpers import callout
@@ -151,12 +151,7 @@ async def create_project_odk_htmx(
 
         return build_odk_finalize_success_html(odk_result, project_id=project_id)
     except ServiceError as e:
-        status_code = (
-            status.HTTP_400_BAD_REQUEST
-            if isinstance(e, SvcValidationError)
-            else status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-        return finalize_error_response(e.message, status_code)
+        return finalize_error_response(e.message, e.status_code)
     except Exception as e:
         log.error(f"Error creating ODK project via HTMX: {e}", exc_info=True)
         error_msg = str(e)
@@ -204,12 +199,8 @@ async def create_project_qfield_htmx(
         )
 
         return build_qfield_finalize_success_html(qfield_result, project_id=project_id)
-    except SvcValidationError as e:
-        return finalize_error_response(e.message, status.HTTP_400_BAD_REQUEST)
     except ServiceError as e:
-        return finalize_error_response(e.message, status.HTTP_500_INTERNAL_SERVER_ERROR)
-    except HTTPException as e:
-        return finalize_error_response(e.detail, e.status_code)
+        return finalize_error_response(e.message, e.status_code)
     except Exception as e:
         log.error(f"Error creating QField project via HTMX: {e}", exc_info=True)
         error_msg = str(e)
