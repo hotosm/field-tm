@@ -17,12 +17,19 @@
 #
 """Download, validate and save OSM data extracts for a project."""
 
+import ast
 import json
 import logging
 from asyncio import TimeoutError as AsyncTimeoutError
 
 import httpx
 from geojson_aoi import parse_aoi
+from osm_data_client import (
+    RawDataClient,
+    RawDataClientConfig,
+    RawDataOutputOptions,
+    RawDataResult,
+)
 from osm_fieldwork.json_data_models import data_models_path
 from psycopg import AsyncConnection
 
@@ -32,6 +39,7 @@ from app.db.models import DbProject
 from app.errors import (
     NotFoundError,
     ServiceError,
+    UnprocessableError,
     UpstreamError,
     ValidationError,
 )
@@ -40,7 +48,8 @@ from app.helpers.geometry_utils import (
     featcol_keep_single_geom_type,
     featcol_polygons_to_centroids,
 )
-from app.projects import project_crud, project_deps, project_schemas
+from app.i18n import _
+from app.projects import project_deps, project_schemas
 
 log = logging.getLogger(__name__)
 
@@ -138,6 +147,71 @@ def _expected_extract_output_geom(geometry_types: list[str], centroid: bool) -> 
     return "Polygon"
 
 
+async def generate_data_extract(
+    project_id: int,
+    aoi: dict,
+    geom_types: list[str],
+    config_json=None,
+    centroid: bool = False,
+    use_st_within: bool = True,
+) -> RawDataResult:  # noqa: PLR0913
+    """Request an OSM extract and return its download URL.
+
+    geom_types selects raw-data-api tables via point, line, and polygon;
+    multiple types union their results. Raises ServiceError on invalid
+    parameters or extraction failure.
+    """
+    if not config_json:
+        raise ValidationError(
+            "To generate a new data extract a extract_config must be specified."
+        )
+    config = RawDataClientConfig(
+        access_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
+        if settings.RAW_DATA_API_AUTH_TOKEN
+        else None
+    )
+    extra_params = {
+        "fileName": (
+            f"ftm_{settings.FTM_DOMAIN}_data_extract_{project_id}"
+            if settings.RAW_DATA_API_AUTH_TOKEN
+            else f"ftm_extract_{project_id}"
+        ),
+        "outputType": "geojson",
+        "geometryType": geom_types,
+        "bindZip": False,
+        "centroid": centroid,
+        "use_st_within": (False if "line" in geom_types else use_st_within),
+        "filters": config_json,
+    }
+
+    try:
+        result = await RawDataClient(config).get_osm_data(
+            aoi,
+            output_options=RawDataOutputOptions(download_file=False),
+            **extra_params,
+        )
+
+        return result
+    except Exception as e:
+        log.error("Raw data API request failed")
+        if "status 406" in str(e) and "Area" in str(e):
+            try:
+                error_str = str(e).split("status 406:")[-1].strip()
+                error_dict = ast.literal_eval(error_str)
+                msg = error_dict["detail"][0]["msg"]
+            except Exception:
+                msg = _(
+                    "Selected area is too large. "
+                    "Please select an area smaller than 200 km²."
+                )
+
+            raise UnprocessableError(msg) from e
+
+        raise UpstreamError(
+            _("Failed to generate data extract from the raw data API.")
+        ) from e
+
+
 async def _request_osm_data_extract(
     project_id: int,
     aoi_featcol: dict,
@@ -146,7 +220,7 @@ async def _request_osm_data_extract(
 ):
     """Request a raw-data-api extract and map common failures to service errors."""
     try:
-        return await project_crud.generate_data_extract(
+        return await generate_data_extract(
             project_id,
             aoi_featcol,
             geometry_types,

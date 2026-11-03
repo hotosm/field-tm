@@ -166,7 +166,7 @@ async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
         fake_get_project_by_id,
     )
     monkeypatch.setattr(
-        project_crud,
+        data_extract_services,
         "generate_data_extract",
         fake_generate_data_extract,
     )
@@ -229,7 +229,7 @@ async def test_download_osm_data_handles_null_features_as_no_matches(monkeypatch
         fake_get_project_by_id,
     )
     monkeypatch.setattr(
-        project_crud,
+        data_extract_services,
         "generate_data_extract",
         fake_generate_data_extract,
     )
@@ -301,7 +301,7 @@ async def test_download_osm_data_maps_invalid_geometry_parse_to_validation_error
         fake_get_project_by_id,
     )
     monkeypatch.setattr(
-        project_crud,
+        data_extract_services,
         "generate_data_extract",
         fake_generate_data_extract,
     )
@@ -355,7 +355,7 @@ async def test_download_osm_data_maps_extract_generation_failure(monkeypatch):
         fake_get_project_by_id,
     )
     monkeypatch.setattr(
-        project_crud,
+        data_extract_services,
         "generate_data_extract",
         fake_generate_data_extract,
     )
@@ -442,7 +442,7 @@ async def test_download_osm_data_computes_centroids_locally(monkeypatch):
         fake_get_project_by_id,
     )
     monkeypatch.setattr(
-        project_crud,
+        data_extract_services,
         "generate_data_extract",
         fake_generate_data_extract,
     )

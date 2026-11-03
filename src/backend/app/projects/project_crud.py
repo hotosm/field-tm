@@ -17,7 +17,6 @@
 #
 """Logic for Field-TM project routes."""
 
-import ast
 import json
 import logging
 import zlib
@@ -29,12 +28,6 @@ from pathlib import Path
 from traceback import format_exc
 from typing import Optional
 
-from osm_data_client import (
-    RawDataClient,
-    RawDataClientConfig,
-    RawDataOutputOptions,
-    RawDataResult,
-)
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from psycopg import AsyncConnection, sql
 from psycopg.rows import class_row
@@ -51,7 +44,6 @@ from app.db.postgis_utils import (
 from app.errors import (
     ServiceError,
     UnprocessableError,
-    UpstreamError,
     ValidationError,
 )
 from app.helpers.geometry_utils import (
@@ -62,71 +54,6 @@ from app.i18n import _
 from app.projects import project_deps
 
 log = logging.getLogger(__name__)
-
-
-async def generate_data_extract(
-    project_id: int,
-    aoi: dict,
-    geom_types: list[str],
-    config_json=None,
-    centroid: bool = False,
-    use_st_within: bool = True,
-) -> RawDataResult:  # noqa: PLR0913
-    """Request an OSM extract and return its download URL.
-
-    geom_types selects raw-data-api tables via point, line, and polygon;
-    multiple types union their results. Raises ServiceError on invalid
-    parameters or extraction failure.
-    """
-    if not config_json:
-        raise ValidationError(
-            "To generate a new data extract a extract_config must be specified."
-        )
-    config = RawDataClientConfig(
-        access_token=settings.RAW_DATA_API_AUTH_TOKEN.get_secret_value()
-        if settings.RAW_DATA_API_AUTH_TOKEN
-        else None
-    )
-    extra_params = {
-        "fileName": (
-            f"ftm_{settings.FTM_DOMAIN}_data_extract_{project_id}"
-            if settings.RAW_DATA_API_AUTH_TOKEN
-            else f"ftm_extract_{project_id}"
-        ),
-        "outputType": "geojson",
-        "geometryType": geom_types,
-        "bindZip": False,
-        "centroid": centroid,
-        "use_st_within": (False if "line" in geom_types else use_st_within),
-        "filters": config_json,
-    }
-
-    try:
-        result = await RawDataClient(config).get_osm_data(
-            aoi,
-            output_options=RawDataOutputOptions(download_file=False),
-            **extra_params,
-        )
-
-        return result
-    except Exception as e:
-        log.error("Raw data API request failed")
-        if "status 406" in str(e) and "Area" in str(e):
-            try:
-                error_str = str(e).split("status 406:")[-1].strip()
-                error_dict = ast.literal_eval(error_str)
-                msg = error_dict["detail"][0]["msg"]
-            except Exception:
-                msg = _(
-                    "Selected area is too large. "
-                    "Please select an area smaller than 200 km²."
-                )
-
-            raise UnprocessableError(msg) from e
-
-        raise UpstreamError(
-            _("Failed to generate data extract from the raw data API.")
-        ) from e
 
 
 # ---- SUPPORT FUNCTIONS ----
