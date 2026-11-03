@@ -23,13 +23,17 @@ from app.errors import (
     ValidationError,
 )
 from app.projects import project_services
-from app.projects.project_services import (
+from app.projects.odk_services import (
     ODKFinalizeResult,
     _build_feature_dataset_payload,
-    _build_task_entities,
-    derive_simple_project_metadata,
     finalize_odk_project,
+)
+from app.projects.project_services import (
+    derive_simple_project_metadata,
     save_task_areas,
+)
+from app.projects.task_sync import (
+    _build_task_entities,
     sync_odk_tasks,
 )
 from app.qfield.qfield_crud import _build_tasks_geojson
@@ -186,39 +190,39 @@ async def test_finalize_odk_project_allows_collect_new_data_only_mode():
 
     with (
         patch(
-            "app.projects.project_services.DbProject.one",
+            "app.db.models.DbProject.one",
             return_value=project,
         ),
         patch(
-            "app.projects.project_services.DbProject.update",
+            "app.db.models.DbProject.update",
             new_callable=AsyncMock,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_odk_project",
+            "app.central.central_crud.create_odk_project",
             side_effect=fake_create_odk_project,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_entity_list",
+            "app.central.central_crud.create_entity_list",
             mock_create_entity_list,
         ),
         patch(
-            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            "app.central.central_crud.feature_geojson_to_entity_dict",
             side_effect=fake_feature_geojson_to_entity_dict,
         ),
         patch(
-            "app.projects.project_services.central_crud.read_and_test_xform",
+            "app.central.central_crud.read_and_test_xform",
             side_effect=fake_read_and_test_xform,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_odk_xform",
+            "app.central.central_crud.create_odk_xform",
             side_effect=fake_create_odk_xform,
         ),
         patch(
-            "app.projects.project_services.project_crud.generate_project_files",
+            "app.projects.project_crud.generate_project_files",
             side_effect=fake_generate_project_files,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_project_manager_user",
+            "app.central.central_crud.create_project_manager_user",
             side_effect=fake_create_project_manager_user,
         ),
     ):
@@ -251,7 +255,7 @@ async def test_finalize_odk_project_requires_odk_credentials(stub_project, db):
     await db.commit()
 
     with (
-        patch("app.projects.project_services.settings") as mock_settings,
+        patch("app.projects.odk_services.settings") as mock_settings,
         pytest.raises(ValidationError, match="ODK Central credentials"),
     ):
         mock_settings.ODK_CENTRAL_URL = ""
@@ -321,43 +325,43 @@ async def test_finalize_odk_project_returns_manager_credentials():
 
     with (
         patch(
-            "app.projects.project_services.DbProject.one",
+            "app.db.models.DbProject.one",
             return_value=project,
         ),
         patch(
-            "app.projects.project_services.DbProject.update",
+            "app.db.models.DbProject.update",
             new_callable=AsyncMock,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_odk_project",
+            "app.central.central_crud.create_odk_project",
             side_effect=fake_create_odk_project,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_entity_list",
+            "app.central.central_crud.create_entity_list",
             side_effect=fake_create_entity_list,
         ),
         patch(
-            "app.projects.project_services.central_crud.task_geojson_dict_to_entity_values",
+            "app.central.central_crud.task_geojson_dict_to_entity_values",
             side_effect=fake_task_geojson_dict_to_entity_values,
         ),
         patch(
-            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            "app.central.central_crud.feature_geojson_to_entity_dict",
             side_effect=fake_feature_geojson_to_entity_dict,
         ),
         patch(
-            "app.projects.project_services.central_crud.read_and_test_xform",
+            "app.central.central_crud.read_and_test_xform",
             side_effect=fake_read_and_test_xform,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_odk_xform",
+            "app.central.central_crud.create_odk_xform",
             side_effect=fake_create_odk_xform,
         ),
         patch(
-            "app.projects.project_services.project_crud.generate_project_files",
+            "app.projects.project_crud.generate_project_files",
             side_effect=fake_generate_project_files,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_project_manager_user",
+            "app.central.central_crud.create_project_manager_user",
             side_effect=fake_create_project_manager_user,
         ),
     ):
@@ -422,43 +426,43 @@ async def test_finalize_odk_project_persists_custom_odk_credentials():
 
     with (
         patch(
-            "app.projects.project_services.DbProject.one",
+            "app.db.models.DbProject.one",
             return_value=project,
         ),
         patch(
-            "app.projects.project_services.DbProject.update",
+            "app.db.models.DbProject.update",
             mock_update,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_odk_project",
+            "app.central.central_crud.create_odk_project",
             side_effect=fake_create_odk_project,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_entity_list",
+            "app.central.central_crud.create_entity_list",
             side_effect=fake_create_entity_list,
         ),
         patch(
-            "app.projects.project_services.central_crud.task_geojson_dict_to_entity_values",
+            "app.central.central_crud.task_geojson_dict_to_entity_values",
             side_effect=fake_task_geojson_dict_to_entity_values,
         ),
         patch(
-            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            "app.central.central_crud.feature_geojson_to_entity_dict",
             side_effect=fake_feature_geojson_to_entity_dict,
         ),
         patch(
-            "app.projects.project_services.central_crud.read_and_test_xform",
+            "app.central.central_crud.read_and_test_xform",
             side_effect=fake_read_and_test_xform,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_odk_xform",
+            "app.central.central_crud.create_odk_xform",
             side_effect=fake_create_odk_xform,
         ),
         patch(
-            "app.projects.project_services.project_crud.generate_project_files",
+            "app.projects.project_crud.generate_project_files",
             side_effect=fake_generate_project_files,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_project_manager_user",
+            "app.central.central_crud.create_project_manager_user",
             side_effect=fake_create_project_manager_user,
         ),
     ):
@@ -518,42 +522,42 @@ async def test_finalize_odk_project_prefers_public_url_for_manager_link():
 
     with (
         patch(
-            "app.projects.project_services.DbProject.one",
+            "app.db.models.DbProject.one",
             return_value=project,
         ),
         patch(
-            "app.projects.project_services.DbProject.update",
+            "app.db.models.DbProject.update",
             new_callable=AsyncMock,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_entity_list",
+            "app.central.central_crud.create_entity_list",
             side_effect=fake_create_entity_list,
         ),
         patch(
-            "app.projects.project_services.central_crud.task_geojson_dict_to_entity_values",
+            "app.central.central_crud.task_geojson_dict_to_entity_values",
             side_effect=fake_task_geojson_dict_to_entity_values,
         ),
         patch(
-            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            "app.central.central_crud.feature_geojson_to_entity_dict",
             side_effect=fake_feature_geojson_to_entity_dict,
         ),
         patch(
-            "app.projects.project_services.central_crud.read_and_test_xform",
+            "app.central.central_crud.read_and_test_xform",
             side_effect=fake_read_and_test_xform,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_odk_xform",
+            "app.central.central_crud.create_odk_xform",
             side_effect=fake_create_odk_xform,
         ),
         patch(
-            "app.projects.project_services.project_crud.generate_project_files",
+            "app.projects.project_crud.generate_project_files",
             side_effect=fake_generate_project_files,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_project_manager_user",
+            "app.central.central_crud.create_project_manager_user",
             side_effect=fake_create_project_manager_user,
         ),
-        patch("app.projects.project_services.settings") as mock_settings,
+        patch("app.projects.odk_services.settings") as mock_settings,
     ):
         mock_settings.ODK_CENTRAL_URL = "http://central:8383"
         mock_settings.ODK_CENTRAL_PUBLIC_URL = "http://odk.field.localhost:7050"
@@ -606,31 +610,31 @@ async def test_finalize_odk_project_generate_files_failure():
 
     with (
         patch(
-            "app.projects.project_services.DbProject.one",
+            "app.db.models.DbProject.one",
             return_value=project,
         ),
         patch(
-            "app.projects.project_services.DbProject.update",
+            "app.db.models.DbProject.update",
             new_callable=AsyncMock,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_entity_list",
+            "app.central.central_crud.create_entity_list",
             side_effect=fake_create_entity_list,
         ),
         patch(
-            "app.projects.project_services.central_crud.task_geojson_dict_to_entity_values",
+            "app.central.central_crud.task_geojson_dict_to_entity_values",
             side_effect=fake_task_geojson_dict_to_entity_values,
         ),
         patch(
-            "app.projects.project_services.central_crud.read_and_test_xform",
+            "app.central.central_crud.read_and_test_xform",
             side_effect=fake_read_and_test_xform,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_odk_xform",
+            "app.central.central_crud.create_odk_xform",
             side_effect=fake_create_odk_xform,
         ),
         patch(
-            "app.projects.project_services.project_crud.generate_project_files",
+            "app.projects.project_crud.generate_project_files",
             side_effect=fake_generate_project_files,
         ),
     ):
@@ -684,39 +688,39 @@ async def test_finalize_odk_project_manager_user_failure_raises_service_error():
 
     with (
         patch(
-            "app.projects.project_services.DbProject.one",
+            "app.db.models.DbProject.one",
             return_value=project,
         ),
         patch(
-            "app.projects.project_services.DbProject.update",
+            "app.db.models.DbProject.update",
             new_callable=AsyncMock,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_entity_list",
+            "app.central.central_crud.create_entity_list",
             side_effect=fake_create_entity_list,
         ),
         patch(
-            "app.projects.project_services.central_crud.task_geojson_dict_to_entity_values",
+            "app.central.central_crud.task_geojson_dict_to_entity_values",
             side_effect=fake_task_geojson_dict_to_entity_values,
         ),
         patch(
-            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            "app.central.central_crud.feature_geojson_to_entity_dict",
             side_effect=fake_feature_geojson_to_entity_dict,
         ),
         patch(
-            "app.projects.project_services.central_crud.read_and_test_xform",
+            "app.central.central_crud.read_and_test_xform",
             side_effect=fake_read_and_test_xform,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_odk_xform",
+            "app.central.central_crud.create_odk_xform",
             side_effect=fake_create_odk_xform,
         ),
         patch(
-            "app.projects.project_services.project_crud.generate_project_files",
+            "app.projects.project_crud.generate_project_files",
             side_effect=fake_generate_project_files,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_project_manager_user",
+            "app.central.central_crud.create_project_manager_user",
             side_effect=fake_create_project_manager_user,
         ),
     ):
@@ -840,7 +844,7 @@ async def test_build_task_entities_uses_stored_task_ids():
         return {"label": "", "data": {"geometry": "geom"}}
 
     with patch(
-        "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+        "app.central.central_crud.feature_geojson_to_entity_dict",
         side_effect=fake_feature_geojson_to_entity_dict,
     ):
         task_entities = await _build_task_entities(project)
@@ -874,7 +878,7 @@ async def test_build_task_entities_include_assignments_and_colour():
         return {"label": "", "data": {"geometry": "geom"}}
 
     with patch(
-        "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+        "app.central.central_crud.feature_geojson_to_entity_dict",
         side_effect=fake_feature_geojson_to_entity_dict,
     ):
         assigned, plain = await _build_task_entities(project)
@@ -910,11 +914,11 @@ async def test_sync_odk_tasks_keeps_field_status():
 
     with (
         patch(
-            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            "app.central.central_crud.feature_geojson_to_entity_dict",
             side_effect=fake_feature_geojson_to_entity_dict,
         ),
         patch(
-            "app.projects.project_services.central_crud.create_entity_list",
+            "app.central.central_crud.create_entity_list",
             new_callable=AsyncMock,
         ) as mock_create,
     ):
@@ -953,7 +957,7 @@ async def test_build_task_entities_stamps_legacy_rows_in_memory():
         return {"label": "", "data": {"geometry": "geom"}}
 
     with patch(
-        "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+        "app.central.central_crud.feature_geojson_to_entity_dict",
         side_effect=fake_feature_geojson_to_entity_dict,
     ):
         task_entities = await _build_task_entities(project)
@@ -987,7 +991,7 @@ async def test_build_task_entities_agrees_with_qfield_builder_on_mixed_ids():
         return {"label": "", "data": {"geometry": "geom"}}
 
     with patch(
-        "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+        "app.central.central_crud.feature_geojson_to_entity_dict",
         side_effect=fake_feature_geojson_to_entity_dict,
     ):
         task_entities = await _build_task_entities(odk_project)
@@ -1006,7 +1010,7 @@ async def test_build_task_entities_outline_fallback_stays_task_one():
         return {"label": "", "data": {"geometry": "geom"}}
 
     with patch(
-        "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+        "app.central.central_crud.feature_geojson_to_entity_dict",
         side_effect=fake_feature_geojson_to_entity_dict,
     ):
         task_entities = await _build_task_entities(project)
@@ -1300,7 +1304,7 @@ async def test_sync_odk_tasks_updates_or_resets_and_deletes(reset, status):
 
     with (
         patch(
-            "app.projects.project_services.central_crud.feature_geojson_to_entity_dict",
+            "app.central.central_crud.feature_geojson_to_entity_dict",
             side_effect=fake_feature_geojson_to_entity_dict,
         ),
         patch(

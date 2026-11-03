@@ -9,17 +9,11 @@ from litestar import status_codes as status
 from litestar.response import Response, Template
 
 from app.db.models import DbProject
-from app.errors import (
-    ServiceError,
-)
-from app.errors import (
-    ValidationError as SvcValidationError,
-)
+from app.errors import ServiceError
+from app.errors import ValidationError as SvcValidationError
 from app.i18n import _
-from app.projects.project_services import (
-    ODKFinalizeResult,
-    QFieldFinalizeResult,
-)
+from app.projects.odk_services import ODKFinalizeResult
+from app.projects.project_services import QFieldFinalizeResult
 
 from ..htmx_helpers import callout
 

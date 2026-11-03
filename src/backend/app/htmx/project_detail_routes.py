@@ -50,9 +50,7 @@ from app.errors import (
 )
 from app.i18n import _
 from app.projects import project_crud
-from app.projects.project_services import (
-    delete_project_with_downstream,
-)
+from app.projects.project_services import delete_project_with_downstream
 from app.qfield.qfield_crud import export_qfield_project_geojson
 from app.qfield.qfield_utils import strip_qfc_api_suffix
 

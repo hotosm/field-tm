@@ -8,12 +8,10 @@ from litestar import status_codes as status
 
 from app.config import settings
 from app.db.models import DbProject
-from app.errors import (
-    ValidationError,
-)
+from app.errors import ValidationError
 from app.projects import task_plan
 from app.projects.mapping_apps import FieldMappingApp, recommend_apps
-from app.projects.project_services import (
+from app.projects.task_sync import (
     tasks_geometry_changed,
     tasks_geometry_hash,
 )
@@ -336,7 +334,7 @@ async def test_sync_task_plan_updates_odk_properties(client, db, project):
     """Property-only re-sync keeps ODK task status and stores the hash."""
     await _published_with_synced_plan(db, project)
     with patch(
-        "app.projects.project_services.sync_odk_tasks", new_callable=AsyncMock
+        "app.projects.task_sync.sync_odk_tasks", new_callable=AsyncMock
     ) as mock_sync:
         response = await client.post(f"/projects/{project.id}/task-plan/sync")
 
@@ -353,7 +351,7 @@ async def test_sync_task_plan_geometry_change_needs_confirmation(client, db, pro
     url = f"/projects/{project.id}/task-plan/sync"
 
     with patch(
-        "app.projects.project_services.sync_odk_tasks", new_callable=AsyncMock
+        "app.projects.task_sync.sync_odk_tasks", new_callable=AsyncMock
     ) as mock_sync:
         refused = await client.post(url)
         assert refused.status_code == status.HTTP_400_BAD_REQUEST
@@ -371,7 +369,7 @@ async def test_sync_task_plan_regenerates_qfield_project(client, db, project):
     """QField re-sync goes through the project regeneration path."""
     await _published_with_synced_plan(db, project, "QField")
     with patch(
-        "app.projects.project_services.resync_qfield_tasks", new_callable=AsyncMock
+        "app.projects.task_sync.resync_qfield_tasks", new_callable=AsyncMock
     ) as mock_resync:
         response = await client.post(f"/projects/{project.id}/task-plan/sync")
 
@@ -385,7 +383,7 @@ async def test_sync_task_plan_reports_app_failure(client, db, project):
     await _published_with_synced_plan(db, project)
     await _set_project(db, project.id, tasks_synced_hash="old")
     with patch(
-        "app.projects.project_services.sync_odk_tasks",
+        "app.projects.task_sync.sync_odk_tasks",
         new_callable=AsyncMock,
         side_effect=RuntimeError("down"),
     ):

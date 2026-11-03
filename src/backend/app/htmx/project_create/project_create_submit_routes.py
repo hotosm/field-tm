@@ -22,9 +22,7 @@ from app.errors import (
     ConflictError,
     ServiceError,
 )
-from app.errors import (
-    ValidationError as SvcValidationError,
-)
+from app.errors import ValidationError as SvcValidationError
 from app.helpers.background_tasks import spawn
 from app.i18n import _, get_current_locale
 from app.projects import project_schemas

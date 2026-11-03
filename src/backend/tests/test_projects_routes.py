@@ -32,11 +32,15 @@ import pytest
 from app.central.central_crud import create_odk_project
 from app.central.central_schemas import ODKCentral
 from app.db.enums import FieldMappingApp, ProjectStatus
-from app.errors import (
-    UpstreamError,
-)
+from app.errors import UpstreamError
 from app.helpers.geometry_utils import check_crs, featcol_polygons_to_centroids
-from app.projects import project_crud, project_services
+from app.projects import (
+    data_extract_services,
+    odk_services,
+    project_crud,
+    project_deps,
+    project_services,
+)
 from app.projects.project_schemas import ProjectUpdate
 
 
@@ -157,25 +161,27 @@ async def test_download_osm_data_parses_geojson_object_not_string(monkeypatch):
         return None
 
     monkeypatch.setattr(
-        project_services.project_deps,
+        project_deps,
         "get_project_by_id",
         fake_get_project_by_id,
     )
     monkeypatch.setattr(
-        project_services.project_crud,
+        project_crud,
         "generate_data_extract",
         fake_generate_data_extract,
     )
-    monkeypatch.setattr(project_services, "_download_extract_geojson", fake_download)
-    monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
     monkeypatch.setattr(
-        project_services,
+        data_extract_services, "_download_extract_geojson", fake_download
+    )
+    monkeypatch.setattr(data_extract_services, "parse_aoi", fake_parse_aoi)
+    monkeypatch.setattr(
+        data_extract_services,
         "featcol_keep_single_geom_type",
         fake_featcol_keep_single_geom_type,
     )
-    monkeypatch.setattr(project_services, "check_crs", fake_check_crs)
+    monkeypatch.setattr(data_extract_services, "check_crs", fake_check_crs)
 
-    result = await project_services.download_osm_data(
+    result = await data_extract_services.download_osm_data(
         db=Mock(),
         project_id=1,
         osm_category="buildings",
@@ -218,17 +224,19 @@ async def test_download_osm_data_handles_null_features_as_no_matches(monkeypatch
         raise AssertionError("parse_aoi should not be called for empty extract results")
 
     monkeypatch.setattr(
-        project_services.project_deps,
+        project_deps,
         "get_project_by_id",
         fake_get_project_by_id,
     )
     monkeypatch.setattr(
-        project_services.project_crud,
+        project_crud,
         "generate_data_extract",
         fake_generate_data_extract,
     )
-    monkeypatch.setattr(project_services, "_download_extract_geojson", fake_download)
-    monkeypatch.setattr(project_services, "parse_aoi", parse_aoi_should_not_run)
+    monkeypatch.setattr(
+        data_extract_services, "_download_extract_geojson", fake_download
+    )
+    monkeypatch.setattr(data_extract_services, "parse_aoi", parse_aoi_should_not_run)
 
     with pytest.raises(
         project_services.ValidationError,
@@ -237,7 +245,7 @@ async def test_download_osm_data_handles_null_features_as_no_matches(monkeypatch
             "Data Only option."
         ),
     ):
-        await project_services.download_osm_data(
+        await data_extract_services.download_osm_data(
             db=Mock(),
             project_id=1,
             osm_category="highways",
@@ -288,17 +296,19 @@ async def test_download_osm_data_maps_invalid_geometry_parse_to_validation_error
         raise TypeError("'NoneType' object is not iterable")
 
     monkeypatch.setattr(
-        project_services.project_deps,
+        project_deps,
         "get_project_by_id",
         fake_get_project_by_id,
     )
     monkeypatch.setattr(
-        project_services.project_crud,
+        project_crud,
         "generate_data_extract",
         fake_generate_data_extract,
     )
-    monkeypatch.setattr(project_services, "_download_extract_geojson", fake_download)
-    monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
+    monkeypatch.setattr(
+        data_extract_services, "_download_extract_geojson", fake_download
+    )
+    monkeypatch.setattr(data_extract_services, "parse_aoi", fake_parse_aoi)
 
     with pytest.raises(
         project_services.ValidationError,
@@ -307,7 +317,7 @@ async def test_download_osm_data_maps_invalid_geometry_parse_to_validation_error
             "Please continue with the Collect New Data Only option."
         ),
     ):
-        await project_services.download_osm_data(
+        await data_extract_services.download_osm_data(
             db=Mock(),
             project_id=1,
             osm_category="buildings",
@@ -340,12 +350,12 @@ async def test_download_osm_data_maps_extract_generation_failure(monkeypatch):
         raise UpstreamError("Failed to generate data extract from the raw data API.")
 
     monkeypatch.setattr(
-        project_services.project_deps,
+        project_deps,
         "get_project_by_id",
         fake_get_project_by_id,
     )
     monkeypatch.setattr(
-        project_services.project_crud,
+        project_crud,
         "generate_data_extract",
         fake_generate_data_extract,
     )
@@ -357,7 +367,7 @@ async def test_download_osm_data_maps_extract_generation_failure(monkeypatch):
             "Please reduce the AOI size or choose Collect New Data Only."
         ),
     ):
-        await project_services.download_osm_data(
+        await data_extract_services.download_osm_data(
             db=Mock(),
             project_id=1,
             osm_category="buildings",
@@ -427,20 +437,22 @@ async def test_download_osm_data_computes_centroids_locally(monkeypatch):
         return None
 
     monkeypatch.setattr(
-        project_services.project_deps,
+        project_deps,
         "get_project_by_id",
         fake_get_project_by_id,
     )
     monkeypatch.setattr(
-        project_services.project_crud,
+        project_crud,
         "generate_data_extract",
         fake_generate_data_extract,
     )
-    monkeypatch.setattr(project_services, "_download_extract_geojson", fake_download)
-    monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
-    monkeypatch.setattr(project_services, "check_crs", fake_check_crs)
+    monkeypatch.setattr(
+        data_extract_services, "_download_extract_geojson", fake_download
+    )
+    monkeypatch.setattr(data_extract_services, "parse_aoi", fake_parse_aoi)
+    monkeypatch.setattr(data_extract_services, "check_crs", fake_check_crs)
 
-    result = await project_services.download_osm_data(
+    result = await data_extract_services.download_osm_data(
         db=Mock(),
         project_id=1,
         osm_category="buildings",
@@ -484,7 +496,7 @@ async def test_featcol_polygons_to_centroids_keeps_points():
 
 def test_configure_extract_sources_polygon_centroid_maps_to_ways_poly():
     """Polygon + centroid should select ways_poly so the config isn't malformed."""
-    config, geom_types = project_services._configure_extract_sources(
+    config, geom_types = data_extract_services._configure_extract_sources(
         {}, "POLYGON", centroid=True
     )
     assert config["from"] == ["ways_poly"]
@@ -493,7 +505,7 @@ def test_configure_extract_sources_polygon_centroid_maps_to_ways_poly():
 
 def test_configure_extract_sources_polyline_centroid_maps_to_ways_line():
     """Polyline + centroid should select ways_line and report 'line' to raw-data-api."""
-    config, geom_types = project_services._configure_extract_sources(
+    config, geom_types = data_extract_services._configure_extract_sources(
         {}, "POLYLINE", centroid=True
     )
     assert config["from"] == ["ways_line"]
@@ -502,7 +514,7 @@ def test_configure_extract_sources_polyline_centroid_maps_to_ways_line():
 
 def test_configure_extract_sources_point_centroid_unions_polygon_and_point():
     """Point + centroid should union ways_poly (centroid-ified) with OSM nodes."""
-    config, geom_types = project_services._configure_extract_sources(
+    config, geom_types = data_extract_services._configure_extract_sources(
         {}, "POINT", centroid=True
     )
     assert config["from"] == ["ways_poly", "nodes"]
@@ -511,7 +523,7 @@ def test_configure_extract_sources_point_centroid_unions_polygon_and_point():
 
 def test_configure_extract_sources_point_no_centroid_queries_nodes_only():
     """Point without centroid should only query OSM nodes."""
-    config, geom_types = project_services._configure_extract_sources(
+    config, geom_types = data_extract_services._configure_extract_sources(
         {}, "POINT", centroid=False
     )
     assert config["from"] == ["nodes"]
@@ -734,12 +746,12 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
         fake_create_project_manager_user,
     )
     monkeypatch.setattr(
-        project_services.project_crud,
+        project_crud,
         "generate_project_files",
         fake_generate_project_files,
     )
 
-    result = await project_services.finalize_odk_project(
+    result = await odk_services.finalize_odk_project(
         db=db,
         project_id=1,
         custom_odk_creds=ODKCentral(
@@ -1000,12 +1012,12 @@ async def test_download_extract_geojson(monkeypatch):
 
     real_client = httpx.AsyncClient
     monkeypatch.setattr(
-        project_services.httpx,
+        data_extract_services.httpx,
         "AsyncClient",
         lambda **kw: real_client(transport=httpx.MockTransport(handler), **kw),
     )
 
     url = "https://extract.example.org/a.geojson"
-    assert await project_services._download_extract_geojson(url) == featcol
+    assert await data_extract_services._download_extract_geojson(url) == featcol
     with pytest.raises(project_services.ServiceError):
-        await project_services._download_extract_geojson(url)
+        await data_extract_services._download_extract_geojson(url)

@@ -17,19 +17,19 @@ from app.errors import (
     ConflictError,
     ServiceError,
 )
-from app.errors import (
-    ValidationError as SvcValidationError,
-)
+from app.errors import ValidationError as SvcValidationError
 from app.helpers.background_tasks import spawn
 from app.i18n import _
 from app.projects import project_schemas
+from app.projects.data_extract_services import (
+    download_osm_data,
+    save_data_extract,
+)
 from app.projects.project_crud import claim_simple_project_basemap_generation
 from app.projects.project_services import (
     create_project_stub,
-    download_osm_data,
     finalize_qfield_project,
     process_xlsform,
-    save_data_extract,
     save_task_areas,
     split_aoi,
 )

@@ -17,30 +17,24 @@
 #
 """Shared project operations for HTMX and backend workflows."""
 
-import hashlib
-import json
 import logging
-from asyncio import TimeoutError as AsyncTimeoutError
 from asyncio import get_running_loop
 from dataclasses import dataclass
 from functools import partial
 from io import BytesIO
 from typing import Optional
 
-import httpx
 from anyio import to_thread
 from area_splitter import SplittingAlgorithm
 from area_splitter.splitter import split_by_sql
 from geojson_aoi import parse_aoi
-from osm_fieldwork.json_data_models import data_models_path
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
 from qfieldcloud_sdk.interfaces import QfcRequestException
 
 from app.central import central_crud, central_deps
-from app.central.central_schemas import ODKCentral
 from app.config import settings
-from app.db.enums import FieldMappingApp, ProjectStatus, XLSFormType
+from app.db.enums import FieldMappingApp, ProjectStatus
 from app.db.languages_and_countries import countries
 from app.db.models import DbProject
 from app.errors import (
@@ -48,22 +42,20 @@ from app.errors import (
     DownstreamDeleteError,
     NotFoundError,
     ServiceError,
-    UpstreamError,
     ValidationError,
 )
 from app.helpers.geometry_utils import (
     AREA_LIMIT_KM2,
     check_crs,
-    featcol_keep_single_geom_type,
-    featcol_polygons_to_centroids,
     geojson_area_km2,
     merge_featcol_polygons_sync,
     polygon_to_centroid,
     stamp_missing_task_ids,
 )
 from app.i18n import _
-from app.projects import project_crud, project_deps, project_schemas
-from app.qfield.qfield_crud import create_qfield_project, resync_qfield_tasks
+from app.projects import project_deps, project_schemas
+from app.projects.task_sync import tasks_geometry_hash
+from app.qfield.qfield_crud import create_qfield_project
 from app.qfield.qfield_deps import qfield_client
 
 log = logging.getLogger(__name__)
@@ -101,15 +93,6 @@ def _format_simple_fallback_city(centroid) -> str:
 
 
 @dataclass(slots=True)
-class ODKFinalizeResult:
-    """Details returned after ODK finalization."""
-
-    odk_url: str
-    manager_username: str
-    manager_password: str
-
-
-@dataclass(slots=True)
 class QFieldFinalizeResult:
     """Details returned after QField finalization."""
 
@@ -121,39 +104,6 @@ class DeleteProjectResult:
     """Result from deleting project in downstream app + Field-TM."""
 
     downstream_status: str
-
-
-def _first_outline_feature(outline: Optional[dict]) -> Optional[dict]:
-    """Normalize a project outline to a single GeoJSON Feature."""
-    if not outline or not isinstance(outline, dict):
-        return None
-
-    outline_type = str(outline.get("type", "")).strip()
-    if outline_type == "FeatureCollection":
-        features = outline.get("features", [])
-        if isinstance(features, list) and features:
-            first_feature = features[0]
-            if isinstance(first_feature, dict):
-                return first_feature
-        return None
-
-    if outline_type == "Feature":
-        return outline
-
-    # Stored project outlines are typically geometry objects from PostGIS.
-    if "coordinates" in outline:
-        return {"type": "Feature", "geometry": outline, "properties": {}}
-
-    return None
-
-
-def _resolve_odk_public_url(custom_odk_creds: Optional[ODKCentral]) -> str:
-    """Resolve public ODK base URL used for UI links and persisted instance URL."""
-    if custom_odk_creds and custom_odk_creds.external_project_instance_url:
-        return custom_odk_creds.external_project_instance_url.rstrip("/")
-    return str(
-        settings.ODK_CENTRAL_PUBLIC_URL or settings.ODK_CENTRAL_URL or ""
-    ).rstrip("/")
 
 
 def _validate_project_stub_inputs(
@@ -433,9 +383,6 @@ async def _populate_project_location(
         project_data.location_str = None
 
 
-# Service functions
-
-
 async def create_project_stub(
     db: AsyncConnection,
     project_name: str,
@@ -526,253 +473,6 @@ async def process_xlsform(
     log.debug(f"Successfully saved XLSForm to database for project {project_id}")
 
 
-def _extract_config_path(osm_category: str) -> str:
-    """Resolve the data-model config path for an OSM category."""
-    try:
-        osm_category_enum = XLSFormType[osm_category.lower()]
-    except (KeyError, AttributeError):
-        osm_category_enum = XLSFormType.buildings
-    return f"{data_models_path}/{osm_category_enum.name}.json"
-
-
-def _configure_extract_sources(
-    config_data: dict,
-    geom_type: str,
-    centroid: bool,
-) -> tuple[dict, list[str]]:
-    """Select raw-data-api source tables and geometry types.
-
-    Point mode with centroid=True includes polygon centroids and existing nodes.
-    """
-    geom_type_lower = geom_type.lower()
-    source_table_config = {
-        ("polygon", False): ["ways_poly"],
-        ("polygon", True): ["ways_poly"],
-        ("point", False): ["nodes"],
-        ("point", True): ["ways_poly", "nodes"],
-        ("polyline", False): ["ways_line"],
-        ("polyline", True): ["ways_line"],
-    }
-    config_data["from"] = source_table_config.get((geom_type_lower, centroid))
-
-    geometry_types_config = {
-        ("polygon", False): ["polygon"],
-        ("polygon", True): ["polygon"],
-        ("point", False): ["point"],
-        ("point", True): ["polygon", "point"],
-        ("polyline", False): ["line"],
-        ("polyline", True): ["line"],
-    }
-    geometry_types = geometry_types_config.get(
-        (geom_type_lower, centroid), [geom_type_lower]
-    )
-    return config_data, geometry_types
-
-
-async def _download_extract_geojson(download_url: str) -> dict:
-    """Download and parse the GeoJSON payload from the raw-data extract URL."""
-    # No total cap (large extracts can take minutes); bound on stalls only.
-    timeout = httpx.Timeout(300, connect=30)
-    try:
-        async with httpx.AsyncClient(timeout=timeout, follow_redirects=True) as client:
-            response = await client.get(download_url)
-    except httpx.HTTPError as e:
-        raise ServiceError("Failed to download GeoJSON from extract URL.") from e
-    if response.is_error:
-        raise ServiceError("Failed to download GeoJSON from extract URL.")
-    text_content = response.text
-
-    try:
-        geojson_data = json.loads(text_content)
-    except json.JSONDecodeError as e:
-        raise ServiceError("Failed to parse GeoJSON data from download.") from e
-
-    if not isinstance(geojson_data, dict):
-        raise ServiceError("Downloaded extract is not valid GeoJSON data.")
-    return geojson_data
-
-
-def _validate_downloaded_geojson(geojson_data: dict) -> dict:
-    """Validate the downloaded GeoJSON payload and normalize empty features."""
-    features = geojson_data.get("features")
-    if features is None:
-        features = []
-        geojson_data["features"] = features
-    if not isinstance(features, list):
-        raise ServiceError("Downloaded GeoJSON has invalid feature structure.")
-    if len(features) == 0:
-        raise ValidationError(
-            "No data found in OSM. Please continue with the Collect New "
-            "Data Only option."
-        )
-    return geojson_data
-
-
-def _expected_extract_output_geom(geometry_types: list[str], centroid: bool) -> str:
-    """Return the GeoJSON geometry type expected from raw-data-api."""
-    # Points when centroid=True (computed after download) or when the only
-    # source is `point`; `line` stays as LineString; otherwise Polygon.
-    if centroid or geometry_types == ["point"]:
-        return "Point"
-    if geometry_types == ["line"]:
-        return "LineString"
-    return "Polygon"
-
-
-async def _request_osm_data_extract(
-    project_id: int,
-    aoi_featcol: dict,
-    geometry_types: list[str],
-    config_data: dict,
-):
-    """Request a raw-data-api extract and map common failures to service errors."""
-    try:
-        return await project_crud.generate_data_extract(
-            project_id,
-            aoi_featcol,
-            geometry_types,
-            config_data,
-            centroid=False,
-            use_st_within=True,
-        )
-    except UpstreamError as exc:
-        raise ServiceError(
-            "OSM data extraction timed out or failed upstream. "
-            "Please reduce the AOI size or choose Collect New Data Only."
-        ) from exc
-    except AsyncTimeoutError as exc:
-        raise ServiceError(
-            "OSM data extraction timed out. "
-            "Please reduce the AOI size or choose Collect New Data Only."
-        ) from exc
-
-
-def _parse_polygon_extract_geojson(geojson_data: dict) -> dict:
-    """Run polygon-only PostGIS normalization for polygon extracts."""
-    try:
-        return parse_aoi(settings.FTM_DB_URL, geojson_data)
-    except TypeError as exc:
-        raise ValidationError(
-            "No valid geometries found in OSM for the selected extract "
-            "settings. Please continue with the Collect New Data Only option."
-        ) from exc
-
-
-def _normalize_downloaded_extract(
-    geojson_data: dict,
-    expected_output_geom: str,
-) -> dict:
-    """Normalize and filter downloaded extract GeoJSON to one output geometry."""
-    # parse_aoi drops non-polygons; point and line extracts must skip it.
-    featcol = (
-        _parse_polygon_extract_geojson(geojson_data)
-        if expected_output_geom == "Polygon"
-        else geojson_data
-    )
-
-    if not featcol or not isinstance(featcol, dict) or not featcol.get("features"):
-        raise ValidationError(
-            "No valid geometries found in OSM for the selected extract settings. "
-            "Please continue with the Collect New Data Only option."
-        )
-
-    return featcol_keep_single_geom_type(featcol, expected_output_geom)
-
-
-async def download_osm_data(
-    db: AsyncConnection,
-    project_id: int,
-    osm_category: str = "buildings",
-    geom_type: str = "POLYGON",
-    centroid: bool = False,
-) -> dict:
-    """Download and validate a project's OSM extract as a GeoJSON FeatureCollection.
-
-    Raises NotFoundError for a missing outline or ServiceError on extraction failure.
-    """
-    project = await project_deps.get_project_by_id(db, project_id)
-
-    outline = project.outline
-    if not outline:
-        raise NotFoundError("Project outline not found.")
-
-    aoi_featcol = {
-        "type": "FeatureCollection",
-        "features": [{"type": "Feature", "geometry": outline, "properties": {}}],
-    }
-
-    with open(_extract_config_path(osm_category), encoding="utf-8") as f:
-        config_data = json.load(f)
-    config_data, geometry_types = _configure_extract_sources(
-        config_data,
-        geom_type,
-        centroid,
-    )
-    expected_output_geom = _expected_extract_output_geom(geometry_types, centroid)
-
-    result = await _request_osm_data_extract(
-        project.id,
-        aoi_featcol,
-        geometry_types,
-        config_data,
-    )
-
-    download_url = result.data.get("download_url")
-    if not download_url:
-        raise ServiceError("Failed to get download URL from data extract.")
-
-    geojson_data = await _download_extract_geojson(download_url)
-    geojson_data = _validate_downloaded_geojson(geojson_data)
-    # Centroids are computed here: raw-data-api's centroid mode was unreliable.
-    if centroid:
-        geojson_data = await featcol_polygons_to_centroids(geojson_data)
-    featcol_single_geom_type = _normalize_downloaded_extract(
-        geojson_data,
-        expected_output_geom,
-    )
-
-    if not featcol_single_geom_type:
-        raise ServiceError("Could not process GeoJSON data.")
-
-    await check_crs(featcol_single_geom_type)
-
-    return featcol_single_geom_type
-
-
-async def save_data_extract(
-    db: AsyncConnection,
-    project_id: int,
-    geojson_data: dict,
-) -> int:
-    """Store a GeoJSON extract and return its feature count.
-
-    Raises ValidationError for empty or invalid GeoJSON.
-    """
-    if not geojson_data:
-        raise ValidationError("No GeoJSON data provided.")
-
-    features = geojson_data.get("features", [])
-    if not features:
-        raise ValidationError("GeoJSON data contains no features.")
-
-    await check_crs(geojson_data)
-
-    await DbProject.update(
-        db,
-        project_id,
-        project_schemas.ProjectUpdate(
-            data_extract_geojson=geojson_data,
-        ),
-    )
-    await db.commit()
-
-    feature_count = len(features)
-    log.info(
-        f"Saved data extract with {feature_count} features for project {project_id}"
-    )
-    return feature_count
-
-
 def _as_aoi_feature_collection(outline: dict) -> dict:
     """Wrap a project outline geometry in a single-feature collection."""
     return {
@@ -857,394 +557,6 @@ async def save_task_areas(
         f"(empty: {is_empty}, count: {task_count})"
     )
     return task_count
-
-
-def _validate_odk_finalization_prereqs(
-    project: DbProject,
-    custom_odk_creds: Optional[ODKCentral],
-) -> None:
-    """Validate the project state and ODK credentials before finalization."""
-    if not project.xlsform_content:
-        raise ValidationError("XLSForm is required. Please upload a form first.")
-    if project.data_extract_geojson is None:
-        raise ValidationError(
-            "Data extract is required. "
-            "Please download OSM data or upload GeoJSON first."
-        )
-    if not custom_odk_creds and (
-        not settings.ODK_CENTRAL_URL or not settings.ODK_CENTRAL_USER
-    ):
-        raise ValidationError(
-            "ODK Central credentials are not configured on the server. "
-            "Please provide custom ODK credentials."
-        )
-
-
-async def _ensure_odk_project(
-    db: AsyncConnection,
-    project_id: int,
-    project: DbProject,
-    custom_odk_creds: Optional[ODKCentral],
-) -> int:
-    """Create the downstream ODK project if it does not already exist."""
-    if project.external_project_id:
-        return project.external_project_id
-
-    log.info(f"Creating ODK project for Field-TM project {project_id}")
-    odk_project = await central_crud.create_odk_project(
-        project.project_name,
-        custom_odk_creds,
-    )
-    project_odk_id = odk_project["id"]
-    await DbProject.update(
-        db,
-        project_id,
-        project_schemas.ProjectUpdate(external_project_id=project_odk_id),
-    )
-    await db.commit()
-    log.info(f"Created ODK project {project_odk_id} for Field-TM project {project_id}")
-    return project_odk_id
-
-
-async def _persist_project_odk_details(
-    db: AsyncConnection,
-    project_id: int,
-    project: DbProject,
-    project_odk_id: int,
-    custom_odk_creds: Optional[ODKCentral],
-) -> None:
-    """Persist the ODK connection details used for this project."""
-    odk_instance_url = _resolve_odk_public_url(custom_odk_creds)
-    should_update_odk_details = False
-    update_payload = project_schemas.ProjectUpdate(external_project_id=project_odk_id)
-
-    if odk_instance_url and odk_instance_url != (
-        project.external_project_instance_url or ""
-    ):
-        update_payload.external_project_instance_url = odk_instance_url
-        should_update_odk_details = True
-
-    if custom_odk_creds:
-        if custom_odk_creds.external_project_username:
-            update_payload.external_project_username = (
-                custom_odk_creds.external_project_username
-            )
-            should_update_odk_details = True
-        if custom_odk_creds.external_project_password:
-            update_payload.external_project_password = (
-                custom_odk_creds.external_project_password
-            )
-            should_update_odk_details = True
-
-    if not should_update_odk_details:
-        return
-
-    await DbProject.update(db, project_id, update_payload)
-    await db.commit()
-
-
-def _apply_default_entity_style(entities_list: list[dict]) -> None:
-    """Ensure generated entities include the default map style fields."""
-    default_style = {
-        "fill": "#1a1a1a",
-        "marker-color": "#1a1a1a",
-        "stroke": "#000000",
-        "stroke-width": "6",
-    }
-    for entity in entities_list:
-        data = entity["data"]
-        for key, value in default_style.items():
-            data.setdefault(key, value)
-
-
-async def _build_feature_dataset_payload(
-    project_id: int, project: DbProject
-) -> tuple[list[str], list[dict]]:
-    """Build the `features` dataset property list and entities."""
-    geojson_data = project.data_extract_geojson or {}
-    features = (
-        geojson_data.get("features", []) if isinstance(geojson_data, dict) else []
-    )
-    if not features:
-        log.info(
-            "No existing features supplied for project %s. "
-            "Creating empty 'features' dataset for collect-new-data workflow.",
-            project_id,
-        )
-        return [], []
-
-    entity_properties = list(features[0].get("properties", {}).keys())
-    for field in ["created_by", "fill", "marker-color", "stroke", "stroke-width"]:
-        if field not in entity_properties:
-            entity_properties.append(field)
-
-    entities_list = await central_crud.task_geojson_dict_to_entity_values(
-        geojson_data, additional_features=True
-    )
-    _apply_default_entity_style(entities_list)
-    return entity_properties, entities_list
-
-
-TASK_ENTITY_PROPERTIES = [
-    "geometry",
-    "task_id",
-    "status",
-    "assigned_group",
-    "assigned_to",
-    "comment",
-    "colour",
-    "fill",
-    "stroke",
-    "stroke-width",
-]
-
-
-def _task_entity_style(entity_dict: dict, properties: dict) -> dict:
-    """Build a task entity from a task plan feature's properties."""
-    task_id = properties["task_id"]
-    colour = properties.get("colour") or "#3388ff"
-    entity_dict["label"] = f"Task {task_id}"
-    entity_dict["data"] = {
-        "geometry": entity_dict["data"]["geometry"],
-        "task_id": str(task_id),
-        "status": "ready",
-        "assigned_group": properties.get("assigned_group") or "",
-        "assigned_to": properties.get("assigned_to") or "",
-        "comment": properties.get("comment") or "",
-        "colour": properties.get("colour") or "",
-        "fill": f"{colour}33",
-        "stroke": colour,
-        "stroke-width": "3",
-    }
-    return entity_dict
-
-
-async def _build_task_entities(project: DbProject) -> list[dict]:
-    """Build the `tasks` dataset entities, creating a fallback task if needed."""
-    task_entities = []
-    task_areas = project.task_areas_geojson
-
-    if task_areas and task_areas.get("features"):
-        log.info(
-            f"Uploading {len(task_areas.get('features', []))} task boundaries to ODK"
-        )
-        # Backfill legacy task IDs using the same helper as QField exports.
-        stamp_missing_task_ids(task_areas)
-        for feature in task_areas.get("features", []):
-            if not feature.get("geometry"):
-                continue
-            entity_dict = await central_crud.feature_geojson_to_entity_dict(
-                feature,
-                additional_features=True,
-            )
-            task_entities.append(_task_entity_style(entity_dict, feature["properties"]))
-
-    if task_entities:
-        return task_entities
-
-    log.info("No task areas found, creating single task entity from project outline")
-    outline_feature = _first_outline_feature(project.outline)
-    if not (outline_feature and outline_feature.get("geometry")):
-        raise ValidationError(
-            "Project outline is missing or invalid. "
-            "Cannot create fallback task for ODK finalization."
-        )
-
-    entity_dict = await central_crud.feature_geojson_to_entity_dict(
-        outline_feature,
-        additional_features=True,
-    )
-    return [_task_entity_style(entity_dict, {"task_id": 1})]
-
-
-def tasks_geometry_hash(project: DbProject) -> str:
-    """Hash task ids and geometries, to tell area edits from assignment edits."""
-    task_areas = project.task_areas_geojson or {}
-    stamp_missing_task_ids(task_areas)
-    parts = sorted(
-        json.dumps([f["properties"].get("task_id"), f.get("geometry")], sort_keys=True)
-        for f in task_areas.get("features") or []
-    )
-    return hashlib.sha256("\n".join(parts).encode()).hexdigest()
-
-
-def tasks_geometry_changed(project: DbProject) -> bool:
-    """Whether task areas changed since the last sync (unknown counts as changed)."""
-    return project.tasks_synced_hash != tasks_geometry_hash(project)
-
-
-async def sync_odk_tasks(
-    project: DbProject,
-    odk_creds: Optional[ODKCentral],
-    project_odk_id: int,
-    reset: bool = False,
-) -> None:
-    """Create or update the ODK `tasks` entity list from the task plan.
-
-    Tasks removed from the plan are deleted. Updates keep each entity's
-    `status`, which mappers change in the field, unless `reset` is set.
-    """
-    await central_crud.create_entity_list(
-        odk_creds,
-        project_odk_id,
-        properties=TASK_ENTITY_PROPERTIES,
-        dataset_name="tasks",
-        entities_list=await _build_task_entities(project),
-        keep_existing=frozenset() if reset else frozenset({"status"}),
-        delete_missing=True,
-    )
-
-
-async def resync_tasks(
-    db: AsyncConnection, project: DbProject, reset_confirmed: bool
-) -> None:
-    """Push the task plan to a published ODK or QField project.
-
-    If task areas changed, the app's task progress is reset, so the caller
-    must confirm it.
-    """
-    changed = tasks_geometry_changed(project)
-    if changed and not reset_confirmed:
-        raise ValidationError(
-            _("Task areas changed. Confirm the reset to re-sync the tasks.")
-        )
-
-    if project.field_mapping_app == FieldMappingApp.ODK:
-        await sync_odk_tasks(
-            project,
-            project.get_odk_credentials(),
-            project.external_project_id,
-            reset=changed,
-        )
-    else:
-        await resync_qfield_tasks(db, project)
-
-    await DbProject.update(
-        db,
-        project.id,
-        project_schemas.ProjectUpdate(tasks_synced_hash=tasks_geometry_hash(project)),
-    )
-    await db.commit()
-
-
-async def _create_manager_credentials(
-    project_odk_id: int,
-    project_name: str,
-    custom_odk_creds: Optional[ODKCentral],
-) -> tuple[str, str]:
-    """Create the project-scoped ODK Central manager account."""
-    try:
-        return await central_crud.create_project_manager_user(
-            project_odk_id=project_odk_id,
-            project_name=project_name,
-            odk_credentials=custom_odk_creds,
-        )
-    except Exception as e:
-        manager_error = getattr(e, "detail", str(e))
-        raise ServiceError(
-            f"Failed to create ODK Central manager user. {manager_error}"
-        ) from e
-
-
-async def _generate_project_files(
-    db: AsyncConnection,
-    project_id: int,
-    custom_odk_creds: Optional[ODKCentral],
-) -> bool:
-    """Generate project files, tolerating legacy patched call signatures in tests."""
-    try:
-        return await project_crud.generate_project_files(
-            db,
-            project_id,
-            odk_credentials=custom_odk_creds,
-        )
-    except TypeError as e:
-        if "unexpected keyword argument 'odk_credentials'" not in str(e):
-            raise
-        return await project_crud.generate_project_files(db, project_id)
-
-
-async def finalize_odk_project(
-    db: AsyncConnection,
-    project_id: int,
-    custom_odk_creds: Optional[ODKCentral] = None,
-) -> ODKFinalizeResult:
-    """Publish to ODK Central and return its URL and manager credentials.
-
-    custom_odk_creds=None uses deployment credentials. Raises ValidationError
-    for missing prerequisites or ServiceError if creation fails.
-    """
-    project = await DbProject.one(db, project_id)
-
-    _validate_odk_finalization_prereqs(project, custom_odk_creds)
-    project_odk_id = await _ensure_odk_project(
-        db,
-        project_id,
-        project,
-        custom_odk_creds,
-    )
-    await _persist_project_odk_details(
-        db,
-        project_id,
-        project,
-        project_odk_id,
-        custom_odk_creds,
-    )
-
-    entity_properties, entities_list = await _build_feature_dataset_payload(
-        project_id,
-        project,
-    )
-
-    log.info(f"Creating entity list 'features' for ODK project {project_odk_id}")
-    await central_crud.create_entity_list(
-        custom_odk_creds,
-        project_odk_id,
-        properties=entity_properties,
-        dataset_name="features",
-        entities_list=entities_list,
-    )
-
-    await sync_odk_tasks(project, custom_odk_creds, project_odk_id)
-
-    xlsform_bytes = BytesIO(project.xlsform_content)
-    xform = await central_crud.read_and_test_xform(xlsform_bytes)
-    log.info(f"Uploading XLSForm to ODK project {project_odk_id}")
-    await central_crud.create_odk_xform(
-        project_odk_id,
-        xform,
-        custom_odk_creds,
-    )
-
-    log.info(f"Generating project files for project {project_id}")
-    success = await _generate_project_files(db, project_id, custom_odk_creds)
-
-    if not success:
-        raise ServiceError("Failed to generate project files. Please contact support.")
-
-    odk_url = f"{_resolve_odk_public_url(custom_odk_creds)}/#/projects/{project_odk_id}"
-    manager_username, manager_password = await _create_manager_credentials(
-        project_odk_id,
-        project.project_name or f"Project {project_id}",
-        custom_odk_creds,
-    )
-
-    # Update project status to PUBLISHED only after manager account exists.
-    await DbProject.update(
-        db,
-        project_id,
-        project_schemas.ProjectUpdate(
-            status=ProjectStatus.PUBLISHED,
-            tasks_synced_hash=tasks_geometry_hash(project),
-        ),
-    )
-    await db.commit()
-
-    return ODKFinalizeResult(
-        odk_url=odk_url,
-        manager_username=manager_username,
-        manager_password=manager_password,
-    )
 
 
 async def publish_project(db: AsyncConnection, project_id: int) -> None:

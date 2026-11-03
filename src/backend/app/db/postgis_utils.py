@@ -26,9 +26,7 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Json
 
 from app.db.enums import DbGeomType
-from app.errors import (
-    ServiceError,
-)
+from app.errors import ServiceError
 
 log = logging.getLogger(__name__)
 

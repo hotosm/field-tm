@@ -15,9 +15,7 @@ from app.errors import (
     ConflictError,
     ServiceError,
 )
-from app.errors import (
-    ValidationError as SvcValidationError,
-)
+from app.errors import ValidationError as SvcValidationError
 from app.htmx.project_create import project_create_simple_flow
 from app.htmx.project_create.project_create_page_routes import (
     new_project_chooser,

@@ -8,9 +8,7 @@ from litestar import Router
 from litestar import status_codes as status
 
 from app.db.models import DbProject
-from app.errors import (
-    ValidationError as SvcValidationError,
-)
+from app.errors import ValidationError as SvcValidationError
 from app.htmx.setup_steps import (
     setup_step_extract_handlers,
     setup_step_extract_routes,
@@ -29,7 +27,7 @@ from app.htmx.setup_steps.setup_step_responses import (
     build_odk_finalize_success_html,
     build_qfield_finalize_success_html,
 )
-from app.projects.project_services import (
+from app.projects.odk_services import (
     ODKFinalizeResult,
 )
 

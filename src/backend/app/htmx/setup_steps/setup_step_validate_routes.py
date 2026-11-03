@@ -19,9 +19,7 @@ from psycopg import AsyncConnection
 from app.auth.auth_deps import login_required
 from app.config import settings
 from app.db.database import db_conn
-from app.errors import (
-    ServiceError,
-)
+from app.errors import ServiceError
 from app.helpers.geometry_utils import (
     AREA_LIMIT_KM2,
     AREA_WARN_KM2,
@@ -30,9 +28,7 @@ from app.helpers.geometry_utils import (
 )
 from app.i18n import _
 
-from ..setup_steps.setup_step_responses import (
-    json_error_response,
-)
+from ..setup_steps.setup_step_responses import json_error_response
 
 log = logging.getLogger(__name__)
 

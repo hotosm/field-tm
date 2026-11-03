@@ -10,24 +10,18 @@ from psycopg import AsyncConnection
 
 from app.config import settings
 from app.db.models import DbProject
-from app.errors import (
-    ServiceError,
-)
-from app.errors import (
-    ValidationError as SvcValidationError,
-)
+from app.errors import ServiceError
+from app.errors import ValidationError as SvcValidationError
 from app.helpers.geometry_utils import check_crs
 from app.i18n import _
 from app.projects import project_schemas
-from app.projects.project_services import (
+from app.projects.data_extract_services import (
     download_osm_data,
     save_data_extract,
 )
 
 from ..htmx_helpers import callout
-from .setup_step_extract_helpers import (
-    get_submitted_geojson_data,
-)
+from .setup_step_extract_helpers import get_submitted_geojson_data
 from .setup_step_responses import (
     build_data_extract_preview_response,
     hx_trigger_response,

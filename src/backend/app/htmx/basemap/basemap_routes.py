@@ -34,9 +34,7 @@ from app.auth.roles import project_manager
 from app.db.database import db_conn
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
-from app.errors import (
-    ServiceError,
-)
+from app.errors import ServiceError
 from app.helpers.basemap_services import (
     check_tilepack_status,
     search_oam_imagery,

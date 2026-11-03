@@ -12,9 +12,7 @@ from app.auth.auth_deps import get_optional_auth_user
 from app.config import AuthProvider, settings
 from app.projects.mapping_apps import app_picker_context
 
-from ..setup_steps.setup_step_responses import (
-    hx_redirect_response,
-)
+from ..setup_steps.setup_step_responses import hx_redirect_response
 from .project_create_parsing import login_prompt_path
 
 

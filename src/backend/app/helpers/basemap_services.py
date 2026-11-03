@@ -9,9 +9,7 @@ import httpx
 from litestar import status_codes as status
 
 from app.config import settings
-from app.errors import (
-    UpstreamError,
-)
+from app.errors import UpstreamError
 from app.i18n import _
 
 REQUEST_TIMEOUT_SECONDS = 30

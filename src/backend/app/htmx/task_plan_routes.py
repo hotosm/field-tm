@@ -18,16 +18,14 @@ from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import project_manager
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp, ProjectStatus
-from app.errors import (
-    ServiceError,
-)
+from app.errors import ServiceError
 from app.i18n import _
-from app.projects.project_services import (
+from app.projects.project_services import save_task_areas
+from app.projects.task_plan import save_task_plan
+from app.projects.task_sync import (
     resync_tasks,
-    save_task_areas,
     tasks_geometry_changed,
 )
-from app.projects.task_plan import save_task_plan
 
 from .htmx_helpers import callout
 from .setup_steps.setup_step_responses import (

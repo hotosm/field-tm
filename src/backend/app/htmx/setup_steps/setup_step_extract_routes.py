@@ -24,9 +24,7 @@ from .setup_step_extract_handlers import (
     handle_submit_geojson_data_extract,
     handle_upload_geojson,
 )
-from .setup_step_responses import (
-    authorized_project_or_response,
-)
+from .setup_step_responses import authorized_project_or_response
 
 
 def _submitted_value(data: dict | None, key: str, default):

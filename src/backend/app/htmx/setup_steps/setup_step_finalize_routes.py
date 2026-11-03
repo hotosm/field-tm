@@ -19,13 +19,11 @@ from app.auth.roles import project_manager
 from app.central.central_schemas import ODKCentral
 from app.db.database import db_conn
 from app.db.enums import FieldMappingApp
-from app.errors import (
-    ServiceError,
-)
+from app.errors import ServiceError
 from app.i18n import _
 from app.projects.mapping_apps import is_sync_app
+from app.projects.odk_services import finalize_odk_project
 from app.projects.project_services import (
-    finalize_odk_project,
     finalize_qfield_project,
     publish_project,
 )

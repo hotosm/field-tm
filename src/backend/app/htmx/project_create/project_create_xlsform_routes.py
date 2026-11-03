@@ -17,17 +17,11 @@ from app.auth.auth_deps import login_required
 from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import project_manager
 from app.db.database import db_conn
-from app.errors import (
-    ServiceError,
-)
-from app.errors import (
-    ValidationError as SvcValidationError,
-)
+from app.errors import ServiceError
+from app.errors import ValidationError as SvcValidationError
 from app.htmx.htmx_schemas import XLSFormUploadData
 from app.i18n import _
-from app.projects.project_services import (
-    process_xlsform,
-)
+from app.projects.project_services import process_xlsform
 
 from ..htmx_helpers import callout
 from ..setup_steps.setup_step_responses import (
