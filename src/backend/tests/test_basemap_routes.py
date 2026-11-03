@@ -7,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from litestar import status_codes as status
 
 from app.db.enums import FieldMappingApp, ProjectStatus
+from app.helpers import basemap_attach
 from app.htmx.basemap import basemap_attach_flow, basemap_routes
 
 
@@ -147,7 +148,7 @@ def test_basemap_attach_progress_fragment_shows_warning_and_retry_on_failed_atta
 
 def test_attach_error_text_classifies_transient_network_failures():
     """Transient network failures should return retry-oriented non-blocking copy."""
-    message = basemap_attach_flow.attach_error_text(
+    message = basemap_attach.attach_error_text(
         RuntimeError("Temporary failure in name resolution from remote host")
     )
 
@@ -157,7 +158,7 @@ def test_attach_error_text_classifies_transient_network_failures():
 
 def test_attach_error_text_keeps_generic_fallback_for_unknown_failures():
     """Unknown failures should keep a safe generic attach failure message."""
-    message = basemap_attach_flow.attach_error_text(RuntimeError("wrapper failure"))
+    message = basemap_attach.attach_error_text(RuntimeError("wrapper failure"))
 
     assert (
         message == "Basemap attach failed for now. Your project is ready to use. "
@@ -722,7 +723,7 @@ async def test_basemap_status_auto_attaches_for_pending_autostart_project(
         basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
     )
     create_task_mock = _closing_spawn_mock()
-    monkeypatch.setattr(basemap_attach_flow, "spawn", create_task_mock)
+    monkeypatch.setattr(basemap_attach, "spawn", create_task_mock)
 
     response = await basemap_routes.basemap_status_htmx.fn(
         request=Mock(query_params={}),
@@ -770,7 +771,7 @@ async def test_basemap_status_does_not_auto_attach_for_manual_flow(monkeypatch):
         basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
     )
     create_task_mock = Mock()
-    monkeypatch.setattr(basemap_attach_flow, "spawn", create_task_mock)
+    monkeypatch.setattr(basemap_attach, "spawn", create_task_mock)
 
     response = await basemap_routes.basemap_status_htmx.fn(
         request=Mock(query_params={}),
@@ -975,7 +976,7 @@ async def test_basemap_attach_requires_download_url(monkeypatch):
 
     # Upstream still has no URL → reconcile cannot self-heal, attach should bail.
     monkeypatch.setattr(
-        basemap_attach_flow,
+        basemap_attach,
         "check_tilepack_status",
         AsyncMock(return_value=("generating", None)),
     )
@@ -1012,7 +1013,7 @@ async def test_basemap_attach_self_heals_missing_url_from_upstream(monkeypatch):
     db.commit = AsyncMock()
 
     monkeypatch.setattr(
-        basemap_attach_flow,
+        basemap_attach,
         "check_tilepack_status",
         AsyncMock(return_value=("ready", "https://tiles/recovered.mbtiles")),
     )
@@ -1026,7 +1027,7 @@ async def test_basemap_attach_self_heals_missing_url_from_upstream(monkeypatch):
     monkeypatch.setattr(
         basemap_routes.DbProject, "one", AsyncMock(return_value=refreshed_project)
     )
-    monkeypatch.setattr(basemap_attach_flow, "spawn", _closing_spawn_mock())
+    monkeypatch.setattr(basemap_attach, "spawn", _closing_spawn_mock())
 
     response = await basemap_routes.basemap_attach_htmx.fn(
         request=Mock(),
@@ -1113,7 +1114,7 @@ async def test_basemap_attach_first_click_returns_in_progress(monkeypatch):
         coro.close()
         return Mock()
 
-    monkeypatch.setattr(basemap_attach_flow, "spawn", _capture_task)
+    monkeypatch.setattr(basemap_attach, "spawn", _capture_task)
 
     response = await basemap_routes.basemap_attach_htmx.fn(
         request=Mock(),
@@ -1150,7 +1151,7 @@ async def test_basemap_attach_repeat_click_is_idempotent_in_progress(monkeypatch
     update_mock = AsyncMock()
     monkeypatch.setattr(basemap_routes.DbProject, "update", update_mock)
     create_task_mock = Mock()
-    monkeypatch.setattr(basemap_attach_flow, "spawn", create_task_mock)
+    monkeypatch.setattr(basemap_attach, "spawn", create_task_mock)
 
     response = await basemap_routes.basemap_attach_htmx.fn(
         request=Mock(),
@@ -1230,22 +1231,18 @@ async def test_run_basemap_attach_background_marks_ready(monkeypatch):
     async def _connect(_):
         return _ConnCtx()
 
-    monkeypatch.setattr(basemap_attach_flow.AsyncConnection, "connect", _connect)
-    monkeypatch.setattr(
-        basemap_attach_flow, "AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS", 0
-    )
-    monkeypatch.setattr(basemap_attach_flow, "AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS", 1)
+    monkeypatch.setattr(basemap_attach.AsyncConnection, "connect", _connect)
+    monkeypatch.setattr(basemap_attach, "AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS", 0)
+    monkeypatch.setattr(basemap_attach, "AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS", 1)
     monkeypatch.setattr(
         basemap_routes.DbProject, "one", AsyncMock(return_value=project)
     )
     attach_mock = AsyncMock()
-    monkeypatch.setattr(
-        basemap_attach_flow, "attach_basemap_to_qfield_project", attach_mock
-    )
+    monkeypatch.setattr(basemap_attach, "attach_basemap_to_qfield_project", attach_mock)
     update_mock = AsyncMock()
     monkeypatch.setattr(basemap_routes.DbProject, "update", update_mock)
 
-    await basemap_attach_flow.run_basemap_attach_background(
+    await basemap_attach.run_basemap_attach_background(
         30, "https://tiles/ready.mbtiles"
     )
 
@@ -1279,21 +1276,17 @@ async def test_run_basemap_attach_background_retries_once_for_transient_failure(
         side_effect=[RuntimeError("Connection reset by peer"), None]
     )
 
-    monkeypatch.setattr(basemap_attach_flow.AsyncConnection, "connect", _connect)
-    monkeypatch.setattr(
-        basemap_attach_flow, "AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS", 0
-    )
-    monkeypatch.setattr(basemap_attach_flow, "AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS", 1)
+    monkeypatch.setattr(basemap_attach.AsyncConnection, "connect", _connect)
+    monkeypatch.setattr(basemap_attach, "AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS", 0)
+    monkeypatch.setattr(basemap_attach, "AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS", 1)
     monkeypatch.setattr(
         basemap_routes.DbProject, "one", AsyncMock(return_value=project)
     )
-    monkeypatch.setattr(
-        basemap_attach_flow, "attach_basemap_to_qfield_project", attach_mock
-    )
+    monkeypatch.setattr(basemap_attach, "attach_basemap_to_qfield_project", attach_mock)
     update_mock = AsyncMock()
     monkeypatch.setattr(basemap_routes.DbProject, "update", update_mock)
 
-    await basemap_attach_flow.run_basemap_attach_background(
+    await basemap_attach.run_basemap_attach_background(
         32, "https://tiles/ready.mbtiles"
     )
 
@@ -1321,24 +1314,22 @@ async def test_run_basemap_attach_background_marks_failed_with_error(monkeypatch
     async def _connect(_):
         return _ConnCtx()
 
-    monkeypatch.setattr(basemap_attach_flow.AsyncConnection, "connect", _connect)
-    monkeypatch.setattr(
-        basemap_attach_flow, "AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS", 0
-    )
-    monkeypatch.setattr(basemap_attach_flow, "AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS", 1)
+    monkeypatch.setattr(basemap_attach.AsyncConnection, "connect", _connect)
+    monkeypatch.setattr(basemap_attach, "AUTOSTART_ATTACH_INITIAL_DELAY_SECONDS", 0)
+    monkeypatch.setattr(basemap_attach, "AUTOSTART_ATTACH_MAX_RETRY_ATTEMPTS", 1)
     monkeypatch.setattr(
         basemap_routes.DbProject, "one", AsyncMock(return_value=project)
     )
     attach_mock = AsyncMock(side_effect=RuntimeError("wrapper failure"))
     monkeypatch.setattr(
-        basemap_attach_flow,
+        basemap_attach,
         "attach_basemap_to_qfield_project",
         attach_mock,
     )
     update_mock = AsyncMock()
     monkeypatch.setattr(basemap_routes.DbProject, "update", update_mock)
 
-    await basemap_attach_flow.run_basemap_attach_background(
+    await basemap_attach.run_basemap_attach_background(
         31, "https://tiles/ready.mbtiles"
     )
 

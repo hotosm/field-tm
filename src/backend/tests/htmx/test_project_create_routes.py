@@ -568,7 +568,7 @@ async def test_prepare_simple_project_data_extract_falls_back_on_no_valid_geomet
     )
     update_mock = AsyncMock()
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.DbProject.update",
+        "app.helpers.basemap_autostart.DbProject.update",
         update_mock,
     )
 
@@ -598,7 +598,7 @@ async def test_prepare_simple_project_data_extract_reraises_unrelated_validation
     )
     update_mock = AsyncMock()
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.DbProject.update",
+        "app.helpers.basemap_autostart.DbProject.update",
         update_mock,
     )
 
@@ -613,7 +613,7 @@ async def test_resume_simple_project_tilepack_if_needed_updates_status(
     monkeypatch,
 ):
     """Resume helper should refresh status for already-selected STAC items."""
-    from app.htmx.project_create.project_create_basemap_orchestration import (
+    from app.helpers.basemap_autostart import (
         resume_simple_project_tilepack_if_needed,
     )
 
@@ -631,17 +631,17 @@ async def test_resume_simple_project_tilepack_if_needed_updates_status(
     update_mock = AsyncMock()
 
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.check_tilepack_status",
+        "app.helpers.basemap_autostart.check_tilepack_status",
         check_status_mock,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.DbProject.update",
+        "app.helpers.basemap_autostart.DbProject.update",
         update_mock,
     )
 
     create_task_mock = Mock()
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.spawn",
+        "app.helpers.basemap_autostart.spawn",
         create_task_mock,
     )
 
@@ -661,7 +661,7 @@ async def test_resume_simple_project_tilepack_if_needed_starts_attach_when_ready
     monkeypatch,
 ):
     """Resume helper should enqueue attach when tilepack is already ready."""
-    from app.htmx.project_create.project_create_basemap_orchestration import (
+    from app.helpers.basemap_autostart import (
         resume_simple_project_tilepack_if_needed,
     )
 
@@ -681,11 +681,11 @@ async def test_resume_simple_project_tilepack_if_needed_starts_attach_when_ready
     update_mock = AsyncMock()
 
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.check_tilepack_status",
+        "app.helpers.basemap_autostart.check_tilepack_status",
         check_status_mock,
     )
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.DbProject.update",
+        "app.helpers.basemap_autostart.DbProject.update",
         update_mock,
     )
 
@@ -693,7 +693,7 @@ async def test_resume_simple_project_tilepack_if_needed_starts_attach_when_ready
         return None
 
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.run_basemap_attach_background",
+        "app.helpers.basemap_autostart.run_basemap_attach_background",
         fake_attach,
     )
 
@@ -710,7 +710,7 @@ async def test_resume_simple_project_tilepack_if_needed_starts_attach_when_ready
         return Mock()
 
     monkeypatch.setattr(
-        "app.htmx.project_create.project_create_basemap_orchestration.spawn",
+        "app.helpers.basemap_autostart.spawn",
         fake_create_task,
     )
 
@@ -728,7 +728,7 @@ async def test_resume_simple_project_tilepack_if_needed_starts_attach_when_ready
 
 async def test_resume_simple_project_tilepack_if_needed_ignores_blank_stac_item():
     """Resume helper should no-op when no STAC item id is set."""
-    from app.htmx.project_create.project_create_basemap_orchestration import (
+    from app.helpers.basemap_autostart import (
         resume_simple_project_tilepack_if_needed,
     )
 

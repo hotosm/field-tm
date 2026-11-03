@@ -1,4 +1,4 @@
-"""Basemap autostart helpers for project-create HTMX routes."""
+"""Pick, generate and attach a basemap for new simple-workflow projects."""
 
 import logging
 from datetime import datetime, timezone
@@ -9,13 +9,13 @@ from app.config import settings
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
 from app.helpers.background_tasks import spawn
+from app.helpers.basemap_attach import run_basemap_attach_background
 from app.helpers.basemap_services import (
     check_tilepack_status,
     search_oam_imagery,
     trigger_tilepack_generation,
 )
 from app.helpers.geometry_utils import outline_bbox
-from app.htmx.basemap.basemap_attach_flow import run_basemap_attach_background
 from app.projects import project_schemas
 
 log = logging.getLogger(__name__)

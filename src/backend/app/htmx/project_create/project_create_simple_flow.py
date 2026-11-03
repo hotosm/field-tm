@@ -19,6 +19,9 @@ from app.errors import (
 )
 from app.errors import ValidationError as SvcValidationError
 from app.helpers.background_tasks import spawn
+from app.helpers.basemap_autostart import (
+    autostart_basemap_for_simple_project,
+)
 from app.i18n import _
 from app.projects import project_schemas
 from app.projects.data_extract_services import (
@@ -34,9 +37,6 @@ from app.projects.project_services import (
     split_aoi,
 )
 
-from .project_create_basemap_orchestration import (
-    autostart_basemap_for_simple_project,
-)
 from .project_create_parsing import build_unique_simple_project_name
 from .project_create_templates import get_default_buildings_template_bytes
 

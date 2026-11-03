@@ -35,6 +35,7 @@ from app.db.database import db_conn
 from app.db.enums import ProjectStatus
 from app.db.models import DbProject
 from app.errors import ServiceError
+from app.helpers.basemap_attach import enqueue_basemap_attach
 from app.helpers.basemap_services import (
     check_tilepack_status,
     search_oam_imagery,
@@ -47,7 +48,6 @@ from app.projects.project_schemas import ProjectUpdate
 from ..htmx_helpers import callout
 from .basemap_attach_flow import (
     attach_precondition_response,
-    enqueue_autostart_attach,
     start_basemap_attach,
 )
 from .basemap_formatting import (
@@ -314,7 +314,7 @@ async def basemap_status_htmx(
             is_ready_with_url
             and (project.basemap_attach_status or "") == "pending_autostart"
         ):
-            await enqueue_autostart_attach(db, project_id, resolved_url)
+            await enqueue_basemap_attach(db, project_id, resolved_url)
 
         refreshed_project = await DbProject.one(db, project_id)
         fragment = ready_fragment if show_ready else progress_fragment
