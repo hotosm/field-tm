@@ -352,8 +352,9 @@ with your field mappers first:
 #### XLS Form Preparation
 
 - Be prepared with the XLS form for the project.
-- If updates are required to the form, you can edit the XLS form even
-  after the project is created.
+- If updates are required to the form, ODK projects can upload a new version
+  from the project page. QField projects must edit the project in QGIS and
+  sync the updates.
 - Note that a few fields in the beginning and end of the form will be
   injected to ask for some feature verification.
 - So project managers are requested to fill up the form through odk

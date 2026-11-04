@@ -18,6 +18,7 @@ from app.htmx.project_detail_routes import (
     export_project_geojson_htmx,
     project_details,
     project_qrcode_htmx,
+    update_project_form_htmx,
 )
 from app.htmx.project_list_routes import project_listing
 from app.htmx.setup_steps.setup_step_extract_routes import (
@@ -64,6 +65,7 @@ htmx_router = Router(
         *PROJECT_CREATE_PAGE_HANDLERS,
         project_details,
         delete_project_htmx,
+        update_project_form_htmx,
         *PROJECT_CREATE_SUBMIT_HANDLERS,
         serve_static_css,
         serve_static_js,

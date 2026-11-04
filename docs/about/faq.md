@@ -501,12 +501,11 @@ help with your contributions.
 
 ### Can I edit my XLSForm after I create a project?
 
-- XLSForms can be updated!
-- Go to the 'Manage Project' section.
-- Edit --> Form Update.
-- You can download the existing form from here.
-- Edit the form, then upload and click the 'Update' button.
-- This will update the form in ODK also.
+- ODK projects: yes. The project creator can open 'Update survey form' on the
+  project page and upload the edited form. Mappers receive the new version
+  automatically.
+- QField projects: not in Field-TM. Edit the project in QGIS and sync the
+  updates.
 
 ### Can I record features that don't exist on the map yet?
 

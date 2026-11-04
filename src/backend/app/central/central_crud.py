@@ -218,6 +218,27 @@ async def create_odk_xform(
         ) from e
 
 
+async def update_odk_xform(
+    odk_id: int,
+    xform_id: str,
+    xform_data: BytesIO,
+    odk_credentials: Optional[central_schemas.ODKCentral],
+) -> None:
+    """Publish a new version of an existing XForm on ODK Central."""
+    try:
+        async with central_deps.pyodk_client(odk_credentials) as client:
+            client.forms.update(
+                form_id=xform_id,
+                project_id=odk_id,
+                definition=xform_data.getvalue().decode("utf-8"),
+            )
+    except Exception as e:
+        log.exception(f"Error: {e}", stack_info=True)
+        raise ServiceError(
+            _("Failed to update form in ODK Central: %(error)s") % {"error": e}
+        ) from e
+
+
 async def get_form_list(db: AsyncConnection) -> list:
     """Returns the list of {id:title} for XLSForms in the database."""
     try:
@@ -310,7 +331,7 @@ async def read_and_test_xform(input_data: BytesIO) -> None:
         raise UnprocessableError(msg) from e
 
 
-async def append_fields_to_user_xlsform(
+async def append_fields_to_user_xlsform(  # noqa: PLR0913
     xlsform: BytesIO,
     form_name: str = "buildings",
     new_geom_type: Optional[DbGeomType] = DbGeomType.POINT,
@@ -319,7 +340,9 @@ async def append_fields_to_user_xlsform(
     mandatory_photo_upload: bool = False,
     default_language: str | None = None,
     use_odk_collect: bool = False,
-) -> tuple[str, BytesIO]:  # noqa: PLR0913
+    *,
+    form_id: str | None = None,
+) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
     log.debug("Appending mandatory Field-TM fields to XLSForm")
     return await append_field_mapping_fields(
@@ -331,10 +354,11 @@ async def append_fields_to_user_xlsform(
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
         use_odk_collect=use_odk_collect,
+        form_id=form_id,
     )
 
 
-async def validate_and_update_user_xlsform(
+async def validate_and_update_user_xlsform(  # noqa: PLR0913
     xlsform: BytesIO,
     default_language: str | None = None,
     form_name: str = "buildings",
@@ -343,7 +367,9 @@ async def validate_and_update_user_xlsform(
     include_photo_upload: bool = True,
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
-) -> BytesIO:  # noqa: PLR0913
+    *,
+    form_id: str | None = None,
+) -> BytesIO:
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
     # Validate before merging to report row numbers from the original upload.
     _validate_user_xlsform_choices(xlsform)
@@ -357,6 +383,7 @@ async def validate_and_update_user_xlsform(
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
         use_odk_collect=use_odk_collect,
+        form_id=form_id,
     )
 
     log.debug("Validating uploaded XLS form")

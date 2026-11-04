@@ -30,6 +30,7 @@ from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.update_xlsform import (
     _configure_form_settings,
+    get_processed_form_options,
     _normalize_language_token,
     append_field_mapping_fields,
     modify_form_for_qfield,
@@ -376,6 +377,93 @@ def test_configure_form_settings_keeps_default_language_as_scalar_string():
     default_language_value = custom_sheets["settings"]["default_language"].iloc[0]
     assert isinstance(default_language_value, str)
     assert default_language_value == "english(en)"
+
+
+def _buildings_form() -> BytesIO:
+    return BytesIO(convert_to_xlsform(str(buildings)))
+
+
+def _form_settings(form: bytes) -> pd.Series:
+    return pd.read_excel(BytesIO(form), sheet_name="settings", engine="calamine").iloc[0]
+
+
+async def test_form_id_override_replaces_uploaded_form_id():
+    """A new form version keeps the published xFormId, not the uploaded one."""
+    xform_id, form = await append_field_mapping_fields(
+        _buildings_form(),
+        form_name="FTM_Project_1",
+        use_odk_collect=True,
+        form_id="published-form-id",
+    )
+
+    assert xform_id == "published-form-id"
+    assert _form_settings(form.getvalue())["form_id"] == "published-form-id"
+    assert 'id="published-form-id"' in xform_convert(form).xform
+
+
+@pytest.mark.parametrize(
+    "options",
+    [
+        {
+            "need_verification_fields": True,
+            "include_photo_upload": True,
+            "mandatory_photo_upload": False,
+        },
+        {
+            "need_verification_fields": False,
+            "include_photo_upload": True,
+            "mandatory_photo_upload": True,
+        },
+        {
+            "need_verification_fields": False,
+            "include_photo_upload": False,
+            "mandatory_photo_upload": False,
+        },
+    ],
+)
+async def test_processed_form_options_round_trip(options):
+    """Rebuilding a form with the recovered options keeps the same choices."""
+    xform_id, form = await append_field_mapping_fields(
+        _buildings_form(),
+        form_name="FTM_Project_1",
+        use_odk_collect=True,
+        default_language="spanish",
+        form_id="published-form-id",
+        **options,
+    )
+
+    recovered = get_processed_form_options(form.getvalue())
+    assert recovered == {
+        **options,
+        "form_id": xform_id,
+        "default_language": "spanish(es)",
+    }
+
+    _, rebuilt = await append_field_mapping_fields(
+        _buildings_form(), use_odk_collect=True, **recovered
+    )
+    assert get_processed_form_options(rebuilt.getvalue()) == recovered
+
+
+def test_processed_form_options_from_older_form():
+    """Forms stored before default_language and the photos repeat still work."""
+    workbook = Workbook()
+    survey = workbook.active
+    survey.title = "survey"
+    survey.append(["type", "name", "required"])
+    survey.append(["image", "image", "yes"])
+    workbook.create_sheet("settings").append(["form_id"])
+    workbook["settings"].append(["stored-form-id"])
+    form = BytesIO()
+    workbook.save(form)
+
+    assert get_processed_form_options(form.getvalue()) == {
+        "form_id": "stored-form-id",
+        "default_language": None,
+        "need_verification_fields": False,
+        "include_photo_upload": True,
+        "mandatory_photo_upload": True,
+    }
 
 
 def check_survey_sheet(workbook: Workbook) -> None:

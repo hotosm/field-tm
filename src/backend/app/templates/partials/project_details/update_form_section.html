@@ -1,0 +1,22 @@
+{# Upload a new form version for a published ODK project. #}
+<wa-details summary="{{ _('Update survey form') }}">
+  <form
+    hx-post="/projects/{{ project.id }}/form"
+    hx-target="#update-form-status"
+    hx-encoding="multipart/form-data"
+    hx-confirm="{{ _('Replace the survey form? Mappers will receive the new version.') }}"
+    class="wa-stack"
+  >
+    <p class="ftm-hint">
+      {{ _("Upload your edited form. Mappers receive it automatically and collected data is kept.
+      Only include your survey questions, as Field-TM adds its own fields.") }}
+    </p>
+    <input type="file" name="xlsform" accept=".xls,.xlsx" required />
+    <div>
+      <wa-button type="submit" variant="neutral" appearance="outlined">
+        {{ _("Update survey form") }}
+      </wa-button>
+    </div>
+    <div id="update-form-status"></div>
+  </form>
+</wa-details>

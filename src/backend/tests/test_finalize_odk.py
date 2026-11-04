@@ -14,6 +14,9 @@ from typing import Optional
 from unittest.mock import AsyncMock, patch
 
 import pytest
+from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
+from osm_fieldwork.update_xlsform import get_processed_form_options
+from osm_fieldwork.xlsforms import buildings
 
 from app.central import central_crud
 from app.central.central_schemas import ODKCentral
@@ -1320,3 +1323,65 @@ async def test_sync_odk_tasks_updates_or_resets_and_deletes(reset, status):
     assert update.get("status") == status
     assert [row["label"] for row in entities.calls["created"]] == ["Task 3"]
     assert entities.calls["deleted"] == ["uuid-2"]
+
+
+# ---------------------------------------------------------------------------
+# Updating the form of a published project
+# ---------------------------------------------------------------------------
+
+
+async def _build_processed_form(**options) -> bytes:
+    _, form = await central_crud.append_fields_to_user_xlsform(
+        BytesIO(convert_to_xlsform(str(buildings))),
+        form_name="FTM_Project_1",
+        use_odk_collect=True,
+        form_id="published-form-id",
+        **options,
+    )
+    return form.getvalue()
+
+
+async def test_update_odk_project_form_keeps_id_and_options():
+    """A new upload keeps the published form ID and the project's form options."""
+    project = DbProject(
+        id=1,
+        external_project_id=5,
+        xlsform_content=await _build_processed_form(include_photo_upload=False),
+    )
+    upload = BytesIO(convert_to_xlsform(str(buildings)))
+
+    with (
+        patch.object(central_crud, "update_odk_xform", AsyncMock()) as update_xform,
+        patch.object(DbProject, "update", AsyncMock()) as update_db,
+    ):
+        await project_services.update_odk_project_form(AsyncMock(), project, upload)
+
+    odk_id, form_id, xform, _ = update_xform.await_args.args
+    assert (odk_id, form_id) == (5, "published-form-id")
+    assert 'id="published-form-id"' in xform.getvalue().decode()
+    assert "survey_photos" not in xform.getvalue().decode()
+    stored = update_db.await_args.args[2].xlsform_content
+    assert get_processed_form_options(stored)["form_id"] == "published-form-id"
+
+
+async def test_update_odk_project_form_keeps_stored_form_if_central_fails():
+    """Field-TM's copy must keep matching ODK when publishing fails."""
+    project = DbProject(
+        id=1,
+        external_project_id=5,
+        xlsform_content=await _build_processed_form(),
+    )
+    upload = BytesIO(convert_to_xlsform(str(buildings)))
+
+    with (
+        patch.object(
+            central_crud,
+            "update_odk_xform",
+            AsyncMock(side_effect=ServiceError("Central said no")),
+        ),
+        patch.object(DbProject, "update", AsyncMock()) as update_db,
+        pytest.raises(ServiceError),
+    ):
+        await project_services.update_odk_project_form(AsyncMock(), project, upload)
+
+    update_db.assert_not_awaited()

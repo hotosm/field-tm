@@ -12,6 +12,14 @@
       survey file if none of these fit.") }}
     </p>
 
+    {% if field_mapping_app_upper == 'QFIELD' %}
+    <wa-callout variant="warning" size="s">
+      <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+      {{ _("You can't change the form in Field-TM after publishing. To change it later, edit the
+      project in QGIS and sync the updates.") }}
+    </wa-callout>
+    {% endif %}
+
     <form
       id="upload-xlsform-form"
       hx-post="/upload-xlsform-htmx?project_id={% if project %}{{ project.id }}{% endif %}"

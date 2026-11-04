@@ -176,7 +176,16 @@
   {% endif %} {% elif status_value == 'PUBLISHED' %} {% if app and app.syncs %} {% include
   "partials/project_details/manager_setup_summary.html" %} {% include
   "partials/project_details/basemap_section.html" %} {% endif %} {% else %} {% include
-  "partials/project_details/setup_steps.html" %} {% endif %} {% if can_delete_project %}
+  "partials/project_details/setup_steps.html" %} {% endif %} {% if status_value == 'PUBLISHED' %} {%
+  if can_delete_project and field_mapping_app_upper == 'ODK' %} {% include
+  "partials/project_details/update_form_section.html" %} {% elif is_manager and
+  field_mapping_app_upper == 'QFIELD' %}
+  <wa-callout variant="warning" size="s">
+    <wa-icon slot="icon" name="triangle-exclamation"></wa-icon>
+    {{ _("You can't change this form in Field-TM. To change it, edit the project in QGIS and sync
+    the updates.") }}
+  </wa-callout>
+  {% endif %} {% endif %} {% if can_delete_project %}
   <wa-details summary="{{ _('Delete project') }}" class="ftm-danger-zone">
     {% if app and app.syncs %}
     <p class="ftm-hint">

@@ -28,6 +28,7 @@ from anyio import to_thread
 from area_splitter import SplittingAlgorithm
 from area_splitter.splitter import split_by_sql
 from geojson_aoi import parse_aoi
+from osm_fieldwork.update_xlsform import get_processed_form_options
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
 from qfieldcloud_sdk.interfaces import QfcRequestException
@@ -418,6 +419,37 @@ async def create_project_stub(
     return project
 
 
+async def _build_project_xlsform(
+    project_id: int,
+    xlsform_bytes: BytesIO,
+    **form_options,
+) -> bytes:
+    """Validate an uploaded XLSForm and add the Field-TM fields to it."""
+    form_name = f"FTM_Project_{project_id}"
+
+    await central_crud.validate_and_update_user_xlsform(
+        xlsform=xlsform_bytes,
+        form_name=form_name,
+        **form_options,
+    )
+
+    xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
+        xlsform=xlsform_bytes,
+        form_name=form_name,
+        **form_options,
+    )
+
+    project_xlsform.seek(0)
+    xlsform_db_bytes = project_xlsform.getvalue()
+    if len(xlsform_db_bytes) == 0 or not xform_id:
+        raise ValidationError("There was an error modifying the XLSForm!")
+
+    log.debug(
+        f"Built XLSForm for xFormId: {xform_id}, bytes length: {len(xlsform_db_bytes)}"
+    )
+    return xlsform_db_bytes
+
+
 async def process_xlsform(
     db: AsyncConnection,
     project_id: int,
@@ -433,11 +465,9 @@ async def process_xlsform(
     Raises ValidationError if validation or processing fails.
     """
     project = await project_deps.get_project_by_id(db, project_id)
-    form_name = f"FTM_Project_{project.id}"
-
-    await central_crud.validate_and_update_user_xlsform(
-        xlsform=xlsform_bytes,
-        form_name=form_name,
+    xlsform_db_bytes = await _build_project_xlsform(
+        project.id,
+        xlsform_bytes,
         need_verification_fields=need_verification_fields,
         include_photo_upload=include_photo_upload,
         mandatory_photo_upload=mandatory_photo_upload,
@@ -445,25 +475,6 @@ async def process_xlsform(
         use_odk_collect=use_odk_collect,
     )
 
-    xform_id, project_xlsform = await central_crud.append_fields_to_user_xlsform(
-        xlsform=xlsform_bytes,
-        form_name=form_name,
-        need_verification_fields=need_verification_fields,
-        include_photo_upload=include_photo_upload,
-        mandatory_photo_upload=mandatory_photo_upload,
-        default_language=default_language,
-        use_odk_collect=use_odk_collect,
-    )
-
-    project_xlsform.seek(0)
-    xlsform_db_bytes = project_xlsform.getvalue()
-    if len(xlsform_db_bytes) == 0 or not xform_id:
-        raise ValidationError("There was an error modifying the XLSForm!")
-
-    log.debug(
-        f"Setting project XLSForm db data for xFormId: {xform_id}, "
-        f"bytes length: {len(xlsform_db_bytes)}"
-    )
     await DbProject.update(
         db,
         project_id,
@@ -471,6 +482,38 @@ async def process_xlsform(
     )
     await db.commit()
     log.debug(f"Successfully saved XLSForm to database for project {project_id}")
+
+
+async def update_odk_project_form(
+    db: AsyncConnection,
+    project: DbProject,
+    xlsform_bytes: BytesIO,
+) -> None:
+    """Publish a new form version to ODK Central, then store it.
+
+    The new version keeps the form ID and Field-TM options of the current form.
+    """
+    form_options = get_processed_form_options(project.xlsform_content)
+    xlsform_db_bytes = await _build_project_xlsform(
+        project.id,
+        xlsform_bytes,
+        use_odk_collect=True,
+        **form_options,
+    )
+
+    await central_crud.update_odk_xform(
+        int(project.external_project_id),
+        form_options["form_id"],
+        await central_crud.read_and_test_xform(BytesIO(xlsform_db_bytes)),
+        project.get_odk_credentials(),
+    )
+
+    await DbProject.update(
+        db,
+        project.id,
+        project_schemas.ProjectUpdate(xlsform_content=xlsform_db_bytes),
+    )
+    await db.commit()
 
 
 def _as_aoi_feature_collection(outline: dict) -> dict:

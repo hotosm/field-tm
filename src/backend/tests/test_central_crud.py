@@ -4,7 +4,7 @@ import json
 from contextlib import asynccontextmanager
 from io import BytesIO
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -495,3 +495,19 @@ async def test_create_project_manager_user_assignment_conflict_idempotent():
     assert username == "field-tm-manager-42@fieldtm.org"
     assert len(password) == 20
     assert fake_client.session.post_calls[1][0] == "projects/42/assignments/7/333"
+
+
+async def test_update_odk_xform_publishes_xml_definition():
+    """The XForm is sent as text, as pyodk reads bytes as XLS/XLSX."""
+    client = Mock()
+
+    @asynccontextmanager
+    async def fake_client(_creds):
+        yield client
+
+    with patch.object(central_crud.central_deps, "pyodk_client", fake_client):
+        await central_crud.update_odk_xform(5, "form-id", BytesIO(b"<h:html/>"), None)
+
+    client.forms.update.assert_called_once_with(
+        form_id="form-id", project_id=5, definition="<h:html/>"
+    )

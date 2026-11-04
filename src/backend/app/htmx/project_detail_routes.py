@@ -22,11 +22,12 @@ import json
 import logging
 from contextlib import suppress
 
-from litestar import delete, get
+from litestar import delete, get, post
 from litestar import status_codes as status
 from litestar.di import Provide
+from litestar.enums import RequestEncodingType
 from litestar.exceptions import HTTPException
-from litestar.params import Parameter
+from litestar.params import Body, Parameter
 from litestar.plugins.htmx import HTMXRequest, HTMXTemplate
 from litestar.response import Response
 from psycopg import AsyncConnection
@@ -41,7 +42,7 @@ from app.auth.auth_schemas import ProjectUserDict
 from app.auth.roles import check_access, ensure_project_viewable, project_manager
 from app.central import central_crud
 from app.db.database import db_conn
-from app.db.enums import FieldMappingApp, ProjectRole
+from app.db.enums import FieldMappingApp, ProjectRole, ProjectStatus
 from app.db.models import DbProject
 from app.errors import (
     DownstreamDeleteError,
@@ -50,11 +51,16 @@ from app.errors import (
 )
 from app.i18n import _
 from app.projects import project_crud
-from app.projects.project_services import delete_project_with_downstream
+from app.projects.project_services import (
+    delete_project_with_downstream,
+    update_odk_project_form,
+)
 from app.qfield.qfield_crud import export_qfield_project_geojson
 from app.qfield.qfield_utils import strip_qfc_api_suffix
 
 from .htmx_helpers import callout
+from .htmx_schemas import XLSFormUploadData
+from .project_create.project_create_templates import resolve_uploaded_xlsform_bytes
 from .setup_steps.setup_step_responses import (
     authorized_project_or_response,
     html_error_response,
@@ -184,6 +190,67 @@ async def delete_project_htmx(
 
     await db.commit()
     return hx_redirect_response("/projects")
+
+
+@post(
+    path="/projects/{project_id:int}/form",
+    dependencies={
+        "db": Provide(db_conn),
+        "auth_user": Provide(login_required),
+    },
+    status_code=status.HTTP_200_OK,
+)
+async def update_project_form_htmx(
+    db: AsyncConnection,
+    project_id: int,
+    auth_user: object,
+    data: XLSFormUploadData = Body(media_type=RequestEncodingType.MULTI_PART),
+) -> Response:
+    """Publish a new version of a published ODK project's survey form."""
+    try:
+        project = await DbProject.one(db, project_id)
+    except KeyError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=_("Project (%(project_id)s) not found.")
+            % {"project_id": project_id},
+        ) from exc
+
+    if not _can_delete_project(auth_user, project):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=_("Only the project creator can update the form."),
+        )
+
+    if (
+        project.field_mapping_app != FieldMappingApp.ODK
+        or project.status != ProjectStatus.PUBLISHED
+    ):
+        return html_error_response(
+            _("Only published ODK projects can update their form."),
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        xlsform_bytes, error_response = await resolve_uploaded_xlsform_bytes(data, db)
+        if error_response:
+            return error_response
+
+        await update_odk_project_form(db, project, xlsform_bytes)
+    except ServiceError as exc:
+        return html_error_response(exc.message, exc.status_code)
+    except Exception as exc:
+        log.exception("Form update failed for project %s: %s", project_id, exc)
+        return html_error_response(
+            _("Could not update the form. Please check the file and try again."),
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    return Response(
+        content=callout("success", _("Survey form updated in ODK Central.")),
+        media_type="text/html",
+        status_code=status.HTTP_200_OK,
+    )
 
 
 @get(

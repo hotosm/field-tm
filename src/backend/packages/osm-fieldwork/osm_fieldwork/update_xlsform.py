@@ -423,6 +423,7 @@ async def _process_all_form_tabs(
     use_odk_collect: bool = False,
     label_cols: list[str] = [],
     default_language: str | None = None,
+    form_id: str | None = None,
 ) -> tuple[str, pd.DataFrame]:
     add_label = "label" not in label_cols
     field_label_cols = None if add_label else label_cols
@@ -436,7 +437,7 @@ async def _process_all_form_tabs(
     photo_collection_df = translated_df(get_photo_fields(mandatory_photo_upload), field_label_cols)
 
     # Configure form settings
-    xform_id = _configure_form_settings(custom_sheets, form_name, default_language)
+    xform_id = _configure_form_settings(custom_sheets, form_name, default_language, form_id)
 
     # Select appropriate form components based on target platform
     form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields, choices_df, digitisation_df, digitisation_choices_df, photo_collection_df if include_photo_upload else None, label_cols)
@@ -490,6 +491,7 @@ async def append_field_mapping_fields(
     mandatory_photo_upload: bool = False,
     default_language: str | None = None,
     use_odk_collect: bool = False,
+    form_id: str | None = None,
 ) -> tuple[str, BytesIO]:
     """Append mandatory fields to the XLSForm for use in Field-TM.
 
@@ -504,6 +506,8 @@ async def append_field_mapping_fields(
             Defaults to True.
         use_odk_collect (bool): Whether to use ODK Collect-specific components.
             Defaults to False.
+        form_id (str, optional): Use this xFormId instead of the one in the form.
+            A new version of a published form must keep its xFormId.
 
     Returns:
         tuple[str, BytesIO]: The xFormId and the updated XLSForm wrapped in BytesIO.
@@ -537,8 +541,25 @@ async def append_field_mapping_fields(
         use_odk_collect=use_odk_collect,
         label_cols=label_cols,
         default_language=resolved_default_language,
+        form_id=form_id,
     )
     return (xformid, await write_xlsform(updated_form))
+
+
+def get_processed_form_options(xlsform: bytes) -> dict:
+    """The append_field_mapping_fields options a processed XLSForm was built with."""
+    sheets = pd.read_excel(BytesIO(xlsform), sheet_name=["survey", "settings"], engine="calamine")
+    survey = sheets["survey"]
+    settings = sheets["settings"].iloc[0]
+    # Older forms have a single image question instead of the photos repeat.
+    photo_rows = survey[survey["name"].isin(["photos", "image"])]
+    return {
+        "form_id": str(settings["form_id"]),
+        "default_language": settings.get("default_language"),
+        "need_verification_fields": (survey["name"] == "verification").any().item(),
+        "include_photo_upload": not photo_rows.empty,
+        "mandatory_photo_upload": (photo_rows["required"] == "yes").any().item(),
+    }
 
 
 async def modify_form_for_qfield(
@@ -794,12 +815,14 @@ def _configure_form_settings(
     custom_sheets: dict,
     form_name: str,
     default_language: str | None,
+    form_id: str | None = None,
 ) -> str:
     """Configure form settings and extract/set form ID.
     
     Args:
         custom_sheets: Dictionary containing dataframes for each sheet
         form_name: Name of the form to be used as form_title
+        form_id: Overrides any form ID already in the settings sheet
         
     Returns:
         str: The form ID (xform_id)
@@ -810,7 +833,7 @@ def _configure_form_settings(
     )
     # Check if settings sheet exists and create if needed
     if "settings" not in custom_sheets or custom_sheets["settings"].empty:
-        xform_id = str(uuid4())
+        xform_id = form_id or str(uuid4())
         custom_sheets["settings"] = pd.DataFrame([{
             "form_id": xform_id,
             "version": current_datetime,
@@ -826,7 +849,12 @@ def _configure_form_settings(
     settings = custom_sheets["settings"]
     
     # Extract existing form id if present, else set to random uuid
-    xform_id = settings["form_id"].iloc[0] if "form_id" in settings else str(uuid4())
+    if form_id:
+        xform_id = form_id
+    elif "form_id" in settings:
+        xform_id = settings["form_id"].iloc[0]
+    else:
+        xform_id = str(uuid4())
     log.debug(f"Using form_id: {xform_id}")
 
     # Update settings
