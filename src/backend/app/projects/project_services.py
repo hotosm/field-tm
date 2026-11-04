@@ -28,6 +28,7 @@ from anyio import to_thread
 from area_splitter import SplittingAlgorithm
 from area_splitter.splitter import split_by_sql
 from geojson_aoi import parse_aoi
+from osm_fieldwork.enums import NewPointCapture
 from osm_fieldwork.update_xlsform import get_processed_form_options
 from pg_nearest_city import AsyncNearestCity
 from psycopg import AsyncConnection
@@ -450,7 +451,7 @@ async def _build_project_xlsform(
     return xlsform_db_bytes
 
 
-async def process_xlsform(
+async def process_xlsform(  # noqa: PLR0913
     db: AsyncConnection,
     project_id: int,
     xlsform_bytes: BytesIO,
@@ -459,7 +460,9 @@ async def process_xlsform(
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
     default_language: str | None = None,
-) -> None:  # noqa: PLR0913
+    *,
+    new_point_capture: NewPointCapture = NewPointCapture.MAP,
+) -> None:
     """Validate, process, and store an XLSForm.
 
     Raises ValidationError if validation or processing fails.
@@ -473,6 +476,7 @@ async def process_xlsform(
         mandatory_photo_upload=mandatory_photo_upload,
         default_language=default_language,
         use_odk_collect=use_odk_collect,
+        new_point_capture=new_point_capture,
     )
 
     await DbProject.update(

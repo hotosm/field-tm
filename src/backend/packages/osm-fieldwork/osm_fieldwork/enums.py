@@ -29,3 +29,10 @@ class DbGeomType(str, Enum):
     POINT = "POINT"
     POLYGON = "POLYGON"
     LINESTRING = "LINESTRING"
+
+
+class NewPointCapture(str, Enum):
+    """How mappers capture the location of a new point in ODK Collect."""
+
+    MAP = "map"
+    GPS = "gps"

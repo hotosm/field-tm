@@ -2807,3 +2807,15 @@ msgstr "ทดสอบข้อมูลรับรอง"
 msgid "Save & Continue"
 msgstr "บันทึกและดำเนินการต่อ"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "จุดใหม่"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "ผู้ทำแผนที่แตะตำแหน่งบนแผนที่"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "ผู้ทำแผนที่บันทึกตำแหน่ง GPS ของตน"

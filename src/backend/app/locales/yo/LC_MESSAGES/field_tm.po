@@ -2855,3 +2855,15 @@ msgstr "Ṣàyẹ̀wò àwọn ìdánimọ̀"
 msgid "Save & Continue"
 msgstr "Fipamọ́ kí o sì tẹ̀síwájú"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "Àwọn ibi tuntun"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "Àwọn olùyà àwòrán ilẹ̀ tẹ ibi náà lórí àwòrán ilẹ̀"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "Àwọn olùyà àwòrán ilẹ̀ ṣe àkọsílẹ̀ ipò GPS wọn"

@@ -2866,3 +2866,15 @@ msgstr "Gwada bayanan shaida"
 msgid "Save & Continue"
 msgstr "Ajiye kuma ci gaba"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "Sabbin maki"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "Masu taswira suna taɓa wurin a taswira"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "Masu taswira suna ɗaukar matsayinsu ta GPS"

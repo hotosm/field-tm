@@ -2913,3 +2913,15 @@ msgstr "గుర్తింపు వివరాలను పరీక్ష�
 msgid "Save & Continue"
 msgstr "సేవ్ చేసి కొనసాగండి"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "కొత్త బిందువులు"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "మ్యాపర్లు మ్యాప్‌లో స్థానాన్ని నొక్కుతారు"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "మ్యాపర్లు GPS ద్వారా తమ స్థానాన్ని నమోదు చేస్తారు"

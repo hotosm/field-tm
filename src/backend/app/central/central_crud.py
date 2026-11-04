@@ -29,6 +29,7 @@ from uuid import uuid4
 
 import pandas as pd
 from litestar import status_codes as status
+from osm_fieldwork.enums import NewPointCapture
 from osm_fieldwork.update_xlsform import append_field_mapping_fields
 from psycopg import AsyncConnection
 from pyodk.errors import PyODKError
@@ -341,6 +342,7 @@ async def append_fields_to_user_xlsform(  # noqa: PLR0913
     default_language: str | None = None,
     use_odk_collect: bool = False,
     *,
+    new_point_capture: NewPointCapture = NewPointCapture.MAP,
     form_id: str | None = None,
 ) -> tuple[str, BytesIO]:
     """Helper to return the intermediate XLSForm prior to convert."""
@@ -349,6 +351,7 @@ async def append_fields_to_user_xlsform(  # noqa: PLR0913
         xlsform,
         form_name=form_name,
         new_geom_type=new_geom_type,
+        new_point_capture=new_point_capture,
         need_verification_fields=need_verification_fields,
         include_photo_upload=include_photo_upload,
         mandatory_photo_upload=mandatory_photo_upload,
@@ -368,6 +371,7 @@ async def validate_and_update_user_xlsform(  # noqa: PLR0913
     mandatory_photo_upload: bool = False,
     use_odk_collect: bool = False,
     *,
+    new_point_capture: NewPointCapture = NewPointCapture.MAP,
     form_id: str | None = None,
 ) -> BytesIO:
     """Wrapper to append mandatory fields and validate user uploaded XLSForm."""
@@ -378,6 +382,7 @@ async def validate_and_update_user_xlsform(  # noqa: PLR0913
         xlsform,
         form_name=form_name,
         new_geom_type=new_geom_type,
+        new_point_capture=new_point_capture,
         need_verification_fields=need_verification_fields,
         include_photo_upload=include_photo_upload,
         mandatory_photo_upload=mandatory_photo_upload,

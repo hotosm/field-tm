@@ -2806,3 +2806,15 @@ msgstr "اختبار بيانات الاعتماد"
 msgid "Save & Continue"
 msgstr "حفظ ومتابعة"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "نقاط جديدة"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "ينقر راسمو الخرائط على الموقع على الخريطة"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "يسجّل راسمو الخرائط موقعهم باستخدام GPS"

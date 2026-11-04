@@ -2901,3 +2901,15 @@ msgstr "Testar credenciais"
 msgid "Save & Continue"
 msgstr "Salvar e continuar"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "Novos pontos"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "Os mapeadores tocam na localização em um mapa"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "Os mapeadores registram sua localização GPS"

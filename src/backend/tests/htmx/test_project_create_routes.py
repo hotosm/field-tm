@@ -9,6 +9,8 @@ from unittest.mock import AsyncMock, Mock
 import pytest
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from litestar import status_codes as status
+from osm_fieldwork.enums import NewPointCapture
+from pydantic import ValidationError as PydanticValidationError
 
 from app.config import AuthProvider, settings
 from app.errors import (
@@ -16,6 +18,7 @@ from app.errors import (
     ServiceError,
 )
 from app.errors import ValidationError as SvcValidationError
+from app.htmx.htmx_schemas import XLSFormUploadData
 from app.htmx.project_create import project_create_simple_flow
 from app.htmx.project_create.project_create_page_routes import (
     new_project_chooser,
@@ -886,6 +889,48 @@ def test_new_project_simple_template_has_submit_loading_indicator():
     assert 'startsWith("/projects/")' in rendered
 
 
+@pytest.mark.parametrize(
+    ("mapping_app", "has_capture_select"), [("ODK", True), ("QFIELD", False)]
+)
+def test_step2_form_offers_new_point_capture_for_odk_only(
+    mapping_app, has_capture_select
+):
+    """Only ODK forms collect new points, so QField has no capture option."""
+    templates_dir = Path(__file__).resolve().parents[2] / "app" / "templates"
+    env = Environment(
+        loader=FileSystemLoader(str(templates_dir)),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
+    env.add_extension("jinja2.ext.i18n")
+    env.install_gettext_callables(
+        lambda message: message, lambda s, p, n: s if n == 1 else p
+    )
+
+    html = env.get_template(
+        "partials/project_details/setup_steps/step2_form.html"
+    ).render(has_xlsform=False, field_mapping_app_upper=mapping_app)
+
+    assert ('name="new_point_capture"' in html) == has_capture_select
+
+
+@pytest.mark.parametrize(
+    ("submitted", "expected"),
+    [
+        ({}, NewPointCapture.MAP),
+        ({"new_point_capture": "gps"}, NewPointCapture.GPS),
+    ],
+)
+def test_xlsform_upload_data_parses_new_point_capture(submitted, expected):
+    """Submitted capture values decode to the enum, defaulting to the map."""
+    assert XLSFormUploadData(**submitted).new_point_capture == expected
+
+
+def test_xlsform_upload_data_rejects_unknown_new_point_capture():
+    """Unknown capture methods fail at the form boundary."""
+    with pytest.raises(PydanticValidationError):
+        XLSFormUploadData(new_point_capture="compass")
+
+
 def test_new_project_simple_template_uses_gettext_for_map_strings():
     """Simple template should route map-script strings through gettext."""
     templates_dir = Path(__file__).resolve().parents[2] / "app" / "templates"
@@ -967,6 +1012,7 @@ async def test_upload_xlsform_htmx_passes_none_default_language_when_not_explici
             include_photo_upload="true",
             mandatory_photo_upload="false",
             use_odk_collect="false",
+            new_point_capture=NewPointCapture.MAP,
             default_language_explicit="false",
             default_language="french",
         ),
@@ -1010,6 +1056,7 @@ async def test_upload_xlsform_htmx_passes_selected_default_language_when_explici
             include_photo_upload="true",
             mandatory_photo_upload="false",
             use_odk_collect="false",
+            new_point_capture=NewPointCapture.GPS,
             default_language_explicit="true",
             default_language="french",
         ),
@@ -1018,6 +1065,7 @@ async def test_upload_xlsform_htmx_passes_selected_default_language_when_explici
 
     assert response.status_code == status.HTTP_200_OK
     assert captured["default_language"] == "french"
+    assert captured["new_point_capture"] == NewPointCapture.GPS
 
 
 def test_parse_outline_payload_accepts_feature_json_string():

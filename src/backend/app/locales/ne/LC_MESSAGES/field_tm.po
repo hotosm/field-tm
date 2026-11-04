@@ -2868,3 +2868,15 @@ msgstr "प्रमाण परीक्षण गर्नुहोस्"
 msgid "Save & Continue"
 msgstr "सुरक्षित गर्नुहोस् र जारी राख्नुहोस्"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "नयाँ बिन्दुहरू"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "नक्साङ्कनकर्ताहरूले नक्सामा स्थान ट्याप गर्छन्"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "नक्साङ्कनकर्ताहरूले GPS बाट आफ्नो स्थान रेकर्ड गर्छन्"

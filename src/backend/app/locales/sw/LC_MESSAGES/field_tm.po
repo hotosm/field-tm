@@ -2917,3 +2917,15 @@ msgstr "Jaribu taarifa za uthibitishaji"
 msgid "Save & Continue"
 msgstr "Hifadhi na uendelee"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "Pointi mpya"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "Wachora ramani wanagusa eneo kwenye ramani"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "Wachora ramani wanarekodi eneo lao kwa GPS"

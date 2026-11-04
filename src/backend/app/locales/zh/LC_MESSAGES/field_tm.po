@@ -2666,3 +2666,15 @@ msgstr "测试凭据"
 msgid "Save & Continue"
 msgstr "保存并继续"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "新增点"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "绘图人员在地图上点选位置"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "绘图人员记录自己的 GPS 位置"

@@ -20,6 +20,7 @@
 from typing import Optional
 
 from litestar.datastructures import UploadFile
+from osm_fieldwork.enums import NewPointCapture
 from pydantic import BaseModel, ConfigDict
 
 
@@ -33,6 +34,7 @@ class XLSFormUploadData(BaseModel):
     include_photo_upload: Optional[str] = "true"
     mandatory_photo_upload: Optional[str] = "false"
     use_odk_collect: Optional[str] = "false"
+    new_point_capture: NewPointCapture = NewPointCapture.MAP
     default_language: Optional[str] = "english"
     default_language_explicit: Optional[str] = "false"
     template_form_id: Optional[str] = None
