@@ -53,9 +53,9 @@ from app.i18n import _
 from app.projects import project_crud
 from app.projects.project_services import (
     delete_project_with_downstream,
+    export_project_geojson,
     update_odk_project_form,
 )
-from app.qfield.qfield_crud import export_qfield_project_geojson
 from app.qfield.qfield_utils import strip_qfc_api_suffix
 
 from .htmx_helpers import callout
@@ -343,26 +343,21 @@ async def export_project_geojson_htmx(
     auth_user: object,
     project_id: int = Parameter(),
 ) -> Response:
-    """Trigger a QFieldCloud package, .gpkg --> GeoJSON, then download."""
+    """Download the project submissions as standard GeoJSON."""
     project, not_found_response = authorized_project_or_response(
         current_user, project_id
     )
     if not_found_response:
         return not_found_response
 
-    if project.field_mapping_app != FieldMappingApp.QFIELD:
-        return html_error_response(
-            _("GeoJSON export is only available for QField projects."),
-            status.HTTP_400_BAD_REQUEST,
-        )
     if not project.external_project_id:
         return html_error_response(
-            _("This project is not yet linked to a QFieldCloud project."),
+            _("This project is not yet linked to ODK Central or QFieldCloud."),
             status.HTTP_400_BAD_REQUEST,
         )
 
     try:
-        feature_collection = await export_qfield_project_geojson(db, project)
+        feature_collection = await export_project_geojson(db, project)
     except ServiceError as exc:
         return html_error_response(exc.message, exc.status_code)
     except Exception as exc:

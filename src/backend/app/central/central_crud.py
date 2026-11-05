@@ -749,6 +749,20 @@ async def create_entity_list(  # noqa: PLR0913
         )
 
 
+async def get_submissions(
+    odk_creds: Optional[central_schemas.ODKCentral], project_odk_id: int
+) -> list[dict]:
+    """All submissions of the project's survey form, with repeats expanded."""
+    async with central_deps.pyodk_client(odk_creds) as client:
+        forms = client.forms.list(project_id=project_odk_id)
+        if not forms:
+            return []
+        table = client.submissions.get_table(
+            form_id=forms[0].xmlFormId, project_id=project_odk_id, expand="*"
+        )
+    return table.get("value", [])
+
+
 async def get_appuser_token(
     xform_id: str,
     project_odk_id: int,

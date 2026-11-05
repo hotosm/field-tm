@@ -38,6 +38,8 @@ XLSForm templates and helpers for Field-TM. For ODK Central clients, use pyodk.
 - `conversion_to_xlsform.py`: converts YAML form definitions to XLSForm.
 - `form_components/`: the shared mandatory fields and choices.
 - `json_data_models/`: raw-data-api query configs for each form category.
+- `export.py`: normalises ODK and QField submissions into one standard
+  GeoJSON format (`from_odk`, `from_qfield`), for QGIS, uMap etc.
 
 ## Installation
 

@@ -22,6 +22,7 @@ import logging
 import types
 from typing import Optional
 
+from osm_fieldwork.export import javarosa_to_geojson
 from psycopg import AsyncConnection
 
 from app.errors import (
@@ -36,8 +37,6 @@ MIN_LONGITUDE = -180
 MAX_LONGITUDE = 180
 MIN_LATITUDE = -90
 MAX_LATITUDE = 90
-MIN_LAT_LON_PARTS = 2
-MIN_POLYGON_POINTS = 4
 MIN_CENTROID_POINTS = 3
 POLYGON_AREA_EPSILON = 1e-10
 
@@ -348,34 +347,4 @@ async def geojson_to_javarosa_geom(geojson_geometry: dict) -> str:
 
 async def javarosa_to_geojson_geom(javarosa_geom_string: str) -> dict:
     """Convert JavaRosa to GeoJSON, inferring point, line, or closed polygon."""
-    if not javarosa_geom_string or not isinstance(javarosa_geom_string, str):
-        return {}
-
-    coordinates = []
-
-    for point_str in javarosa_geom_string.strip().split(";"):
-        parts = point_str.strip().split()
-
-        if len(parts) < MIN_LAT_LON_PARTS:
-            continue
-
-        try:
-            lat = float(parts[0])
-            lon = float(parts[1])
-            coordinates.append([lon, lat])
-        except ValueError:
-            continue
-
-    if not coordinates:
-        return {}
-
-    if len(coordinates) == 1:
-        geom_type = "Point"
-        coordinates = coordinates[0]
-    elif coordinates[0] == coordinates[-1] and len(coordinates) >= MIN_POLYGON_POINTS:
-        geom_type = "Polygon"
-        coordinates = [coordinates]
-    else:
-        geom_type = "LineString"
-
-    return {"type": geom_type, "coordinates": coordinates}
+    return javarosa_to_geojson(javarosa_geom_string) or {}

@@ -28,6 +28,7 @@ from anyio import to_thread
 from area_splitter import SplittingAlgorithm
 from area_splitter.splitter import split_by_sql
 from geojson_aoi import parse_aoi
+from osm_fieldwork import export
 from osm_fieldwork.enums import NewPointCapture
 from osm_fieldwork.update_xlsform import get_processed_form_options
 from pg_nearest_city import AsyncNearestCity
@@ -56,7 +57,7 @@ from app.helpers.geometry_utils import (
 from app.i18n import _
 from app.projects import project_deps, project_schemas
 from app.projects.task_sync import tasks_geometry_hash
-from app.qfield.qfield_crud import create_qfield_project
+from app.qfield.qfield_crud import create_qfield_project, export_qfield_project_geojson
 from app.qfield.qfield_deps import qfield_client
 
 log = logging.getLogger(__name__)
@@ -643,3 +644,25 @@ async def finalize_qfield_project(
     await db.commit()
 
     return QFieldFinalizeResult(qfield_url=qfield_url)
+
+
+async def export_project_geojson(db: AsyncConnection, project: DbProject) -> dict:
+    """Project submissions as a standard GeoJSON FeatureCollection (ODK or QField)."""
+    xlsform = project.xlsform_content
+    media = export.media_fields(bytes(xlsform)) if xlsform else set()
+
+    if project.field_mapping_app == FieldMappingApp.QFIELD:
+        survey = await export_qfield_project_geojson(db, project)
+        features = [export.from_qfield(f, media) for f in survey["features"]]
+    elif project.field_mapping_app == FieldMappingApp.ODK:
+        records = await central_crud.get_submissions(
+            project.get_odk_credentials(), int(project.external_project_id)
+        )
+        if not records:
+            raise NotFoundError(_("No submissions found yet."))
+        features = [export.from_odk(r, media) for r in records]
+    else:
+        raise ValidationError(
+            _("Export is only available for ODK and QField projects.")
+        )
+    return export.to_feature_collection(features)

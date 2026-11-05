@@ -11,7 +11,7 @@
   field_mapping_app_upper = field_mapping_app_value.upper() if field_mapping_app_value else none %}
   {% set app = mapping_app(project.field_mapping_app) %} {% set has_xlsform =
   project.xlsform_content is not none and project.xlsform_content %} {% set can_export = is_manager
-  and field_mapping_app_upper == 'QFIELD' and project.external_project_id %}
+  and field_mapping_app_upper in ('QFIELD', 'ODK') and project.external_project_id %}
   <div class="wa-split wa-gap-m">
     <div class="ftm-project-title">
       {% if app %}
@@ -31,7 +31,7 @@
       id="ftm-export-geojson-link"
       variant="neutral"
       appearance="outlined"
-      title="{{ _('Trigger a fresh QFieldCloud package and download the project data as a single GeoJSON file.') }}"
+      title="{{ _('Download all submissions as a single GeoJSON file, for QGIS, uMap and other tools.') }}"
       onclick="window.exportProjectGeoJSON({{ project.id }})"
     >
       <wa-icon slot="start" name="download"></wa-icon>
@@ -58,7 +58,7 @@
   <script>
     (function () {
       const I18N = {
-        packaging: {{ _("Packaging project on QFieldCloud - this may take a minute, please be patient...")|tojson }},
+        packaging: {{ _("Gathering submissions - this may take a minute, please be patient...")|tojson }},
         downloadStarted: {{ _("✓ Download started.")|tojson }},
         failed: {{ _("Export failed:")|tojson }},
         networkError: {{ _("Network error while exporting. Please try again.")|tojson }},
