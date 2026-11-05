@@ -97,13 +97,11 @@ def _load_field_project_module():
         "sanitize",
         SimpleNamespace(sanitize_generated_qgis_metadata=lambda *args, **kwargs: None),
     )
-    sys_modules.setdefault(
-        "utils",
-        SimpleNamespace(
-            parse_and_validate_extent=lambda *args, **kwargs: [0, 0, 0, 0],
-            set_project_file_permissions=lambda *args, **kwargs: None,
-        ),
-    )
+    utils_spec = spec_from_file_location("utils", module_path.with_name("utils.py"))
+    assert utils_spec is not None and utils_spec.loader is not None
+    utils_module = module_from_spec(utils_spec)
+    utils_spec.loader.exec_module(utils_module)
+    sys_modules.setdefault("utils", utils_module)
 
     spec.loader.exec_module(module)
     return module
@@ -592,7 +590,7 @@ def test_register_plugin_data_dirs_adds_top_level_subdirs_to_project_entry(tmp_p
             written[(scope, key)] = value
             return True
 
-    field_project._register_plugin_data_dirs(
+    field_project.register_plugin_data_dirs(
         FakeProject(), tmp_path, field_project.logging.getLogger(__name__)
     )
 
@@ -621,13 +619,13 @@ def test_register_plugin_data_dirs_merges_existing_and_skips_unchanged_write(
             write_calls.append((scope, key, value))
             return True
 
-    field_project._register_plugin_data_dirs(
+    field_project.register_plugin_data_dirs(
         FakeProject(["DCIM"]), tmp_path, field_project.logging.getLogger(__name__)
     )
     assert write_calls == [("QFieldSync", "dataDirs", ["DCIM", "plugins", "styles"])]
 
     write_calls.clear()
-    field_project._register_plugin_data_dirs(
+    field_project.register_plugin_data_dirs(
         FakeProject(["plugins", "styles"]),
         tmp_path,
         field_project.logging.getLogger(__name__),

@@ -250,4 +250,4 @@ async def test_published_project_form_controls(
     )
 
     assert (f'hx-post="/projects/{project.id}/form"' in response.text) is shows_upload
-    assert ("sync the" in response.text and "QGIS" in response.text) is shows_warning
+    assert ("edit the project in QGIS" in response.text) is shows_warning
