@@ -663,6 +663,9 @@ class AreaSplitter:
                         placeholder, _sql_literal(param_value)
                     )
                 splitter_cursor.execute(sql_content)
+        # A file can run several statements, and the features are in the last result
+        while splitter_cursor.nextset():
+            pass
         return splitter_cursor.fetchall()[0][0]["features"]
 
     def splitBySquare(  # noqa: N802
@@ -1030,9 +1033,16 @@ be either the data extract used by the XLSForm, or a postgresql database.
         help="Size in meters if using square splitting",
     )
     parser.add_argument(
-        "-number", "--number", nargs="?", const=5, help="Number of buildings in a task"
+        "-number",
+        "--number",
+        nargs="?",
+        const=5,
+        type=int,
+        help="Number of buildings in a task",
     )
-    parser.add_argument("-tasks", "--tasks", nargs="?", const=5, help="Number of tasks")
+    parser.add_argument(
+        "-tasks", "--tasks", nargs="?", const=5, type=int, help="Number of tasks"
+    )
     parser.add_argument("-b", "--boundary", required=True, help="Polygon AOI")
     parser.add_argument("-s", "--source", help="Source data, Geojson or PG:[dbname]")
     parser.add_argument(
