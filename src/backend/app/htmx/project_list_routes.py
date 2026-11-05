@@ -18,6 +18,7 @@
 
 """Project listing HTMX routes."""
 
+import math
 from urllib.parse import urlencode
 
 from litestar import get
@@ -38,7 +39,13 @@ PROJECT_SORT_OPTIONS = {
     "oldest",
     "name_asc",
     "name_desc",
+    "nearest",
 }
+# Two decimal places is roughly 1 km: enough to rank nearby projects, without
+# handling a precise location for a request that is never stored anyway.
+NEAR_COORD_DECIMALS = 2
+MAX_LATITUDE = 90
+MAX_LONGITUDE = 180
 
 
 def create_project_href(auth_user: object | None) -> str:
@@ -53,6 +60,20 @@ def _parse_page(raw: str | None) -> int:
         return max(int(raw or 1), 1)
     except ValueError:
         return 1
+
+
+def _parse_near(lat_raw: str | None, lon_raw: str | None) -> tuple[float, float] | None:
+    """Parse a coarse ``(lat, lon)`` pair from query params, or return None."""
+    try:
+        lat = float(lat_raw or "")
+        lon = float(lon_raw or "")
+    except ValueError:
+        return None
+    if not (math.isfinite(lat) and math.isfinite(lon)):
+        return None
+    if abs(lat) > MAX_LATITUDE or abs(lon) > MAX_LONGITUDE:
+        return None
+    return round(lat, NEAR_COORD_DECIMALS), round(lon, NEAR_COORD_DECIMALS)
 
 
 def _page_href(filters: dict[str, str], page: int) -> str:
@@ -78,6 +99,14 @@ async def project_listing(
     sort_param = request.query_params.get("sort") or "newest"
     selected_status = None
     selected_sort = sort_param if sort_param in PROJECT_SORT_OPTIONS else "newest"
+    near = None
+    if selected_sort == "nearest":
+        near = _parse_near(
+            request.query_params.get("lat"), request.query_params.get("lon")
+        )
+        if near is None:
+            # Distance sorting needs a valid location; fall back quietly.
+            selected_sort = "newest"
 
     if status_param:
         try:
@@ -95,6 +124,7 @@ async def project_listing(
             status=selected_status,
             search=search_query or None,
             sort_by=selected_sort,
+            near=near,
         )
         or []
     )
@@ -103,6 +133,8 @@ async def project_listing(
         "status": selected_status.value if selected_status else "",
         "search": search_query,
         "sort": selected_sort,
+        "lat": str(near[0]) if near else "",
+        "lon": str(near[1]) if near else "",
     }
     return HTMXTemplate(
         template_name="home.html",
@@ -114,6 +146,7 @@ async def project_listing(
             "selected_status": selected_status.value if selected_status else "",
             "search_query": search_query,
             "selected_sort": selected_sort,
+            "near": near,
             "create_project_href": create_project_href(auth_user),
         },
     )

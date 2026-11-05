@@ -11,8 +11,13 @@
   {% set status_options = [ ('', _('All projects')), ('DRAFT', _('Draft')), ('PUBLISHED',
   _('Published')), ('COMPLETED', _('Completed')), ('ARCHIVED', _('Archived')), ] %} {% set
   sort_options = [ ('newest', _('Newest first')), ('oldest', _('Oldest first')), ('name_asc',
-  _('Name (A-Z)')), ('name_desc', _('Name (Z-A)')), ] %}
+  _('Name (A-Z)')), ('name_desc', _('Name (Z-A)')), ] %} {% if near %} {% set sort_options =
+  sort_options + [('nearest', _('Nearest to me'))] %} {% endif %}
   <form class="ftm-projects-toolbar" method="get" action="/projects">
+    {% if near %}
+    <input type="hidden" name="lat" value="{{ near[0] }}" />
+    <input type="hidden" name="lon" value="{{ near[1] }}" />
+    {% endif %}
     <wa-select
       id="projects-status-filter"
       name="status"
@@ -47,7 +52,24 @@
     >
       <wa-icon name="magnifying-glass" slot="start"></wa-icon>
     </wa-input>
+    <wa-button
+      id="projects-near-me"
+      type="button"
+      size="s"
+      variant="neutral"
+      appearance="outlined"
+      data-error-unsupported="{{ _('Your browser cannot share a location, so nearby projects cannot be found.') }}"
+      data-error-denied="{{ _('Location access was denied. Allow it in your browser settings to find nearby projects.') }}"
+      data-error-failed="{{ _('Your location could not be determined. Please try again.') }}"
+    >
+      <wa-icon slot="start" name="location-crosshairs"></wa-icon>
+      {{ _("Projects near me") }}
+    </wa-button>
   </form>
+
+  <wa-callout id="projects-near-me-error" variant="warning" hidden>
+    <span></span>
+  </wa-callout>
 
   <p class="ftm-hint">
     {% set count = projects|length %} {% trans count %}Showing {{ count }} project{% pluralize
@@ -55,8 +77,13 @@
     {"status": selected_status|lower|title} }}{% endif %}{% if search_query %} {{ _('matching
     "%(query)s"') % {"query": search_query} }}{% endif %}
   </p>
-
-  {% if projects %}
+  {% if near %}
+  <p class="ftm-hint">
+    <wa-icon name="location-crosshairs"></wa-icon>
+    {% trans trimmed %}Sorted by distance from your approximate location. Your location is only used
+    for this search and is not saved.{% endtrans %}
+  </p>
+  {% endif %} {% if projects %}
   <div class="wa-grid ftm-card-grid">
     {% for project in projects %} {% set status_value = project.status.value if project.status and
     project.status.value else (project.status if project.status is string else 'DRAFT') %} {% set
@@ -88,6 +115,13 @@
           <span class="ftm-hint">
             <wa-icon name="location-dot"></wa-icon>
             {{ _("Location:") }} {{ project.location_str }}
+          </span>
+          {% endif %} {% if project.distance_km is not none %}
+          <span class="ftm-hint ftm-project-card__distance">
+            <wa-icon name="route"></wa-icon>
+            {% if project.distance_km < 1 %} {{ _("Less than 1 km away") }} {% else %} {% trans
+            trimmed distance=project.distance_km|round|int %}{{ distance }} km away{% endtrans %} {%
+            endif %}
           </span>
           {% endif %} {% if project.description %}
           <p class="ftm-hint ftm-project-card__description">{{ project.description }}</p>
@@ -151,6 +185,43 @@
     });
     form.querySelectorAll("wa-select").forEach((select) => {
       select.addEventListener("change", () => form.submit());
+    });
+
+    // "Projects near me": the browser asks for consent, then the coarse
+    // position is sent once as a query param and never stored.
+    const nearButton = document.getElementById("projects-near-me");
+    const nearError = document.getElementById("projects-near-me-error");
+    const showNearError = (message) => {
+      nearError.querySelector("span").textContent = message;
+      nearError.hidden = false;
+      nearButton.loading = false;
+    };
+    nearButton.addEventListener("click", () => {
+      nearError.hidden = true;
+      if (!("geolocation" in navigator)) {
+        showNearError(nearButton.dataset.errorUnsupported);
+        return;
+      }
+      nearButton.loading = true;
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const params = new URLSearchParams(window.location.search);
+          params.delete("page");
+          params.set("sort", "nearest");
+          // ~1 km precision is plenty for ranking projects.
+          params.set("lat", position.coords.latitude.toFixed(2));
+          params.set("lon", position.coords.longitude.toFixed(2));
+          window.location.assign(`/projects?${params}`);
+        },
+        (error) => {
+          showNearError(
+            error.code === error.PERMISSION_DENIED
+              ? nearButton.dataset.errorDenied
+              : nearButton.dataset.errorFailed,
+          );
+        },
+        { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 },
+      );
     });
   })();
 </script>
