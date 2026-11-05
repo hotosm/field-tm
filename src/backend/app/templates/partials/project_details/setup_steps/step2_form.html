@@ -89,6 +89,16 @@
             </select>
           </label>
 
+          {% if field_mapping_app_upper == 'ODK' %}
+          <label class="wa-stack wa-gap-2xs">
+            <span>{{ _("New points") }}</span>
+            <select id="new-point-capture-select" name="new_point_capture">
+              <option value="map">{{ _("Mappers tap the location on a map") }}</option>
+              <option value="gps">{{ _("Mappers capture their GPS location") }}</option>
+            </select>
+          </label>
+          {% endif %}
+
           <div class="wa-stack wa-gap-s" role="group" aria-label="{{ _('Form questions') }}">
             <wa-checkbox
               id="include-photo-upload-checkbox"

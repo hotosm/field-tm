@@ -34,7 +34,7 @@ from uuid import uuid4
 import pandas as pd
 from python_calamine.pandas import pandas_monkeypatch
 
-from osm_fieldwork.enums import DbGeomType
+from osm_fieldwork.enums import DbGeomType, NewPointCapture
 from osm_fieldwork.form_components.choice_fields import get_choice_fields
 from osm_fieldwork.form_components.mandatory_fields import (
     meta_df,
@@ -417,6 +417,7 @@ async def _process_all_form_tabs(
     form_name: str = f"ftm_{uuid4()}",
     additional_entities: Optional[list[str]] = None,
     new_geom_type: DbGeomType = DbGeomType.POINT,
+    new_point_capture: NewPointCapture = NewPointCapture.MAP,
     need_verification_fields: bool = True,
     include_photo_upload: bool = True,
     mandatory_photo_upload: bool = False,
@@ -440,7 +441,7 @@ async def _process_all_form_tabs(
     xform_id = _configure_form_settings(custom_sheets, form_name, default_language, form_id)
 
     # Select appropriate form components based on target platform
-    form_components = _get_form_components(use_odk_collect, new_geom_type, need_verification_fields, choices_df, digitisation_df, digitisation_choices_df, photo_collection_df if include_photo_upload else None, label_cols)
+    form_components = _get_form_components(use_odk_collect, new_geom_type, new_point_capture, need_verification_fields, choices_df, digitisation_df, digitisation_choices_df, photo_collection_df if include_photo_upload else None, label_cols)
 
     # Process survey sheet
     custom_sheets["survey"] = _process_survey_sheet(
@@ -492,6 +493,8 @@ async def append_field_mapping_fields(
     default_language: str | None = None,
     use_odk_collect: bool = False,
     form_id: str | None = None,
+    *,
+    new_point_capture: NewPointCapture = NewPointCapture.MAP,
 ) -> tuple[str, BytesIO]:
     """Append mandatory fields to the XLSForm for use in Field-TM.
 
@@ -508,6 +511,8 @@ async def append_field_mapping_fields(
             Defaults to False.
         form_id (str, optional): Use this xFormId instead of the one in the form.
             A new version of a published form must keep its xFormId.
+        new_point_capture (NewPointCapture): Whether new points are placed on a map
+            or captured by GPS in ODK Collect. Defaults to NewPointCapture.MAP.
 
     Returns:
         tuple[str, BytesIO]: The xFormId and the updated XLSForm wrapped in BytesIO.
@@ -535,6 +540,7 @@ async def append_field_mapping_fields(
         form_name=form_name,
         additional_entities=additional_entities,
         new_geom_type=new_geom_type,
+        new_point_capture=new_point_capture,
         need_verification_fields=need_verification_fields,
         include_photo_upload=include_photo_upload,
         mandatory_photo_upload=mandatory_photo_upload,
@@ -544,6 +550,14 @@ async def append_field_mapping_fields(
         form_id=form_id,
     )
     return (xformid, await write_xlsform(updated_form))
+
+
+def _get_new_point_capture(survey: pd.DataFrame) -> NewPointCapture:
+    """The capture method of a processed form, recorded by the new_feature appearance."""
+    if "appearance" not in survey:
+        return NewPointCapture.MAP
+    appearance = survey.loc[survey["name"] == TEMPLATE_GEOMETRY_NAME, "appearance"]
+    return NewPointCapture.GPS if appearance.isna().any() else NewPointCapture.MAP
 
 
 def get_processed_form_options(xlsform: bytes) -> dict:
@@ -559,6 +573,7 @@ def get_processed_form_options(xlsform: bytes) -> dict:
         "need_verification_fields": (survey["name"] == "verification").any().item(),
         "include_photo_upload": not photo_rows.empty,
         "mandatory_photo_upload": (photo_rows["required"] == "yes").any().item(),
+        "new_point_capture": _get_new_point_capture(survey),
     }
 
 
@@ -736,6 +751,7 @@ def _move_row_into_group(
 def _get_form_components(
         use_odk_collect: bool,
         new_geom_type: DbGeomType,
+        new_point_capture: NewPointCapture,
         need_verification_fields: bool,
         choices_df: pd.DataFrame,
         digitisation_df: pd.DataFrame,
@@ -752,7 +768,7 @@ def _get_form_components(
         digitisation_df.loc[digitisation_correct_col, "read_only"] = "${new_feature} != ''"
 
     return {
-        "survey_df": create_survey_df(use_odk_collect, new_geom_type, need_verification_fields, label_cols),
+        "survey_df": create_survey_df(use_odk_collect, new_geom_type, new_point_capture, need_verification_fields, label_cols),
         "choices_df": choices_df,
         "digitisation_df": digitisation_df,
         "photo_collection_df": photo_collection_df,

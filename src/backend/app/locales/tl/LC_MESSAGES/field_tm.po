@@ -2950,3 +2950,15 @@ msgstr "Subukan ang Mga Kredensyal"
 msgid "Save & Continue"
 msgstr "I-save at Magpatuloy"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "Mga bagong punto"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "Tinatap ng mga tagapagmapa ang lokasyon sa mapa"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "Itinatala ng mga tagapagmapa ang kanilang lokasyon gamit ang GPS"

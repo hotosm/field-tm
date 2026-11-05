@@ -42,7 +42,7 @@ Modules and functionalities:
 import pandas as pd
 from datetime import datetime
 
-from osm_fieldwork.enums import DbGeomType
+from osm_fieldwork.enums import DbGeomType, NewPointCapture
 from osm_fieldwork.form_components.translations import add_label_translations
 
 
@@ -103,6 +103,7 @@ def get_photo_fields(mandatory_photo_upload: bool = False):
 def _get_mandatory_fields(
         use_odk_collect: bool,
         new_geom_type: DbGeomType,
+        new_point_capture: NewPointCapture,
         need_verification_fields: bool,
         label_cols: list[str],
     ):
@@ -112,6 +113,7 @@ def _get_mandatory_fields(
     Args:
         use_odk_collect: Mode of data collection
         new_geom_type: The geometry type (POINT, POLYGON, LINESTRING)
+        new_point_capture: Whether new points are placed on a map or captured by GPS
         need_verification_fields: Whether to include verification fields
     
     Returns:
@@ -190,7 +192,8 @@ def _get_mandatory_fields(
             add_label_translations({
                 "type": geom_field,
                 "name": "new_feature",
-                "appearance": "placement-map",
+                # A geopoint with no appearance is captured from the device GPS
+                "appearance": "placement-map" if new_point_capture == NewPointCapture.MAP else "",
                 "relevant": "${mapping_mode} = 'new'",
                 "required": "yes",
             },
@@ -326,6 +329,7 @@ def _get_mandatory_fields(
 def create_survey_df(
         use_odk_collect: bool,
         new_geom_type: DbGeomType,
+        new_point_capture: NewPointCapture,
         need_verification_fields: bool,
         label_cols: list[str]
     ) -> pd.DataFrame:
@@ -334,7 +338,7 @@ def create_survey_df(
     We do this in a function to allow the geometry type
     for new data to be specified.
     """
-    fields = _get_mandatory_fields(use_odk_collect, new_geom_type, need_verification_fields, label_cols)
+    fields = _get_mandatory_fields(use_odk_collect, new_geom_type, new_point_capture, need_verification_fields, label_cols)
     mandatory_df = pd.DataFrame(fields)
     return pd.concat([meta_df, mandatory_df])
 

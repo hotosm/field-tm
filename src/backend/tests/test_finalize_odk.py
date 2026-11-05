@@ -15,6 +15,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
+from osm_fieldwork.enums import NewPointCapture
 from osm_fieldwork.update_xlsform import get_processed_form_options
 from osm_fieldwork.xlsforms import buildings
 
@@ -1362,6 +1363,29 @@ async def test_update_odk_project_form_keeps_id_and_options():
     assert "survey_photos" not in xform.getvalue().decode()
     stored = update_db.await_args.args[2].xlsform_content
     assert get_processed_form_options(stored)["form_id"] == "published-form-id"
+
+
+async def test_update_odk_project_form_keeps_new_point_capture():
+    """A published GPS capture form stays GPS capture after a form update."""
+    project = DbProject(
+        id=1,
+        external_project_id=5,
+        xlsform_content=await _build_processed_form(
+            new_point_capture=NewPointCapture.GPS
+        ),
+    )
+    upload = BytesIO(convert_to_xlsform(str(buildings)))
+
+    with (
+        patch.object(central_crud, "update_odk_xform", AsyncMock()),
+        patch.object(DbProject, "update", AsyncMock()) as update_db,
+    ):
+        await project_services.update_odk_project_form(AsyncMock(), project, upload)
+
+    stored = update_db.await_args.args[2].xlsform_content
+    assert get_processed_form_options(stored)["new_point_capture"] == (
+        NewPointCapture.GPS
+    )
 
 
 async def test_update_odk_project_form_keeps_stored_form_if_central_fails():

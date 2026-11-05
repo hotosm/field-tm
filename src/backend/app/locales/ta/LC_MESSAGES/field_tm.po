@@ -2936,3 +2936,15 @@ msgstr "சான்றுகளைச் சோதிக்கவும்"
 msgid "Save & Continue"
 msgstr "சேமித்து தொடரவும்"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "புதிய புள்ளிகள்"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "வரைபடம் உருவாக்குபவர்கள் வரைபடத்தில் இருப்பிடத்தைத் தட்டுகிறார்கள்"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "வரைபடம் உருவாக்குபவர்கள் GPS மூலம் தங்கள் இருப்பிடத்தைப் பதிவு செய்கிறார்கள்"

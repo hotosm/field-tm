@@ -27,6 +27,7 @@ from openpyxl import Workbook, load_workbook, worksheet
 from pyxform.xls2xform import convert as xform_convert
 
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
+from osm_fieldwork.enums import NewPointCapture
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.update_xlsform import (
     _configure_form_settings,
@@ -408,16 +409,19 @@ async def test_form_id_override_replaces_uploaded_form_id():
             "need_verification_fields": True,
             "include_photo_upload": True,
             "mandatory_photo_upload": False,
+            "new_point_capture": NewPointCapture.MAP,
         },
         {
             "need_verification_fields": False,
             "include_photo_upload": True,
             "mandatory_photo_upload": True,
+            "new_point_capture": NewPointCapture.GPS,
         },
         {
             "need_verification_fields": False,
             "include_photo_upload": False,
             "mandatory_photo_upload": False,
+            "new_point_capture": NewPointCapture.MAP,
         },
     ],
 )
@@ -445,6 +449,24 @@ async def test_processed_form_options_round_trip(options):
     assert get_processed_form_options(rebuilt.getvalue()) == recovered
 
 
+@pytest.mark.parametrize(
+    ("capture", "appearance"),
+    [(NewPointCapture.MAP, "placement-map"), (NewPointCapture.GPS, "")],
+)
+async def test_new_point_capture_sets_appearance(capture, appearance):
+    """The capture method sets a valid new_feature appearance that can be recovered."""
+    _, form = await append_field_mapping_fields(
+        _buildings_form(), use_odk_collect=True, new_point_capture=capture
+    )
+    xform_convert(BytesIO(form.getvalue()))
+
+    survey = pd.read_excel(BytesIO(form.getvalue()), sheet_name="survey").fillna("")
+    new_feature = survey[survey["name"] == "new_feature"].iloc[0]
+    assert new_feature["type"] == "geopoint"
+    assert new_feature["appearance"] == appearance
+    assert get_processed_form_options(form.getvalue())["new_point_capture"] == capture
+
+
 def test_processed_form_options_from_older_form():
     """Forms stored before default_language and the photos repeat still work."""
     workbook = Workbook()
@@ -463,6 +485,7 @@ def test_processed_form_options_from_older_form():
         "need_verification_fields": False,
         "include_photo_upload": True,
         "mandatory_photo_upload": True,
+        "new_point_capture": NewPointCapture.MAP,
     }
 
 

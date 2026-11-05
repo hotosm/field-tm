@@ -2698,3 +2698,15 @@ msgstr "認証情報をテスト"
 msgid "Save & Continue"
 msgstr "保存して続行"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "新しいポイント"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "マッピング担当者が地図上の位置をタップします"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "マッピング担当者がGPSで現在位置を記録します"

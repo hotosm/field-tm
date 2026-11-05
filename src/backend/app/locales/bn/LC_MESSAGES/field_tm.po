@@ -2854,3 +2854,15 @@ msgstr "তথ্য পরীক্ষা করুন"
 msgid "Save & Continue"
 msgstr "সংরক্ষণ করুন ও এগিয়ে যান"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "নতুন বিন্দু"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "মানচিত্রকারীরা মানচিত্রে অবস্থানটি ট্যাপ করেন"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "মানচিত্রকারীরা GPS দিয়ে তাঁদের অবস্থান রেকর্ড করেন"

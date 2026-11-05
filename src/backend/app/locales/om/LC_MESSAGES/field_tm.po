@@ -2919,3 +2919,15 @@ msgstr "Ragaa qori"
 msgid "Save & Continue"
 msgstr "Olkaa'i fi itti fufi"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "Qabxiilee haaraa"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "Kaartaa kaastonni kaartaa irratti bakka tuqu"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "Kaartaa kaastonni bakka GPS isaanii galmeessu"

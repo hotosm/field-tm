@@ -2859,3 +2859,15 @@ msgstr "क्रेडेंशियल जाँचें"
 msgid "Save & Continue"
 msgstr "सहेजें और जारी रखें"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "नए बिंदु"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "मानचित्रकार मानचित्र पर स्थान पर टैप करते हैं"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "मानचित्रकार GPS से अपना स्थान रिकॉर्ड करते हैं"

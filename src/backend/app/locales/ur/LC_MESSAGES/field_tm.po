@@ -2853,3 +2853,15 @@ msgstr "معلومات آزمائیں"
 msgid "Save & Continue"
 msgstr "محفوظ کریں اور جاری رکھیں"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "نئے نقاط"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "نقشہ ساز نقشے پر مقام کو ٹیپ کرتے ہیں"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "نقشہ ساز GPS سے اپنا مقام ریکارڈ کرتے ہیں"

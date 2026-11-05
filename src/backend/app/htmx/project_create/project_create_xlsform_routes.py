@@ -118,6 +118,7 @@ async def upload_xlsform_htmx(
             include_photo_upload=include_photo_upload_bool,
             mandatory_photo_upload=mandatory_photo_upload_bool,
             use_odk_collect=use_odk_collect_bool,
+            new_point_capture=data.new_point_capture,
             default_language=default_language,
         )
 

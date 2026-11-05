@@ -2867,3 +2867,15 @@ msgstr "Kiểm tra thông tin xác thực"
 msgid "Save & Continue"
 msgstr "Lưu và tiếp tục"
 
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "Điểm mới"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "Người lập bản đồ chạm vào vị trí trên bản đồ"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "Người lập bản đồ ghi lại vị trí GPS của mình"
