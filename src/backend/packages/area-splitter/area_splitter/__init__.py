@@ -18,7 +18,7 @@ class SplittingAlgorithm(StrEnum):
 
     @property
     def sql_path(self) -> Path | None:
-        """Get the algorithm-specific (step 4) SQL file for building-based algorithms."""
+        """Get the step 4 SQL file for building-based algorithms."""
         if self in (
             SplittingAlgorithm.AVG_BUILDING_VORONOI,
             SplittingAlgorithm.AVG_BUILDING_SKELETON,
@@ -36,7 +36,7 @@ class SplittingAlgorithm(StrEnum):
 
     @property
     def sql_files(self) -> list[Path] | None:
-        """Ordered SQL files to run for SQL-based splitting, or None if not SQL-based."""
+        """Get ordered SQL files for splitting, or None for non-SQL algorithms."""
         if self.sql_path:
             return [
                 algorithms_path / "common/1-linear-features.sql",
