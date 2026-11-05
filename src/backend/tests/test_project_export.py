@@ -4,6 +4,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from litestar import status_codes as status
+from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
+from osm_fieldwork.xlsforms import healthcare
 
 from app.db.enums import FieldMappingApp
 from app.db.models import DbProject
@@ -66,6 +68,23 @@ async def test_export_qfield_project():
     props = fc["features"][0]["properties"]
     assert props["id"] == "q1"
     assert props["task_id"] == 2
+
+
+async def test_export_uses_osm_keys_from_the_form():
+    """Questions with an osm_key column export under their OSM tag."""
+    project = _project(FieldMappingApp.ODK)
+    project.xlsform_content = convert_to_xlsform(healthcare)
+    record = {"__id": "x", "contact_number": "+221771", "healthcare": "clinic nurse"}
+    with patch.object(
+        project_services.central_crud,
+        "get_submissions",
+        AsyncMock(return_value=[record]),
+    ):
+        fc = await project_services.export_project_geojson(None, project)
+
+    props = fc["features"][0]["properties"]
+    assert props["contact:phone"] == "+221771"
+    assert props["healthcare"] == "clinic;nurse"
 
 
 async def test_export_odk_without_submissions_is_404():

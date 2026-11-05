@@ -28,14 +28,16 @@ from pyxform.xls2xform import convert as xform_convert
 
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.enums import DbGeomType, NewPointCapture
+from osm_fieldwork.export import osm_fields
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.update_xlsform import (
     GEOMETRY_QUESTION_TYPES,
     QFIELD_GEOMETRY_EXPRESSION,
     _configure_form_settings,
-    get_processed_form_options,
     _normalize_language_token,
+    _standardize_language_columns,
     append_field_mapping_fields,
+    get_processed_form_options,
     modify_form_for_qfield,
 )
 from osm_fieldwork.xlsforms import buildings, healthcare, xlsforms_path
@@ -114,6 +116,44 @@ async def test_healthcare_xlsform():
     xformid, updated_form = await append_field_mapping_fields(form_bytes, "healthcare")
     # Check it's still a valid xlsform by converting to XML
     xform_convert(updated_form)
+
+
+async def test_healthcare_form_keeps_osm_keys():
+    """The export reads osm_key from the stored form, so it must survive injection."""
+    form_bytes = io.BytesIO(convert_to_xlsform(str(healthcare)))
+    _, updated_form = await append_field_mapping_fields(form_bytes, "healthcare")
+    assert osm_fields(updated_form.getvalue())["contact_number"].key == "contact:phone"
+
+
+def test_healthcare_form_is_translated():
+    """Every healthcare label has its English, French, Spanish and Swahili text."""
+    sheets = pd.read_excel(
+        io.BytesIO(convert_to_xlsform(str(healthcare))), sheet_name=None
+    )
+    columns = [
+        f"label::{language}"
+        for language in ("English(en)", "French(fr)", "Spanish(es)", "Swahili(sw)")
+    ]
+    for sheet in (sheets["survey"], sheets["choices"]):
+        filled = sheet[columns].notna().sum(axis=1)
+        assert filled.isin([0, len(columns)]).all()
+
+
+def test_translated_columns_share_one_language_token():
+    """All translated columns must normalise, or pyxform sees a second language."""
+    survey = pd.DataFrame(
+        columns=[
+            "label::English (en)",
+            "guidance_hint::English (en)",
+            "constraint_message::English (en)",
+        ]
+    )
+    columns = _standardize_language_columns(survey, "english").columns
+    assert list(columns) == [
+        "label::english(en)",
+        "guidance_hint::english(en)",
+        "constraint_message::english(en)",
+    ]
 
 
 BUNDLED_FORMS = sorted(Path(xlsforms_path).glob("*.yaml"))

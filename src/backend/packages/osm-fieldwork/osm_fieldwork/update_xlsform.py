@@ -227,7 +227,7 @@ def _standardized_language_column(
 
 def _standardize_one_column(col: str, default_language: str) -> str:
     """Normalize one XLSForm column name against supported base columns."""
-    for base_col in ["label", "hint", "required_message"]:
+    for base_col in ["label", "hint", "required_message", "guidance_hint", "constraint_message"]:
         standardized = _standardized_language_column(col, base_col, default_language)
         if standardized != col:
             return standardized

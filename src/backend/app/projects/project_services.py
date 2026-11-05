@@ -650,6 +650,7 @@ async def export_project_geojson(db: AsyncConnection, project: DbProject) -> dic
     """Project submissions as a standard GeoJSON FeatureCollection (ODK or QField)."""
     xlsform = project.xlsform_content
     media = export.media_fields(bytes(xlsform)) if xlsform else set()
+    osm_fields = export.osm_fields(bytes(xlsform)) if xlsform else {}
 
     if project.field_mapping_app == FieldMappingApp.QFIELD:
         survey = await export_qfield_project_geojson(db, project)
@@ -665,4 +666,6 @@ async def export_project_geojson(db: AsyncConnection, project: DbProject) -> dic
         raise ValidationError(
             _("Export is only available for ODK and QField projects.")
         )
-    return export.to_feature_collection(features)
+    return export.to_feature_collection(
+        [export.apply_osm_keys(feature, osm_fields) for feature in features]
+    )

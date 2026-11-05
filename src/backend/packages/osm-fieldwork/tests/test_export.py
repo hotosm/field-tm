@@ -4,15 +4,21 @@ from io import BytesIO
 from pathlib import Path
 
 import pandas as pd
+import pytest
 
+from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
 from osm_fieldwork.export import (
     CORE_FIELDS,
+    OsmField,
+    apply_osm_keys,
     from_odk,
     from_qfield,
     javarosa_to_geojson,
     media_fields,
+    osm_fields,
     to_feature_collection,
 )
+from osm_fieldwork.xlsforms import healthcare
 
 ODK_RECORD = {
     "__id": "uuid:abc",
@@ -138,3 +144,71 @@ def test_to_feature_collection():
     fc = to_feature_collection([from_odk({"__id": "x"})])
     assert fc["type"] == "FeatureCollection"
     assert len(fc["features"]) == 1
+
+
+def test_osm_fields_absent_without_column():
+    """Forms with no osm_key column keep their question names."""
+    buffer = BytesIO()
+    pd.DataFrame([{"type": "text", "name": "street"}]).to_excel(
+        buffer, sheet_name="survey", index=False
+    )
+    assert osm_fields(buffer.getvalue()) == {}
+
+
+def test_osm_fields_from_healthcare_form():
+    """The bundled healthcare form tags its questions, flagging multi-selects."""
+    fields = osm_fields(convert_to_xlsform(healthcare))
+    assert fields["street"] == OsmField("addr:street", False)
+    assert fields["healthcare"] == OsmField("healthcare", True)
+    assert fields["_mon_hours"] == OsmField(None)
+
+
+def test_apply_osm_keys():
+    """Answers take their OSM key and untagged answers are left alone."""
+    fields = {
+        "street": OsmField("addr:street", False),
+        "healthcare": OsmField("healthcare", True),
+        "beds": OsmField("beds", False),
+    }
+    feature = from_odk(
+        {
+            "__id": "x",
+            "addr": {"street": "Rue A"},
+            "healthcare": "clinic laboratory",
+            "beds": None,
+            "comment": "untagged",
+        }
+    )
+    props = apply_osm_keys(feature, fields)["properties"]
+    assert props["addr:street"] == "Rue A"
+    assert props["healthcare"] == "clinic;laboratory"
+    assert props["beds"] is None
+    assert props["comment"] == "untagged"
+    assert "street" not in props
+
+
+@pytest.mark.parametrize("value", ["{clinic,laboratory}", '["clinic", "laboratory"]'])
+def test_apply_osm_keys_qgis_multi_select(value):
+    """QGIS multi-selects are array strings, not space separated."""
+    feature = {"properties": {"healthcare": value}}
+    fields = {"healthcare": OsmField("healthcare", True)}
+    assert apply_osm_keys(feature, fields)["properties"] == {
+        "healthcare": "clinic;laboratory"
+    }
+
+
+def test_working_fields_are_dropped():
+    """A form's own helper questions go, other underscore properties stay."""
+    feature = from_qfield(
+        {"properties": {"_mon_hours": "08:00-12:00", "_layer": "survey"}}
+    )
+    fields = osm_fields(convert_to_xlsform(healthcare))
+    props = apply_osm_keys(feature, fields)["properties"]
+    assert "_mon_hours" not in props
+    assert props["_layer"] == "survey"
+
+
+def test_underscore_questions_kept_without_osm_key_column():
+    """Forms that do not use osm_key export all of their answers."""
+    feature = from_qfield({"properties": {"_custom": "answer"}})
+    assert apply_osm_keys(feature, {})["properties"]["_custom"] == "answer"

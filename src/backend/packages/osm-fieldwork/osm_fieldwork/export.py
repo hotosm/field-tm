@@ -9,7 +9,9 @@ Adapters (`from_odk`, `from_qfield`) only map app-specific metadata;
 """
 
 import json
+import re
 from io import BytesIO
+from typing import NamedTuple
 
 import pandas as pd
 
@@ -52,11 +54,46 @@ DROP_FIELDS = {
 }
 
 MEDIA_TYPES = {"image", "audio", "video", "file", "background-audio"}
+OSM_KEY_COLUMN = "osm_key"
+# ODK separates selections with spaces, QGIS stores them as {a,b} or ["a","b"]
+MULTI_SELECT_VALUE = re.compile(r'[^\s{}\[\],"]+')
+
+
+class OsmField(NamedTuple):
+    """The OSM tag a question exports to, or no tag for a working field."""
+
+    key: str | None
+    multiple: bool = False
+
+
+def _read_survey(xlsform: bytes) -> pd.DataFrame:
+    return pd.read_excel(BytesIO(xlsform), sheet_name="survey", engine="calamine")
+
+
+def osm_fields(xlsform: bytes) -> dict[str, OsmField]:
+    """Questions with an OSM tag, from the XLSForm's optional `osm_key` column.
+
+    XLSForm names cannot contain a colon, so `addr:street` needs its own column.
+    Forms using the column can also mark working fields with a leading underscore,
+    such as opening hour parts, which are left out of the export.
+    """
+    survey = _read_survey(xlsform)
+    if OSM_KEY_COLUMN not in survey:
+        return {}
+    fields = {}
+    for name, key, field_type in zip(
+        survey["name"], survey[OSM_KEY_COLUMN], survey["type"], strict=True
+    ):
+        if isinstance(key, str):
+            fields[name] = OsmField(key, field_type.startswith("select_multiple"))
+        elif isinstance(name, str) and name.startswith("_"):
+            fields[name] = OsmField(None)
+    return fields
 
 
 def media_fields(xlsform: bytes) -> set[str]:
     """Names of the attachment (photo, audio, etc) questions in an XLSForm."""
-    survey = pd.read_excel(BytesIO(xlsform), sheet_name="survey", engine="calamine")
+    survey = _read_survey(xlsform)
     return {
         name
         for field_type, name in zip(survey["type"], survey["name"])
@@ -197,6 +234,22 @@ def from_qfield(feature: dict, media: set[str] = frozenset()) -> dict:
         submitted_at=answers.get("end") or answers.get("start"),
         attachments=_find_media(answers, media, []),
     )
+
+
+def apply_osm_keys(feature: dict, fields: dict[str, OsmField]) -> dict:
+    """Rename tagged answers to OSM keys, for conflating the export back to OSM."""
+    properties = {}
+    for name, value in feature["properties"].items():
+        field = fields.get(name)
+        if field is None:
+            properties[name] = value
+        elif field.key is None:
+            continue
+        elif field.multiple and isinstance(value, str):
+            properties[field.key] = ";".join(MULTI_SELECT_VALUE.findall(value))
+        else:
+            properties[field.key] = value
+    return {**feature, "properties": properties}
 
 
 def to_feature_collection(features: list[dict]) -> dict:

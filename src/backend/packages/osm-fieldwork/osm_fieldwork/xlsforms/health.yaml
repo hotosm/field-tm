@@ -1,412 +1,1114 @@
 survey:
-  - "#":
-      Converted by yxf, from health.xlsx. Edit the YAML file instead of the Excel
-      file.
+  - '#': Based on the Healthsites campaign form. Edit this YAML, not an Excel copy.
+      The osm_key column gives each question's OSM tag for the GeoJSON export.
   - type: geopoint
     name: new_feature
-    label::English(en): Where is this feature?
-    label::French(fr): Où se trouve cet élément ?
-    label::Spanish(es): ¿Dónde está este elemento?
-    label::Swahili(sw): Kipengele hiki kiko wapi?
+    label::English(en): Facility Location
     required: yes
-  - type: begin group
-    name: healthcare
-    label::English(en): Healthcare Types
-    appearance: field-list
-    label::Swahili(sw): Aina za Afya
-    label::French(fr): Types de soins de santé
-    label::Spanish(es): Tipos de asistencia sanitaria
-  - type: select_multiple healthcare
-    name: healthcare_type
-    label::English(en): What type of healthcare is provided ?
-    appearance: minimal
-    required: yes
-    label::Swahili(sw): Jengo hili ni la aina gani?
-    label::French(fr): De quel type de bâtiment s'agit-il ?
-    label::Spanish(es): ¿Qué tipo de edificio es este?
-  - type: select_multiple specialty
-    name: specialty
-    label::English(en): What is the specialty provided here ?
-    appearance: minimal
-    label::Swahili(sw): Je, linaitwaje, kama lipo moja?
-    label::French(fr): Quel est le nom s'il y en a un ?
-    label::Spanish(es): ¿Cuál es el nombre si hay uno?
-  - type: select_multiple amenity:type
-    name: amenity_type
-    label::English(en): What type of equipment do they have ?
-    appearance: minimal
-    label::Swahili(sw): Kuta zimetengenezwa na nini?
-    label::French(fr): De quoi sont faits les murs ?
-    label::Spanish(es): ¿De qué están hechas las paredes?
+    label::French(fr): Localisation de la structure sanitaire
+    label::Spanish(es): Ubicación del establecimiento de salud
+    label::Swahili(sw): Mahali kilipo kituo cha afya
+  - type: note
+    name: _licence_note
+    label::English(en): The information you enter will be published openly on OpenStreetMap
+      and healthsites.io under the Open Database License (ODbL 1.0). Do not enter personal
+      information about patients or staff.
+    label::French(fr): Les informations que vous saisissez seront publiées librement
+      sur OpenStreetMap et healthsites.io sous la licence Open Database License (ODbL
+      1.0). Ne saisissez aucune donnée personnelle concernant les patients ou le personnel.
+    label::Spanish(es): La información que introduzca se publicará abiertamente en OpenStreetMap
+      y healthsites.io bajo la licencia Open Database License (ODbL 1.0). No introduzca
+      datos personales de pacientes ni de personal.
+    label::Swahili(sw): Taarifa utakazoingiza zitachapishwa wazi kwenye OpenStreetMap
+      na healthsites.io chini ya leseni ya Open Database License (ODbL 1.0). Usiingize
+      taarifa binafsi za wagonjwa au wafanyakazi.
+  - type: calculate
+    name: source
+    calculation: "'survey'"
+    guidance_hint::English(en): Used to indicate the source of information (i.e. meta
+      data) added to OpenStreetMap
+    guidance_hint::French(fr): Utilisé pour indiquer la source de l'information (c.-à-d.
+      les métadonnées) ajoutée à OpenStreetMap
+    guidance_hint::Spanish(es): Indica la fuente de la información (metadatos) añadida
+      a OpenStreetMap
+    guidance_hint::Swahili(sw): Hutumika kuonyesha chanzo cha taarifa (metadata) zilizoongezwa
+      kwenye OpenStreetMap
+    osm_key: source
   - type: text
     name: name
-    label::English(en): What is the name of this facility ?
-    appearance: minimal
+    label::English(en): Name of Facility
     required: yes
-    label::Swahili(sw): Je! kuna ngazi ngapi katika hili jengo?
-    label::French(fr): Combien y a-t-il de niveaux dans le bâtiment ?
-    label::Spanish(es): ¿Cuántos niveles hay en el edificio?
-  - type: select_one operator:type
-    name: operator_type
-    label::English(en): What is the type of operator ?
-    appearance: minimal
-  - type: select_one yes_no
-    name: emergency
-    label::English(en): Does this facility provide emergency services ?
-    appearance: minimal
-    label::Swahili(sw): Ni dini gani inatumika hapa?
-    label::French(fr): Quelle religion est pratiquée ici ?
-    label::Spanish(es): ¿Qué religión se practica aquí?
-  - type: select_one opening_hours
-    name: opening_hours
-    label::English(en): What are the opening hours ?
-    appearance: minimal
-    label::Swahili(sw): Dhehebu gani?
-    label::French(fr): Quelle est la dénomination ?
-    label::Spanish(es): ¿Cuál es la denominación?
-  - type: end group
-    label::Swahili(sw): Madhehebu gani ya kiislam?
-    label::French(fr): Qu'est-ce que la secte musulmane ?
-    label::Spanish(es): ¿Qué es la secta musulmana?
+    guidance_hint::English(en): The primary tag used for naming an element
+    label::French(fr): Nom de la structure sanitaire
+    guidance_hint::French(fr): La clé principale utilisée pour nommer un élément
+    label::Spanish(es): Nombre del establecimiento de salud
+    guidance_hint::Spanish(es): La etiqueta principal para dar nombre a un elemento
+    label::Swahili(sw): Jina la kituo cha afya
+    guidance_hint::Swahili(sw): Lebo kuu inayotumika kutaja jina la kipengele
+    osm_key: name
   - type: begin group
-    name: details
-    label::English(en): More Details (Optional)
+    name: addr
+    label::English(en): Address
     appearance: field-list
-    label::Swahili(sw): Maelezo Zaidi (Si lazima)
-    label::French(fr): Plus de détails (optionnel)
-    label::Spanish(es): More Details (Optional)
-  - type: select_one insurance
-    name: insurance
-    label::English(en): Does this facility take health insurance ?
-    appearance: minimal
-    label::Swahili(sw): Ni aina gani za huduma zinazopatikana hapa?
-    label::French(fr): Quels types de services sont disponibles ici ?
-    label::Spanish(es): ¿Qué tipo de servicios están disponibles aquí?
-  - type: select_one yes_no
-    name: wheelchair
-    label::English(en): Is this facility wheelchair accessible ?
-    appearance: minimal
-    label::Swahili(sw): Hili ni duka la aina gani la rejareja?
-    label::French(fr): De quel type de magasin s'agit-il ?
-    label::Spanish(es): ¿Qué tipo de tienda minorista es este?
+    label::French(fr): Adresse
+    label::Spanish(es): Dirección
+    label::Swahili(sw): Anwani
   - type: text
-    name: phone
-    label::English(en): What is the contact phone number ?
-    appearance: minimal
-    label::Swahili(sw): Je, hili ni jengo la watalii la aina gani?
-    label::French(fr): De quel type de bâtiment touristique s'agit-il ?
-    label::Spanish(es): ¿Qué tipo de edificio turístico es este?
-  - type: select_one yes_no
-    name: power
-    label::English(en): Is there electricity  ?
-    appearance: minimal
-    label::Swahili(sw): Jengo hili la elimu ni la aina gani?
-    label::French(fr): De quel type de bâtiment scolaire s'agit-il ?
-    label::Spanish(es): ¿Qué tipo de edificio educativo es este?
-  - type: select_one generator:source
-    name: generator_source
-    label::English(en): What is the source of power ?
-    appearance: minimal
-    label::Swahili(sw):
-      Kwa maelezo zaidi kuhusu skuli, tafadhali tumia XForm ya elimu
-      badala yake.
-    label::French(fr):
-      Pour plus de détails sur les écoles, veuillez utiliser le XForm
-      éducation à la place.
-    label::Spanish(es):
-      Para obtener más detalles sobre las escuelas, utilice la educación
-      XForm en su lugar.
-  - type: select_one yes_no
-    name: operational
-    label::English(en): Is this facility operational ?
-    appearance: minimal
-    label::Swahili(sw): Je, hili ni jengo la umma la aina gani?
-    label::French(fr): De quel type de bâtiment public s'agit-il ?
-    label::Spanish(es): ¿Qué tipo de edificio público es este?
+    name: housenumber
+    label::English(en): House Number
+    guidance_hint::English(en): The house number (may contain non-digits). If a single
+      entry has multiple house numbers, separate them by ",". e.g. "12b,12c". Only required
+      key for an address (except when key:addr:housename is used), all others are optional.
+    label::French(fr): Numéro de la maison
+    guidance_hint::French(fr): Le numéro de la maison (peut contenir des caractères
+      non numériques). Si une entrée comporte plusieurs numéros, séparez-les par « ,
+      », p. ex. « 12b,12c ». Seule clé obligatoire d'une adresse (sauf si la clé addr:housename
+      est utilisée) ; toutes les autres sont facultatives.
+    label::Spanish(es): Número de casa
+    guidance_hint::Spanish(es): El número de la casa (puede contener caracteres no numéricos).
+      Si un elemento tiene varios números, sepárelos con ",", por ejemplo "12b,12c".
+      Es la única clave obligatoria de una dirección (salvo si se usa addr:housename);
+      las demás son opcionales.
+    label::Swahili(sw): Namba ya nyumba
+    guidance_hint::Swahili(sw): Namba ya nyumba (inaweza kuwa na herufi). Ikiwa kuna
+      namba zaidi ya moja, zitenganishe kwa ",", kwa mfano "12b,12c". Hii ndiyo ufunguo
+      pekee unaohitajika kwenye anwani (isipokuwa addr:housename ikitumika); nyingine
+      zote si lazima.
+    osm_key: addr:housenumber
+  - type: text
+    name: street
+    label::English(en): Street
+    guidance_hint::English(en): The street name portion of an address
+    label::French(fr): Rue
+    guidance_hint::French(fr): Le nom de la rue faisant partie de l'adresse
+    label::Spanish(es): Calle
+    guidance_hint::Spanish(es): El nombre de la calle en una dirección
+    label::Swahili(sw): Mtaa
+    guidance_hint::Swahili(sw): Jina la mtaa katika anwani
+    osm_key: addr:street
+  - type: text
+    name: postcode
+    label::English(en): Post Code
+    guidance_hint::English(en): The postal code of the building/area
+    label::French(fr): Code postal
+    guidance_hint::French(fr): Le code postal du bâtiment ou de la zone
+    label::Spanish(es): Código postal
+    guidance_hint::Spanish(es): El código postal del edificio o de la zona
+    label::Swahili(sw): Msimbo wa posta
+    guidance_hint::Swahili(sw): Msimbo wa posta wa jengo au eneo
+    osm_key: addr:postcode
+  - type: text
+    name: city
+    label::English(en): City
+    guidance_hint::English(en): The name of a city/village (locality), like used as
+      a part of a postal address
+    label::French(fr): Ville
+    guidance_hint::French(fr): Le nom de la ville ou du village (localité), tel qu'utilisé
+      dans une adresse postale
+    label::Spanish(es): Ciudad
+    guidance_hint::Spanish(es): El nombre de la ciudad o del pueblo (localidad), tal
+      como se usa en una dirección postal
+    label::Swahili(sw): Mji
+    guidance_hint::Swahili(sw): Jina la mji au kijiji (eneo), kama linavyotumika kwenye
+      anwani ya posta
+    osm_key: addr:city
+  - type: text
+    name: country
+    label::English(en): Country
+    hint::English(en): Two-letter ISO country code, for example SN.
+    constraint: coalesce(., '') = '' or regex(., '^[A-Za-z]{2}$')
+    constraint_message::English(en): Enter the two-letter country code.
+    guidance_hint::English(en): The country code of the current address
+    label::French(fr): Pays
+    hint::French(fr): Code pays ISO à deux lettres, par exemple SN.
+    constraint_message::French(fr): Entrez le code pays à deux lettres.
+    guidance_hint::French(fr): Le code pays de l'adresse
+    label::Spanish(es): País
+    hint::Spanish(es): Código de país ISO de dos letras, por ejemplo SN.
+    constraint_message::Spanish(es): Introduzca el código de país de dos letras.
+    guidance_hint::Spanish(es): El código de país de la dirección
+    label::Swahili(sw): Nchi
+    hint::Swahili(sw): Msimbo wa nchi wa ISO wenye herufi mbili, kwa mfano SN.
+    constraint_message::Swahili(sw): Ingiza msimbo wa nchi wenye herufi mbili.
+    guidance_hint::Swahili(sw): Msimbo wa nchi wa anwani hii
+    osm_key: addr:country
   - type: end group
+  - type: text
+    name: contact_number
+    label::English(en): Phone Number
+    hint::English(en): Include the international calling code, for example +221.
+    constraint: coalesce(., '') = '' or regex(., '^\+?[1-9]\d{1,14}$')
+    constraint_message::English(en): Entry must be in E.164 format. Only +, a valid
+      country code and numbers are allowed.
+    guidance_hint::English(en): The contact tag is the prefix for several contact:*
+      keys to describe contacts
+    label::French(fr): Numéro de téléphone
+    hint::French(fr): Inclure l'indicatif international, par exemple +221.
+    constraint_message::French(fr): Le numéro doit être au format E.164. Seuls le signe
+      +, un indicatif de pays valide et des chiffres sont acceptés.
+    guidance_hint::French(fr): La clé contact est le préfixe de plusieurs clés contact:*
+      qui décrivent les moyens de contact
+    label::Spanish(es): Número de teléfono
+    hint::Spanish(es): Incluya el prefijo internacional, por ejemplo +221.
+    constraint_message::Spanish(es): El número debe tener el formato E.164. Solo se
+      admiten el signo +, un prefijo de país válido y dígitos.
+    guidance_hint::Spanish(es): La clave contact es el prefijo de varias claves contact:*
+      que describen las formas de contacto
+    label::Swahili(sw): Namba ya simu
+    hint::Swahili(sw): Weka msimbo wa kimataifa wa simu, kwa mfano +221.
+    constraint_message::Swahili(sw): Namba lazima iwe katika muundo wa E.164. Inaruhusiwa
+      alama ya +, msimbo halali wa nchi na tarakimu pekee.
+    guidance_hint::Swahili(sw): Ufunguo contact ni kiambishi cha funguo kadhaa za contact:*
+      zinazoelezea njia za mawasiliano
+    osm_key: contact:phone
+  - type: select_one oper_list
+    name: operator_type
+    label::English(en): Operator Type
+    guidance_hint::English(en): This tag is used to give more information about the
+      type of operator for a feature
+    label::French(fr): Type d'exploitant
+    guidance_hint::French(fr): Cette clé donne plus d'informations sur le type d'exploitant
+      d'un élément
+    label::Spanish(es): Tipo de operador
+    guidance_hint::Spanish(es): Esta etiqueta da más información sobre el tipo de operador
+      de un elemento
+    label::Swahili(sw): Aina ya mwendeshaji
+    guidance_hint::Swahili(sw): Lebo hii inatoa maelezo zaidi kuhusu aina ya mwendeshaji
+      wa kipengele
+    osm_key: operator:type
+  - type: text
+    name: operator
+    label::English(en): Facility Operator Name
+    guidance_hint::English(en): The operator tag is used to name a company, corporation,
+      person or any other entity who is directly in charge of the current operation
+      of a map object
+    label::French(fr): Nom de l'exploitant de l'établissement
+    guidance_hint::French(fr): La clé operator sert à nommer l'entreprise, la société,
+      la personne ou toute autre entité directement responsable du fonctionnement de
+      l'élément cartographié
+    label::Spanish(es): Nombre del operador del establecimiento
+    guidance_hint::Spanish(es): La etiqueta operator indica la empresa, sociedad, persona
+      u otra entidad directamente responsable del funcionamiento actual del elemento
+    label::Swahili(sw): Jina la mwendeshaji wa kituo
+    guidance_hint::Swahili(sw): Lebo ya operator hutaja kampuni, shirika, mtu au taasisi
+      nyingine inayohusika moja kwa moja na uendeshaji wa sasa wa kipengele
+    osm_key: operator
+  - type: select_one op_stat_list
+    name: operational_status
+    label::English(en): Operational Status
+    guidance_hint::English(en): Used to document an observation of the current functional
+      status of a mapped feature
+    label::French(fr): Statut opérationnel
+    guidance_hint::French(fr): Utilisé pour documenter une observation de l'état de
+      fonctionnement actuel d'un élément cartographié
+    label::Spanish(es): Estado operativo
+    guidance_hint::Spanish(es): Registra una observación del estado de funcionamiento
+      actual de un elemento
+    label::Swahili(sw): Hali ya utendaji
+    guidance_hint::Swahili(sw): Hutumika kurekodi hali ya sasa ya utendaji wa kipengele
+      iliyoonekana
+    osm_key: operational_status
+  - type: select_one oh_list
+    name: _opening_hours_type
+    label::English(en): When is the facility open?
+    hint::English(en): Select an option for how you would like to enter the open hours.
+    required: yes
+    label::French(fr): Quand la structure sanitaire est-elle ouverte ?
+    hint::French(fr): Sélectionnez une option pour indiquer comment vous souhaitez entrer
+      les heures d'ouverture.
+    label::Spanish(es): ¿Cuándo está abierto el establecimiento?
+    hint::Spanish(es): Seleccione cómo desea introducir el horario de apertura.
+    label::Swahili(sw): Kituo kinafunguliwa lini?
+    hint::Swahili(sw): Chagua jinsi unavyotaka kuingiza saa za kufungua.
+  - type: begin group
+    name: _dow_group
+    label::English(en): Open hours by day of the week
+    appearance: field-list
+    relevant: ${_opening_hours_type} = 'oh_select'
+    label::French(fr): Heures d'ouverture par jour de la semaine
+    label::Spanish(es): Horario de apertura por día de la semana
+    label::Swahili(sw): Saa za kufungua kwa kila siku ya wiki
+  - type: note
+    name: _hours_note
+    label::English(en): Enter open hours for each day. Leave a day empty if the facility
+      is closed.
+    hint::English(en): 'Format like: 09:00-18:30, 08:00-11:00,12:30-15:00 or sunrise-sunset'
+    label::French(fr): Entrez les heures d'ouverture pour chaque jour. Laissez vide
+      si la structure est fermée ce jour-là.
+    hint::French(fr): 'Format : 09:00-18:30, 08:00-11:00,12:30-15:00 ou sunrise-sunset'
+    label::Spanish(es): Introduzca el horario de cada día. Deje el día vacío si el establecimiento
+      está cerrado.
+    hint::Spanish(es): 'Formato: 09:00-18:30, 08:00-11:00,12:30-15:00 o sunrise-sunset'
+    label::Swahili(sw): Ingiza saa za kufungua za kila siku. Acha wazi kama kituo kimefungwa
+      siku hiyo.
+    hint::Swahili(sw): 'Muundo: 09:00-18:30, 08:00-11:00,12:30-15:00 au sunrise-sunset'
+  - type: text
+    name: _mon_hours
+    label::English(en): Monday open hours
+    label::French(fr): Heures d'ouverture du lundi
+    label::Spanish(es): Horario del lunes
+    label::Swahili(sw): Saa za kufungua Jumatatu
+  - type: text
+    name: _tue_hours
+    label::English(en): Tuesday open hours
+    label::French(fr): Heures d'ouverture du mardi
+    label::Spanish(es): Horario del martes
+    label::Swahili(sw): Saa za kufungua Jumanne
+  - type: text
+    name: _wed_hours
+    label::English(en): Wednesday open hours
+    label::French(fr): Heures d'ouverture du mercredi
+    label::Spanish(es): Horario del miércoles
+    label::Swahili(sw): Saa za kufungua Jumatano
+  - type: text
+    name: _thu_hours
+    label::English(en): Thursday open hours
+    label::French(fr): Heures d'ouverture du jeudi
+    label::Spanish(es): Horario del jueves
+    label::Swahili(sw): Saa za kufungua Alhamisi
+  - type: text
+    name: _fri_hours
+    label::English(en): Friday open hours
+    label::French(fr): Heures d'ouverture du vendredi
+    label::Spanish(es): Horario del viernes
+    label::Swahili(sw): Saa za kufungua Ijumaa
+  - type: text
+    name: _sat_hours
+    label::English(en): Saturday open hours
+    label::French(fr): Heures d'ouverture du samedi
+    label::Spanish(es): Horario del sábado
+    label::Swahili(sw): Saa za kufungua Jumamosi
+  - type: text
+    name: _sun_hours
+    label::English(en): Sunday open hours
+    label::French(fr): Heures d'ouverture du dimanche
+    label::Spanish(es): Horario del domingo
+    label::Swahili(sw): Saa za kufungua Jumapili
+  - type: text
+    name: _ph_hours
+    label::English(en): Public Holiday open hours
+    label::French(fr): Heures d'ouverture les jours fériés
+    label::Spanish(es): Horario en días festivos
+    label::Swahili(sw): Saa za kufungua sikukuu za umma
+  - type: calculate
+    name: _select_hours
+    calculation: concat('Mo ', if(${_mon_hours} != '', ${_mon_hours}, 'off'), '; ',
+      'Tu ', if(${_tue_hours} != '', ${_tue_hours}, 'off'), '; ', 'We ', if(${_wed_hours}
+      != '', ${_wed_hours}, 'off'), '; ', 'Th ', if(${_thu_hours} != '', ${_thu_hours},
+      'off'), '; ', 'Fr ', if(${_fri_hours} != '', ${_fri_hours}, 'off'), '; ', 'Sa
+      ', if(${_sat_hours} != '', ${_sat_hours}, 'off'), '; ', 'Su ', if(${_sun_hours}
+      != '', ${_sun_hours}, 'off'), '; ', 'PH ', if(${_ph_hours} != '', ${_ph_hours},
+      'off'))
+  - type: end group
+  - type: text
+    name: _weekday_hours
+    label::English(en): Enter weekday hours
+    hint::English(en): Format like:<br>09:00-18:30<br>08:00-11:00,12:30-15:00<br>sunrise-sunset
+    relevant: ${_opening_hours_type} = 'oh_weekday'
+    required: yes
+    label::French(fr): Entrez les horaires de la semaine
+    hint::French(fr): Format :<br>09:00-18:30<br>08:00-11:00,12:30-15:00<br>sunrise-sunset
+      (lever et coucher du soleil)
+    label::Spanish(es): Introduzca el horario de lunes a viernes
+    hint::Spanish(es): Formato:<br>09:00-18:30<br>08:00-11:00,12:30-15:00<br>sunrise-sunset
+      (salida y puesta del sol)
+    label::Swahili(sw): Ingiza saa za siku za kazi
+    hint::Swahili(sw): Muundo:<br>09:00-18:30<br>08:00-11:00,12:30-15:00<br>sunrise-sunset
+      (macheo hadi machweo)
+  - type: text
+    name: _advanced_hours
+    label::English(en): OSM 'opening_hours'
+    hint::English(en): Format like:<br>Mo 10:00-12:00,12:30-15:00; Tu off; We-Fr 08:00-15:00;
+      Sa 08:00-12:00; PH off<br><br>sunrise-sunset<br><br>08:00-19:00 open "Office"
+      || 00:00-24:00 open "Emergency"<br><br>[More format info](https://wiki.openstreetmap.org/wiki/Key:opening_hours)
+    appearance: multiline
+    relevant: ${_opening_hours_type} = 'oh_advanced'
+    required: yes
+    label::French(fr): Champ 'opening_hours' OSM
+    hint::French(fr): "Format :<br>Mo 10:00-12:00,12:30-15:00; Tu off; We-Fr 08:00-15:00;\
+      \ Sa 08:00-12:00; PH off<br><br>sunrise-sunset<br><br>08:00-19:00 open \"Office\"\
+      \ || 00:00-24:00 open \"Emergency\"<br><br>[Plus d'informations sur le format](https://wiki.openstreetmap.org/wiki/Key:opening_hours).\
+      \ Rappel : lundi = Mo, mardi = Tu, mercredi = We, jeudi = Th, vendredi = Fr, samedi\
+      \ = Sa, dimanche = Su, jours fériés = PH."
+    label::Spanish(es): Campo 'opening_hours' de OSM
+    hint::Spanish(es): 'Formato:<br>Mo 10:00-12:00,12:30-15:00; Tu off; We-Fr 08:00-15:00;
+      Sa 08:00-12:00; PH off<br><br>sunrise-sunset<br><br>08:00-19:00 open "Office"
+      || 00:00-24:00 open "Emergency"<br><br>[Más información sobre el formato](https://wiki.openstreetmap.org/wiki/Key:opening_hours).
+      Recordatorio: lunes = Mo, martes = Tu, miércoles = We, jueves = Th, viernes =
+      Fr, sábado = Sa, domingo = Su, festivos = PH.'
+    label::Swahili(sw): Sehemu ya 'opening_hours' ya OSM
+    hint::Swahili(sw): 'Muundo:<br>Mo 10:00-12:00,12:30-15:00; Tu off; We-Fr 08:00-15:00;
+      Sa 08:00-12:00; PH off<br><br>sunrise-sunset<br><br>08:00-19:00 open "Office"
+      || 00:00-24:00 open "Emergency"<br><br>[Maelezo zaidi kuhusu muundo](https://wiki.openstreetmap.org/wiki/Key:opening_hours).
+      Kumbuka: Jumatatu = Mo, Jumanne = Tu, Jumatano = We, Alhamisi = Th, Ijumaa = Fr,
+      Jumamosi = Sa, Jumapili = Su, sikukuu za umma = PH.'
+  - type: calculate
+    name: opening_hours
+    calculation: if(${_opening_hours_type} = 'oh_select', ${_select_hours}, if(${_opening_hours_type}
+      = 'oh_24_7', '24/7', if(${_opening_hours_type} = 'oh_advanced', ${_advanced_hours},
+      if(${_opening_hours_type} = 'oh_weekday', concat('Mo-Fr ', ${_weekday_hours},
+      '; PH off'), 'unknown'))))
+    guidance_hint::English(en): Describes when something is open or closed. There is
+      a specific standard format for this data https://wiki.openstreetmap.org/wiki/Key:opening_hours/specification
+    guidance_hint::French(fr): 'Décrit quand un lieu est ouvert ou fermé. Ces données
+      suivent un format standard : https://wiki.openstreetmap.org/wiki/Key:opening_hours/specification'
+    guidance_hint::Spanish(es): 'Describe cuándo un lugar está abierto o cerrado. Estos
+      datos siguen un formato estándar: https://wiki.openstreetmap.org/wiki/Key:opening_hours/specification'
+    guidance_hint::Swahili(sw): 'Huelezea wakati mahali panapofunguliwa au kufungwa.
+      Taarifa hizi hufuata muundo maalum: https://wiki.openstreetmap.org/wiki/Key:opening_hours/specification'
+    osm_key: opening_hours
+  - type: note
+    name: _disp_hours
+    label::English(en): 'Verify the open hours are correct or go back and fix: ${opening_hours}'
+    label::French(fr): "Vérifiez que les heures d'ouverture sont correctes ou revenez\
+      \ en arrière pour les corriger : ${opening_hours}"
+    label::Spanish(es): 'Compruebe que el horario es correcto o vuelva atrás para corregirlo:
+      ${opening_hours}'
+    label::Swahili(sw): 'Hakikisha saa za kufungua ni sahihi au rudi nyuma kuzirekebisha:
+      ${opening_hours}'
+  - type: select_one amenity_list
+    name: amenity
+    label::English(en): Facility Category
+    guidance_hint::English(en): For describing useful and important facilities for visitors
+      and residents
+    label::French(fr): Catégorie de la structure sanitaire
+    guidance_hint::French(fr): Pour décrire les équipements utiles et importants pour
+      les visiteurs et les résidents
+    label::Spanish(es): Categoría del establecimiento de salud
+    guidance_hint::Spanish(es): Describe instalaciones útiles e importantes para visitantes
+      y residentes
+    label::Swahili(sw): Aina ya kituo cha afya
+    guidance_hint::Swahili(sw): Huelezea huduma muhimu kwa wageni na wakazi
+    osm_key: amenity
+  - type: select_multiple healthcare_list
+    name: healthcare
+    label::English(en): Available Services
+    required: yes
+    guidance_hint::English(en): A key to tag all places that provide healthcare (are
+      part of the healthcare sector)
+    label::French(fr): Services disponibles
+    guidance_hint::French(fr): Clé permettant d'étiqueter tous les lieux qui fournissent
+      des soins de santé (qui font partie du secteur de la santé)
+    label::Spanish(es): Servicios disponibles
+    guidance_hint::Spanish(es): Clave para etiquetar todos los lugares que prestan atención
+      de salud (forman parte del sector de la salud)
+    label::Swahili(sw): Huduma zinazopatikana
+    guidance_hint::Swahili(sw): Ufunguo wa kuweka lebo kwenye maeneo yote yanayotoa
+      huduma za afya (yaliyo sehemu ya sekta ya afya)
+    osm_key: healthcare
+  - type: select_multiple hc_speciality_list
+    name: speciality
+    label::English(en): Specialities
+    guidance_hint::English(en): A key to detail the special services provided by a healthcare
+      facility. To be used in conjunction with the 'healthcare=*' tag. For example 'healthcare=laboratory',
+      and 'healthcare:speciality=blood_check'
+    label::French(fr): Spécialités
+    guidance_hint::French(fr): Clé détaillant les services spécialisés fournis par une
+      structure sanitaire. À utiliser avec la clé « healthcare=* ». Par exemple « healthcare=laboratory
+      » et « healthcare:speciality=blood_check »
+    label::Spanish(es): Especialidades
+    guidance_hint::Spanish(es): Clave que detalla los servicios especializados de un
+      establecimiento de salud. Se usa junto con la etiqueta 'healthcare=*'. Por ejemplo
+      'healthcare=laboratory' y 'healthcare:speciality=blood_check'
+    label::Swahili(sw): Utaalamu
+    guidance_hint::Swahili(sw): Ufunguo unaoeleza huduma maalum zinazotolewa na kituo
+      cha afya. Hutumika pamoja na lebo ya 'healthcare=*'. Kwa mfano 'healthcare=laboratory'
+      na 'healthcare:speciality=blood_check'
+    osm_key: healthcare:speciality
+  - type: select_multiple amenity_type_list
+    name: health_amenity_type
+    label::English(en): Speciality medical equipment available
+    guidance_hint::English(en): Indicates what type of speciality medical equipment
+      is available at the healthsite
+    label::French(fr): Équipement médical spécialisé disponible
+    guidance_hint::French(fr): Indique le type d'équipement médical spécialisé disponible
+      dans la structure sanitaire
+    label::Spanish(es): Equipo médico especializado disponible
+    guidance_hint::Spanish(es): Indica el tipo de equipo médico especializado disponible
+      en el establecimiento
+    label::Swahili(sw): Vifaa maalum vya matibabu vinavyopatikana
+    guidance_hint::Swahili(sw): Huonyesha aina ya vifaa maalum vya matibabu vinavyopatikana
+      kituoni
+    osm_key: health_amenity:type
+  - type: select_one yn_list
+    name: emergency
+    label::English(en): Does this facility provide Emergency Services?
+    guidance_hint::English(en): This key describes various emergency services
+    label::French(fr): Cette structure sanitaire fournit-elle des services d'urgence
+      ?
+    guidance_hint::French(fr): Cette clé décrit différents services d'urgence
+    label::Spanish(es): ¿Este establecimiento presta servicios de urgencias?
+    guidance_hint::Spanish(es): Esta clave describe distintos servicios de urgencias
+    label::Swahili(sw): Je, kituo hiki kinatoa huduma za dharura?
+    guidance_hint::Swahili(sw): Ufunguo huu unaelezea huduma mbalimbali za dharura
+    osm_key: emergency
+  - type: select_one yn_list
+    name: dispensing
+    label::English(en): Does the pharmacy dispense prescription medication?
+    relevant: ${amenity} = 'pharmacy'
+    required: yes
+    guidance_hint::English(en): Whether a pharmacy dispenses prescription drugs or not.
+      Used to add information to something that is already tagged as amenity=pharmacy
+    label::French(fr): La pharmacie délivre-t-elle des médicaments sur ordonnance ?
+    guidance_hint::French(fr): Indique si une pharmacie délivre ou non des médicaments
+      sur ordonnance. Complète un élément déjà étiqueté amenity=pharmacy
+    label::Spanish(es): ¿La farmacia dispensa medicamentos con receta?
+    guidance_hint::Spanish(es): Indica si una farmacia dispensa o no medicamentos con
+      receta. Complementa un elemento ya etiquetado como amenity=pharmacy
+    label::Swahili(sw): Je, duka hili la dawa linatoa dawa kwa cheti cha daktari?
+    guidance_hint::Swahili(sw): Huonyesha kama duka la dawa linatoa dawa kwa cheti cha
+      daktari au la. Huongeza taarifa kwenye kipengele chenye lebo ya amenity=pharmacy
+    osm_key: dispensing
+  - type: integer
+    name: beds
+    label::English(en): Number of Beds
+    guidance_hint::English(en): Indicates the number of beds in a hotel or hospital
+    label::French(fr): Nombre de lits
+    guidance_hint::French(fr): Indique le nombre de lits dans un hôtel ou un hôpital
+    label::Spanish(es): Número de camas
+    guidance_hint::Spanish(es): Indica el número de camas de un hotel o un hospital
+    label::Swahili(sw): Idadi ya vitanda
+    guidance_hint::Swahili(sw): Huonyesha idadi ya vitanda katika hoteli au hospitali
+    osm_key: beds
+  - type: integer
+    name: staff_doctors
+    label::English(en): Number of Doctors
+    guidance_hint::English(en): Indicates the number of doctors in a hospital
+    label::French(fr): Nombre de médecins
+    guidance_hint::French(fr): Indique le nombre de médecins dans un hôpital
+    label::Spanish(es): Número de médicos
+    guidance_hint::Spanish(es): Indica el número de médicos de un hospital
+    label::Swahili(sw): Idadi ya madaktari
+    guidance_hint::Swahili(sw): Huonyesha idadi ya madaktari hospitalini
+    osm_key: staff_count:doctors
+  - type: integer
+    name: staff_nurses
+    label::English(en): Number of Nurses
+    guidance_hint::English(en): Indicates the number of nurses in a hospital
+    label::French(fr): Nombre d'infirmiers et d'infirmières
+    guidance_hint::French(fr): Indique le nombre d'infirmiers et d'infirmières dans
+      un hôpital
+    label::Spanish(es): Número de enfermeros
+    guidance_hint::Spanish(es): Indica el número de enfermeros de un hospital
+    label::Swahili(sw): Idadi ya wauguzi
+    guidance_hint::Swahili(sw): Huonyesha idadi ya wauguzi hospitalini
+    osm_key: staff_count:nurses
+  - type: select_multiple ins_list
+    name: insurance
+    label::English(en): Types of insurance accepted?
+    required: yes
+    guidance_hint::English(en): This key describes the type of health insurance accepted
+      at the healthsite
+    label::French(fr): Quels types d'assurance cette structure sanitaire accepte-t-elle
+      ?
+    guidance_hint::French(fr): Cette clé décrit le type d'assurance maladie acceptée
+      par la structure sanitaire
+    label::Spanish(es): ¿Qué tipos de seguro se aceptan?
+    guidance_hint::Spanish(es): Esta clave describe el tipo de seguro de salud aceptado
+      en el establecimiento
+    label::Swahili(sw): Ni aina gani za bima zinazokubaliwa?
+    guidance_hint::Swahili(sw): Ufunguo huu unaelezea aina ya bima ya afya inayokubaliwa
+      kituoni
+    osm_key: insurance:health
+  - type: select_one yn_wc
+    name: wheelchair
+    label::English(en): Is this facility wheelchair accessible?
+    guidance_hint::English(en): Used to mark places or ways that are suitable to be
+      used with a wheelchair and a person with a disability who uses another mobility
+      device (like a walker)
+    label::French(fr): Cette structure sanitaire est-elle accessible en fauteuil roulant
+      ?
+    guidance_hint::French(fr): Utilisé pour indiquer les lieux ou chemins accessibles
+      en fauteuil roulant et aux personnes handicapées utilisant une autre aide à la
+      mobilité (comme un déambulateur)
+    label::Spanish(es): ¿Este establecimiento es accesible en silla de ruedas?
+    guidance_hint::Spanish(es): Indica lugares o vías adecuados para sillas de ruedas
+      y para personas con discapacidad que usan otra ayuda a la movilidad (como un andador)
+    label::Swahili(sw): Je, kituo hiki kinafikika kwa kiti cha magurudumu?
+    guidance_hint::Swahili(sw): Huonyesha maeneo au njia zinazofaa kwa kiti cha magurudumu
+      na kwa watu wenye ulemavu wanaotumia kifaa kingine cha kutembelea
+    osm_key: wheelchair
+  - type: select_one water_src_list
+    name: water_source
+    label::English(en): What is the source of water for this facility?
+    guidance_hint::English(en): Used to indicate the source of the water for features
+      that provide or use water
+    label::French(fr): Quelle est la source d'eau de cette structure sanitaire ?
+    guidance_hint::French(fr): Utilisé pour indiquer la source d'eau des éléments qui
+      fournissent ou utilisent de l'eau
+    label::Spanish(es): ¿Cuál es la fuente de agua de este establecimiento?
+    guidance_hint::Spanish(es): Indica la fuente de agua de los elementos que suministran
+      o usan agua
+    label::Swahili(sw): Chanzo cha maji cha kituo hiki ni kipi?
+    guidance_hint::Swahili(sw): Huonyesha chanzo cha maji cha vipengele vinavyotoa au
+      kutumia maji
+    osm_key: water_source
+  - type: select_one elec_src_list
+    name: electricity
+    label::English(en): What is the source of power for this facility?
+    guidance_hint::English(en): Used to indicate the source of the electricity
+    label::French(fr): Quelle est la source d'électricité de cette structure sanitaire
+      ?
+    guidance_hint::French(fr): Utilisé pour indiquer la source de l'électricité
+    label::Spanish(es): ¿Cuál es la fuente de electricidad de este establecimiento?
+    guidance_hint::Spanish(es): Indica la fuente de la electricidad
+    label::Swahili(sw): Chanzo cha umeme cha kituo hiki ni kipi?
+    guidance_hint::Swahili(sw): Huonyesha chanzo cha umeme
+    osm_key: electricity
+  - type: text
+    name: url
+    label::English(en): URL for this location (if available)
+    constraint: coalesce(., '') = '' or regex(., '(?i)^(https?):\/\/[^\s/$.?#].[^\s]*$'
+      )
+    constraint_message::English(en): Not a valid URL
+    guidance_hint::English(en): Specifying a url related to a feature, in this case
+      the url if available
+    label::French(fr): URL de cette structure sanitaire (si disponible)
+    constraint_message::French(fr): URL invalide
+    guidance_hint::French(fr): URL liée à l'élément, ici l'URL de la structure si elle
+      existe
+    label::Spanish(es): URL de este lugar (si existe)
+    constraint_message::Spanish(es): URL no válida
+    guidance_hint::Spanish(es): URL relacionada con el elemento, en este caso la del
+      establecimiento si existe
+    label::Swahili(sw): URL ya eneo hili (kama ipo)
+    constraint_message::Swahili(sw): URL si sahihi
+    guidance_hint::Swahili(sw): URL inayohusiana na kipengele, hapa ni URL ya kituo
+      kama ipo
+    osm_key: url
   - type: text
     name: comment
     label::English(en): Any other comments about this feature
     appearance: minimal
-    label::Swahili(sw): Maoni mengine yoyote kuhusu kipengele hiki
     label::French(fr): Tout autre commentaire sur cet endroit
     label::Spanish(es): Cualquier otro comentario sobre esta característica
+    label::Swahili(sw): Maoni mengine yoyote kuhusu kipengele hiki
+    osm_key: note
 choices:
-  - list_name: amenity
-    name: doctors
-    label: Doctors
-  - list_name: amenity
-    name: hospital
-    label: Hospital
-  - list_name: amenity
-    name: dentist
-    label: Dentist
-  - list_name: amenity
-    name: healthcare
-    label: pharmacy
-  - list_name: amenity
-    name: veterinary
-    label: Veterinary
-  - list_name: healthcare
-    name: doctors
-    label: Doctors
-  - list_name: healthcare
-    name: hospital
-    label: Hospital
-  - list_name: healthcare
-    name: dentist
-    label: Dentist
-  - list_name: healthcare
-    name: healthcare
-    label: pharmacy
-  - list_name: healthcare
-    name: veterinary
-    label: Veterinary
-  - list_name: healthcare
-    name: yes
-    label: Yes
-  - list_name: healthcare
-    name: clinic
-    label: Clinic
-  - list_name: healthcare
-    name: pharmacy
-    label: pharmacy
-  - list_name: healthcare
-    name: physiotherapist
-    label: Physiotherapist
-  - list_name: healthcare
-    name: alternative
-    label: Alternative
-  - list_name: healthcare
-    name: laboratory
-    label: laboratory
-  - list_name: healthcare
-    name: optometrist
-    label: Optometrist
-  - list_name: healthcare
-    name: rehabilitation
-    label: Rehabilitation
-  - list_name: healthcare
-    name: blood_donation
-    label: Blood Donation
-  - list_name: healthcare
-    name: birthing_center
-    label: Birthing Center
-  - list_name: healthcare
-    name: midwife
-    label: Midwife
-  - list_name: healthcare
-    name: doctor
-    label: Doctors
-  - list_name: healthcare
-    name: pediatrics
-    label: Pediatrics
-  - list_name: healthcare
-    name: counseling
-    label: Counseling
-  - list_name: healthcare
-    name: dialysis
-    label: dialysis
-  - list_name: healthcare
-    name: hospice
-    label: Hospice
-  - list_name: healthcare
-    name: nurse
-    label: Nurse
-  - list_name: healthcare
-    name: psychotherapist
-    label: Psychotherapist
-  - list_name: healthcare
-    name: sample_collection
-    label: Sample Collection
-  - list_name: healthcare
-    name: speech_therapist
-    label: Speech Therapist
-  - list_name: healthcare
-    name: vaccination_centre
-    label: Vaccination Centre
-  - list_name: specialty
-    name: biology
-    label: Biology
-  - list_name: specialty
-    name: blood_check
-    label: Blood_check
-  - list_name: specialty
-    name: clinical_pathology
-    label: Clinical Pathology
-  - list_name: specialty
-    name: diagnostic_radiology
-    label: Diagnostic Radiology
-  - list_name: specialty
-    name: medical_physics
-    label: Medical Physics
-  - list_name: specialty
-    name: medical_engineering
-    label: Medical Engineering
-  - list_name: specialty
-    name: radiology
-    label: Radiology
-  - list_name: specialty
-    name: abortion
-    label: Abortion Clinic
-  - list_name: specialty
-    name: fertility_clinic
-    label: Fertility Clinic
-  - list_name: specialty
-    name: dialysis
-    label: dialysis
-  - list_name: amenity:type
-    name: ultrasound
-    label: Ultrasound
-  - list_name: amenity:type
-    name: mri
-    label: MRI
-  - list_name: amenity:type
-    name: x_ray
-    label: Xray
-  - list_name: amenity:type
-    name: dialysis
-    label: dialysis
-  - list_name: amenity:type
-    name: operating_theater
-    label: Operating Theater
-  - list_name: amenity:type
-    name: laboratory
-    label: laboratory
-  - list_name: amenity:type
-    name: imaging_equipment
-    label: Imaging Equipment
-  - list_name: amenity:type
-    name: intensive_care_unit
-    label: Intensive Care Unit
-  - list_name: amenity:type
-    name: emergency_department
-    label: Emergency Department
-  - list_name: amenity:type
-    name: baby_hatch
-    label: Baby Hatch
-  - list_name: insurance
-    name: no
-    label: No
-  - list_name: insurance
+  - list_name: oper_list
     name: public
-    label: Public
-  - list_name: insurance
+    label::English(en): Public
+    label::French(fr): Public
+    label::Spanish(es): Público
+    label::Swahili(sw): Umma
+  - list_name: oper_list
     name: private
-    label: Private
-  - list_name: insurance
-    name: unknown
-    label: Unknown
-  - list_name: water_supply
-    name: well
-    label: Well
-  - list_name: water_supply
-    name: water_works
-    label: Water Works
-  - list_name: water_supply
-    name: groundwater
-    label: Groundwater
-  - list_name: water_supply
-    name: rain
-    label: Rain
-  - list_name: generator:source
-    name: grid
-    label: Grid
-  - list_name: generator:source
-    name: generator
-    label: Generator
-  - list_name: generator:source
-    name: solar
-    label: Solar
-  - list_name: generator:source
-    name: none
-    label: No power
-  - list_name: opening_hours
-    name: 24/7
-    label: 24/7
-  - list_name: opening_hours
-    name: mo-sa_08:00-18:00
-    label: Monday – Sat 08:00-18:00
-  - list_name: opening_hours
-    name: mo-sa_09:00-17:00
-    label: Monday – Sat 09:00-17:00
-  - list_name: opening_hours
-    name: mo-sa_09:00-18:00
-    label: Monday – Sat 09:00-18:00
-  - list_name: opening_hours
-    name: mo-fr_09:00-17:00
-    label: Monday – Friday 09:00-17:00
-  - list_name: opening_hours
-    name: mo-su_09:00-21:00
-    label: Monday - Sunday 09:00-21:00
-  - list_name: opening_hours
-    name: mo-fr_08:00-18:00; Sa-Su 08:00-15:00
-    label: Monday - Friday 08:00-18:00; Sat - Sunday 08:00-15:00
-  - list_name: opening_hours
-    name: by_appointment
-    label: By Appointment Only
-  - list_name: operator:type
-    name: public
-    label: Public
-  - list_name: operator:type
-    name: private
-    label: Private
-  - list_name: operator:type
+    label::English(en): Private
+    label::French(fr): Privé
+    label::Spanish(es): Privado
+    label::Swahili(sw): Binafsi
+  - list_name: oper_list
     name: community
-    label: Community
-  - list_name: operator:type
+    label::English(en): Community
+    label::French(fr): Communautaire
+    label::Spanish(es): Comunitario
+    label::Swahili(sw): Jamii
+  - list_name: oper_list
     name: religious
-    label: Religious
-  - list_name: operator:type
+    label::English(en): Religious
+    label::French(fr): Religieux
+    label::Spanish(es): Religioso
+    label::Swahili(sw): Kidini
+  - list_name: oper_list
     name: government
-    label: Government
-  - list_name: operator:type
+    label::English(en): Government
+    label::French(fr): Gouvernemental
+    label::Spanish(es): Gobierno
+    label::Swahili(sw): Serikali
+  - list_name: oper_list
     name: ngo
-    label: NGO
-  - list_name: operator:type
+    label::English(en): NGO
+    label::French(fr): ONG
+    label::Spanish(es): ONG
+    label::Swahili(sw): NGO
+  - list_name: oper_list
     name: combination
-    label: Combination
-  - list_name: yes_no
+    label::English(en): Combination
+    label::French(fr): Combinaison
+    label::Spanish(es): Combinación
+    label::Swahili(sw): Mchanganyiko
+  - list_name: op_stat_list
+    name: operational
+    label::English(en): Operational
+    label::French(fr): Opérationnel
+    label::Spanish(es): Operativo
+    label::Swahili(sw): Kinafanya kazi
+  - list_name: op_stat_list
+    name: non_operational
+    label::English(en): Non Operational
+    label::French(fr): Non opérationnel
+    label::Spanish(es): No operativo
+    label::Swahili(sw): Hakifanyi kazi
+  - list_name: op_stat_list
+    name: unknown
+    label::English(en): Unknown
+    label::French(fr): Inconnu
+    label::Spanish(es): Desconocido
+    label::Swahili(sw): Haijulikani
+  - list_name: oh_list
+    name: oh_select
+    label::English(en): Enter the hours for each day
+    label::French(fr): Entrer les heures pour chaque jour
+    label::Spanish(es): Introducir el horario de cada día
+    label::Swahili(sw): Ingiza saa za kila siku
+  - list_name: oh_list
+    name: oh_weekday
+    label::English(en): Only open on weekdays with the same hours every day.
+    label::French(fr): Ouvert uniquement en semaine avec les mêmes heures tous les jours.
+    label::Spanish(es): Solo abre de lunes a viernes, con el mismo horario todos los
+      días.
+    label::Swahili(sw): Hufunguliwa siku za kazi pekee, kwa saa zilezile kila siku.
+  - list_name: oh_list
+    name: oh_24_7
+    label::English(en): 24/7 - All day, every day
+    label::French(fr): 24/7 - Toute la journée, tous les jours
+    label::Spanish(es): 24/7 - Todo el día, todos los días
+    label::Swahili(sw): 24/7 - Saa zote, kila siku
+  - list_name: oh_list
+    name: oh_advanced
+    label::English(en): Type in OSM String by hand (Advanced Option)
+    label::French(fr): Saisir la chaîne OSM à la main (option avancée)
+    label::Spanish(es): Escribir la cadena OSM a mano (opción avanzada)
+    label::Swahili(sw): Andika mfuatano wa OSM kwa mkono (chaguo la juu)
+  - list_name: oh_list
+    name: oh_unknown
+    label::English(en): I don't know the operating hours
+    label::French(fr): Je ne connais pas les heures d'ouverture
+    label::Spanish(es): No conozco el horario
+    label::Swahili(sw): Sijui saa za kufungua
+  - list_name: amenity_list
+    name: clinic
+    label::English(en): Clinic
+    label::French(fr): Clinique
+    label::Spanish(es): Clínica
+    label::Swahili(sw): Zahanati
+  - list_name: amenity_list
+    name: doctors
+    label::English(en): Doctors
+    label::French(fr): Dispensaire/Cabinet médical
+    label::Spanish(es): Consultorio médico
+    label::Swahili(sw): Madaktari
+  - list_name: amenity_list
+    name: hospital
+    label::English(en): Hospital
+    label::French(fr): Hôpital
+    label::Spanish(es): Hospital
+    label::Swahili(sw): Hospitali
+  - list_name: amenity_list
+    name: dentist
+    label::English(en): Dentist
+    label::French(fr): Dentiste
+    label::Spanish(es): Dentista
+    label::Swahili(sw): Daktari wa meno
+  - list_name: amenity_list
+    name: pharmacy
+    label::English(en): Pharmacy
+    label::French(fr): Pharmacie
+    label::Spanish(es): Farmacia
+    label::Swahili(sw): Duka la dawa
+  - list_name: healthcare_list
+    name: doctor
+    label::English(en): Doctor
+    label::French(fr): Médecine générale
+    label::Spanish(es): Medicina general
+    label::Swahili(sw): Daktari
+  - list_name: healthcare_list
+    name: pharmacy
+    label::English(en): Pharmacy
+    label::French(fr): Pharmacie
+    label::Spanish(es): Farmacia
+    label::Swahili(sw): Duka la dawa
+  - list_name: healthcare_list
+    name: hospital
+    label::English(en): Hospital
+    label::French(fr): Hôpital
+    label::Spanish(es): Hospital
+    label::Swahili(sw): Hospitali
+  - list_name: healthcare_list
+    name: clinic
+    label::English(en): Clinic
+    label::French(fr): Clinique
+    label::Spanish(es): Clínica
+    label::Swahili(sw): Zahanati
+  - list_name: healthcare_list
+    name: dentist
+    label::English(en): Dentist
+    label::French(fr): Dentiste
+    label::Spanish(es): Dentista
+    label::Swahili(sw): Daktari wa meno
+  - list_name: healthcare_list
+    name: physiotherapist
+    label::English(en): Physiotherapy
+    label::French(fr): Kinésithérapie
+    label::Spanish(es): Fisioterapia
+    label::Swahili(sw): Tiba ya viungo
+  - list_name: healthcare_list
+    name: alternative
+    label::English(en): Alternative medicine
+    label::French(fr): Médecine alternative
+    label::Spanish(es): Medicina alternativa
+    label::Swahili(sw): Tiba mbadala
+  - list_name: healthcare_list
+    name: laboratory
+    label::English(en): Laboratory
+    label::French(fr): Laboratoire
+    label::Spanish(es): Laboratorio
+    label::Swahili(sw): Maabara
+  - list_name: healthcare_list
+    name: optometrist
+    label::English(en): Optometry/Ophthalmology
+    label::French(fr): Optométrie/Ophtalmologie
+    label::Spanish(es): Optometría/Oftalmología
+    label::Swahili(sw): Huduma za macho
+  - list_name: healthcare_list
+    name: rehabilitation
+    label::English(en): Rehabilitation
+    label::French(fr): Rééducation
+    label::Spanish(es): Rehabilitación
+    label::Swahili(sw): Huduma za utengemao
+  - list_name: healthcare_list
+    name: blood_donation
+    label::English(en): Blood donation
+    label::French(fr): Don de sang
+    label::Spanish(es): Donación de sangre
+    label::Swahili(sw): Uchangiaji wa damu
+  - list_name: healthcare_list
+    name: birthing_centre
+    label::English(en): Birthing centre
+    label::French(fr): Maternité
+    label::Spanish(es): Centro de maternidad
+    label::Swahili(sw): Kituo cha kujifungulia
+  - list_name: healthcare_list
+    name: blood_bank
+    label::English(en): Blood bank
+    label::French(fr): Banque de sang
+    label::Spanish(es): Banco de sangre
+    label::Swahili(sw): Benki ya damu
+  - list_name: healthcare_list
+    name: counselling
+    label::English(en): Counselling
+    label::French(fr): Conseil psychologique
+    label::Spanish(es): Orientación psicológica
+    label::Swahili(sw): Ushauri nasaha
+  - list_name: healthcare_list
+    name: dialysis
+    label::English(en): Dialysis
+    label::French(fr): Dialyse
+    label::Spanish(es): Diálisis
+    label::Swahili(sw): Usafishaji wa damu (dialysis)
+  - list_name: healthcare_list
+    name: hospice
+    label::English(en): Hospice
+    label::French(fr): Soins palliatifs
+    label::Spanish(es): Cuidados paliativos
+    label::Swahili(sw): Huduma shufaa
+  - list_name: healthcare_list
+    name: midwife
+    label::English(en): Midwife
+    label::French(fr): Sage-femme
+    label::Spanish(es): Partería
+    label::Swahili(sw): Mkunga
+  - list_name: healthcare_list
+    name: nurse
+    label::English(en): Nurse
+    label::French(fr): Infirmier ou infirmière
+    label::Spanish(es): Enfermería
+    label::Swahili(sw): Muuguzi
+  - list_name: healthcare_list
+    name: psychotherapist
+    label::English(en): Psychotherapist
+    label::French(fr): Psychothérapeute
+    label::Spanish(es): Psicoterapia
+    label::Swahili(sw): Tiba ya kisaikolojia
+  - list_name: healthcare_list
+    name: sample_collection
+    label::English(en): Sample collection
+    label::French(fr): Prélèvement d'échantillons
+    label::Spanish(es): Toma de muestras
+    label::Swahili(sw): Ukusanyaji wa sampuli
+  - list_name: healthcare_list
+    name: speech_therapist
+    label::English(en): Speech therapist
+    label::French(fr): Orthophoniste
+    label::Spanish(es): Logopedia
+    label::Swahili(sw): Tiba ya usemi
+  - list_name: healthcare_list
+    name: vaccination_centre
+    label::English(en): Vaccination centre
+    label::French(fr): Centre de vaccination
+    label::Spanish(es): Centro de vacunación
+    label::Swahili(sw): Kituo cha chanjo
+  - list_name: amenity_type_list
+    name: ultrasound
+    label::English(en): Ultrasound
+    label::French(fr): Échographie
+    label::Spanish(es): Ecografía
+    label::Swahili(sw): Ultrasound
+  - list_name: amenity_type_list
+    name: mri
+    label::English(en): MRI
+    label::French(fr): IRM
+    label::Spanish(es): Resonancia magnética
+    label::Swahili(sw): MRI
+  - list_name: amenity_type_list
+    name: x_ray
+    label::English(en): X-Ray
+    label::French(fr): Radiographie (rayons X)
+    label::Spanish(es): Rayos X
+    label::Swahili(sw): Eksirei
+  - list_name: amenity_type_list
+    name: dialysis
+    label::English(en): Dialysis
+    label::French(fr): Dialyse
+    label::Spanish(es): Diálisis
+    label::Swahili(sw): Usafishaji wa damu (dialysis)
+  - list_name: amenity_type_list
+    name: operating_theater
+    label::English(en): Operating Theater
+    label::French(fr): Bloc opératoire
+    label::Spanish(es): Quirófano
+    label::Swahili(sw): Chumba cha upasuaji
+  - list_name: amenity_type_list
+    name: laboratory
+    label::English(en): Laboratory
+    label::French(fr): Laboratoire
+    label::Spanish(es): Laboratorio
+    label::Swahili(sw): Maabara
+  - list_name: amenity_type_list
+    name: imaging_equipment
+    label::English(en): Imaging Equipment
+    label::French(fr): Équipement d'imagerie médicale
+    label::Spanish(es): Equipo de imagen médica
+    label::Swahili(sw): Vifaa vya picha za matibabu
+  - list_name: amenity_type_list
+    name: intensive_care_unit
+    label::English(en): Intensive Care Unit
+    label::French(fr): Unité de soins intensifs
+    label::Spanish(es): Unidad de cuidados intensivos
+    label::Swahili(sw): Chumba cha wagonjwa mahututi
+  - list_name: amenity_type_list
+    name: emergency_department
+    label::English(en): Emergency Department
+    label::French(fr): Service des urgences
+    label::Spanish(es): Servicio de urgencias
+    label::Swahili(sw): Idara ya dharura
+  - list_name: yn_list
     name: yes
-    label: Yes
-  - list_name: yes_no
+    label::English(en): Yes
+    label::French(fr): Oui
+    label::Spanish(es): Sí
+    label::Swahili(sw): Ndiyo
+  - list_name: yn_list
     name: no
-    label: No
+    label::English(en): No
+    label::French(fr): Non
+    label::Spanish(es): No
+    label::Swahili(sw): Hapana
+  - list_name: ins_list
+    name: public
+    label::English(en): Public
+    label::French(fr): Publique
+    label::Spanish(es): Público
+    label::Swahili(sw): Umma
+  - list_name: ins_list
+    name: private
+    label::English(en): Private
+    label::French(fr): Privée
+    label::Spanish(es): Privado
+    label::Swahili(sw): Binafsi
+  - list_name: ins_list
+    name: no
+    label::English(en): No insurance
+    label::French(fr): Aucune
+    label::Spanish(es): Ninguno
+    label::Swahili(sw): Hakuna
+  - list_name: ins_list
+    name: unknown
+    label::English(en): Unknown
+    label::French(fr): Inconnue
+    label::Spanish(es): Desconocido
+    label::Swahili(sw): Haijulikani
+  - list_name: yn_wc
+    name: yes
+    label::English(en): Yes
+    label::French(fr): Oui
+    label::Spanish(es): Sí
+    label::Swahili(sw): Ndiyo
+  - list_name: yn_wc
+    name: no
+    label::English(en): No
+    label::French(fr): Non
+    label::Spanish(es): No
+    label::Swahili(sw): Hapana
+  - list_name: yn_wc
+    name: limited
+    label::English(en): Limited
+    label::French(fr): Limité
+    label::Spanish(es): Limitado
+    label::Swahili(sw): Kwa kiasi
+  - list_name: water_src_list
+    name: well
+    label::English(en): Well
+    label::French(fr): Puits
+    label::Spanish(es): Pozo
+    label::Swahili(sw): Kisima
+  - list_name: water_src_list
+    name: water_works
+    label::English(en): Water works
+    label::French(fr): Réseau d'eau
+    label::Spanish(es): Red de agua
+    label::Swahili(sw): Maji ya bomba
+  - list_name: water_src_list
+    name: manual_pump
+    label::English(en): Manual pump
+    label::French(fr): Pompe manuelle
+    label::Spanish(es): Bomba manual
+    label::Swahili(sw): Pampu ya mkono
+  - list_name: water_src_list
+    name: powered_pump
+    label::English(en): Powered pump
+    label::French(fr): Pompe motorisée
+    label::Spanish(es): Bomba motorizada
+    label::Swahili(sw): Pampu ya umeme
+  - list_name: water_src_list
+    name: groundwater
+    label::English(en): Groundwater
+    label::French(fr): Eau souterraine
+    label::Spanish(es): Agua subterránea
+    label::Swahili(sw): Maji ya ardhini
+  - list_name: water_src_list
+    name: rain
+    label::English(en): Rain
+    label::French(fr): Eau de pluie
+    label::Spanish(es): Agua de lluvia
+    label::Swahili(sw): Maji ya mvua
+  - list_name: elec_src_list
+    name: grid
+    label::English(en): Power grid
+    label::French(fr): Réseau électrique
+    label::Spanish(es): Red eléctrica
+    label::Swahili(sw): Umeme wa gridi
+  - list_name: elec_src_list
+    name: generator
+    label::English(en): Generator
+    label::French(fr): Générateur
+    label::Spanish(es): Generador
+    label::Swahili(sw): Jenereta
+  - list_name: elec_src_list
+    name: solar
+    label::English(en): Solar
+    label::French(fr): Solaire
+    label::Spanish(es): Solar
+    label::Swahili(sw): Umeme wa jua
+  - list_name: elec_src_list
+    name: other
+    label::English(en): Other Power
+    label::French(fr): Autre source
+    label::Spanish(es): Otra fuente
+    label::Swahili(sw): Chanzo kingine
+  - list_name: elec_src_list
+    name: none
+    label::English(en): No Power
+    label::French(fr): Pas d'électricité
+    label::Spanish(es): Sin electricidad
+    label::Swahili(sw): Hakuna umeme
+  - list_name: hc_speciality_list
+    name: abortion
+    label::English(en): Abortion
+    label::French(fr): Avortement
+    label::Spanish(es): Aborto
+    label::Swahili(sw): Utoaji mimba
+  - list_name: hc_speciality_list
+    name: biology
+    label::English(en): Biology
+    label::French(fr): Biologie
+    label::Spanish(es): Biología
+    label::Swahili(sw): Baiolojia
+  - list_name: hc_speciality_list
+    name: blood_check
+    label::English(en): Blood check
+    label::French(fr): Analyse de sang
+    label::Spanish(es): Análisis de sangre
+    label::Swahili(sw): Kipimo cha damu
+  - list_name: hc_speciality_list
+    name: clinical_pathology
+    label::English(en): Clinical pathology
+    label::French(fr): Pathologie clinique
+    label::Spanish(es): Patología clínica
+    label::Swahili(sw): Patholojia ya kliniki
+  - list_name: hc_speciality_list
+    name: diagnostic_radiology
+    label::English(en): Diagnostic radiology
+    label::French(fr): Radiologie diagnostique
+    label::Spanish(es): Radiología diagnóstica
+    label::Swahili(sw): Radiolojia ya uchunguzi
+  - list_name: hc_speciality_list
+    name: fertility
+    label::English(en): Fertility
+    label::French(fr): Fertilité
+    label::Spanish(es): Fertilidad
+    label::Swahili(sw): Uzazi
+  - list_name: hc_speciality_list
+    name: paediatrics
+    label::English(en): Paediatrics
+    label::French(fr): Pédiatrie
+    label::Spanish(es): Pediatría
+    label::Swahili(sw): Magonjwa ya watoto
+  - list_name: hc_speciality_list
+    name: radiology
+    label::English(en): Radiology
+    label::French(fr): Radiologie
+    label::Spanish(es): Radiología
+    label::Swahili(sw): Radiolojia
+  - list_name: hc_speciality_list
+    name: vaccination
+    label::English(en): Vaccination
+    label::French(fr): Vaccination
+    label::Spanish(es): Vacunación
+    label::Swahili(sw): Chanjo
 settings:
   - form_id: healthcare
-    version: "2026.10.1"
+    version: 2026.11.2
     form_title: OSM Healthcare
     allow_choice_duplicates: yes
 yxf:
   headers:
     survey:
-      - "#"
-      - type
-      - name
-      - label::English(en)
-      - hint::English(en)
-      - appearance
-      - relevant
-      - choice_filter
-      - calculation
-      - default
-      - trigger
-      - parameters
-      - required
-      - required_message::English(en)
-      - label::Swahili(sw)
-      - hint::Swahili(sw)
-      - label::French(fr)
-      - hint::French(fr)
-      - label::Spanish(es)
-      - hint::Spanish(es)
-      - save_to
+    - '#'
+    - type
+    - name
+    - label::English(en)
+    - hint::English(en)
+    - appearance
+    - relevant
+    - calculation
+    - default
+    - required
+    - constraint
+    - constraint_message::English(en)
+    - guidance_hint::English(en)
+    - label::French(fr)
+    - hint::French(fr)
+    - constraint_message::French(fr)
+    - guidance_hint::French(fr)
+    - label::Spanish(es)
+    - hint::Spanish(es)
+    - constraint_message::Spanish(es)
+    - guidance_hint::Spanish(es)
+    - label::Swahili(sw)
+    - hint::Swahili(sw)
+    - constraint_message::Swahili(sw)
+    - guidance_hint::Swahili(sw)
+    - osm_key
     choices:
-      - list_name
-      - name
-      - label
+    - list_name
+    - name
+    - label::English(en)
+    - label::French(fr)
+    - label::Spanish(es)
+    - label::Swahili(sw)
     settings:
-      - form_id
-      - version
-      - form_title
-      - allow_choice_duplicates
+    - form_id
+    - version
+    - form_title
+    - allow_choice_duplicates

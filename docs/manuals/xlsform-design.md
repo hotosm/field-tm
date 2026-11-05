@@ -76,6 +76,22 @@ A few terms should be explained:
 
 - The main part of the form - the questions for the survey!
 
+## OSM Tags In The Export
+
+XLSForm question names cannot contain a colon, so they cannot hold tags such as
+`addr:street`. To export a question under its OSM tag, add an `osm_key` column to
+the survey sheet:
+
+| type                       | name       | osm_key     |
+| -------------------------- | ---------- | ----------- |
+| text                       | street     | addr:street |
+| select_multiple care_types | healthcare | healthcare  |
+
+The GeoJSON export then uses `addr:street` as the property name, and joins
+`select_multiple` answers with semicolons. Questions without an `osm_key` keep
+their name. In forms with this column, questions whose name starts with `_` are
+working fields, and are left out of the export.
+
 ## Translations
 
 - Ideally two letter ISO codes should be used, along with a label,

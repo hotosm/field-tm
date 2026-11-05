@@ -54,6 +54,24 @@
       },
       {
         "pharmacy": []
+      },
+      {
+        "name": []
+      },
+      {
+        "amenity": []
+      },
+      {
+        "operator": []
+      },
+      {
+        "operator:type": []
+      },
+      {
+        "opening_hours": []
+      },
+      {
+        "contact:phone": []
       }
     ],
     "ways_poly": [
@@ -110,6 +128,24 @@
       },
       {
         "pharmacy": []
+      },
+      {
+        "name": []
+      },
+      {
+        "amenity": []
+      },
+      {
+        "operator": []
+      },
+      {
+        "operator:type": []
+      },
+      {
+        "opening_hours": []
+      },
+      {
+        "contact:phone": []
       }
     ],
     "ways_line": [],
@@ -129,6 +165,10 @@
       {
         "healthcare:speciality": ["not null"],
         "op": "or"
+      },
+      {
+        "amenity": [["hospital", "clinic", "doctors", "dentist", "pharmacy"]],
+        "op": "or"
       }
     ],
     "ways_poly": [
@@ -142,6 +182,10 @@
       },
       {
         "healthcare:speciality": ["not null"],
+        "op": "or"
+      },
+      {
+        "amenity": [["hospital", "clinic", "doctors", "dentist", "pharmacy"]],
         "op": "or"
       }
     ],
@@ -165,6 +209,12 @@
     "facility:x-ray",
     "addr:city",
     "building:level",
-    "pharmacy"
+    "pharmacy",
+    "name",
+    "amenity",
+    "operator",
+    "operator:type",
+    "opening_hours",
+    "contact:phone"
   ]
 }
