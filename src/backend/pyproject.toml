@@ -37,7 +37,7 @@ dependencies = [
     "pyodk==1.3.0",
     "qfieldcloud-sdk==0.18.0",
     "httpx==0.28.1",
-    "pg-nearest-city==2.0.0",
+    "pg-nearest-city==3.0.0",
     "raw-data-api-py==0.3.0",
     "geojson-aoi-parser==1.0.0",
     "hotosm-auth[litestar] @ git+https://github.com/hotosm/login.git@a2a1ce2a395c#subdirectory=auth-libs/python",
