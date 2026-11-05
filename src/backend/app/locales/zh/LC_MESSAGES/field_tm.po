@@ -2579,7 +2579,7 @@ msgid "OSM Highways"
 msgstr "OSM 道路"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:53
-msgid "OSM Healthcare"
+msgid "OSM Health Centers"
 msgstr "OSM 医疗设施"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:54

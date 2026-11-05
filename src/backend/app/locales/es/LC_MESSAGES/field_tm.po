@@ -2830,7 +2830,7 @@ msgid "OSM Highways"
 msgstr "Carreteras OSM"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:53
-msgid "OSM Healthcare"
+msgid "OSM Health Centers"
 msgstr "Salud OSM"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:54

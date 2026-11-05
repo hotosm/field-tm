@@ -1,7 +1,7 @@
 export const OSM_FORM_TITLE_TO_PRESET = {
   "OSM Buildings": { category: "buildings", geomType: "POLYGON", centroid: false },
   "OSM Highways": { category: "highways", geomType: "POLYLINE", centroid: false },
-  "OSM Healthcare": { category: "health", geomType: "POINT", centroid: false },
+  "OSM Health Centers": { category: "health", geomType: "POINT", centroid: false },
   "OSM Toilets": { category: "toilets", geomType: "POINT", centroid: false },
   "OSM Religious": { category: "religious", geomType: "POINT", centroid: false },
   "OSM Landuse": { category: "landusage", geomType: "POLYGON", centroid: false },

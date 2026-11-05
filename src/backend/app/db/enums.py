@@ -79,12 +79,12 @@ class XLSFormType(StrEnum, Enum):
     This cannot match an existing OSM tag value, so some words are replaced
     (e.g. OSM=healthcare, XLSForm=health).
 
-    The the value is the user facing form name (e.g. healthcare).
+    The the value is the user facing form name (e.g. OSM Health Centers).
     """
 
     buildings = "OSM Buildings"
     highways = "OSM Highways"
-    health = "OSM Healthcare"
+    health = "OSM Health Centers"
     toilets = "OSM Toilets"
     religious = "OSM Religious"
     landusage = "OSM Landuse"

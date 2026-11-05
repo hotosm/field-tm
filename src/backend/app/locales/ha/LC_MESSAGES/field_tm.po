@@ -2770,7 +2770,7 @@ msgid "OSM Highways"
 msgstr "Hanyoyin OSM"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:53
-msgid "OSM Healthcare"
+msgid "OSM Health Centers"
 msgstr "Kiwon lafiya na OSM"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:54

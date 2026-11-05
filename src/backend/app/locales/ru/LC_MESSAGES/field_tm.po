@@ -2805,7 +2805,7 @@ msgid "OSM Highways"
 msgstr "Дороги OSM"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:53
-msgid "OSM Healthcare"
+msgid "OSM Health Centers"
 msgstr "Медицинские объекты OSM"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:54

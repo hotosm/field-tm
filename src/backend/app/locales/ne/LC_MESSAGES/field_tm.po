@@ -2772,7 +2772,7 @@ msgid "OSM Highways"
 msgstr "OSM सडकहरू"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:53
-msgid "OSM Healthcare"
+msgid "OSM Health Centers"
 msgstr "OSM स्वास्थ्य सेवा"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:54

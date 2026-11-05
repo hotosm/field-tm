@@ -2759,7 +2759,7 @@ msgid "OSM Highways"
 msgstr "Ọ̀nà OSM"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:53
-msgid "OSM Healthcare"
+msgid "OSM Health Centers"
 msgstr "Ìtọju ìlera OSM"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:54

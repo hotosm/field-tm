@@ -2768,7 +2768,7 @@ msgid "OSM Highways"
 msgstr "Silnice OSM"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:53
-msgid "OSM Healthcare"
+msgid "OSM Health Centers"
 msgstr "Zdravotnictví OSM"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:54

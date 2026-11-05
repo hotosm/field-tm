@@ -2842,7 +2842,7 @@ msgid "OSM Highways"
 msgstr "OSM சாலைகள்"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:53
-msgid "OSM Healthcare"
+msgid "OSM Health Centers"
 msgstr "OSM சுகாதாரம்"
 
 #: app/templates/partials/project_details/setup_steps/step3_data.html:54

@@ -1067,9 +1067,9 @@ choices:
     label::Spanish(es): Vacunación
     label::Swahili(sw): Chanjo
 settings:
-  - form_id: healthcare
-    version: 2026.11.2
-    form_title: OSM Healthcare
+  - form_id: healthcenters
+    version: 2026.11.3
+    form_title: OSM Health Centers
     allow_choice_duplicates: yes
 yxf:
   headers:
