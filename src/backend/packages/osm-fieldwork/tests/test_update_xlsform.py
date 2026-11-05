@@ -27,9 +27,11 @@ from openpyxl import Workbook, load_workbook, worksheet
 from pyxform.xls2xform import convert as xform_convert
 
 from osm_fieldwork.conversion_to_xlsform import convert_to_xlsform
-from osm_fieldwork.enums import NewPointCapture
+from osm_fieldwork.enums import DbGeomType, NewPointCapture
 from osm_fieldwork.form_components.translations import INCLUDED_LANGUAGES
 from osm_fieldwork.update_xlsform import (
+    GEOMETRY_QUESTION_TYPES,
+    QFIELD_GEOMETRY_EXPRESSION,
     _configure_form_settings,
     get_processed_form_options,
     _normalize_language_token,
@@ -465,6 +467,242 @@ async def test_new_point_capture_sets_appearance(capture, appearance):
     assert new_feature["type"] == "geopoint"
     assert new_feature["appearance"] == appearance
     assert get_processed_form_options(form.getvalue())["new_point_capture"] == capture
+
+
+def _user_form(*questions: list) -> BytesIO:
+    """An XLSForm with the given [type, name, label, relevant] survey rows."""
+    workbook = Workbook()
+    survey = workbook.active
+    survey.title = "survey"
+    survey.append(["type", "name", "label", "hint", "relevant"])
+    for question in questions:
+        survey.append(question)
+    workbook.create_sheet("settings").append(["form_id", "form_title"])
+    workbook["settings"].append(["user_form", "User form"])
+    form = BytesIO()
+    workbook.save(form)
+    form.seek(0)
+    return form
+
+
+async def _merged_survey(form: BytesIO, **options) -> pd.DataFrame:
+    """Build an ODK form, check it converts, and return its survey sheet."""
+    _, updated = await append_field_mapping_fields(form, use_odk_collect=True, **options)
+    xform_convert(BytesIO(updated.getvalue()))
+    return pd.read_excel(BytesIO(updated.getvalue()), sheet_name="survey").fillna("")
+
+
+def geometry_questions_in(survey: pd.DataFrame) -> list[str]:
+    """Names of the questions collecting geometry, including pyxform aliases."""
+    return survey.loc[survey["type"].isin(GEOMETRY_QUESTION_TYPES), "name"].tolist()
+
+
+TAP_QUESTION = ["text", "tap_name", "Tap name", "", ""]
+
+
+@pytest.mark.parametrize("question_type", ["geopoint", "gps", "location", "add location prompt"])
+@pytest.mark.parametrize(
+    ("capture", "appearance"),
+    [(NewPointCapture.MAP, "placement-map"), (NewPointCapture.GPS, "")],
+)
+async def test_user_geopoint_merges_into_new_feature(question_type, capture, appearance):
+    """A user's own point question merges, whichever capture method was selected."""
+    survey = await _merged_survey(
+        _user_form(
+            [question_type, "tap_location", "Where is the tap?", "Stand beside it", ""],
+            ["text", "tap_name", "Tap name", "", "${tap_location} != ''"],
+        ),
+        new_point_capture=capture,
+    )
+
+    assert "tap_location" not in set(survey["name"])
+    assert geometry_questions_in(survey) == ["new_feature"]
+    new_feature = survey[survey["name"] == "new_feature"].iloc[0]
+    assert new_feature["type"] == "geopoint"
+    assert new_feature["appearance"] == appearance
+    assert new_feature.filter(like="label").eq("Where is the tap?").any()
+    assert new_feature.filter(like="hint").eq("Stand beside it").any()
+    assert survey[survey["name"] == "tap_name"].iloc[0]["relevant"] == "${new_feature} != ''"
+
+
+@pytest.mark.parametrize(
+    "questions",
+    [
+        [["geopoint", "spot", "Where?", "", ""]],
+        [
+            ["begin group", "outer", "Outer", "", ""],
+            ["begin group", "inner", "Inner", "", ""],
+            ["geopoint", "spot", "Where?", "", ""],
+            ["end group", "", "", "", ""],
+            ["end group", "", "", "", ""],
+            TAP_QUESTION,
+        ],
+    ],
+    ids=["only-question-in-form", "only-question-in-nested-groups"],
+)
+async def test_merging_the_only_question_of_a_group_keeps_the_form_valid(questions):
+    """Groups emptied by the merge are removed, as pyxform rejects empty groups."""
+    survey = await _merged_survey(_user_form(*questions))
+
+    assert geometry_questions_in(survey) == ["new_feature"]
+    assert not {"outer", "inner"} & set(survey["name"])
+
+
+async def test_merge_keeps_user_constraint_and_parameters():
+    """Validation and accuracy settings pass on, but required and relevant stay ours."""
+    workbook = load_workbook(_user_form(["geopoint", "spot", "Where?", "", "1 = 1"], TAP_QUESTION))
+    survey_sheet = workbook["survey"]
+    for column, heading, value in [
+        ("F", "constraint", "selected-at(${spot}, 3) < 50"),
+        ("G", "constraint_message", "Too inaccurate"),
+        ("H", "parameters", "capture-accuracy=5"),
+        ("I", "required", "no"),
+    ]:
+        survey_sheet[f"{column}1"] = heading
+        survey_sheet[f"{column}2"] = value
+    form = BytesIO()
+    workbook.save(form)
+    form.seek(0)
+
+    survey = await _merged_survey(form)
+
+    new_feature = survey[survey["name"] == "new_feature"].iloc[0]
+    assert new_feature["constraint"] == "selected-at(${new_feature}, 3) < 50"
+    assert new_feature.filter(like="constraint_message").eq("Too inaccurate").any()
+    assert new_feature["parameters"] == "capture-accuracy=5"
+    assert new_feature["required"] == "yes"
+    assert new_feature["relevant"] == "${mapping_mode} = 'new'"
+
+
+async def test_user_appearance_does_not_override_selected_capture():
+    """The selected capture method wins over the appearance in the user's form."""
+    workbook = load_workbook(_user_form(["geopoint", "spot", "Where?", "", ""], TAP_QUESTION))
+    workbook["survey"]["F1"] = "appearance"
+    workbook["survey"]["F2"] = "placement-map"
+    form = BytesIO()
+    workbook.save(form)
+    form.seek(0)
+
+    survey = await _merged_survey(form, new_point_capture=NewPointCapture.GPS)
+
+    assert survey[survey["name"] == "new_feature"].iloc[0]["appearance"] == ""
+
+
+@pytest.mark.parametrize(
+    ("question_type", "new_geom_type", "injected_type"),
+    [("geoshape", DbGeomType.POLYGON, "geoshape"), ("geotrace", DbGeomType.LINESTRING, "geotrace")],
+)
+async def test_user_shape_and_trace_merge_into_matching_new_feature(
+    question_type, new_geom_type, injected_type
+):
+    """Geoshape and geotrace questions merge when that is the geometry being collected."""
+    survey = await _merged_survey(
+        _user_form([question_type, "outline", "Trace it", "", ""], TAP_QUESTION),
+        new_geom_type=new_geom_type,
+    )
+
+    assert geometry_questions_in(survey) == ["new_feature"]
+    assert survey[survey["name"] == "new_feature"].iloc[0]["type"] == injected_type
+
+
+async def test_template_geometry_question_is_still_replaced_by_name():
+    """A question named new_feature is the duplicate, so other geopoints stay."""
+    survey = await _merged_survey(
+        _user_form(
+            ["geopoint", "new_feature", "Where?", "", ""],
+            ["geopoint", "entrance", "Entrance", "", ""],
+        )
+    )
+
+    assert geometry_questions_in(survey) == ["new_feature", "entrance"]
+
+
+@pytest.mark.parametrize(
+    ("questions", "kept"),
+    [
+        ([["geoshape", "outline", "Outline", "", ""]], "outline"),
+        ([["start-geopoint", "user_start", "", "", ""]], "user_start"),
+        (
+            [
+                ["begin repeat", "taps", "Taps", "", ""],
+                ["geopoint", "tap_location", "Tap", "", ""],
+                ["end repeat", "taps", "", "", ""],
+            ],
+            "tap_location",
+        ),
+    ],
+    ids=["other-geometry", "passive-metadata", "repeated"],
+)
+async def test_questions_collecting_separate_data_are_not_merged(questions, kept):
+    """Only a question that really duplicates new_feature is merged."""
+    survey = await _merged_survey(_user_form(*questions, TAP_QUESTION))
+
+    assert kept in set(survey["name"])
+    assert "new_feature" in set(survey["name"])
+
+
+async def test_only_first_user_geopoint_merges():
+    """A second point question is separate data, such as the end of a route."""
+    survey = await _merged_survey(
+        _user_form(
+            ["geopoint", "route_start", "Start", "", ""],
+            ["geopoint", "route_end", "End", "", ""],
+        )
+    )
+
+    assert geometry_questions_in(survey) == ["new_feature", "route_end"]
+
+
+async def _qfield_survey(form: BytesIO) -> pd.DataFrame:
+    """The survey sheet sent to xlsform2qgis for a user's form."""
+    _, updated = await append_field_mapping_fields(form)
+    _, qfield_form = await modify_form_for_qfield(updated)
+    return pd.read_excel(BytesIO(qfield_form.getvalue()), sheet_name="survey").fillna("")
+
+
+async def test_qfield_form_keeps_one_geometry_question():
+    """QField layers have one geometry, so other questions merge into it."""
+    survey = await _qfield_survey(
+        _user_form(
+            ["geopoint", "route_start", "Start", "", ""],
+            ["gps", "route_end", "End", "", ""],
+            ["geoshape", "outline", "Outline", "", ""],
+            ["text", "tap_name", "Tap name", "", "${route_start} != '' and ${route_endpoint} = ''"],
+        )
+    )
+
+    assert geometry_questions_in(survey) == ["feature"]
+    assert survey[survey["name"] == "tap_name"].iloc[0]["relevant"] == (
+        f"{QFIELD_GEOMETRY_EXPRESSION} != '' and ${{route_endpoint}} = ''"
+    )
+
+
+async def test_qfield_form_keeps_repeated_geometry_questions():
+    """Repeats become child layers in QField, each with its own geometry."""
+    survey = await _qfield_survey(
+        _user_form(
+            ["begin repeat", "taps", "Taps", "", ""],
+            ["geopoint", "tap_location", "Tap", "", ""],
+            ["end repeat", "taps", "", "", ""],
+        )
+    )
+
+    assert geometry_questions_in(survey) == ["feature", "tap_location"]
+
+
+async def test_qfield_form_drops_group_emptied_by_merge():
+    """A group holding only a merged geometry question goes with it."""
+    survey = await _qfield_survey(
+        _user_form(
+            ["begin group", "location", "Location", "", ""],
+            ["geopoint", "spot", "Where?", "", ""],
+            ["end group", "", "", "", ""],
+            TAP_QUESTION,
+        )
+    )
+
+    assert "location" not in set(survey["name"])
+    assert "tap_name" in set(survey["name"])
 
 
 def test_processed_form_options_from_older_form():

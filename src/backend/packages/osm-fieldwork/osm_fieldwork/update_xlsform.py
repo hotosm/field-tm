@@ -37,6 +37,7 @@ from python_calamine.pandas import pandas_monkeypatch
 from osm_fieldwork.enums import DbGeomType, NewPointCapture
 from osm_fieldwork.form_components.choice_fields import get_choice_fields
 from osm_fieldwork.form_components.mandatory_fields import (
+    NEW_FEATURE,
     meta_df,
     create_survey_df,
     get_photo_fields,
@@ -60,10 +61,28 @@ NAME_COLUMN = "name"
 TYPE_COLUMN = "type"
 # Standalone geometry question in templates, replaced by the injected geometry
 TEMPLATE_GEOMETRY_NAME = "new_feature"
+# Settings a user's geometry question passes on when merged into new_feature
+MERGED_GEOMETRY_COLUMNS = ("label", "hint", "constraint", "parameters")
+# XLSForm question types asking for geometry, including pyxform aliases.
+# Passive metadata such as start-geopoint asks the mapper nothing, so is left out.
+GEOMETRY_QUESTION_TYPES = {
+    "geopoint": "geopoint",
+    "gps": "geopoint",
+    "location": "geopoint",
+    "add location prompt": "geopoint",
+    "q geopoint": "geopoint",
+    "q location": "geopoint",
+    "geoshape": "geoshape",
+    "q geoshape": "geoshape",
+    "geotrace": "geotrace",
+    "q geotrace": "geotrace",
+}
 DEFAULT_LANGUAGE_NAME = "english"
 DEFAULT_LANGUAGE_TOKEN = (
     f"{DEFAULT_LANGUAGE_NAME}({INCLUDED_LANGUAGES[DEFAULT_LANGUAGE_NAME]})"
 )
+# QGIS expression for the geometry of the feature being edited in QField
+QFIELD_GEOMETRY_EXPRESSION = "geom_to_wkt(@current_geometry)"
 QFIELD_METADATA_NAMES_TO_REMOVE = {
     "start",
     "end",
@@ -280,6 +299,71 @@ def normalize_with_meta(row, meta_df):
     return row
 
 
+def _replace_in_cells(df: pd.DataFrame, pattern: str, replacement: str) -> pd.DataFrame:
+    """Regex replace within text cells, leaving empty cells as they are."""
+    def replace_cell(cell: object) -> object:
+        return re.sub(pattern, replacement, cell) if isinstance(cell, str) else cell
+
+    return df.apply(lambda column: column.map(replace_cell))
+
+
+def _outside_repeats(question_types: pd.Series) -> pd.Series:
+    """Which rows are outside any repeat, where one row is one answer per submission."""
+    depth = (
+        question_types.isin(["begin repeat", "begin_repeat"]).cumsum()
+        - question_types.isin(["end repeat", "end_repeat"]).cumsum()
+    )
+    return depth == 0
+
+
+def _merge_user_geometry_question(
+        mandatory_df: pd.DataFrame,
+        user_question_df: pd.DataFrame,
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Fold the user's own geometry question into the injected new_feature question.
+
+    The new_feature name stays because Field-TM calculations depend on it, so the
+    injected question takes the user's wording, constraint and parameters, and
+    references to the user's question are repointed. Required and relevant stay ours,
+    as the new feature workflow depends on them. Only the first match merges: further
+    questions, other geometry types and repeated questions collect separate data.
+    """
+    injected = mandatory_df[NAME_COLUMN] == TEMPLATE_GEOMETRY_NAME
+    # QField forms have no injected question, and a template question is dropped by name
+    if not injected.any() or TEMPLATE_GEOMETRY_NAME in set(user_question_df[NAME_COLUMN]):
+        return mandatory_df, user_question_df
+
+    types = user_question_df[TYPE_COLUMN]
+    injected_geometry = mandatory_df.loc[injected, TYPE_COLUMN].iloc[0]
+    duplicates = user_question_df[(types.map(GEOMETRY_QUESTION_TYPES) == injected_geometry) & _outside_repeats(types)]
+    if duplicates.empty:
+        return mandatory_df, user_question_df
+
+    duplicate_name = duplicates.iloc[0][NAME_COLUMN]
+    log.info(f"Merging question '{duplicate_name}' into {TEMPLATE_GEOMETRY_NAME}")
+    reference = re.escape(f"${{{duplicate_name}}}")
+    repointed_df = _replace_in_cells(user_question_df, reference, NEW_FEATURE)
+    duplicate = repointed_df.loc[duplicates.index[0]]
+
+    merged_mandatory_df = mandatory_df.copy()
+    for column in user_question_df.columns:
+        if column.startswith(MERGED_GEOMETRY_COLUMNS) and pd.notna(duplicate[column]):
+            merged_mandatory_df.loc[injected, column] = duplicate[column]
+
+    return merged_mandatory_df, repointed_df.drop(index=duplicates.index[0])
+
+
+def _drop_empty_groups(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove groups with no questions left in them, which pyxform cannot convert."""
+    while True:
+        begins = df[TYPE_COLUMN].isin(["begin group", "begin_group"])
+        ends = df[TYPE_COLUMN].isin(["end group", "end_group"])
+        empty_begins = begins & ends.shift(-1, fill_value=False)
+        if not empty_begins.any():
+            return df
+        df = df[~(empty_begins | empty_begins.shift(1, fill_value=False))]
+
+
 def merge_dataframes(
         mandatory_df: pd.DataFrame, 
         user_question_df: pd.DataFrame, 
@@ -319,6 +403,8 @@ def merge_dataframes(
             axis=1
         )
     
+    mandatory_df, user_question_df = _merge_user_geometry_question(mandatory_df, user_question_df)
+
     # NOTE filter out 'end group' from duplicate check as they have empty NAME_COLUMN
     is_end_group = user_question_df["type"].isin(["end group", "end_group"])
     
@@ -372,7 +458,7 @@ def merge_dataframes(
     if photo_collection_df is not None:
         frames.append(photo_collection_df)
     
-    return pd.concat(frames, ignore_index=True)
+    return _drop_empty_groups(pd.concat(frames, ignore_index=True))
 
 
 def append_select_one_from_file_row(df: pd.DataFrame, entity_name: str) -> pd.DataFrame:
@@ -636,6 +722,7 @@ async def modify_form_for_qfield(
         qf_survey_df = qf_survey_df[qf_survey_df["save_to"].isna()].reset_index(drop=True)
 
     qf_survey_df = _drop_group_from_survey(qf_survey_df, "verification")
+    qf_survey_df = _merge_extra_geometry_questions(qf_survey_df)
 
     names_to_remove = {
         "feature_exists",
@@ -677,6 +764,32 @@ async def modify_form_for_qfield(
     custom_sheets["survey"] = qf_survey_df
 
     return (form_language, await write_xlsform(custom_sheets))
+
+
+def _merge_extra_geometry_questions(df: pd.DataFrame) -> pd.DataFrame:
+    """Reduce a QField form to the one geometry question its layer can use.
+
+    xlsform2qgis takes the layer geometry from the first question and gives the others
+    no field, so anything referencing them would always be empty. Repeats are kept,
+    as they become child layers with their own geometry.
+    """
+    is_extra = (
+        df[TYPE_COLUMN].isin(GEOMETRY_QUESTION_TYPES)
+        & _outside_repeats(df[TYPE_COLUMN])
+        & (df[NAME_COLUMN] != FEATURE_COLUMN)
+    )
+    if not is_extra.any():
+        return df
+
+    log.info(f"Merging into the QField geometry: {df.loc[is_extra, NAME_COLUMN].tolist()}")
+    names = "|".join(re.escape(name) for name in df.loc[is_extra, NAME_COLUMN])
+    # Label text is shown as written, so an expression only works in expression columns
+    expression_columns = [col for col in df.columns if not col.startswith(("label", "hint"))]
+    remaining_df = df[~is_extra].copy()
+    remaining_df[expression_columns] = _replace_in_cells(
+        remaining_df[expression_columns], rf"\$\{{({names})\}}", QFIELD_GEOMETRY_EXPRESSION
+    )
+    return _drop_empty_groups(remaining_df).reset_index(drop=True)
 
 
 def _find_matching_end_group(df: pd.DataFrame, begin_idx: int) -> Optional[int]:
