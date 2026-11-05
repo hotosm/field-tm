@@ -4,6 +4,7 @@ import json
 from types import SimpleNamespace
 from unittest.mock import Mock
 
+import pytest
 from litestar import Router
 from litestar import status_codes as status
 
@@ -13,6 +14,7 @@ from app.htmx.setup_steps import (
     setup_step_extract_handlers,
     setup_step_extract_routes,
     setup_step_finalize_routes,
+    setup_step_validate_routes,
 )
 from app.htmx.setup_steps.setup_step_extract_routes import (
     accept_data_extract_htmx,
@@ -515,3 +517,32 @@ def test_build_finalize_error_html_uses_generic_text_for_json_payload():
     assert response_template.template_name.endswith("finalize_error.html")
     assert "Project finalisation failed." in response_template.context["user_message"]
     assert '"detail"' in response_template.context["technical_details"]
+
+
+@pytest.mark.parametrize(
+    ("area_km2", "expected"),
+    [
+        (50, None),
+        (500, "may take longer"),
+        (5000, "only for very sparse data collection"),
+        (60000, "exceeds the 50000 km² limit"),
+    ],
+)
+async def test_area_warning_tiers(monkeypatch, area_km2, expected):
+    """Large areas get a strong warning; only areas over the hard limit are refused."""
+
+    async def fake_area(_db, _geometry):
+        return area_km2
+
+    monkeypatch.setattr(setup_step_validate_routes, "geojson_area_km2", fake_area)
+    polygon = {"type": "Polygon", "coordinates": [[[0, 0], [1, 0], [1, 1], [0, 0]]]}
+    feature = {"type": "Feature", "geometry": polygon, "properties": {}}
+
+    body = await setup_step_validate_routes._normalize_geojson_response_body(
+        None, feature
+    )
+
+    if expected is None:
+        assert body["warning"] is None
+    else:
+        assert expected in body["warning"]

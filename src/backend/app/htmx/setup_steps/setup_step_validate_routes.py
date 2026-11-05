@@ -22,6 +22,7 @@ from app.config import settings
 from app.db.database import db_conn
 from app.errors import ServiceError
 from app.helpers.geometry_utils import (
+    AREA_LARGE_KM2,
     AREA_LIMIT_KM2,
     AREA_WARN_KM2,
     geojson_area_km2,
@@ -31,6 +32,7 @@ from app.i18n import _
 from ..setup_steps.setup_step_responses import json_error_response
 
 log = logging.getLogger(__name__)
+
 
 TM_AOI_REQUEST_TIMEOUT_SECONDS = 30
 
@@ -116,6 +118,13 @@ async def _normalize_geojson_response_body(
             "Area is %(area_km2)s km², which exceeds the %(area_limit)s km² limit. "
             "Please reduce your project area."
         ) % {"area_km2": area_km2, "area_limit": AREA_LIMIT_KM2}
+    elif area_km2 > AREA_LARGE_KM2:
+        warning = _(
+            "Area is %(area_km2)s km², over %(area_large)s km². Projects this large "
+            "will likely fail to download OSM data, generate basemaps or split into "
+            "tasks. Use them only for very sparse data collection, with your own "
+            "uploaded data extract."
+        ) % {"area_km2": area_km2, "area_large": AREA_LARGE_KM2}
     elif area_km2 > AREA_WARN_KM2:
         warning = _(
             "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "

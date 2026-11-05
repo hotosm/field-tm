@@ -41,9 +41,11 @@ MIN_POLYGON_POINTS = 4
 MIN_CENTROID_POINTS = 3
 POLYGON_AREA_EPSILON = 1e-10
 
-# Project area limits (km²)
+# Project area limits (km²). Above AREA_LARGE_KM2, OSM extracts, basemaps and
+# task splitting usually fail, so only sparse surveys with an uploaded extract work.
 AREA_WARN_KM2 = 100
-AREA_LIMIT_KM2 = 1000
+AREA_LARGE_KM2 = 1000
+AREA_LIMIT_KM2 = 50000
 
 
 _COORD_NESTING = {
