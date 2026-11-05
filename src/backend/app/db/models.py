@@ -597,7 +597,9 @@ class DbProject:
             columns.append(key)
             if key == "outline":
                 value_placeholders.append(
-                    sql.SQL("ST_GeomFromGeoJSON({})").format(sql.Placeholder(key))
+                    sql.SQL("ST_UnaryUnion(ST_GeomFromGeoJSON({}))").format(
+                        sql.Placeholder(key)
+                    )
                 )
                 # Must be string json for db input
                 model_dump[key] = json.dumps(model_dump[key])

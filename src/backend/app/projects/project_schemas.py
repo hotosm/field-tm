@@ -45,7 +45,6 @@ from app.db.enums import (
     ProjectStatus,
 )
 from app.db.models import slugify
-from app.helpers.geometry_utils import merge_featcol_polygons_sync
 
 
 class StubProjectIn(BaseModel):
@@ -58,7 +57,6 @@ class StubProjectIn(BaseModel):
     project_name: str = Field(validation_alias=AliasChoices("project_name", "name"))
     field_mapping_app: FieldMappingApp
     description: Optional[str] = None
-    merge: bool = True
     outline: MultiPolygon | Polygon = None
     status: Optional[ProjectStatus] = None
     hashtags: Optional[list[str]] = []
@@ -123,25 +121,13 @@ class StubProjectIn(BaseModel):
                 ],
             )
 
-        merge = info.data.get("merge", True)
         input_geojson = value.model_dump() if hasattr(value, "model_dump") else value
-        merged_geojson = parse_aoi(
-            settings.FTM_DB_URL,
-            input_geojson,
-            merge=merge,
-        )
+        features = parse_aoi(settings.FTM_DB_URL, input_geojson)["features"]
 
-        if merge:
-            merged_geojson = merge_featcol_polygons_sync(
-                settings.FTM_DB_URL, merged_geojson
-            )
-            return merged_geojson.get("features")[0].get("geometry")
-        else:
-            geometries = [
-                feature.get("geometry").get("coordinates")
-                for feature in merged_geojson.get("features", [])
-            ]
-            return {"type": "MultiPolygon", "coordinates": geometries}
+        if len(features) == 1:
+            return features[0]["geometry"]
+        geometries = [feature["geometry"]["coordinates"] for feature in features]
+        return {"type": "MultiPolygon", "coordinates": geometries}
 
     @model_validator(mode="after")
     def append_ftm_hashtag_and_slug(self) -> Self:

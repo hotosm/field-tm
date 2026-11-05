@@ -244,7 +244,7 @@ def _parse_polygon_extract_geojson(geojson_data: dict) -> dict:
     """Run polygon-only PostGIS normalization for polygon extracts."""
     try:
         return parse_aoi(settings.FTM_DB_URL, geojson_data)
-    except TypeError as exc:
+    except ValueError as exc:
         raise ValidationError(
             "No valid geometries found in OSM for the selected extract "
             "settings. Please continue with the Collect New Data Only option."

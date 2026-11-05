@@ -41,6 +41,7 @@
 
   let map;
   let drawnLayers;
+  let uploadedGeojson = null;
   let drawControl;
   let activeDrawHandler = null;
   let undoControl = null;
@@ -114,6 +115,7 @@
   }
 
   async function validateAndShowAreaInfo() {
+    uploadedGeojson = null;
     const outlineTextarea = document.getElementById("outline-geojson");
     if (!outlineTextarea) return;
 
@@ -365,6 +367,43 @@
     document.getElementById("geojson-file-input")?.click();
   });
 
+  async function validateUploadedGeojson() {
+    const response = await fetch("/validate-geojson", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        geojson: uploadedGeojson,
+        merge_geometries: Boolean(document.getElementById("merge-geometries-checkbox")?.checked),
+      }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      setMapError(result.error || MAP_I18N.failedToValidateGeoJSON);
+      return;
+    }
+
+    if (!result.geojson) {
+      throw new Error(MAP_I18N.noGeoJSONReturned);
+    }
+
+    loadGeoJSONOnMap(result.geojson);
+    showAreaInfo(result.area_km2, result.warning);
+  }
+
+  // Revalidate from the original upload, as a merge can't be undone from the map.
+  document.getElementById("merge-geometries-checkbox")?.addEventListener("change", function () {
+    if (!uploadedGeojson) return;
+    setMapError("");
+    validateUploadedGeojson().catch((error) => {
+      console.error("Error processing GeoJSON:", error);
+      setMapError(error.message || MAP_I18N.invalidGeoJSONFile);
+    });
+  });
+
   document.getElementById("geojson-file-input")?.addEventListener("change", function (e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -375,36 +414,12 @@
         const geojsonData = JSON.parse(e.target.result);
         setMapError("");
 
-        // A task plan's project area is the union of its tasks.
+        // A task plan's project area is the union of its tasks, formed on save.
         const isTaskPlan = geojsonData.features?.some((f) => Number.isInteger(f?.properties?.task_id));
-        const mergeGeometriesCheckbox = document.getElementById("merge-geometries-checkbox");
-        const mergeGeometries = isTaskPlan || Boolean(mergeGeometriesCheckbox?.checked);
         renderCallout(document.getElementById("task-plan-info"), "brand", isTaskPlan ? MAP_I18N.taskPlanUploaded : "");
 
-        const response = await fetch("/validate-geojson", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            geojson: geojsonData,
-            merge_geometries: mergeGeometries,
-          }),
-        });
-
-        const result = await response.json();
-
-        if (!response.ok) {
-          setMapError(result.error || MAP_I18N.failedToValidateGeoJSON);
-          return;
-        }
-
-        if (result.geojson) {
-          loadGeoJSONOnMap(result.geojson);
-          showAreaInfo(result.area_km2, result.warning);
-        } else {
-          throw new Error(MAP_I18N.noGeoJSONReturned);
-        }
+        uploadedGeojson = geojsonData;
+        await validateUploadedGeojson();
       } catch (error) {
         console.error("Error processing GeoJSON:", error);
         setMapError(error.message || MAP_I18N.invalidGeoJSONFile);
@@ -450,6 +465,7 @@
         return;
       }
 
+      uploadedGeojson = null;
       loadGeoJSONOnMap(result.geojson);
       showAreaInfo(result.area_km2, result.warning);
     } catch (error) {
@@ -476,6 +492,7 @@
 
   document.getElementById("clear-map-btn")?.addEventListener("click", function () {
     if (drawnLayers) {
+      uploadedGeojson = null;
       drawnLayers.clearLayers();
       updateGeoJSON();
       showAreaInfo(null);

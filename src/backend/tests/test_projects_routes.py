@@ -32,13 +32,19 @@ import pytest
 from app.central.central_crud import create_odk_project
 from app.central.central_schemas import ODKCentral
 from app.db.enums import FieldMappingApp, ProjectStatus
-from app.errors import UpstreamError
-from app.helpers.geometry_utils import check_crs, featcol_polygons_to_centroids
+from app.errors import UpstreamError, ValidationError
+from app.helpers.geometry_utils import (
+    check_crs,
+    featcol_polygons_to_centroids,
+    polygon_to_centroid,
+)
+from app.htmx.setup_steps import setup_step_validate_routes
 from app.projects import (
     data_extract_services,
     odk_services,
     project_crud,
     project_deps,
+    project_schemas,
     project_services,
 )
 from app.projects.project_schemas import ProjectUpdate
@@ -293,7 +299,7 @@ async def test_download_osm_data_maps_invalid_geometry_parse_to_validation_error
         return downloaded_geojson
 
     def fake_parse_aoi(*_args, **_kwargs):
-        raise TypeError("'NoneType' object is not iterable")
+        raise ValueError("No Polygon geometries found in the AOI.")
 
     monkeypatch.setattr(
         project_deps,
@@ -1021,3 +1027,93 @@ async def test_download_extract_geojson(monkeypatch):
     assert await data_extract_services._download_extract_geojson(url) == featcol
     with pytest.raises(project_services.ServiceError):
         await data_extract_services._download_extract_geojson(url)
+
+
+def _square(offset: float = 0) -> list:
+    corners = [(0, 0), (1, 0), (1, 1), (0, 1), (0, 0)]
+    return [[[x + offset, y + offset] for x, y in corners]]
+
+
+def _featcol(*polygons: list) -> dict:
+    return {
+        "type": "FeatureCollection",
+        "features": [
+            {
+                "type": "Feature",
+                "properties": {},
+                "geometry": {"type": "Polygon", "coordinates": polygon},
+            }
+            for polygon in polygons
+        ],
+    }
+
+
+def _stub_project(outline: dict) -> project_schemas.StubProjectIn:
+    return project_schemas.StubProjectIn(
+        project_name="Disjoint",
+        field_mapping_app=FieldMappingApp.QFIELD,
+        outline=outline,
+    )
+
+
+def test_stub_project_keeps_disjoint_areas(monkeypatch):
+    """Areas are not merged on save, as that is chosen when validating the upload."""
+    outline = _featcol(_square(), _square(5))
+    parse_aoi = Mock(return_value=outline)
+    monkeypatch.setattr(project_schemas, "parse_aoi", parse_aoi)
+
+    project = _stub_project(outline)
+
+    assert project.outline.type == "MultiPolygon"
+    assert len(project.outline.coordinates) == 2
+    assert "merge" not in parse_aoi.call_args.kwargs
+
+
+def test_stub_project_single_area_stays_polygon(monkeypatch):
+    """One area is stored as a Polygon."""
+    outline = _featcol(_square())
+    monkeypatch.setattr(project_schemas, "parse_aoi", Mock(return_value=outline))
+
+    assert _stub_project(outline).outline.type == "Polygon"
+
+
+def test_simple_outline_raises_friendly_error(monkeypatch):
+    """Parser errors reach the user as a validation message."""
+
+    def fake_parse_aoi(*_args, **_kwargs):
+        raise ValueError("No Polygon geometries found in the AOI.")
+
+    monkeypatch.setattr(project_services, "parse_aoi", fake_parse_aoi)
+
+    with pytest.raises(ValidationError, match="No Polygon geometries"):
+        project_services._build_simple_outline_payload({"type": "Point"})
+
+
+@pytest.mark.asyncio
+async def test_centroid_of_multipolygon_uses_first_polygon():
+    """Project location lookup works for split project areas."""
+    centroid = await polygon_to_centroid(
+        {"type": "MultiPolygon", "coordinates": [_square(), _square(5)]}
+    )
+
+    assert (centroid.x, centroid.y) == pytest.approx((0.5, 0.5))
+
+
+@pytest.mark.asyncio
+async def test_area_of_split_upload_covers_every_area(monkeypatch):
+    """Split uploads must not skip the area limit checks by measuring zero."""
+    area_geometry = Mock()
+
+    async def fake_area(_db, geometry):
+        area_geometry(geometry)
+        return 1.0
+
+    monkeypatch.setattr(setup_step_validate_routes, "geojson_area_km2", fake_area)
+
+    await setup_step_validate_routes._normalize_geojson_response_body(
+        None, _featcol(_square(), _square(5))
+    )
+
+    geometry = area_geometry.call_args.args[0]
+    assert geometry["type"] == "MultiPolygon"
+    assert len(geometry["coordinates"]) == 2

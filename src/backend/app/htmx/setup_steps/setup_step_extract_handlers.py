@@ -1,5 +1,6 @@
 """Handlers for setup-step data extract HTMX workflow."""
 
+import json
 import logging
 
 from geojson_aoi import parse_aoi
@@ -120,19 +121,15 @@ async def handle_upload_geojson(
                 file_content,
                 merge=False,
             )
-        except ValueError as e:
+        except (json.JSONDecodeError, UnicodeDecodeError, OSError):
             return Response(
-                content=callout("danger", str(e)),
+                content=callout("danger", _("The file could not be read as GeoJSON.")),
                 media_type="text/html",
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )
-
-        if not featcol.get("features", []):
+        except ValueError as e:
             return Response(
-                content=callout(
-                    "danger",
-                    _("No valid geometries found in GeoJSON."),
-                ),
+                content=callout("danger", str(e)),
                 media_type="text/html",
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             )

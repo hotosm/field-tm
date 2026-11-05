@@ -22,7 +22,7 @@ import logging
 import types
 from typing import Optional
 
-from psycopg import AsyncConnection, Connection
+from psycopg import AsyncConnection
 
 from app.errors import (
     UnprocessableError,
@@ -125,49 +125,29 @@ async def geojson_area_km2(db: AsyncConnection, geojson_geom: dict) -> float:
     return float(row[0]) if row and row[0] is not None else 0.0
 
 
-def merge_featcol_polygons_sync(db_url: str, featcol: dict) -> dict:
-    """Union polygon features into one feature.
-
-    Workaround for geojson_aoi_parser<=0.3.5 ignoring merge=True; remove
-    once upstream implements merging in geojson_aoi/_sync/postgis.py.
-    """
-    features = featcol.get("features", [])
-    if len(features) <= 1:
-        return featcol
-    geoms = [feat["geometry"] for feat in features if feat.get("geometry")]
-    if len(geoms) <= 1:
-        return featcol
-
-    with Connection.connect(db_url) as conn, conn.cursor() as cur:
-        cur.execute(
-            "SELECT ST_AsGeoJSON(ST_Union(ST_GeomFromGeoJSON(value::text)))::json "
-            "FROM jsonb_array_elements(%s::jsonb)",
-            (json.dumps(geoms),),
-        )
-        row = cur.fetchone()
-
-    merged_geom = row[0] if row else None
-    if not merged_geom:
-        return featcol
-
-    return {
-        "type": "FeatureCollection",
-        "features": [{"type": "Feature", "geometry": merged_geom, "properties": None}],
-    }
+def _vertex_mean(coords: list) -> types.SimpleNamespace:
+    """The mean of the vertices, for shapes too small or thin to have an area."""
+    n = len(coords)
+    if not n:
+        return types.SimpleNamespace(x=0.0, y=0.0)
+    return types.SimpleNamespace(
+        x=sum(c[0] for c in coords) / n, y=sum(c[1] for c in coords) / n
+    )
 
 
 async def polygon_to_centroid(
     polygon: dict,
 ) -> types.SimpleNamespace:
-    """Compute the centroid of a GeoJSON Polygon using the shoelace formula."""
+    """Compute the centroid of a GeoJSON Polygon using the shoelace formula.
+
+    For a MultiPolygon, this is the centroid of its first Polygon.
+    """
+    if polygon.get("type") == "MultiPolygon":
+        polygon = {"type": "Polygon", "coordinates": polygon["coordinates"][0]}
     coords = polygon.get("coordinates", [[]])[0]
     n = len(coords)
     if n < MIN_CENTROID_POINTS:
-        lons = [c[0] for c in coords]
-        lats = [c[1] for c in coords]
-        cx = sum(lons) / n if n else 0.0
-        cy = sum(lats) / n if n else 0.0
-        return types.SimpleNamespace(x=cx, y=cy)
+        return _vertex_mean(coords)
     area = 0.0
     cx = 0.0
     cy = 0.0
@@ -180,9 +160,7 @@ async def polygon_to_centroid(
         cy += (yi + yi1) * cross
     area /= 2.0
     if abs(area) < POLYGON_AREA_EPSILON:
-        lons = [c[0] for c in coords]
-        lats = [c[1] for c in coords]
-        return types.SimpleNamespace(x=sum(lons) / n, y=sum(lats) / n)
+        return _vertex_mean(coords)
     cx /= 6.0 * area
     cy /= 6.0 * area
     return types.SimpleNamespace(x=cx, y=cy)
@@ -193,9 +171,7 @@ async def featcol_polygons_to_centroids(featcol: dict) -> dict:
     features = []
     for feature in featcol.get("features", []):
         geom = feature.get("geometry") or {}
-        if geom.get("type") == "MultiPolygon" and geom.get("coordinates"):
-            geom = {"type": "Polygon", "coordinates": geom["coordinates"][0]}
-        if geom.get("type") == "Polygon":
+        if geom.get("type") in ("Polygon", "MultiPolygon") and geom.get("coordinates"):
             point = await polygon_to_centroid(geom)
             feature = {
                 **feature,

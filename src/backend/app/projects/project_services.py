@@ -50,7 +50,6 @@ from app.helpers.geometry_utils import (
     AREA_LIMIT_KM2,
     check_crs,
     geojson_area_km2,
-    merge_featcol_polygons_sync,
     polygon_to_centroid,
     stamp_missing_task_ids,
 )
@@ -243,11 +242,8 @@ def _build_stub_project_data(
         description=description.strip(),
         outline=outline,
         hashtags=hashtags,
-        merge=True,
     )
 
-    if hasattr(project_data, "merge"):
-        delattr(project_data, "merge")
     project_data.status = ProjectStatus.DRAFT
     return project_data
 
@@ -315,19 +311,11 @@ def _derive_simple_project_metadata(
 
 def _build_simple_outline_payload(outline: dict) -> dict:
     """Normalize simplified-flow outlines to GeoJSON geometry for storage."""
-    featcol = parse_aoi(settings.FTM_DB_URL, outline, merge=True)
-    featcol = merge_featcol_polygons_sync(settings.FTM_DB_URL, featcol)
-    features = featcol.get("features", [])
-    if not features:
-        raise ValidationError(
-            "You must draw or upload an Area of Interest (AOI) on the map."
-        )
-    geometry = features[0].get("geometry")
-    if not geometry:
-        raise ValidationError(
-            "You must draw or upload an Area of Interest (AOI) on the map."
-        )
-    return geometry
+    try:
+        featcol = parse_aoi(settings.FTM_DB_URL, outline)
+    except ValueError as e:
+        raise ValidationError(str(e)) from e
+    return featcol["features"][0]["geometry"]
 
 
 async def derive_simple_project_metadata(

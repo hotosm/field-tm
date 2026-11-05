@@ -6,6 +6,7 @@ import json
 import logging
 
 import httpx
+import psycopg
 from geojson_aoi import parse_aoi
 from litestar import get, post
 from litestar import status_codes as status
@@ -24,7 +25,6 @@ from app.helpers.geometry_utils import (
     AREA_LIMIT_KM2,
     AREA_WARN_KM2,
     geojson_area_km2,
-    merge_featcol_polygons_sync,
 )
 from app.i18n import _
 
@@ -83,12 +83,9 @@ def _parse_tasking_manager_aoi_response(tm_response: httpx.Response) -> dict | R
         merged_featcol = parse_aoi(settings.FTM_DB_URL, tm_geojson, merge=False)
     except ValueError as exc:
         return json_error_response(str(exc), 422)
-
-    if not merged_featcol.get("features", []):
-        return json_error_response(
-            _("Tasking Manager project AOI did not contain any polygon geometries."),
-            422,
-        )
+    except psycopg.Error:
+        log.warning("PostGIS rejected Tasking Manager AOI", exc_info=True)
+        return _invalid_geometry_response()
 
     return (
         merged_featcol["features"][0]
@@ -97,14 +94,20 @@ def _parse_tasking_manager_aoi_response(tm_response: httpx.Response) -> dict | R
     )
 
 
+def _invalid_geometry_response() -> Response:
+    return json_error_response(
+        _("The project area contains invalid geometry. Please fix it and retry."), 422
+    )
+
+
 async def _normalize_geojson_response_body(
     db: AsyncConnection, result_geojson: dict
 ) -> dict:
-    geometry = (
-        result_geojson.get("geometry")
-        if result_geojson.get("type") == "Feature"
-        else result_geojson
-    )
+    features = result_geojson.get("features", [result_geojson])
+    geometry = {
+        "type": "MultiPolygon",
+        "coordinates": [feature["geometry"]["coordinates"] for feature in features],
+    }
     area_km2 = round(await geojson_area_km2(db, geometry), 2)
 
     warning = None
@@ -148,17 +151,6 @@ async def validate_geojson(
             merge=bool(merge_geometries),
         )
 
-        if not merged_featcol.get("features", []):
-            return json_error_response(
-                _("No polygon geometries found. Project area must be a polygon."),
-                422,
-            )
-
-        if merge_geometries:
-            merged_featcol = merge_featcol_polygons_sync(
-                settings.FTM_DB_URL, merged_featcol
-            )
-
         result_geojson = (
             merged_featcol["features"][0]
             if len(merged_featcol.get("features", [])) == 1
@@ -177,6 +169,9 @@ async def validate_geojson(
         return json_error_response(e.message, e.status_code)
     except ValueError as e:
         return json_error_response(str(e), 422)
+    except psycopg.Error:
+        log.warning("PostGIS rejected uploaded AOI", exc_info=True)
+        return _invalid_geometry_response()
     except Exception as e:
         log.error(f"Error validating GeoJSON: {e}", exc_info=True)
         error_msg = str(e)

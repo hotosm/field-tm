@@ -39,7 +39,7 @@ dependencies = [
     "httpx==0.28.1",
     "pg-nearest-city==2.0.0",
     "raw-data-api-py==0.3.0",
-    "geojson-aoi-parser==0.3.5",
+    "geojson-aoi-parser==1.0.0",
     "hotosm-auth[litestar] @ git+https://github.com/hotosm/login.git@a2a1ce2a395c#subdirectory=auth-libs/python",
     "osm-fieldwork",
     "area-splitter",
