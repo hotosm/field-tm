@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-10-20 23:29+0100\n"
+"POT-Creation-Date: 2026-11-05 16:09+0000\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: th\n"
@@ -18,15 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:157
+#: app/main.py:159
 msgid "Validation failed"
 msgstr "ล้มเหลว"
 
-#: app/main.py:181
+#: app/main.py:183
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิด โปรดติดต่อผู้ดูแลระบบ"
 
-#: app/main.py:326
+#: app/main.py:329
 msgid "Could not connect to database"
 msgstr "ไม่สามารถเชื่อมต่อกับฐานข้อมูลได้"
 
@@ -47,22 +47,27 @@ msgstr "คุณต้องเข้าสู่ระบบเพื่อด
 msgid "User (%(user_sub)s) could not be inserted in db"
 msgstr "(%(user_sub)s) ใน db ได้"
 
-#: app/central/central_crud.py:165
+#: app/central/central_crud.py:166
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
 msgstr "เกิดข้อผิดพลาดขณะสร้างโครงการใน ODK Central: %(error)s"
 
-#: app/central/central_crud.py:219
+#: app/central/central_crud.py:218
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
 msgstr "ไม่สามารถอัปโหลดแบบฟอร์มไปยัง ODK Central: %(error)s"
 
-#: app/central/central_crud.py:273
+#: app/central/central_crud.py:239
+#, python-format
+msgid "Failed to update form in ODK Central: %(error)s"
+msgstr ""
+
+#: app/central/central_crud.py:287
 #, python-format
 msgid "Could not read XLSForm file: %(error)s"
 msgstr "ไม่สามารถอ่านไฟล์ XLSForm: %(error)s"
 
-#: app/central/central_crud.py:299
+#: app/central/central_crud.py:312
 #, python-format
 msgid ""
 "XLSForm has select questions referencing lists that aren't defined in the"
@@ -71,53 +76,53 @@ msgstr ""
 "XLSForm ได้เลือกคำถามที่อ้างอิงถึงรายการที่ไม่ได้กำหนดไว้ในแผ่นตัวเลือก: "
 "%(rows)s ตรวจสอบแบบสำรวจและเอกสารตัวเลือกของคุณ"
 
-#: app/central/central_crud.py:318
+#: app/central/central_crud.py:331
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
 msgstr "XLSForm ไม่ถูกต้อง: %(error)s"
 
-#: app/central/central_crud.py:400
+#: app/central/central_crud.py:420
 msgid "'geometry' data field is mandatory"
 msgstr "จําเป็นต้องมีฟิลด์ข้อมูล 'geometry'"
 
-#: app/central/central_crud.py:715
+#: app/central/central_crud.py:734
 msgid "ODK project_id is missing; cannot create/merge entity lists."
 msgstr "ODK project_id หายไป ไม่สามารถสร้าง/รวมรายการเอนทิตีได้"
 
-#: app/central/central_crud.py:755
+#: app/central/central_crud.py:788
 msgid "Could not generate token for app user."
 msgstr "ไม่สามารถสร้างโทเค็นสำหรับผู้ใช้แอปได้"
 
-#: app/central/central_crud.py:787 app/central/central_crud.py:793
+#: app/central/central_crud.py:816 app/central/central_crud.py:821
 msgid "An error occurred while creating the app user token."
 msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิดขณะสร้างรหัส QR"
 
-#: app/central/central_crud.py:807
+#: app/central/central_crud.py:834
 #, python-format
 msgid "Could not assign %(scope)s role to app user."
 msgstr "ไม่สามารถกำหนดบทบาท %(scope)s ให้กับผู้ใช้แอปได้"
 
-#: app/central/central_crud.py:846
+#: app/central/central_crud.py:871
 msgid "Could not find 'Project Manager' role in ODK Central."
 msgstr "เปิดโครงการใน ODK Central"
 
-#: app/central/central_crud.py:871
+#: app/central/central_crud.py:893
 msgid "ODK Central returned no user ID after creation."
 msgstr "ODK Central ไม่ส่งคืน ID ผู้ใช้หลังจากการสร้าง"
 
-#: app/central/central_crud.py:996
+#: app/central/central_crud.py:1009
 msgid "Failed to create ODK Central manager user."
 msgstr "ไม่สามารถสร้างผู้ใช้ผู้จัดการ ODK Central"
 
-#: app/central/central_crud.py:1013
+#: app/central/central_crud.py:1024
 msgid "ODK credentials are invalid, or may have changed."
 msgstr "ข้อมูลรับรอง ODK ไม่ถูกต้อง หรืออาจมีการเปลี่ยนแปลง"
 
-#: app/central/central_crud.py:1019
+#: app/central/central_crud.py:1029
 msgid "Failed to connect to Central. Is the URL valid?"
 msgstr "เชื่อมต่อกับ Central ไม่ได้ URL ถูกต้องหรือไม่"
 
-#: app/central/central_crud.py:1025
+#: app/central/central_crud.py:1034
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิดขณะสร้างรหัส QR"
 
@@ -130,53 +135,89 @@ msgstr "โปรดระบุไฟล์ .xls หรือ .xlsx ที่�
 msgid "No data provided."
 msgstr "ไม่ได้ระบุข้อมูลที่ดึงออก"
 
+#: app/helpers/basemap_attach.py:91
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
+msgstr ""
+"การแนบแผนที่ฐานล้มเหลวในขณะนี้ โปรเจกต์ของคุณพร้อมใช้งานแล้ว "
+"โปรดลองแนบอีกครั้ง"
+
+#: app/helpers/basemap_attach.py:96
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+"ไม่สามารถแนบแผนที่ฐานให้เสร็จสมบูรณ์ได้เนื่องจากปัญหาเครือข่ายชั่วคราว "
+"โปรเจกต์ของคุณพร้อมใช้งานแล้ว โปรดลองแนบอีกครั้ง"
+
 #: app/helpers/basemap_services.py:26
 #, python-format
 msgid "%(action)s failed with HTTP %(status_code)s."
 msgstr "%(action)s ล้มเหลวด้วย HTTP %(status_code)s"
 
-#: app/helpers/basemap_services.py:40
+#: app/helpers/basemap_services.py:36
 #, python-format
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s ล้มเหลวเนื่องจากข้อผิดพลาดการเชื่อมต่ออัปสตรีม"
 
-#: app/helpers/basemap_services.py:181
+#: app/helpers/basemap_services.py:175
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack API ส่งคืน HTTP %(status_code)s"
+
+#: app/helpers/geometry_utils.py:82
+msgid "Project outline is missing or has no geometry."
+msgstr "ขาดหายไปหรือไม่มีรูปทรงเรขาคณิต"
+
+#: app/helpers/geometry_utils.py:85
+msgid "Project outline geometry has no coordinates."
+msgstr "เรขาคณิตโครงร่างของโครงการไม่มีพิกัด"
 
 #: app/helpers/helper_routes.py:55
 msgid "Failed to convert YAML form to XLSForm."
 msgstr "ไม่สามารถแปลงแบบฟอร์ม YAML เป็น XLSForm"
 
-#: app/htmx/project_detail_routes.py:164
+#: app/htmx/project_detail_routes.py:167 app/htmx/project_detail_routes.py:215
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "ไม่พบโครงการ (%(project_id)s)"
 
-#: app/htmx/project_detail_routes.py:171
+#: app/htmx/project_detail_routes.py:174
 msgid "Only the project manager can delete this project."
 msgstr "มีเพียงผู้จัดการโครงการเท่านั้นที่ลบโครงการนี้ได้"
 
-#: app/htmx/project_detail_routes.py:215 app/templates/project_details.html:204
+#: app/htmx/project_detail_routes.py:222
+msgid "Only the project creator can update the form."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:230
+msgid "Only published ODK projects can update their form."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:245
+msgid "Could not update the form. Please check the file and try again."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:250
+msgid "Survey form updated in ODK Central."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:279 app/templates/project_details.html:213
 msgid "Project not found."
 msgstr "ไม่พบโครงการ"
 
-#: app/htmx/project_detail_routes.py:251
-#: app/htmx/setup_steps/setup_step_responses.py:70
+#: app/htmx/project_detail_routes.py:314
+#: app/htmx/setup_steps/setup_step_responses.py:68
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "ข้อผิดพลาด: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:292
-msgid "GeoJSON export is only available for QField projects."
-msgstr "การส่งออก GeoJSON ใช้ได้กับโปรเจ็กต์ QField เท่านั้น"
+#: app/htmx/project_detail_routes.py:355
+msgid "This project is not yet linked to ODK Central or QFieldCloud."
+msgstr ""
 
-#: app/htmx/project_detail_routes.py:297
-msgid "This project is not yet linked to a QFieldCloud project."
-msgstr "โปรเจ็กต์นี้ยังไม่ได้เชื่อมโยงกับโปรเจ็กต์ QFieldCloud"
-
-#: app/htmx/project_detail_routes.py:308
+#: app/htmx/project_detail_routes.py:366
 #, python-format
 msgid "Failed to export GeoJSON: %(error)s"
 msgstr "ไม่สามารถส่งออก GeoJSON: %(error)s"
@@ -211,35 +252,19 @@ msgstr "อัปเดตงานใน %(app)s ไม่สำเร็จ �
 msgid "Tasks updated in %(app)s."
 msgstr "อัปเดตงานใน %(app)s แล้ว"
 
-#: app/htmx/basemap/basemap_attach_flow.py:69
-msgid ""
-"Basemap attach failed for now. Your project is ready to use. Please retry"
-" attach."
-msgstr ""
-"การแนบแผนที่ฐานล้มเหลวในขณะนี้ โปรเจกต์ของคุณพร้อมใช้งานแล้ว "
-"โปรดลองแนบอีกครั้ง"
-
-#: app/htmx/basemap/basemap_attach_flow.py:74
-msgid ""
-"Basemap attach could not complete due to a temporary network issue. Your "
-"project is ready to use. Please retry attach."
-msgstr ""
-"ไม่สามารถแนบแผนที่ฐานให้เสร็จสมบูรณ์ได้เนื่องจากปัญหาเครือข่ายชั่วคราว "
-"โปรเจกต์ของคุณพร้อมใช้งานแล้ว โปรดลองแนบอีกครั้ง"
-
-#: app/htmx/basemap/basemap_attach_flow.py:123
+#: app/htmx/basemap/basemap_attach_flow.py:33
 msgid "Basemap attach is available after publication."
 msgstr "การแนบแผนที่ฐานจะใช้งานได้หลังจากเผยแพร่แล้ว"
 
-#: app/htmx/basemap/basemap_attach_flow.py:132
+#: app/htmx/basemap/basemap_attach_flow.py:42
 msgid "Basemap attach is only available for QField projects."
 msgstr "การแนบแผนที่ฐานใช้ได้เฉพาะกับโครงการ QField เท่านั้น"
 
-#: app/htmx/basemap/basemap_attach_flow.py:142
+#: app/htmx/basemap/basemap_attach_flow.py:52
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "แผนที่ฐานยังไม่พร้อม โปรดรอให้การสร้างเสร็จสิ้น"
 
-#: app/htmx/basemap/basemap_attach_flow.py:157
+#: app/htmx/basemap/basemap_attach_flow.py:67
 msgid ""
 "Basemap download URL is not available yet. Please refresh status and try "
 "again shortly."
@@ -247,7 +272,7 @@ msgstr ""
 "URL ดาวน์โหลดแผนที่ฐานยังไม่พร้อมใช้งาน "
 "โปรดรีเฟรชสถานะแล้วลองอีกครั้งในอีกสักครู่"
 
-#: app/htmx/basemap/basemap_attach_flow.py:173
+#: app/htmx/basemap/basemap_attach_flow.py:83
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -255,7 +280,7 @@ msgid ""
 msgstr "ยังไม่ได้ตั้งค่าการแนบแผนที่ฐานของ QField ในการติดตั้งนี้ ขาด %(config)s"
 
 #: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:90
+#: app/htmx/setup_steps/setup_step_responses.py:88
 msgid "Project not found or access denied."
 msgstr "ไม่พบโครงการหรือถูกปฏิเสธการเข้าถึง"
 
@@ -295,21 +320,21 @@ msgstr ""
 "พื้นที่โครงการต้องเป็น JSON ที่ถูกต้อง (GeoJSON Polygon, MultiPolygon, "
 "Feature หรือ FeatureCollection)"
 
-#: app/htmx/project_create/project_create_simple_flow.py:86
+#: app/htmx/project_create/project_create_simple_flow.py:90
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
 msgstr "ไม่พบอาคาร OSM ที่มีอยู่ในพื้นที่นี้ ดำเนินการทำแผนที่ตั้งแต่ต้นต่อไป"
 
-#: app/htmx/project_create/project_create_simple_flow.py:184
+#: app/htmx/project_create/project_create_simple_flow.py:188
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 "ไม่สามารถโหลดแบบฟอร์ม OSM Buildings "
 "เริ่มต้นสำหรับการสร้างโครงการแบบง่ายได้"
 
-#: app/htmx/project_create/project_create_simple_flow.py:312
-#: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:214
+#: app/htmx/project_create/project_create_simple_flow.py:316
+#: app/htmx/project_create/project_create_submit_routes.py:138
+#: app/htmx/project_create/project_create_submit_routes.py:212
 msgid "An unexpected error occurred. Please try again."
 msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิด โปรดลองอีกครั้ง"
 
@@ -321,11 +346,11 @@ msgstr "โหลดแบบฟอร์มแม่แบบไม่สำเ
 msgid "Please select a form or upload a file."
 msgstr "โปรดเลือกแบบฟอร์มหรืออัปโหลดไฟล์"
 
-#: app/htmx/project_create/project_create_xlsform_routes.py:132
+#: app/htmx/project_create/project_create_xlsform_routes.py:128
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "ตรวจสอบและอัปโหลดแบบฟอร์มสำเร็จแล้ว กำลังโหลดหน้าใหม่..."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:46
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:43
 msgid ""
 "Tasks were planned with the old data. They are kept, but reopen the task "
 "planner to update feature counts."
@@ -333,12 +358,12 @@ msgstr ""
 "งานถูกวางแผนด้วยข้อมูลเดิม งานยังคงอยู่ "
 "แต่ให้เปิดตัววางแผนงานอีกครั้งเพื่ออัปเดตจำนวนฟีเจอร์"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:79
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:76
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "ดาวน์โหลดข้อมูล OSM สำเร็จ พบ %(feature_count)s ฟีเจอร์"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:82
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:79
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "downloading again with different parameters."
@@ -346,21 +371,21 @@ msgstr ""
 "หากถูกต้องแล้ว ให้คลิก \"ยอมรับข้อมูลที่ดึงออก\" "
 "มิฉะนั้นให้ลองดาวน์โหลดอีกครั้งด้วยพารามิเตอร์อื่น"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:115
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:112
 #: app/templates/partials/project_details/style_and_scripts.html:24
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "ชนิดไฟล์ไม่ถูกต้อง โปรดอัปโหลดไฟล์ .geojson หรือ .json"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:138
-msgid "No valid geometries found in GeoJSON."
-msgstr "ไม่พบรูปทรงเรขาคณิตที่ใช้ได้ใน GeoJSON"
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:126
+msgid "The file could not be read as GeoJSON."
+msgstr ""
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:152
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:145
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ อัปโหลด GeoJSON สำเร็จ พบ %(feature_count)s ฟีเจอร์"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:155
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:148
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "uploading a different file."
@@ -368,21 +393,21 @@ msgstr ""
 "หากถูกต้องแล้ว ให้คลิก \"ยอมรับข้อมูลที่ดึงออก\" "
 "มิฉะนั้นให้ลองอัปโหลดไฟล์อื่น"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:188
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:181
 msgid "✓ Collect-new-data mode selected. You can continue."
 msgstr "✓ เลือกโหมดเก็บข้อมูลใหม่แล้ว คุณดำเนินการต่อได้"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:222
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:215
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
 msgstr "ไม่พบข้อมูล GeoJSON โปรดดาวน์โหลดข้อมูล OSM หรืออัปโหลดไฟล์ GeoJSON ก่อน"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:241
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:234
 msgid "✓ Data extract successfully saved! You can now continue to the Tasks step."
 msgstr "✓ บันทึกข้อมูลที่ดึงออกเรียบร้อยแล้ว! ตอนนี้คุณไปต่อที่ขั้นตอนงานได้"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:288
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
 msgid ""
 "No data extract is staged. Please download OSM data or upload a GeoJSON "
 "file first."
@@ -390,7 +415,7 @@ msgstr ""
 "ยังไม่มีข้อมูลที่ดึงออกที่เตรียมไว้ โปรดดาวน์โหลดข้อมูล OSM "
 "หรืออัปโหลดไฟล์ GeoJSON ก่อน"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:303
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:296
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
@@ -399,7 +424,7 @@ msgstr ""
 "✓ ยอมรับข้อมูลที่ดึงแล้ว! บันทึกฟีเจอร์ %(feature_count)s รายการแล้ว "
 "ขั้นตอนที่ 3 เสร็จสมบูรณ์แล้ว"
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:343
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
 msgid "Data extract discarded. Choose a data source above to try again."
 msgstr "ยกเลิกข้อมูลที่ดึงออกแล้ว เลือกแหล่งข้อมูลด้านบนเพื่อลองอีกครั้ง"
 
@@ -411,11 +436,11 @@ msgstr "ข้อมูล GeoJSON ในคำขอไม่ถูกต้อ
 msgid "Error reading GeoJSON data from request."
 msgstr "เกิดข้อผิดพลาดในการอ่านข้อมูล GeoJSON จากคำขอ"
 
-#: app/htmx/setup_steps/setup_step_finalize_routes.py:104
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:92
 msgid "Project mapping app is not configured for finalisation."
 msgstr "ยังไม่ได้กำหนดค่าแอปทำแผนที่ของโปรเจกต์สำหรับการสรุปขั้นสุดท้าย"
 
-#: app/htmx/setup_steps/setup_step_finalize_routes.py:142
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:130
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
@@ -423,11 +448,11 @@ msgstr ""
 "ระบุ ODK URL ชื่อผู้ใช้ และรหัสผ่าน (ทั้ง 3 รายการ) "
 "หรือเว้นว่างทั้งหมดเพื่อใช้ค่าเริ่มต้นของเซิร์ฟเวอร์"
 
-#: app/htmx/setup_steps/setup_step_responses.py:85
+#: app/htmx/setup_steps/setup_step_responses.py:83
 msgid "An unexpected error occurred"
 msgstr "เกิดข้อผิดพลาดที่ไม่คาดคิด"
 
-#: app/htmx/setup_steps/setup_step_responses.py:160
+#: app/htmx/setup_steps/setup_step_responses.py:158
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -437,27 +462,27 @@ msgstr ""
 "หากยังเกิดปัญหา "
 "โปรดส่งรายละเอียดทางเทคนิคด้านล่างให้ผู้ดูแลระบบหรือทีมสนับสนุนของคุณ"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:61
+#: app/htmx/setup_steps/setup_step_validate_routes.py:58
 msgid "Could not reach Tasking Manager. Please try again later."
 msgstr "ติดต่อ Tasking Manager ไม่ได้ โปรดลองอีกครั้งในภายหลัง"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:66
+#: app/htmx/setup_steps/setup_step_validate_routes.py:63
 #, python-format
 msgid "Tasking Manager project %(id)s was not found."
 msgstr "ไม่พบโครงการ %(id)s ใน Tasking Manager"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:71
+#: app/htmx/setup_steps/setup_step_validate_routes.py:68
 #, python-format
 msgid "Tasking Manager returned an error (HTTP %(status)s)."
 msgstr "Tasking Manager ส่งข้อผิดพลาดกลับมา (HTTP %(status)s)"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:84
+#: app/htmx/setup_steps/setup_step_validate_routes.py:81
 msgid "Tasking Manager returned an invalid response."
 msgstr "Tasking Manager ส่งการตอบกลับที่ไม่ถูกต้อง"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:94
-msgid "Tasking Manager project AOI did not contain any polygon geometries."
-msgstr "พื้นที่สนใจของโครงการ Tasking Manager ไม่มีรูปเรขาคณิตแบบรูปหลายเหลี่ยม"
+#: app/htmx/setup_steps/setup_step_validate_routes.py:101
+msgid "The project area contains invalid geometry. Please fix it and retry."
+msgstr ""
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
@@ -471,111 +496,124 @@ msgstr ""
 #: app/htmx/setup_steps/setup_step_validate_routes.py:123
 #, python-format
 msgid ""
+"Area is %(area_km2)s km², over %(area_large)s km². Projects this large "
+"will likely fail to download OSM data, generate basemaps or split into "
+"tasks. Use them only for very sparse data collection, with your own "
+"uploaded data extract."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:130
+#, python-format
+msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
 "longer to process."
 msgstr ""
 "พื้นที่คือ %(area_km2)s km² พื้นที่ขนาดใหญ่ (>%(area_warn)s km²) "
 "อาจใช้เวลาประมวลผลนานขึ้น"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:148
+#: app/htmx/setup_steps/setup_step_validate_routes.py:155
 msgid "GeoJSON is required"
 msgstr "จำเป็นต้องมี GeoJSON"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:158
-msgid "No polygon geometries found. Project area must be a polygon."
-msgstr "ไม่พบรูปทรงแบบหลายเหลี่ยม พื้นที่โครงการต้องเป็นรูปหลายเหลี่ยม"
-
-#: app/htmx/setup_steps/setup_step_validate_routes.py:206
+#: app/htmx/setup_steps/setup_step_validate_routes.py:205
 msgid "Tasking Manager project ID must be a positive integer."
 msgstr "รหัสโครงการ Tasking Manager ต้องเป็นจำนวนเต็มบวก"
 
-#: app/projects/mapping_apps.py:48
+#: app/projects/data_extract_services.py:204
+msgid "Selected area is too large. Please select an area smaller than 200 km²."
+msgstr "พื้นที่ที่เลือกใหญ่เกินไป โปรดเลือกพื้นที่ที่เล็กกว่า 200 km²"
+
+#: app/projects/data_extract_services.py:211
+msgid "Failed to generate data extract from the raw data API."
+msgstr "ไม่สามารถสร้างการแยกข้อมูลจาก API ข้อมูลดิบ"
+
+#: app/projects/mapping_apps.py:53
 msgid "GIS mapping app for Android and iOS, with our simple task plugin."
 msgstr "แอปทำแผนที่ GIS สำหรับ Android และ iOS พร้อมปลั๊กอินงานแบบง่ายของเรา"
 
-#: app/projects/mapping_apps.py:49
+#: app/projects/mapping_apps.py:54
 msgid "Drawing and editing geometry, detailed surveys"
 msgstr "การวาดและแก้ไขรูปเรขาคณิต การสำรวจอย่างละเอียด"
 
-#: app/projects/mapping_apps.py:57
+#: app/projects/mapping_apps.py:62
 msgid "Form-based survey app for Android."
 msgstr "แอปสำรวจแบบฟอร์มสำหรับ Android"
 
-#: app/projects/mapping_apps.py:58
+#: app/projects/mapping_apps.py:63
 msgid "Form-heavy surveys, simple phones"
 msgstr "การสำรวจที่ใช้แบบฟอร์มมาก โทรศัพท์แบบพื้นฐาน"
 
-#: app/projects/mapping_apps.py:66
+#: app/projects/mapping_apps.py:71
 msgid "Fast OpenStreetMap editor for shops, amenities and entrances."
 msgstr ""
 "ตัวแก้ไข OpenStreetMap ที่รวดเร็วสำหรับร้านค้า สิ่งอำนวยความสะดวก "
 "และทางเข้า"
 
-#: app/projects/mapping_apps.py:67
+#: app/projects/mapping_apps.py:72
 msgid "Updating existing OSM buildings and points of interest"
 msgstr "การอัปเดตอาคารและจุดสนใจที่มีอยู่ใน OSM"
 
-#: app/projects/mapping_apps.py:75
+#: app/projects/mapping_apps.py:80
 msgid "Answer simple quests to complete OpenStreetMap data."
 msgstr "ตอบภารกิจง่าย ๆ เพื่อเติมข้อมูล OpenStreetMap ให้สมบูรณ์"
 
-#: app/projects/mapping_apps.py:76
+#: app/projects/mapping_apps.py:81
 msgid "Quick OSM attribute quests on roads and points of interest"
 msgstr "ภารกิจคุณลักษณะ OSM แบบรวดเร็วบนถนนและจุดสนใจ"
 
-#: app/projects/mapping_apps.py:84
+#: app/projects/mapping_apps.py:89
 msgid "Offline-first mapping for communities and territories."
 msgstr "การทำแผนที่แบบออฟไลน์เป็นหลักสำหรับชุมชนและอาณาเขต"
 
-#: app/projects/mapping_apps.py:85
+#: app/projects/mapping_apps.py:90
 msgid "Offline, community-led mapping"
 msgstr "การทำแผนที่แบบออฟไลน์ที่นำโดยชุมชน"
 
-#: app/projects/mapping_apps.py:93
+#: app/projects/mapping_apps.py:98
 msgid "Offline maps and navigation, with OSM editing."
 msgstr "แผนที่ออฟไลน์และการนำทาง พร้อมการแก้ไข OSM"
 
-#: app/projects/mapping_apps.py:94
+#: app/projects/mapping_apps.py:99
 msgid "Navigating to tasks, editing OSM points"
 msgstr "การนำทางไปยังงาน การแก้ไขจุด OSM"
 
-#: app/projects/mapping_apps.py:102
+#: app/projects/mapping_apps.py:107
 msgid "Open street-level imagery, captured with any camera."
 msgstr "ภาพระดับถนนแบบเปิด ถ่ายด้วยกล้องใดก็ได้"
 
-#: app/projects/mapping_apps.py:103
+#: app/projects/mapping_apps.py:108
 msgid "Street-level imagery along roads"
 msgstr "ภาพระดับถนนตามแนวถนน"
 
-#: app/projects/mapping_apps.py:111
+#: app/projects/mapping_apps.py:116
 msgid "Print paper maps, sketch on them, scan them back."
 msgstr "พิมพ์แผนที่กระดาษ วาดลงบนแผนที่ แล้วสแกนกลับเข้ามา"
 
-#: app/projects/mapping_apps.py:112
+#: app/projects/mapping_apps.py:117
 msgid "Paper maps and sketch mapping"
 msgstr "แผนที่กระดาษและการทำแผนที่แบบร่าง"
 
-#: app/projects/mapping_apps.py:120
+#: app/projects/mapping_apps.py:125
 msgid "Turn locations shared in chat apps into a map."
 msgstr "เปลี่ยนตำแหน่งที่แชร์ในแอปแชทให้เป็นแผนที่"
 
-#: app/projects/mapping_apps.py:121
+#: app/projects/mapping_apps.py:126
 msgid "Location sharing from chat apps"
 msgstr "การแชร์ตำแหน่งจากแอปแชท"
 
-#: app/projects/mapping_apps.py:125
+#: app/projects/mapping_apps.py:130
 msgid "Other app"
 msgstr "แอปอื่น"
 
-#: app/projects/mapping_apps.py:129
+#: app/projects/mapping_apps.py:134
 msgid "Any other app. Share the tasks as files and links."
 msgstr "แอปอื่นใดก็ได้ แชร์งานเป็นไฟล์และลิงก์"
 
-#: app/projects/mapping_apps.py:130
+#: app/projects/mapping_apps.py:135
 msgid "Any app"
 msgstr "แอปใดก็ได้"
 
-#: app/projects/mapping_apps.py:157
+#: app/projects/mapping_apps.py:162
 msgid ""
 "Not for OpenStreetMap: QField for map-based capture and editing, or ODK "
 "for form-heavy surveys."
@@ -583,11 +621,11 @@ msgstr ""
 "ไม่ใช่สำหรับ OpenStreetMap: QField สำหรับการเก็บและแก้ไขข้อมูลบนแผนที่ "
 "หรือ ODK สำหรับการสำรวจที่ใช้แบบฟอร์มมาก"
 
-#: app/projects/mapping_apps.py:162
+#: app/projects/mapping_apps.py:167
 msgid "Poorly mapped: QField lets mappers draw the missing geometry."
 msgstr "ยังทำแผนที่ไม่ครบ: QField ช่วยให้ผู้ทำแผนที่วาดรูปเรขาคณิตที่ขาดหายไปได้"
 
-#: app/projects/mapping_apps.py:166
+#: app/projects/mapping_apps.py:171
 msgid ""
 "Already mapped: Every Door is the quickest way to update buildings and "
 "points of interest."
@@ -595,7 +633,7 @@ msgstr ""
 "ทำแผนที่ไว้แล้ว: Every Door "
 "เป็นวิธีที่เร็วที่สุดในการอัปเดตอาคารและจุดสนใจ"
 
-#: app/projects/mapping_apps.py:171
+#: app/projects/mapping_apps.py:176
 msgid ""
 "Already mapped: StreetComplete for road details, or Panoramax for street-"
 "level imagery."
@@ -603,39 +641,31 @@ msgstr ""
 "ทำแผนที่ไว้แล้ว: StreetComplete สำหรับรายละเอียดถนน หรือ Panoramax "
 "สำหรับภาพระดับถนน"
 
-#: app/projects/mapping_apps.py:174
+#: app/projects/mapping_apps.py:179
 msgid "QField handles any kind of feature."
 msgstr "QField รองรับฟีเจอร์ทุกประเภท"
 
-#: app/projects/project_crud.py:120
-msgid "Selected area is too large. Please select an area smaller than 200 km²."
-msgstr "พื้นที่ที่เลือกใหญ่เกินไป โปรดเลือกพื้นที่ที่เล็กกว่า 200 km²"
-
-#: app/projects/project_crud.py:131
-msgid "Failed to generate data extract from the raw data API."
-msgstr "ไม่สามารถสร้างการแยกข้อมูลจาก API ข้อมูลดิบ"
-
-#: app/projects/project_crud.py:206
+#: app/projects/project_crud.py:130
 msgid "This job was interrupted. Please try again."
 msgstr "งานนี้ถูกขัดจังหวะ โปรดลองอีกครั้ง"
 
-#: app/projects/project_crud.py:692
+#: app/projects/project_crud.py:611
 msgid "QField project ID not found."
 msgstr "ไม่พบโครงการ"
 
-#: app/projects/project_crud.py:712
+#: app/projects/project_crud.py:628
 msgid "Project name not found."
 msgstr "ไม่พบโครงการ"
 
-#: app/projects/project_crud.py:719
+#: app/projects/project_crud.py:632
 msgid "ODK project ID not found."
 msgstr "ไม่พบโครงการ"
 
-#: app/projects/project_crud.py:728
+#: app/projects/project_crud.py:638
 msgid "Appuser token not found."
 msgstr "ไม่พบโครงการ"
 
-#: app/projects/project_crud.py:745
+#: app/projects/project_crud.py:652
 msgid "Failed to generate QR code."
 msgstr "โหลดแบบฟอร์มแม่แบบไม่สำเร็จ"
 
@@ -656,88 +686,88 @@ msgstr "พื้นที่ไม่มีชื่อ"
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "พื้นที่ {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:389
+#: app/projects/project_services.py:299
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/projects/project_services.py:1154
-msgid "Task areas changed. Confirm the reset to re-sync the tasks."
-msgstr "พื้นที่งานเปลี่ยนไป ยืนยันการรีเซ็ตเพื่อซิงค์งานใหม่"
+#: app/projects/project_services.py:662
+msgid "No submissions found yet."
+msgstr ""
 
-#: app/projects/task_plan.py:31
+#: app/projects/project_services.py:666
+msgid "Export is only available for ODK and QField projects."
+msgstr ""
+
+#: app/projects/task_plan.py:32
 #, python-format
 msgid "Values must be %(max_length)s characters or fewer."
 msgstr "ค่าต้องมีความยาวไม่เกิน %(max_length)s อักขระ"
 
-#: app/projects/task_plan.py:44
+#: app/projects/task_plan.py:45
 msgid "Group labels may only contain letters, numbers, hyphens and underscores."
 msgstr "ป้ายกลุ่มต้องมีเฉพาะตัวอักษร ตัวเลข ขีดกลาง และขีดล่าง"
 
-#: app/projects/task_plan.py:61
+#: app/projects/task_plan.py:62
 msgid "Colours must be hex values such as #d63f3f."
 msgstr "สีต้องเป็นค่าเลขฐานสิบหก เช่น #d63f3f"
 
-#: app/projects/task_plan.py:112
+#: app/projects/task_plan.py:113
 #, python-format
 msgid "Task %(number)s must be a Polygon with WGS84 coordinates."
 msgstr "งาน %(number)s ต้องเป็นรูปหลายเหลี่ยมที่ใช้พิกัด WGS84"
 
-#: app/projects/task_plan.py:122
+#: app/projects/task_plan.py:123
 #, python-format
 msgid "Task %(number)s: %(error)s"
 msgstr "งาน %(number)s: %(error)s"
 
-#: app/projects/task_plan.py:143
+#: app/projects/task_plan.py:144
 msgid "A task plan must be a GeoJSON FeatureCollection."
 msgstr "แผนงานต้องเป็น GeoJSON FeatureCollection"
 
-#: app/projects/task_plan.py:145
+#: app/projects/task_plan.py:146
 msgid "The task plan has no tasks."
 msgstr "แผนงานไม่มีงาน"
 
-#: app/projects/task_plan.py:148
+#: app/projects/task_plan.py:149
 #, python-format
 msgid "A task plan can have at most %(max_tasks)s tasks."
 msgstr "แผนงานหนึ่งมีงานได้สูงสุด %(max_tasks)s งาน"
 
-#: app/qfield/qfield_crud.py:157
-msgid "Project outline is missing or has no geometry."
-msgstr "ขาดหายไปหรือไม่มีรูปทรงเรขาคณิต"
+#: app/projects/task_sync.py:185
+msgid "Task areas changed. Confirm the reset to re-sync the tasks."
+msgstr "พื้นที่งานเปลี่ยนไป ยืนยันการรีเซ็ตเพื่อซิงค์งานใหม่"
 
-#: app/qfield/qfield_crud.py:163
-msgid "Project outline geometry has no coordinates."
-msgstr "เรขาคณิตโครงร่างของโครงการไม่มีพิกัด"
-
-#: app/qfield/qfield_crud.py:450
+#: app/qfield/qfield_crud.py:386
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS เสร็จสมบูรณ์ แต่ไม่มีการเขียนไฟล์เอาต์พุต"
 
-#: app/qfield/qfield_crud.py:462
+#: app/qfield/qfield_crud.py:395
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS wrapper เสร็จสมบูรณ์ แต่ไม่มีไฟล์ .qgz ในเอาต์พุต"
 
-#: app/qfield/qfield_crud.py:485
+#: app/qfield/qfield_crud.py:416
 msgid "Project outline is required for QField project creation."
 msgstr "✓ การตั้งค่าโครงการนี้ไม่จำเป็นต้องแบ่งงาน"
 
-#: app/qfield/qfield_crud.py:490
+#: app/qfield/qfield_crud.py:419
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm จำเป็นสำหรับการสร้างโปรเจ็กต์ QField"
 
-#: app/qfield/qfield_crud.py:502
+#: app/qfield/qfield_crud.py:428
 msgid "Failed to modify XLSForm for QField."
 msgstr "ไม่สามารถแก้ไข XLSForm สำหรับ QField"
 
-#: app/qfield/qfield_crud.py:572
+#: app/qfield/qfield_crud.py:496
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField หายไป ไม่สามารถแนบแผนที่ฐานได้"
 
-#: app/qfield/qfield_crud.py:609
+#: app/qfield/qfield_crud.py:532
 msgid "Basemap attach completed but produced no project files."
 msgstr "แผนที่ฐานถูกแนบเข้ากับโปรเจ็กต์ QField แล้ว"
 
-#: app/qfield/qfield_crud.py:794
+#: app/qfield/qfield_crud.py:716
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -746,46 +776,46 @@ msgstr ""
 "QFieldCloud ยังประมวลผลไฟล์โปรเจกต์ไม่เสร็จหลังจากลอง %(attempts)d ครั้ง "
 "(สถานะล่าสุด: %(status)s)"
 
-#: app/qfield/qfield_crud.py:848 app/qfield/qfield_crud.py:862
+#: app/qfield/qfield_crud.py:769 app/qfield/qfield_crud.py:779
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS ล้มเหลว: %(error)s"
 
-#: app/qfield/qfield_crud.py:855
+#: app/qfield/qfield_crud.py:774
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS ส่งคืน JSON ที่ไม่ถูกต้อง"
 
-#: app/qfield/qfield_crud.py:879
+#: app/qfield/qfield_crud.py:793
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "ไม่สามารถดาวน์โหลดแผนที่ฐาน MBTiles สำหรับการอัปโหลด (HTTP %(status)s)"
 
-#: app/qfield/qfield_crud.py:894
+#: app/qfield/qfield_crud.py:803
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "ดาวน์โหลดรหัส QR"
 
-#: app/qfield/qfield_crud.py:969
+#: app/qfield/qfield_crud.py:876
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "ไม่สามารถอัปโหลดไฟล์ไปยัง QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1084
+#: app/qfield/qfield_crud.py:988
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ ข้อมูลรับรองถูกต้อง"
 
-#: app/qfield/qfield_crud.py:1115
+#: app/qfield/qfield_crud.py:1017
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "โปรเจ็กต์นี้ไม่ได้ลิงก์กับโปรเจ็กต์ QFieldCloud"
 
-#: app/qfield/qfield_crud.py:1122
+#: app/qfield/qfield_crud.py:1022
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "QFIELDCLOUD_QGIS_URL ไม่ได้ถูกกำหนดค่า"
 
-#: app/qfield/qfield_crud.py:1152
+#: app/qfield/qfield_crud.py:1049
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr "ไม่พบไฟล์ GeoPackage ในแพ็คเกจ QFieldCloud"
 
-#: app/qfield/qfield_crud.py:1171
+#: app/qfield/qfield_crud.py:1066
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
@@ -793,27 +823,27 @@ msgstr ""
 "ไม่พบข้อมูลการสำรวจในแพ็คเกจ QFieldCloud "
 "ผู้ทำแผนที่อาจยังไม่ได้ส่งคำตอบใดๆ"
 
-#: app/qfield/qfield_crud.py:1194
+#: app/qfield/qfield_crud.py:1087
 msgid "QFieldCloud did not return a package job id."
 msgstr "QFieldCloud ไม่ได้ส่งคืนรหัสงานแพ็คเกจ"
 
-#: app/qfield/qfield_crud.py:1211
+#: app/qfield/qfield_crud.py:1101
 msgid "QFieldCloud failed to package the project."
 msgstr "QFieldCloud ล้มเหลวในการทำแพ็กเกจโปรเจ็กต์"
 
-#: app/qfield/qfield_crud.py:1217
+#: app/qfield/qfield_crud.py:1105
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
 "%(status)s)."
 msgstr "หมดเวลารอให้ QFieldCloud ทำแพ็กเกจโปรเจ็กต์ (สถานะสุดท้าย: %(status)s)"
 
-#: app/qfield/qfield_crud.py:1237
+#: app/qfield/qfield_crud.py:1124
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "การแปลง GeoPackage ล้มเหลว: %(error)s"
 
-#: app/qfield/qfield_crud.py:1244
+#: app/qfield/qfield_crud.py:1130
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "wrapper ของ QGIS ส่งคืน JSON ที่ไม่ถูกต้องสำหรับ /export"
 
@@ -821,7 +851,7 @@ msgstr "wrapper ของ QGIS ส่งคืน JSON ที่ไม่ถู�
 msgid "Projects"
 msgstr "โครงการ"
 
-#: app/templates/home.html:7 app/templates/landing.html:447
+#: app/templates/home.html:7 app/templates/landing.html:472
 #: app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:42
 msgid "Create Project"
@@ -935,29 +965,29 @@ msgstr "ถัดไป"
 msgid "No projects found. Create your first project to get started!"
 msgstr "ไม่พบโครงการ สร้างโครงการแรกของคุณเพื่อเริ่มต้น"
 
-#: app/templates/landing.html:433
+#: app/templates/landing.html:458
 msgid "Coordinate field campaigns"
 msgstr "ประสานงานภาคสนาม"
 
-#: app/templates/landing.html:436
+#: app/templates/landing.html:461
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
 msgstr "เพิ่มประสิทธิภาพและความแม่นยำของการทำแผนที่ภาคสนามผ่านการประสานงานที่ราบรื่น"
 
-#: app/templates/landing.html:440
+#: app/templates/landing.html:465
 msgid "Explore Projects"
 msgstr "สำรวจโครงการ"
 
-#: app/templates/landing.html:457
+#: app/templates/landing.html:482
 msgid "Loading metrics..."
 msgstr "กำลังโหลดตัวชี้วัด..."
 
-#: app/templates/landing.html:465
+#: app/templates/landing.html:490
 msgid "What is it?"
 msgstr "นี่คืออะไร"
 
-#: app/templates/landing.html:467
+#: app/templates/landing.html:492
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
 "map features\n"
@@ -966,7 +996,7 @@ msgstr ""
 "Field Tasking Manager (Field-TM) "
 "ช่วยให้ทีมงานเพิ่มองค์ความรู้ท้องถิ่นให้กับฟีเจอร์บนแผนที่ผ่านการประสานงานการทำแผนที่ภาคสนาม"
 
-#: app/templates/landing.html:471
+#: app/templates/landing.html:496
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
 "mature tools\n"
@@ -981,19 +1011,19 @@ msgstr ""
 "เป็นเวิร์กโฟลว์บนมือถือและเว็บแบบอิสระที่ช่วยให้ทีมเก็บข้อมูลภูมิสารสนเทศได้อย่างมีประสิทธิภาพด้วยอุปกรณ์"
 " Android ทั่วไป"
 
-#: app/templates/landing.html:478
+#: app/templates/landing.html:503
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr "ผู้จัดการโครงการสาธิตเวิร์กโฟลว์การทำแผนที่ของ FieldTM บนแล็ปท็อป"
 
-#: app/templates/landing.html:484
+#: app/templates/landing.html:509
 msgid "Main Features"
 msgstr "คุณสมบัติหลัก"
 
-#: app/templates/landing.html:487
+#: app/templates/landing.html:512
 msgid "Flexible Data Collection"
 msgstr "การเก็บข้อมูลที่ยืดหยุ่น"
 
-#: app/templates/landing.html:489
+#: app/templates/landing.html:514
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
 "workflows that\n"
@@ -1002,11 +1032,11 @@ msgstr ""
 "รองรับแบบสำรวจที่หลากหลาย รูปแบบข้อมูลหลายชนิด "
 "และเวิร์กโฟลว์ที่ปรับให้เหมาะกับความต้องการในการดำเนินงานที่แตกต่างกัน"
 
-#: app/templates/landing.html:494
+#: app/templates/landing.html:519
 msgid "Open Source and Customizable"
 msgstr "โอเพนซอร์สและปรับแต่งได้"
 
-#: app/templates/landing.html:496
+#: app/templates/landing.html:521
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
 "\n"
@@ -1015,30 +1045,30 @@ msgstr ""
 "ปรับ Field-TM ให้เหมาะกับตรรกะแบบสำรวจ โครงสร้างข้อมูล "
 "และความต้องการด้านการเชื่อมต่อของคุณ"
 
-#: app/templates/landing.html:501
+#: app/templates/landing.html:526
 msgid "Entity-Level Tracking"
 msgstr "การติดตามระดับเอนทิตี"
 
-#: app/templates/landing.html:503
+#: app/templates/landing.html:528
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed\n"
 "          decisions quickly."
 msgstr "ติดตามความคืบหน้าของการสำรวจในระดับงานและระดับฟีเจอร์เพื่อให้ผู้จัดการตัดสินใจได้อย่างรวดเร็วและมีข้อมูลรองรับ"
 
-#: app/templates/landing.html:511
+#: app/templates/landing.html:536
 msgid "Who is it for?"
 msgstr "เหมาะสำหรับใคร"
 
-#: app/templates/landing.html:514
+#: app/templates/landing.html:539
 msgid "Project Manager"
 msgstr "ผู้จัดการโครงการ"
 
-#: app/templates/landing.html:515
+#: app/templates/landing.html:540
 msgid "Create and coordinate field campaigns"
 msgstr "สร้างและประสานงานภาคสนาม"
 
-#: app/templates/landing.html:517
+#: app/templates/landing.html:542
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
 " interest,\n"
@@ -1047,31 +1077,31 @@ msgstr ""
 "ผู้จัดการโครงการใช้ Field-TM เพื่อตั้งค่าโครงการทำแผนที่ กำหนดพื้นที่สนใจ"
 " ออกแบบแบบสำรวจ และแบ่งงานออกเป็นส่วนที่จัดการได้"
 
-#: app/templates/landing.html:521
+#: app/templates/landing.html:546
 msgid "Define a project area and upload or choose a survey form"
 msgstr "กำหนดพื้นที่โครงการและอัปโหลดหรือเลือกแบบสำรวจ"
 
-#: app/templates/landing.html:522
+#: app/templates/landing.html:547
 msgid "Split the area into tasks and generate a data extract"
 msgstr "แบ่งพื้นที่เป็นงานและสร้างข้อมูลที่ดึงออก"
 
-#: app/templates/landing.html:523
+#: app/templates/landing.html:548
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "เผยแพร่โครงการไปยัง ODK Central หรือ QFieldCloud"
 
-#: app/templates/landing.html:524
+#: app/templates/landing.html:549
 msgid "Share a QR code so mappers can start collecting data"
 msgstr "แชร์รหัส QR เพื่อให้ผู้ทำแผนที่เริ่มเก็บข้อมูลได้"
 
-#: app/templates/landing.html:528
+#: app/templates/landing.html:553
 msgid "Field Mapper"
 msgstr "ผู้ทำแผนที่ภาคสนาม"
 
-#: app/templates/landing.html:529
+#: app/templates/landing.html:554
 msgid "Collect data in the field with your phone"
 msgstr "เก็บข้อมูลภาคสนามด้วยโทรศัพท์ของคุณ"
 
-#: app/templates/landing.html:531
+#: app/templates/landing.html:556
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
 "publishes a\n"
@@ -1082,35 +1112,35 @@ msgstr ""
 "เมื่อผู้จัดการโครงการเผยแพร่โครงการแล้ว "
 "ผู้ทำแผนที่จะเข้าถึงได้โดยตรงในแอปมือถือที่เลือกใช้"
 
-#: app/templates/landing.html:535
+#: app/templates/landing.html:560
 msgid "Scan the QR code shared by your project manager"
 msgstr "สแกนรหัส QR ที่ผู้จัดการโครงการแชร์ให้"
 
-#: app/templates/landing.html:536
+#: app/templates/landing.html:561
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "โครงการจะโหลดอัตโนมัติใน ODK Collect หรือ QField"
 
-#: app/templates/landing.html:537
+#: app/templates/landing.html:562
 msgid "Navigate to your assigned task area and collect data"
 msgstr "ไปยังพื้นที่งานที่ได้รับมอบหมายและเก็บข้อมูล"
 
-#: app/templates/landing.html:538
+#: app/templates/landing.html:563
 msgid "Submit your survey, which goes straight to the server"
 msgstr "ส่งแบบสำรวจของคุณ ซึ่งจะถูกส่งตรงไปยังเซิร์ฟเวอร์"
 
-#: app/templates/landing.html:545
+#: app/templates/landing.html:570
 msgid "Field-TM Use Cases"
 msgstr "กรณีใช้งานของ Field-TM"
 
-#: app/templates/landing.html:550
+#: app/templates/landing.html:575
 msgid "Field mapping in progress"
 msgstr "การทำแผนที่ภาคสนามที่กำลังดำเนินอยู่"
 
-#: app/templates/landing.html:555
+#: app/templates/landing.html:580
 msgid "1. Community Mapping"
 msgstr "1. การทำแผนที่ชุมชน"
 
-#: app/templates/landing.html:557
+#: app/templates/landing.html:582
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public\n"
@@ -1119,11 +1149,11 @@ msgstr ""
 "Field Tasking Manager ช่วยให้ชุมชนสามารถทำแผนที่ชุมชนแออัด "
 "สิ่งอำนวยความสะดวกสาธารณะ และบริการท้องถิ่นเพื่อการวางแผนที่ครอบคลุม"
 
-#: app/templates/landing.html:562
+#: app/templates/landing.html:587
 msgid "2. Urban Planning and Management"
 msgstr "2. การวางผังและการจัดการเมือง"
 
-#: app/templates/landing.html:564
+#: app/templates/landing.html:589
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities\n"
@@ -1132,11 +1162,11 @@ msgstr ""
 "สร้างเมืองที่ชาญฉลาดยิ่งขึ้นด้วยการสำรวจบ้าน ถนน "
 "และสาธารณูปโภคแบบประสานงานผ่านงานทำแผนที่ที่ชัดเจนและจัดการได้"
 
-#: app/templates/landing.html:569
+#: app/templates/landing.html:594
 msgid "3. Disaster Response and Recovery"
 msgstr "3. การตอบสนองและฟื้นฟูหลังภัยพิบัติ"
 
-#: app/templates/landing.html:571
+#: app/templates/landing.html:596
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
 "volunteers, and\n"
@@ -1146,43 +1176,54 @@ msgstr ""
 "ประสานงานอาสาสมัคร "
 "และส่งมอบข้อมูลที่เชื่อถือได้สำหรับปฏิบัติการบรรเทาทุกข์"
 
-#: app/templates/landing.html:580
+#: app/templates/landing.html:605
 msgid "Resources"
 msgstr "ทรัพยากร"
 
-#: app/templates/landing.html:588
+#: app/templates/landing.html:613
 msgid "Data Prep"
 msgstr "การเตรียมข้อมูล"
 
-#: app/templates/landing.html:589
+#: app/templates/landing.html:614
 msgid "HOT Export Tool"
 msgstr "เครื่องมือส่งออก HOT"
 
-#: app/templates/landing.html:591
+#: app/templates/landing.html:616
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr "ดาวน์โหลดข้อมูลภูมิสารสนเทศที่พร้อมใช้งานสำหรับพื้นที่โครงการของคุณ"
 
-#: app/templates/landing.html:600 app/templates/landing.html:612
+#: app/templates/landing.html:625 app/templates/landing.html:637
 msgid "Documentation"
 msgstr "เอกสาร"
 
-#: app/templates/landing.html:601
+#: app/templates/landing.html:626
 msgid "ODK Central Guide"
 msgstr "คู่มือ ODK Central"
 
-#: app/templates/landing.html:603
+#: app/templates/landing.html:628
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr "เรียนรู้วิธีจัดการแบบฟอร์ม ผู้ใช้แอป และการส่งข้อมูลภาคสนามใน ODK"
 
-#: app/templates/landing.html:613
+#: app/templates/landing.html:638
 msgid "QField Guide"
 msgstr "คู่มือ QField"
 
-#: app/templates/landing.html:615
+#: app/templates/landing.html:640
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "ตั้งค่าโครงการ QFieldCloud "
 "และเวิร์กโฟลว์บนมือถือสำหรับการทำแผนที่แบบออฟไลน์"
+
+#: app/templates/landing.html:648 app/templates/landing.html:661
+msgid "Join the Community"
+msgstr ""
+
+#: app/templates/landing.html:650
+msgid ""
+"Field-TM is built in the open with mappers, developers and partners "
+"around the world.\n"
+"        Come and say hello on the HOTOSM Slack."
+msgstr ""
 
 #: app/templates/layout.html:14
 msgid "Coordinated field mapping for Open Mapping campaigns."
@@ -1533,7 +1574,7 @@ msgstr ""
 "บนแท็กเพื่อลบ"
 
 #: app/templates/new_project_custom.html:144
-#: app/templates/partials/project_details/setup_steps/step2_form.html:116
+#: app/templates/partials/project_details/setup_steps/step2_form.html:134
 msgid "Continue"
 msgstr "ดำเนินการต่อ"
 
@@ -1611,11 +1652,9 @@ msgstr "กลับไปยังโครงการ"
 
 #: app/templates/project_details.html:34
 msgid ""
-"Trigger a fresh QFieldCloud package and download the project data as a "
-"single GeoJSON file."
+"Download all submissions as a single GeoJSON file, for QGIS, uMap and "
+"other tools."
 msgstr ""
-"ทริกเกอร์แพ็คเกจ QFieldCloud ใหม่และดาวน์โหลดข้อมูลโปรเจ็กต์เป็นไฟล์ "
-"GeoJSON ไฟล์เดียว"
 
 #: app/templates/project_details.html:38
 msgid "Export Data"
@@ -1640,10 +1679,8 @@ msgid "Create the project again, or contact an admin if this keeps happening."
 msgstr "สร้างโครงการใหม่อีกครั้ง หรือติดต่อผู้ดูแลระบบหากยังเกิดขึ้นอยู่"
 
 #: app/templates/project_details.html:61
-msgid ""
-"Packaging project on QFieldCloud - this may take a minute, please be "
-"patient..."
-msgstr "โครงการบรรจุภัณฑ์บน QFieldCloud - อาจใช้เวลาสักครู่ โปรดอดทนรอ..."
+msgid "Gathering submissions - this may take a minute, please be patient..."
+msgstr ""
 
 #: app/templates/project_details.html:62
 msgid "✓ Download started."
@@ -1693,12 +1730,19 @@ msgstr "ดูโครงการภายนอก →"
 msgid "This project is not ready for mapping yet."
 msgstr "โครงการนี้ยังไม่พร้อมสำหรับการทำแผนที่"
 
-#: app/templates/project_details.html:180
-#: app/templates/project_details.html:198
+#: app/templates/project_details.html:185
+msgid ""
+"You can't change this form in Field-TM. To change it, edit the project in"
+" QGIS and sync\n"
+"    the updates."
+msgstr ""
+
+#: app/templates/project_details.html:189
+#: app/templates/project_details.html:207
 msgid "Delete project"
 msgstr "ลบโครงการ"
 
-#: app/templates/project_details.html:183
+#: app/templates/project_details.html:192
 msgid ""
 "Deletes the project here and in the mapping app (ODK Central or "
 "QFieldCloud), including\n"
@@ -1707,7 +1751,7 @@ msgstr ""
 "ลบโครงการที่นี่และในแอปทำแผนที่ (ODK Central หรือ QFieldCloud) "
 "รวมถึงข้อมูลที่เก็บไว้ที่นั่น การดำเนินการนี้ย้อนกลับไม่ได้"
 
-#: app/templates/project_details.html:186
+#: app/templates/project_details.html:195
 msgid ""
 "Delete this project in Field-TM and in the mapping app, including\n"
 "    collected data? This cannot be undone."
@@ -1715,15 +1759,15 @@ msgstr ""
 "ลบโครงการนี้ใน Field-TM และในแอปทำแผนที่ รวมถึงข้อมูลที่เก็บไว้หรือไม่ "
 "การดำเนินการนี้ย้อนกลับไม่ได้"
 
-#: app/templates/project_details.html:188
+#: app/templates/project_details.html:197
 msgid "Deletes the project and its tasks. This cannot be undone."
 msgstr "ลบโครงการและงานของโครงการ การดำเนินการนี้ย้อนกลับไม่ได้"
 
-#: app/templates/project_details.html:189
+#: app/templates/project_details.html:198
 msgid "Delete this project and its tasks? This cannot be undone."
 msgstr "ลบโครงการนี้และงานของโครงการหรือไม่ การดำเนินการนี้ย้อนกลับไม่ได้"
 
-#: app/templates/project_details.html:205
+#: app/templates/project_details.html:214
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view it."
@@ -1828,6 +1872,12 @@ msgstr "ใส่รหัสโครงการ Tasking Manager ก่อน"
 msgid "Could not load AOI from Tasking Manager."
 msgstr "โหลดพื้นที่สนใจจาก Tasking Manager ไม่ได้"
 
+#: app/templates/partials/new_project/map_script.html:14
+msgid ""
+"This looks like a task plan. After the project is created, upload the "
+"same file in the Tasks section to keep your tasks and assignments."
+msgstr ""
+
 #: app/templates/partials/new_project/map_section.html:5
 msgid "Draw Area"
 msgstr "วาดพื้นที่"
@@ -1846,48 +1896,48 @@ msgid ""
 "      map on the map below."
 msgstr "วาดพื้นที่ที่คุณต้องการทำแผนที่บนแผนที่ด้านล่าง"
 
-#: app/templates/partials/new_project/map_section.html:20
-#: app/templates/partials/project_details/setup_steps/step2_form.html:70
+#: app/templates/partials/new_project/map_section.html:21
+#: app/templates/partials/project_details/setup_steps/step2_form.html:78
 #: app/templates/partials/project_details/setup_steps/step3_data.html:44
 msgid "More options"
 msgstr "ตัวเลือกแบบฟอร์ม:"
 
-#: app/templates/partials/new_project/map_section.html:23
+#: app/templates/partials/new_project/map_section.html:24
 msgid "Upload a GeoJSON file"
 msgstr "อัปโหลดไฟล์ GeoJSON"
 
-#: app/templates/partials/new_project/map_section.html:25
+#: app/templates/partials/new_project/map_section.html:26
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
 "          drawing."
 msgstr "หากคุณมีไฟล์แผนที่ที่มีขอบเขตพื้นที่อยู่แล้ว ให้อัปโหลดที่นี่แทนการวาด"
 
-#: app/templates/partials/new_project/map_section.html:31
+#: app/templates/partials/new_project/map_section.html:32
 msgid "Upload your own map file (GeoJSON)"
 msgstr "อัปโหลด GeoJSON แบบกำหนดเอง"
 
-#: app/templates/partials/new_project/map_section.html:39
+#: app/templates/partials/new_project/map_section.html:40
 msgid "Load from a HOT Tasking Manager project"
 msgstr "โหลดจากโครงการ HOT Tasking Manager"
 
-#: app/templates/partials/new_project/map_section.html:41
+#: app/templates/partials/new_project/map_section.html:42
 msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
 msgstr "ใส่รหัสโครงการ HOT Tasking Manager เพื่อโหลดพื้นที่สนใจของโครงการ"
 
-#: app/templates/partials/new_project/map_section.html:50
+#: app/templates/partials/new_project/map_section.html:51
 msgid "Tasking Manager project ID"
 msgstr "รหัสโครงการ Tasking Manager"
 
-#: app/templates/partials/new_project/map_section.html:53
+#: app/templates/partials/new_project/map_section.html:54
 msgid "Load AOI"
 msgstr "โหลดพื้นที่"
 
-#: app/templates/partials/new_project/map_section.html:60
+#: app/templates/partials/new_project/map_section.html:61
 msgid "Combine multiple shapes into one"
 msgstr "รวมหลายรูปทรงเป็นหนึ่งเดียว"
 
-#: app/templates/partials/new_project/map_section.html:64
+#: app/templates/partials/new_project/map_section.html:65
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2214,6 +2264,22 @@ msgstr ""
 "หลังจากแก้ไขงานแล้ว ให้ซิงค์ใหม่เพื่ออัปเดตในแอปทำแผนที่ "
 "การเปลี่ยนพื้นที่งานจะรีเซ็ตความคืบหน้าของงานในแอป"
 
+#: app/templates/partials/project_details/update_form_section.html:2
+#: app/templates/partials/project_details/update_form_section.html:17
+msgid "Update survey form"
+msgstr ""
+
+#: app/templates/partials/project_details/update_form_section.html:7
+msgid "Replace the survey form? Mappers will receive the new version."
+msgstr ""
+
+#: app/templates/partials/project_details/update_form_section.html:11
+msgid ""
+"Upload your edited form. Mappers receive it automatically and collected "
+"data is kept.\n"
+"      Only include your survey questions, as Field-TM adds its own fields."
+msgstr ""
+
 #: app/templates/partials/project_details/fragments/basemap_progress.html:4
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
@@ -2504,23 +2570,30 @@ msgstr ""
 "เลือกแบบสำรวจสำเร็จรูปที่ตรงกับสิ่งที่คุณทำแผนที่ หากไม่มีแบบใดเหมาะสม "
 "คุณอัปโหลดไฟล์แบบสำรวจของคุณเองได้"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:24
+#: app/templates/partials/project_details/setup_steps/step2_form.html:18
+msgid ""
+"You can't change the form in Field-TM after publishing. To change it "
+"later, edit the\n"
+"      project in QGIS and sync the updates."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:32
 msgid "Survey form"
 msgstr "แบบฟอร์มสำรวจ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:26
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
 msgid "Loading survey types..."
 msgstr "กำลังโหลดประเภทแบบสำรวจ..."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:31
+#: app/templates/partials/project_details/setup_steps/step2_form.html:39
 msgid "or"
 msgstr "หรือ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step2_form.html:42
 msgid "upload your own survey file (.xls / .xlsx)"
 msgstr "อัปโหลดไฟล์แบบสำรวจของคุณเอง (.xls / .xlsx)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:40
+#: app/templates/partials/project_details/setup_steps/step2_form.html:48
 msgid ""
 "Heads up: Field-TM auto-adds fields for tasks and feature selection. Your"
 " form should\n"
@@ -2531,55 +2604,67 @@ msgstr ""
 " ฟอร์มของคุณควรมีเฉพาะคำถามสำรวจที่คุณต้องการถามเท่านั้น (อย่าใส่ฟิลด์ "
 "select_one_from_file สำหรับงาน/ฟีเจอร์)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:73
+#: app/templates/partials/project_details/setup_steps/step2_form.html:81
 msgid "Form language"
 msgstr "ภาษา"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:75
+#: app/templates/partials/project_details/setup_steps/step2_form.html:83
 msgid "English"
 msgstr "อังกฤษ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:76
+#: app/templates/partials/project_details/setup_steps/step2_form.html:84
 msgid "Spanish"
 msgstr "สเปน"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:77
+#: app/templates/partials/project_details/setup_steps/step2_form.html:85
 msgid "French"
 msgstr "ฝรั่งเศส"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:78
+#: app/templates/partials/project_details/setup_steps/step2_form.html:86
 msgid "Portuguese"
 msgstr "โปรตุเกส"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:79
+#: app/templates/partials/project_details/setup_steps/step2_form.html:87
 msgid "Swahili"
 msgstr "สวาฮีลี"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:80
+#: app/templates/partials/project_details/setup_steps/step2_form.html:88
 msgid "Hindi"
 msgstr "ฮินดี"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:84
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "จุดใหม่"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "ผู้ทำแผนที่แตะตำแหน่งบนแผนที่"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "ผู้ทำแผนที่บันทึกตำแหน่ง GPS ของตน"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:102
 msgid "Form questions"
 msgstr "ตัวเลือกแบบฟอร์ม:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:88
+#: app/templates/partials/project_details/setup_steps/step2_form.html:106
 msgid "Mappers will be asked to take a photo at the location."
 msgstr "ขอให้ผู้ใช้ถ่ายรูป ณ ตำแหน่งของตน"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:89
+#: app/templates/partials/project_details/setup_steps/step2_form.html:107
 msgid "Ask for a photo"
 msgstr "ขอให้ถ่ายภาพ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+#: app/templates/partials/project_details/setup_steps/step2_form.html:114
 msgid "Make photo mandatory"
 msgstr "กำหนดให้รูปถ่ายเป็นสิ่งบังคับ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:101
+#: app/templates/partials/project_details/setup_steps/step2_form.html:119
 msgid "Mappers confirm whether existing OSM features are correctly digitised."
 msgstr "ขอให้ผู้ทำแผนที่ยืนยันว่าองค์ประกอบที่มีอยู่ถูกดิจิไทซ์อย่างถูกต้องหรือไม่"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:102
+#: app/templates/partials/project_details/setup_steps/step2_form.html:120
 msgid "Ask to verify existing features"
 msgstr "ขอให้ผู้ทำแผนที่ยืนยันว่าองค์ประกอบที่มีอยู่ถูกดิจิไทซ์อย่างถูกต้องหรือไม่"
 
@@ -2807,15 +2892,3 @@ msgstr "ทดสอบข้อมูลรับรอง"
 msgid "Save & Continue"
 msgstr "บันทึกและดำเนินการต่อ"
 
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:94
-msgid "New points"
-msgstr "จุดใหม่"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:96
-msgid "Mappers tap the location on a map"
-msgstr "ผู้ทำแผนที่แตะตำแหน่งบนแผนที่"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:97
-msgid "Mappers capture their GPS location"
-msgstr "ผู้ทำแผนที่บันทึกตำแหน่ง GPS ของตน"

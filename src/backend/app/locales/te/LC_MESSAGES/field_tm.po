@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-10-20 23:29+0100\n"
+"POT-Creation-Date: 2026-11-05 16:09+0000\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: te\n"
@@ -18,15 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:157
+#: app/main.py:159
 msgid "Validation failed"
 msgstr "ధ్రువీకరణ విఫలమైంది"
 
-#: app/main.py:181
+#: app/main.py:183
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "అనూహ్యమైన లోపం ఏర్పడింది. దయచేసి నిర్వాహకుడిని సంప్రదించండి."
 
-#: app/main.py:326
+#: app/main.py:329
 msgid "Could not connect to database"
 msgstr "డేటాబేస్కు కనెక్ట్ చేయడం సాధ్యపడలేదు"
 
@@ -47,22 +47,27 @@ msgstr "ఈ ప్రాజెక్ట్‌ను చూడటానికి 
 msgid "User (%(user_sub)s) could not be inserted in db"
 msgstr "వినియోగదారు (%(user_sub)s) dbలో చొప్పించబడలేదు"
 
-#: app/central/central_crud.py:165
+#: app/central/central_crud.py:166
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
 msgstr "ODK Central లో ప్రాజెక్ట్ సృష్టించడంలో లోపం: %(error)s"
 
-#: app/central/central_crud.py:219
+#: app/central/central_crud.py:218
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
 msgstr "ఫారమ్‌ను ODK సెంట్రల్‌కి అప్‌లోడ్ చేయడంలో విఫలమైంది: %(error)s"
 
-#: app/central/central_crud.py:273
+#: app/central/central_crud.py:239
+#, python-format
+msgid "Failed to update form in ODK Central: %(error)s"
+msgstr ""
+
+#: app/central/central_crud.py:287
 #, python-format
 msgid "Could not read XLSForm file: %(error)s"
 msgstr "XLSForm ఫైల్‌ని చదవడం సాధ్యపడలేదు: %(error)s"
 
-#: app/central/central_crud.py:299
+#: app/central/central_crud.py:312
 #, python-format
 msgid ""
 "XLSForm has select questions referencing lists that aren't defined in the"
@@ -72,53 +77,53 @@ msgstr ""
 "జాబితాలను కలిగి ఉంది: %(rows)s. మీ సర్వే మరియు ఎంపికల షీట్‌లను తనిఖీ "
 "చేయండి."
 
-#: app/central/central_crud.py:318
+#: app/central/central_crud.py:331
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
 msgstr "XLSForm చెల్లదు: %(error)s"
 
-#: app/central/central_crud.py:400
+#: app/central/central_crud.py:420
 msgid "'geometry' data field is mandatory"
 msgstr "'జ్యామితి' డేటా ఫీల్డ్ తప్పనిసరి"
 
-#: app/central/central_crud.py:715
+#: app/central/central_crud.py:734
 msgid "ODK project_id is missing; cannot create/merge entity lists."
 msgstr "ODK project_id లేదు; ఎంటిటీ జాబితాలను సృష్టించడం/విలీనం చేయడం సాధ్యం కాదు."
 
-#: app/central/central_crud.py:755
+#: app/central/central_crud.py:788
 msgid "Could not generate token for app user."
 msgstr "యాప్ వినియోగదారు కోసం టోకెన్‌ని రూపొందించలేకపోయింది."
 
-#: app/central/central_crud.py:787 app/central/central_crud.py:793
+#: app/central/central_crud.py:816 app/central/central_crud.py:821
 msgid "An error occurred while creating the app user token."
 msgstr "QR కోడ్‌ను రూపొందిస్తున్నప్పుడు అనూహ్యమైన లోపం ఏర్పడింది."
 
-#: app/central/central_crud.py:807
+#: app/central/central_crud.py:834
 #, python-format
 msgid "Could not assign %(scope)s role to app user."
 msgstr "యాప్ వినియోగదారుకు %(scope)s పాత్రను కేటాయించలేకపోయింది."
 
-#: app/central/central_crud.py:846
+#: app/central/central_crud.py:871
 msgid "Could not find 'Project Manager' role in ODK Central."
 msgstr "ODK Central లో ప్రాజెక్ట్‌ను తెరవండి"
 
-#: app/central/central_crud.py:871
+#: app/central/central_crud.py:893
 msgid "ODK Central returned no user ID after creation."
 msgstr "ODK సెంట్రల్ సృష్టించిన తర్వాత ఏ వినియోగదారు IDని అందించలేదు."
 
-#: app/central/central_crud.py:996
+#: app/central/central_crud.py:1009
 msgid "Failed to create ODK Central manager user."
 msgstr "ODK Central మేనేజర్ వినియోగదారుని సృష్టించడంలో విఫలమైంది."
 
-#: app/central/central_crud.py:1013
+#: app/central/central_crud.py:1024
 msgid "ODK credentials are invalid, or may have changed."
 msgstr "ODK ఆధారాలు చెల్లవు, లేదా మారి ఉండవచ్చు."
 
-#: app/central/central_crud.py:1019
+#: app/central/central_crud.py:1029
 msgid "Failed to connect to Central. Is the URL valid?"
 msgstr "Central కు కనెక్ట్ కాలేకపోయింది. URL సరైనదేనా?"
 
-#: app/central/central_crud.py:1025
+#: app/central/central_crud.py:1034
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "ODK Central ఆధారాలను పరీక్షిస్తున్నప్పుడు అనూహ్యమైన లోపం ఏర్పడింది."
 
@@ -131,53 +136,90 @@ msgstr "చెల్లుబాటు అయ్యే .xls లేదా .xlsx �
 msgid "No data provided."
 msgstr "డేటా ఎక్స్‌ట్రాక్ట్ ఇవ్వలేదు."
 
+#: app/helpers/basemap_attach.py:91
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
+msgstr ""
+"బేస్‌మ్యాప్‌ను జతచేయడం ఇప్పటికి విఫలమైంది. మీ ప్రాజెక్ట్ ఉపయోగించడానికి "
+"సిద్ధంగా ఉంది. దయచేసి మళ్లీ జతచేయడానికి ప్రయత్నించండి."
+
+#: app/helpers/basemap_attach.py:96
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+"తాత్కాలిక నెట్‌వర్క్ సమస్య కారణంగా బేస్‌మ్యాప్ జతచేయడం పూర్తికాలేదు. మీ "
+"ప్రాజెక్ట్ ఉపయోగించడానికి సిద్ధంగా ఉంది. దయచేసి మళ్లీ జతచేయడానికి "
+"ప్రయత్నించండి."
+
 #: app/helpers/basemap_services.py:26
 #, python-format
 msgid "%(action)s failed with HTTP %(status_code)s."
 msgstr "%(action)s HTTP %(status_code)s తో విఫలమైంది."
 
-#: app/helpers/basemap_services.py:40
+#: app/helpers/basemap_services.py:36
 #, python-format
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s విఫలమైంది."
 
-#: app/helpers/basemap_services.py:181
+#: app/helpers/basemap_services.py:175
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "Tilepack API HTTP %(status_code)sని అందించింది."
+
+#: app/helpers/geometry_utils.py:82
+msgid "Project outline is missing or has no geometry."
+msgstr "ప్రాజెక్ట్ అవుట్‌లైన్ లేదు లేదా జ్యామితి లేదు."
+
+#: app/helpers/geometry_utils.py:85
+msgid "Project outline geometry has no coordinates."
+msgstr "ప్రాజెక్ట్ అవుట్‌లైన్ జ్యామితికి కోఆర్డినేట్‌లు లేవు."
 
 #: app/helpers/helper_routes.py:55
 msgid "Failed to convert YAML form to XLSForm."
 msgstr "YAML ఫారమ్‌ని XLSFormకి మార్చడంలో విఫలమైంది."
 
-#: app/htmx/project_detail_routes.py:164
+#: app/htmx/project_detail_routes.py:167 app/htmx/project_detail_routes.py:215
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "ప్రాజెక్ట్ (%(project_id)s) కనబడలేదు."
 
-#: app/htmx/project_detail_routes.py:171
+#: app/htmx/project_detail_routes.py:174
 msgid "Only the project manager can delete this project."
 msgstr "ఈ ప్రాజెక్ట్‌ను ప్రాజెక్ట్ మేనేజర్ మాత్రమే తొలగించగలరు."
 
-#: app/htmx/project_detail_routes.py:215 app/templates/project_details.html:204
+#: app/htmx/project_detail_routes.py:222
+msgid "Only the project creator can update the form."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:230
+msgid "Only published ODK projects can update their form."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:245
+msgid "Could not update the form. Please check the file and try again."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:250
+msgid "Survey form updated in ODK Central."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:279 app/templates/project_details.html:213
 msgid "Project not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/htmx/project_detail_routes.py:251
-#: app/htmx/setup_steps/setup_step_responses.py:70
+#: app/htmx/project_detail_routes.py:314
+#: app/htmx/setup_steps/setup_step_responses.py:68
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "లోపం: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:292
-msgid "GeoJSON export is only available for QField projects."
-msgstr "GeoJSON ఎగుమతి QField ప్రాజెక్ట్‌లకు మాత్రమే అందుబాటులో ఉంది."
+#: app/htmx/project_detail_routes.py:355
+msgid "This project is not yet linked to ODK Central or QFieldCloud."
+msgstr ""
 
-#: app/htmx/project_detail_routes.py:297
-msgid "This project is not yet linked to a QFieldCloud project."
-msgstr "ఈ ప్రాజెక్ట్ ఇంకా QFieldCloud ప్రాజెక్ట్‌కి లింక్ చేయబడలేదు."
-
-#: app/htmx/project_detail_routes.py:308
+#: app/htmx/project_detail_routes.py:366
 #, python-format
 msgid "Failed to export GeoJSON: %(error)s"
 msgstr "GeoJSONని ఎగుమతి చేయడంలో విఫలమైంది: %(error)s"
@@ -212,36 +254,19 @@ msgstr "%(app)s లో టాస్క్‌లను నవీకరించ�
 msgid "Tasks updated in %(app)s."
 msgstr "%(app)s లో టాస్క్‌లు నవీకరించబడ్డాయి."
 
-#: app/htmx/basemap/basemap_attach_flow.py:69
-msgid ""
-"Basemap attach failed for now. Your project is ready to use. Please retry"
-" attach."
-msgstr ""
-"బేస్‌మ్యాప్‌ను జతచేయడం ఇప్పటికి విఫలమైంది. మీ ప్రాజెక్ట్ ఉపయోగించడానికి "
-"సిద్ధంగా ఉంది. దయచేసి మళ్లీ జతచేయడానికి ప్రయత్నించండి."
-
-#: app/htmx/basemap/basemap_attach_flow.py:74
-msgid ""
-"Basemap attach could not complete due to a temporary network issue. Your "
-"project is ready to use. Please retry attach."
-msgstr ""
-"తాత్కాలిక నెట్‌వర్క్ సమస్య కారణంగా బేస్‌మ్యాప్ జతచేయడం పూర్తికాలేదు. మీ "
-"ప్రాజెక్ట్ ఉపయోగించడానికి సిద్ధంగా ఉంది. దయచేసి మళ్లీ జతచేయడానికి "
-"ప్రయత్నించండి."
-
-#: app/htmx/basemap/basemap_attach_flow.py:123
+#: app/htmx/basemap/basemap_attach_flow.py:33
 msgid "Basemap attach is available after publication."
 msgstr "ప్రచురణ తర్వాత బేస్‌మ్యాప్ జతచేయడం అందుబాటులో ఉంటుంది."
 
-#: app/htmx/basemap/basemap_attach_flow.py:132
+#: app/htmx/basemap/basemap_attach_flow.py:42
 msgid "Basemap attach is only available for QField projects."
 msgstr "బేస్‌మ్యాప్ జతచేయడం QField ప్రాజెక్టులకు మాత్రమే అందుబాటులో ఉంటుంది."
 
-#: app/htmx/basemap/basemap_attach_flow.py:142
+#: app/htmx/basemap/basemap_attach_flow.py:52
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "బేస్‌మ్యాప్ ఇంకా సిద్ధంగా లేదు. సృష్టి పూర్తయ్యే వరకు వేచి ఉండండి."
 
-#: app/htmx/basemap/basemap_attach_flow.py:157
+#: app/htmx/basemap/basemap_attach_flow.py:67
 msgid ""
 "Basemap download URL is not available yet. Please refresh status and try "
 "again shortly."
@@ -249,7 +274,7 @@ msgstr ""
 "బేస్‌మ్యాప్ డౌన్‌లోడ్ URL ఇంకా అందుబాటులో లేదు. దయచేసి స్థితిని రిఫ్రెష్ "
 "చేసి కొద్దిసేపటికి మళ్లీ ప్రయత్నించండి."
 
-#: app/htmx/basemap/basemap_attach_flow.py:173
+#: app/htmx/basemap/basemap_attach_flow.py:83
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -259,7 +284,7 @@ msgstr ""
 "%(config)s లేదు."
 
 #: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:90
+#: app/htmx/setup_steps/setup_step_responses.py:88
 msgid "Project not found or access denied."
 msgstr "ప్రాజెక్ట్ కనబడలేదు లేదా ప్రాప్తి నిరాకరించబడింది."
 
@@ -303,7 +328,7 @@ msgstr ""
 "ప్రాజెక్ట్ ప్రాంతం తప్పనిసరిగా చెల్లుబాటు అయ్యే JSON కావాలి (GeoJSON "
 "Polygon, MultiPolygon, Feature, లేదా FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:86
+#: app/htmx/project_create/project_create_simple_flow.py:90
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -311,15 +336,15 @@ msgstr ""
 "ఈ ప్రాంతంలో ఇప్పటికే ఉన్న OSM భవనాలు కనబడలేదు. మొదటి నుండి మ్యాపింగ్ "
 "కొనసాగించండి."
 
-#: app/htmx/project_create/project_create_simple_flow.py:184
+#: app/htmx/project_create/project_create_simple_flow.py:188
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 "సరళమైన ప్రాజెక్ట్ సృష్టి కోసం డిఫాల్ట్ OSM Buildings ఫారమ్‌ను లోడ్ "
 "చేయలేకపోయాము."
 
-#: app/htmx/project_create/project_create_simple_flow.py:312
-#: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:214
+#: app/htmx/project_create/project_create_simple_flow.py:316
+#: app/htmx/project_create/project_create_submit_routes.py:138
+#: app/htmx/project_create/project_create_submit_routes.py:212
 msgid "An unexpected error occurred. Please try again."
 msgstr "అనుకోని లోపం సంభవించింది. దయచేసి మళ్లీ ప్రయత్నించండి."
 
@@ -331,13 +356,13 @@ msgstr "టెంప్లేట్ ఫారమ్‌ను లోడ్ చే
 msgid "Please select a form or upload a file."
 msgstr "దయచేసి ఒక ఫారమ్ ఎంచుకోండి లేదా ఫైల్‌ను అప్‌లోడ్ చేయండి."
 
-#: app/htmx/project_create/project_create_xlsform_routes.py:132
+#: app/htmx/project_create/project_create_xlsform_routes.py:128
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr ""
 "ఫారమ్ విజయవంతంగా ధృవీకరించబడి అప్‌లోడ్ చేయబడింది! పేజీ మళ్లీ లోడ్ "
 "అవుతోంది..."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:46
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:43
 msgid ""
 "Tasks were planned with the old data. They are kept, but reopen the task "
 "planner to update feature counts."
@@ -345,14 +370,14 @@ msgstr ""
 "టాస్క్‌లు పాత డేటాతో ప్లాన్ చేయబడ్డాయి. అవి అలాగే ఉంటాయి, కానీ ఫీచర్ల "
 "సంఖ్యను నవీకరించడానికి టాస్క్ ప్లానర్‌ను మళ్లీ తెరవండి."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:79
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:76
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr ""
 "OSM డేటా విజయవంతంగా డౌన్‌లోడ్ అయింది! %(feature_count)s లక్షణాలు "
 "కనబడ్డాయి."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:82
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:79
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "downloading again with different parameters."
@@ -360,23 +385,23 @@ msgstr ""
 "అంతా సరిగ్గా ఉంటే, \"డేటా ఎక్స్‌ట్రాక్ట్‌ను అంగీకరించండి\" క్లిక్ చేయండి."
 " లేకపోతే వేరే పారామితులతో మళ్లీ డౌన్‌లోడ్ చేయండి."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:115
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:112
 #: app/templates/partials/project_details/style_and_scripts.html:24
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "చెల్లని ఫైల్ రకం. దయచేసి .geojson లేదా .json ఫైల్‌ను అప్‌లోడ్ చేయండి."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:138
-msgid "No valid geometries found in GeoJSON."
-msgstr "GeoJSON లో చెల్లుబాటు అయ్యే జ్యామితులు కనబడలేదు."
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:126
+msgid "The file could not be read as GeoJSON."
+msgstr ""
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:152
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:145
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr ""
 "✓ GeoJSON విజయవంతంగా అప్‌లోడ్ చేయబడింది! %(feature_count)s లక్షణాలు "
 "కనబడ్డాయి."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:155
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:148
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "uploading a different file."
@@ -384,11 +409,11 @@ msgstr ""
 "అంతా సరిగ్గా ఉంటే, \"డేటా ఎక్స్‌ట్రాక్ట్‌ను అంగీకరించండి\" క్లిక్ చేయండి."
 " లేకపోతే వేరే ఫైల్‌ను అప్‌లోడ్ చేయండి."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:188
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:181
 msgid "✓ Collect-new-data mode selected. You can continue."
 msgstr "✓ కొత్త డేటా సేకరణ మోడ్ ఎంచుకోబడింది. మీరు కొనసాగవచ్చు."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:222
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:215
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -396,13 +421,13 @@ msgstr ""
 "GeoJSON డేటా కనబడలేదు. దయచేసి ముందుగా OSM డేటాను డౌన్‌లోడ్ చేయండి లేదా "
 "GeoJSON ఫైల్‌ను అప్‌లోడ్ చేయండి."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:241
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:234
 msgid "✓ Data extract successfully saved! You can now continue to the Tasks step."
 msgstr ""
 "✓ డేటా ఎక్స్‌ట్రాక్ట్ సేవ్ చేయబడింది! ఇప్పుడు మీరు టాస్క్‌ల దశకు "
 "వెళ్లవచ్చు."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:288
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
 msgid ""
 "No data extract is staged. Please download OSM data or upload a GeoJSON "
 "file first."
@@ -410,7 +435,7 @@ msgstr ""
 "సిద్ధంగా ఉన్న డేటా ఎక్స్‌ట్రాక్ట్ ఏదీ లేదు. ముందుగా OSM డేటాను డౌన్‌లోడ్ "
 "చేయండి లేదా GeoJSON ఫైల్‌ను అప్‌లోడ్ చేయండి."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:303
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:296
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
@@ -419,7 +444,7 @@ msgstr ""
 "✓ డేటా ఎక్స్‌ట్రాక్ట్ ఆమోదించబడింది! %(feature_count)s ఫీచర్లు సేవ్ "
 "అయ్యాయి. దశ 3 ఇప్పుడు పూర్తైంది."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:343
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
 msgid "Data extract discarded. Choose a data source above to try again."
 msgstr ""
 "డేటా ఎక్స్‌ట్రాక్ట్ తీసివేయబడింది. మళ్లీ ప్రయత్నించడానికి పైన డేటా "
@@ -433,11 +458,11 @@ msgstr "రిక్వెస్ట్‌లో చెల్లని GeoJSON �
 msgid "Error reading GeoJSON data from request."
 msgstr "రిక్వెస్ట్ నుండి GeoJSON డేటాను చదవడంలో లోపం ఏర్పడింది."
 
-#: app/htmx/setup_steps/setup_step_finalize_routes.py:104
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:92
 msgid "Project mapping app is not configured for finalisation."
 msgstr "ప్రాజెక్ట్ మ్యాపింగ్ యాప్ ఫైనలైజేషన్ కోసం కాన్ఫిగర్ చేయబడలేదు."
 
-#: app/htmx/setup_steps/setup_step_finalize_routes.py:142
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:130
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
@@ -445,11 +470,11 @@ msgstr ""
 "ODK URL, వినియోగదారు పేరు, పాస్‌వర్డ్ (మూడింటినీ) ఇవ్వండి, లేదా సర్వర్ "
 "డిఫాల్ట్‌లను ఉపయోగించడానికి అన్నింటినీ ఖాళీగా వదిలేయండి."
 
-#: app/htmx/setup_steps/setup_step_responses.py:85
+#: app/htmx/setup_steps/setup_step_responses.py:83
 msgid "An unexpected error occurred"
 msgstr "అనూహ్యమైన లోపం ఏర్పడింది"
 
-#: app/htmx/setup_steps/setup_step_responses.py:160
+#: app/htmx/setup_steps/setup_step_responses.py:158
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -459,27 +484,27 @@ msgstr ""
 "ప్రయత్నించండి. ఇది కొనసాగితే, క్రింద ఉన్న సాంకేతిక వివరాలను మీ instance "
 "నిర్వాహకుడికి లేదా మద్దతు బృందానికి పంపండి."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:61
+#: app/htmx/setup_steps/setup_step_validate_routes.py:58
 msgid "Could not reach Tasking Manager. Please try again later."
 msgstr "Tasking Manager ను చేరుకోలేకపోయాము. దయచేసి తర్వాత మళ్లీ ప్రయత్నించండి."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:66
+#: app/htmx/setup_steps/setup_step_validate_routes.py:63
 #, python-format
 msgid "Tasking Manager project %(id)s was not found."
 msgstr "Tasking Manager ప్రాజెక్ట్ %(id)s కనుగొనబడలేదు."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:71
+#: app/htmx/setup_steps/setup_step_validate_routes.py:68
 #, python-format
 msgid "Tasking Manager returned an error (HTTP %(status)s)."
 msgstr "Tasking Manager లోపాన్ని తిరిగి ఇచ్చింది (HTTP %(status)s)."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:84
+#: app/htmx/setup_steps/setup_step_validate_routes.py:81
 msgid "Tasking Manager returned an invalid response."
 msgstr "Tasking Manager చెల్లని ప్రతిస్పందనను తిరిగి ఇచ్చింది."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:94
-msgid "Tasking Manager project AOI did not contain any polygon geometries."
-msgstr "Tasking Manager ప్రాజెక్ట్ ఆసక్తి ప్రాంతంలో బహుభుజి జ్యామితి ఏదీ లేదు."
+#: app/htmx/setup_steps/setup_step_validate_routes.py:101
+msgid "The project area contains invalid geometry. Please fix it and retry."
+msgstr ""
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
@@ -493,111 +518,126 @@ msgstr ""
 #: app/htmx/setup_steps/setup_step_validate_routes.py:123
 #, python-format
 msgid ""
+"Area is %(area_km2)s km², over %(area_large)s km². Projects this large "
+"will likely fail to download OSM data, generate basemaps or split into "
+"tasks. Use them only for very sparse data collection, with your own "
+"uploaded data extract."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:130
+#, python-format
+msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
 "longer to process."
 msgstr ""
 "ప్రాంతం %(area_km2)s km² ఉంది. పెద్ద ప్రాంతాలు (>%(area_warn)s km²) "
 "ప్రాసెస్ చేయడానికి ఎక్కువ సమయం పట్టవచ్చు."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:148
+#: app/htmx/setup_steps/setup_step_validate_routes.py:155
 msgid "GeoJSON is required"
 msgstr "GeoJSON అవసరం"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:158
-msgid "No polygon geometries found. Project area must be a polygon."
-msgstr "పాలిగాన్ జ్యామితులు కనబడలేదు. ప్రాజెక్ట్ ప్రాంతం ఒక పాలిగాన్ అయి ఉండాలి."
-
-#: app/htmx/setup_steps/setup_step_validate_routes.py:206
+#: app/htmx/setup_steps/setup_step_validate_routes.py:205
 msgid "Tasking Manager project ID must be a positive integer."
 msgstr "Tasking Manager ప్రాజెక్ట్ ID ధన పూర్ణాంకం అయి ఉండాలి."
 
-#: app/projects/mapping_apps.py:48
+#: app/projects/data_extract_services.py:204
+msgid "Selected area is too large. Please select an area smaller than 200 km²."
+msgstr ""
+"ఎంచుకున్న ప్రాంతం చాలా పెద్దది. దయచేసి 200 km² కంటే చిన్న ప్రాంతాన్ని "
+"ఎంచుకోండి."
+
+#: app/projects/data_extract_services.py:211
+msgid "Failed to generate data extract from the raw data API."
+msgstr "ముడి డేటా API నుండి డేటా సారాన్ని రూపొందించడంలో విఫలమైంది."
+
+#: app/projects/mapping_apps.py:53
 msgid "GIS mapping app for Android and iOS, with our simple task plugin."
 msgstr "Android మరియు iOS కోసం GIS మ్యాపింగ్ యాప్, మా సులభమైన టాస్క్ ప్లగిన్‌తో."
 
-#: app/projects/mapping_apps.py:49
+#: app/projects/mapping_apps.py:54
 msgid "Drawing and editing geometry, detailed surveys"
 msgstr "జ్యామితిని గీయడం మరియు సవరించడం, వివరమైన సర్వేలు"
 
-#: app/projects/mapping_apps.py:57
+#: app/projects/mapping_apps.py:62
 msgid "Form-based survey app for Android."
 msgstr "Android కోసం ఫారమ్ ఆధారిత సర్వే యాప్."
 
-#: app/projects/mapping_apps.py:58
+#: app/projects/mapping_apps.py:63
 msgid "Form-heavy surveys, simple phones"
 msgstr "ఎక్కువ ఫారమ్‌లు ఉన్న సర్వేలు, సాధారణ ఫోన్‌లు"
 
-#: app/projects/mapping_apps.py:66
+#: app/projects/mapping_apps.py:71
 msgid "Fast OpenStreetMap editor for shops, amenities and entrances."
 msgstr ""
 "దుకాణాలు, సౌకర్యాలు మరియు ప్రవేశ ద్వారాల కోసం వేగవంతమైన OpenStreetMap "
 "ఎడిటర్."
 
-#: app/projects/mapping_apps.py:67
+#: app/projects/mapping_apps.py:72
 msgid "Updating existing OSM buildings and points of interest"
 msgstr "ఇప్పటికే ఉన్న OSM భవనాలు మరియు ఆసక్తి ప్రదేశాలను నవీకరించడం"
 
-#: app/projects/mapping_apps.py:75
+#: app/projects/mapping_apps.py:80
 msgid "Answer simple quests to complete OpenStreetMap data."
 msgstr "OpenStreetMap డేటాను పూర్తి చేయడానికి సులభమైన ప్రశ్నలకు సమాధానం ఇవ్వండి."
 
-#: app/projects/mapping_apps.py:76
+#: app/projects/mapping_apps.py:81
 msgid "Quick OSM attribute quests on roads and points of interest"
 msgstr "రోడ్లు మరియు ఆసక్తి ప్రదేశాలపై వేగవంతమైన OSM లక్షణ ప్రశ్నలు"
 
-#: app/projects/mapping_apps.py:84
+#: app/projects/mapping_apps.py:89
 msgid "Offline-first mapping for communities and territories."
 msgstr "సమాజాలు మరియు భూభాగాల కోసం ఆఫ్‌లైన్-ప్రాధాన్య మ్యాపింగ్."
 
-#: app/projects/mapping_apps.py:85
+#: app/projects/mapping_apps.py:90
 msgid "Offline, community-led mapping"
 msgstr "ఆఫ్‌లైన్, సమాజ నేతృత్వంలోని మ్యాపింగ్"
 
-#: app/projects/mapping_apps.py:93
+#: app/projects/mapping_apps.py:98
 msgid "Offline maps and navigation, with OSM editing."
 msgstr "OSM సవరణతో ఆఫ్‌లైన్ మ్యాప్‌లు మరియు నావిగేషన్."
 
-#: app/projects/mapping_apps.py:94
+#: app/projects/mapping_apps.py:99
 msgid "Navigating to tasks, editing OSM points"
 msgstr "టాస్క్‌లకు నావిగేషన్, OSM పాయింట్లను సవరించడం"
 
-#: app/projects/mapping_apps.py:102
+#: app/projects/mapping_apps.py:107
 msgid "Open street-level imagery, captured with any camera."
 msgstr "ఏ కెమెరాతోనైనా తీసిన బహిరంగ వీధి-స్థాయి చిత్రాలు."
 
-#: app/projects/mapping_apps.py:103
+#: app/projects/mapping_apps.py:108
 msgid "Street-level imagery along roads"
 msgstr "రోడ్ల వెంబడి వీధి-స్థాయి చిత్రాలు"
 
-#: app/projects/mapping_apps.py:111
+#: app/projects/mapping_apps.py:116
 msgid "Print paper maps, sketch on them, scan them back."
 msgstr "కాగితపు మ్యాప్‌లను ముద్రించి, వాటిపై గీసి, మళ్లీ స్కాన్ చేయండి."
 
-#: app/projects/mapping_apps.py:112
+#: app/projects/mapping_apps.py:117
 msgid "Paper maps and sketch mapping"
 msgstr "కాగితపు మ్యాప్‌లు మరియు స్కెచ్ మ్యాపింగ్"
 
-#: app/projects/mapping_apps.py:120
+#: app/projects/mapping_apps.py:125
 msgid "Turn locations shared in chat apps into a map."
 msgstr "చాట్ యాప్‌లలో పంచుకున్న స్థానాలను మ్యాప్‌గా మార్చండి."
 
-#: app/projects/mapping_apps.py:121
+#: app/projects/mapping_apps.py:126
 msgid "Location sharing from chat apps"
 msgstr "చాట్ యాప్‌ల నుండి స్థానం పంచుకోవడం"
 
-#: app/projects/mapping_apps.py:125
+#: app/projects/mapping_apps.py:130
 msgid "Other app"
 msgstr "ఇతర యాప్"
 
-#: app/projects/mapping_apps.py:129
+#: app/projects/mapping_apps.py:134
 msgid "Any other app. Share the tasks as files and links."
 msgstr "ఏ ఇతర యాప్ అయినా. టాస్క్‌లను ఫైల్‌లు మరియు లింక్‌లుగా పంచుకోండి."
 
-#: app/projects/mapping_apps.py:130
+#: app/projects/mapping_apps.py:135
 msgid "Any app"
 msgstr "ఏ యాప్ అయినా"
 
-#: app/projects/mapping_apps.py:157
+#: app/projects/mapping_apps.py:162
 msgid ""
 "Not for OpenStreetMap: QField for map-based capture and editing, or ODK "
 "for form-heavy surveys."
@@ -605,13 +645,13 @@ msgstr ""
 "OpenStreetMap కోసం కాదు: మ్యాప్ ఆధారిత సేకరణ మరియు సవరణకు QField, లేదా "
 "ఎక్కువ ఫారమ్‌లు ఉన్న సర్వేలకు ODK."
 
-#: app/projects/mapping_apps.py:162
+#: app/projects/mapping_apps.py:167
 msgid "Poorly mapped: QField lets mappers draw the missing geometry."
 msgstr ""
 "తక్కువగా మ్యాప్ చేయబడింది: తప్పిపోయిన జ్యామితిని గీయడానికి QField "
 "మ్యాపర్లకు వీలు కల్పిస్తుంది."
 
-#: app/projects/mapping_apps.py:166
+#: app/projects/mapping_apps.py:171
 msgid ""
 "Already mapped: Every Door is the quickest way to update buildings and "
 "points of interest."
@@ -619,7 +659,7 @@ msgstr ""
 "ఇప్పటికే మ్యాప్ చేయబడింది: భవనాలు మరియు ఆసక్తి ప్రదేశాలను నవీకరించడానికి "
 "Every Door అత్యంత వేగవంతమైన మార్గం."
 
-#: app/projects/mapping_apps.py:171
+#: app/projects/mapping_apps.py:176
 msgid ""
 "Already mapped: StreetComplete for road details, or Panoramax for street-"
 "level imagery."
@@ -627,41 +667,31 @@ msgstr ""
 "ఇప్పటికే మ్యాప్ చేయబడింది: రోడ్డు వివరాలకు StreetComplete, లేదా "
 "వీధి-స్థాయి చిత్రాలకు Panoramax."
 
-#: app/projects/mapping_apps.py:174
+#: app/projects/mapping_apps.py:179
 msgid "QField handles any kind of feature."
 msgstr "QField ఏ రకమైన ఫీచర్‌నైనా నిర్వహిస్తుంది."
 
-#: app/projects/project_crud.py:120
-msgid "Selected area is too large. Please select an area smaller than 200 km²."
-msgstr ""
-"ఎంచుకున్న ప్రాంతం చాలా పెద్దది. దయచేసి 200 km² కంటే చిన్న ప్రాంతాన్ని "
-"ఎంచుకోండి."
-
-#: app/projects/project_crud.py:131
-msgid "Failed to generate data extract from the raw data API."
-msgstr "ముడి డేటా API నుండి డేటా సారాన్ని రూపొందించడంలో విఫలమైంది."
-
-#: app/projects/project_crud.py:206
+#: app/projects/project_crud.py:130
 msgid "This job was interrupted. Please try again."
 msgstr "ఈ పని మధ్యలో ఆగిపోయింది. దయచేసి మళ్లీ ప్రయత్నించండి."
 
-#: app/projects/project_crud.py:692
+#: app/projects/project_crud.py:611
 msgid "QField project ID not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/projects/project_crud.py:712
+#: app/projects/project_crud.py:628
 msgid "Project name not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/projects/project_crud.py:719
+#: app/projects/project_crud.py:632
 msgid "ODK project ID not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/projects/project_crud.py:728
+#: app/projects/project_crud.py:638
 msgid "Appuser token not found."
 msgstr "ప్రాజెక్ట్ కనబడలేదు."
 
-#: app/projects/project_crud.py:745
+#: app/projects/project_crud.py:652
 msgid "Failed to generate QR code."
 msgstr "టెంప్లేట్ ఫారమ్‌ను లోడ్ చేయలేకపోయాము."
 
@@ -683,94 +713,94 @@ msgstr "పేరు లేని ప్రాంతం"
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "ప్రాంతం {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:389
+#: app/projects/project_services.py:299
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/projects/project_services.py:1154
-msgid "Task areas changed. Confirm the reset to re-sync the tasks."
+#: app/projects/project_services.py:662
+msgid "No submissions found yet."
 msgstr ""
-"టాస్క్ ప్రాంతాలు మారాయి. టాస్క్‌లను మళ్లీ సింక్ చేయడానికి రీసెట్‌ను "
-"నిర్ధారించండి."
 
-#: app/projects/task_plan.py:31
+#: app/projects/project_services.py:666
+msgid "Export is only available for ODK and QField projects."
+msgstr ""
+
+#: app/projects/task_plan.py:32
 #, python-format
 msgid "Values must be %(max_length)s characters or fewer."
 msgstr "విలువలు %(max_length)s అక్షరాలు లేదా అంతకంటే తక్కువ ఉండాలి."
 
-#: app/projects/task_plan.py:44
+#: app/projects/task_plan.py:45
 msgid "Group labels may only contain letters, numbers, hyphens and underscores."
 msgstr ""
 "గ్రూప్ లేబుల్‌లలో అక్షరాలు, సంఖ్యలు, హైఫన్‌లు మరియు అండర్‌స్కోర్‌లు "
 "మాత్రమే ఉండవచ్చు."
 
-#: app/projects/task_plan.py:61
+#: app/projects/task_plan.py:62
 msgid "Colours must be hex values such as #d63f3f."
 msgstr "రంగులు #d63f3f వంటి హెక్స్ విలువలు అయి ఉండాలి."
 
-#: app/projects/task_plan.py:112
+#: app/projects/task_plan.py:113
 #, python-format
 msgid "Task %(number)s must be a Polygon with WGS84 coordinates."
 msgstr ""
 "టాస్క్ %(number)s తప్పనిసరిగా WGS84 కోఆర్డినేట్‌లతో కూడిన బహుభుజి అయి "
 "ఉండాలి."
 
-#: app/projects/task_plan.py:122
+#: app/projects/task_plan.py:123
 #, python-format
 msgid "Task %(number)s: %(error)s"
 msgstr "టాస్క్ %(number)s: %(error)s"
 
-#: app/projects/task_plan.py:143
+#: app/projects/task_plan.py:144
 msgid "A task plan must be a GeoJSON FeatureCollection."
 msgstr "టాస్క్ ప్లాన్ తప్పనిసరిగా GeoJSON FeatureCollection అయి ఉండాలి."
 
-#: app/projects/task_plan.py:145
+#: app/projects/task_plan.py:146
 msgid "The task plan has no tasks."
 msgstr "టాస్క్ ప్లాన్‌లో టాస్క్‌లు ఏవీ లేవు."
 
-#: app/projects/task_plan.py:148
+#: app/projects/task_plan.py:149
 #, python-format
 msgid "A task plan can have at most %(max_tasks)s tasks."
 msgstr "ఒక టాస్క్ ప్లాన్‌లో గరిష్టంగా %(max_tasks)s టాస్క్‌లు ఉండవచ్చు."
 
-#: app/qfield/qfield_crud.py:157
-msgid "Project outline is missing or has no geometry."
-msgstr "ప్రాజెక్ట్ అవుట్‌లైన్ లేదు లేదా జ్యామితి లేదు."
+#: app/projects/task_sync.py:185
+msgid "Task areas changed. Confirm the reset to re-sync the tasks."
+msgstr ""
+"టాస్క్ ప్రాంతాలు మారాయి. టాస్క్‌లను మళ్లీ సింక్ చేయడానికి రీసెట్‌ను "
+"నిర్ధారించండి."
 
-#: app/qfield/qfield_crud.py:163
-msgid "Project outline geometry has no coordinates."
-msgstr "ప్రాజెక్ట్ అవుట్‌లైన్ జ్యామితికి కోఆర్డినేట్‌లు లేవు."
-
-#: app/qfield/qfield_crud.py:450
+#: app/qfield/qfield_crud.py:386
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS రేపర్ పూర్తయింది కానీ అవుట్‌పుట్ ఫైల్‌లు లేవు."
 
-#: app/qfield/qfield_crud.py:462
+#: app/qfield/qfield_crud.py:395
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS రేపర్ పూర్తయింది కానీ అవుట్‌పుట్‌లో .qgz ఫైల్ లేదు."
 
-#: app/qfield/qfield_crud.py:485
+#: app/qfield/qfield_crud.py:416
 msgid "Project outline is required for QField project creation."
 msgstr "✓ ఈ ప్రాజెక్ట్ సెటప్‌కు పని విభజన అవసరం లేదు."
 
-#: app/qfield/qfield_crud.py:490
+#: app/qfield/qfield_crud.py:419
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm అవసరం."
 
-#: app/qfield/qfield_crud.py:502
+#: app/qfield/qfield_crud.py:428
 msgid "Failed to modify XLSForm for QField."
 msgstr "QField కోసం XLSFormని సవరించడంలో విఫలమైంది."
 
-#: app/qfield/qfield_crud.py:572
+#: app/qfield/qfield_crud.py:496
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField ప్రాజెక్ట్ ID లేదు; బేస్‌మ్యాప్‌ను జోడించడం సాధ్యం కాదు."
 
-#: app/qfield/qfield_crud.py:609
+#: app/qfield/qfield_crud.py:532
 msgid "Basemap attach completed but produced no project files."
 msgstr "బేస్‌మ్యాప్ QField ప్రాజెక్ట్‌కు జత చేయబడింది."
 
-#: app/qfield/qfield_crud.py:794
+#: app/qfield/qfield_crud.py:716
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -779,48 +809,48 @@ msgstr ""
 "%(attempts)d ప్రయత్నాల తర్వాత కూడా QFieldCloud ప్రాజెక్ట్ ఫైల్ "
 "ప్రాసెసింగ్‌ను పూర్తి చేయలేదు (చివరి స్థితి: %(status)s)."
 
-#: app/qfield/qfield_crud.py:848 app/qfield/qfield_crud.py:862
+#: app/qfield/qfield_crud.py:769 app/qfield/qfield_crud.py:779
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS ప్రాజెక్ట్ ఉత్పత్తి విఫలమైంది: %(error)s"
 
-#: app/qfield/qfield_crud.py:855
+#: app/qfield/qfield_crud.py:774
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS రేపర్ చెల్లని JSONని అందించింది."
 
-#: app/qfield/qfield_crud.py:879
+#: app/qfield/qfield_crud.py:793
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr ""
 "అప్‌లోడ్ కోసం బేస్‌మ్యాప్ MBTilesని డౌన్‌లోడ్ చేయడంలో విఫలమైంది (HTTP "
 "%(status)s)."
 
-#: app/qfield/qfield_crud.py:894
+#: app/qfield/qfield_crud.py:803
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "QR కోడ్‌ను డౌన్‌లోడ్ చేయండి"
 
-#: app/qfield/qfield_crud.py:969
+#: app/qfield/qfield_crud.py:876
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "QFieldCloudకి ఫైల్‌లను అప్‌లోడ్ చేయడంలో విఫలమైంది: %(error)s"
 
-#: app/qfield/qfield_crud.py:1084
+#: app/qfield/qfield_crud.py:988
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ గుర్తింపు వివరాలు చెల్లుబాటు అవుతున్నాయి!"
 
-#: app/qfield/qfield_crud.py:1115
+#: app/qfield/qfield_crud.py:1017
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "ఈ ప్రాజెక్ట్ QFieldCloud ప్రాజెక్ట్‌కి లింక్ చేయబడలేదు."
 
-#: app/qfield/qfield_crud.py:1122
+#: app/qfield/qfield_crud.py:1022
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "QFIELDCLOUD_QGIS_URL కాన్ఫిగర్ చేయబడలేదు."
 
-#: app/qfield/qfield_crud.py:1152
+#: app/qfield/qfield_crud.py:1049
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr "QFieldCloud ప్యాకేజీలో GeoPackage ఫైల్‌లు ఏవీ కనుగొనబడలేదు."
 
-#: app/qfield/qfield_crud.py:1171
+#: app/qfield/qfield_crud.py:1066
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
@@ -828,15 +858,15 @@ msgstr ""
 "QFieldCloud ప్యాకేజీలో సర్వే డేటా ఏదీ కనుగొనబడలేదు. మ్యాపర్‌లు ఇంకా "
 "ఎలాంటి ప్రతిస్పందనలను సమర్పించి ఉండకపోవచ్చు."
 
-#: app/qfield/qfield_crud.py:1194
+#: app/qfield/qfield_crud.py:1087
 msgid "QFieldCloud did not return a package job id."
 msgstr "QFieldCloud ప్యాకేజీ జాబ్ ఐడిని తిరిగి ఇవ్వలేదు."
 
-#: app/qfield/qfield_crud.py:1211
+#: app/qfield/qfield_crud.py:1101
 msgid "QFieldCloud failed to package the project."
 msgstr "QFieldCloud ప్రాజెక్ట్‌ను ప్యాకేజీ చేయడంలో విఫలమైంది."
 
-#: app/qfield/qfield_crud.py:1217
+#: app/qfield/qfield_crud.py:1105
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
@@ -845,12 +875,12 @@ msgstr ""
 "ప్రాజెక్ట్‌ను ప్యాకేజీ చేయడానికి QFieldCloud కోసం వేచి ఉన్న సమయం "
 "ముగిసింది (చివరి స్థితి: %(status)s)."
 
-#: app/qfield/qfield_crud.py:1237
+#: app/qfield/qfield_crud.py:1124
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "జియోప్యాకేజ్ మార్పిడి విఫలమైంది: %(error)s"
 
-#: app/qfield/qfield_crud.py:1244
+#: app/qfield/qfield_crud.py:1130
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "QGIS రేపర్ /ఎగుమతి కోసం చెల్లని JSONని అందించింది."
 
@@ -858,7 +888,7 @@ msgstr "QGIS రేపర్ /ఎగుమతి కోసం చెల్లన
 msgid "Projects"
 msgstr "ప్రాజెక్టులు"
 
-#: app/templates/home.html:7 app/templates/landing.html:447
+#: app/templates/home.html:7 app/templates/landing.html:472
 #: app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:42
 msgid "Create Project"
@@ -974,11 +1004,11 @@ msgstr ""
 "ఏ ప్రాజెక్ట్ కనబడలేదు. ప్రారంభించడానికి మీ మొదటి ప్రాజెక్ట్‌ను "
 "సృష్టించండి!"
 
-#: app/templates/landing.html:433
+#: app/templates/landing.html:458
 msgid "Coordinate field campaigns"
 msgstr "ఫీల్డ్ కార్యక్రమాలను సమన్వయం చేయండి"
 
-#: app/templates/landing.html:436
+#: app/templates/landing.html:461
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
@@ -986,19 +1016,19 @@ msgstr ""
 "అంతరాయం లేకుండా సమన్వయం ద్వారా ఫీల్డ్ మ్యాపింగ్ సామర్థ్యాన్ని మరియు "
 "ఖచ్చితత్వాన్ని పెంచడం."
 
-#: app/templates/landing.html:440
+#: app/templates/landing.html:465
 msgid "Explore Projects"
 msgstr "ప్రాజెక్టులను పరిశీలించండి"
 
-#: app/templates/landing.html:457
+#: app/templates/landing.html:482
 msgid "Loading metrics..."
 msgstr "మెట్రిక్‌లు లోడ్ అవుతున్నాయి..."
 
-#: app/templates/landing.html:465
+#: app/templates/landing.html:490
 msgid "What is it?"
 msgstr "ఇది ఏమిటి?"
 
-#: app/templates/landing.html:467
+#: app/templates/landing.html:492
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
 "map features\n"
@@ -1008,7 +1038,7 @@ msgstr ""
 "ద్వారా బృందాలు స్థానిక జ్ఞానాన్ని మ్యాప్ లక్షణాలకు జోడించడానికి "
 "సహాయపడుతుంది."
 
-#: app/templates/landing.html:471
+#: app/templates/landing.html:496
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
 "mature tools\n"
@@ -1022,21 +1052,21 @@ msgstr ""
 "సాధారణంగా అందుబాటులో ఉన్న Android పరికరాలతో బృందాలు భౌగోళిక డేటాను "
 "సమర్థవంతంగా సేకరించడంలో సహాయపడే స్వతంత్ర మొబైల్ మరియు వెబ్ వర్క్‌ఫ్లో."
 
-#: app/templates/landing.html:478
+#: app/templates/landing.html:503
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr ""
 "ఒక ప్రాజెక్ట్ మేనేజర్ ల్యాప్‌టాప్‌పై FieldTM మ్యాపింగ్ వర్క్‌ఫ్లోని "
 "చూపిస్తున్నారు"
 
-#: app/templates/landing.html:484
+#: app/templates/landing.html:509
 msgid "Main Features"
 msgstr "ప్రధాన లక్షణాలు"
 
-#: app/templates/landing.html:487
+#: app/templates/landing.html:512
 msgid "Flexible Data Collection"
 msgstr "అనుకూల డేటా సేకరణ"
 
-#: app/templates/landing.html:489
+#: app/templates/landing.html:514
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
 "workflows that\n"
@@ -1045,11 +1075,11 @@ msgstr ""
 "విభిన్న సర్వే ఫారమ్‌లు, అనేక డేటా ఫార్మాట్‌లు మరియు వేర్వేరు ఆపరేషనల్ "
 "అవసరాలకు సరిపోయే అనుకూల వర్క్‌ఫ్లోలకు మద్దతు ఇస్తుంది."
 
-#: app/templates/landing.html:494
+#: app/templates/landing.html:519
 msgid "Open Source and Customizable"
 msgstr "ఓపెన్ సోర్స్ మరియు అనుకూలీకరించదగినది"
 
-#: app/templates/landing.html:496
+#: app/templates/landing.html:521
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
 "\n"
@@ -1058,11 +1088,11 @@ msgstr ""
 "మీ సర్వే తర్కం, డేటా నిర్మాణాలు మరియు సమీకరణ అవసరాలకు Field-TM ను "
 "సరిపోల్చుకోండి."
 
-#: app/templates/landing.html:501
+#: app/templates/landing.html:526
 msgid "Entity-Level Tracking"
 msgstr "ఎంటిటీ-స్థాయి ట్రాకింగ్"
 
-#: app/templates/landing.html:503
+#: app/templates/landing.html:528
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed\n"
@@ -1071,19 +1101,19 @@ msgstr ""
 "మేనేజర్లు త్వరగా సమాచారం ఆధారిత నిర్ణయాలు తీసుకునేలా పని మరియు లక్షణ "
 "స్థాయిలో సర్వే పురోగతిని పర్యవేక్షించండి."
 
-#: app/templates/landing.html:511
+#: app/templates/landing.html:536
 msgid "Who is it for?"
 msgstr "ఇది ఎవరికి?"
 
-#: app/templates/landing.html:514
+#: app/templates/landing.html:539
 msgid "Project Manager"
 msgstr "ప్రాజెక్ట్ మేనేజర్"
 
-#: app/templates/landing.html:515
+#: app/templates/landing.html:540
 msgid "Create and coordinate field campaigns"
 msgstr "ఫీల్డ్ కార్యక్రమాలను సృష్టించండి మరియు సమన్వయం చేయండి"
 
-#: app/templates/landing.html:517
+#: app/templates/landing.html:542
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
 " interest,\n"
@@ -1093,33 +1123,33 @@ msgstr ""
 "ఏర్పాటు చేస్తారు, ఆసక్తి ప్రాంతాలను నిర్వచిస్తారు, సర్వే ఫారమ్‌లను "
 "రూపకల్పన చేస్తారు, మరియు పనిని నిర్వహించదగిన భాగాలుగా విభజిస్తారు."
 
-#: app/templates/landing.html:521
+#: app/templates/landing.html:546
 msgid "Define a project area and upload or choose a survey form"
 msgstr ""
 "ప్రాజెక్ట్ ప్రాంతాన్ని నిర్వచించి సర్వే ఫారమ్‌ను అప్‌లోడ్ చేయండి లేదా "
 "ఎంచుకోండి"
 
-#: app/templates/landing.html:522
+#: app/templates/landing.html:547
 msgid "Split the area into tasks and generate a data extract"
 msgstr "ప్రాంతాన్ని పనులుగా విభజించి డేటా ఎక్స్‌ట్రాక్ట్ రూపొందించండి"
 
-#: app/templates/landing.html:523
+#: app/templates/landing.html:548
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "ప్రాజెక్ట్‌ను ODK Central లేదా QFieldCloud లో ప్రచురించండి"
 
-#: app/templates/landing.html:524
+#: app/templates/landing.html:549
 msgid "Share a QR code so mappers can start collecting data"
 msgstr "మ్యాపర్లు డేటా సేకరించడం ప్రారంభించేందుకు QR కోడ్‌ను పంచుకోండి"
 
-#: app/templates/landing.html:528
+#: app/templates/landing.html:553
 msgid "Field Mapper"
 msgstr "ఫీల్డ్ మ్యాపర్"
 
-#: app/templates/landing.html:529
+#: app/templates/landing.html:554
 msgid "Collect data in the field with your phone"
 msgstr "మీ ఫోన్‌తో ఫీల్డ్‌లో డేటా సేకరించండి"
 
-#: app/templates/landing.html:531
+#: app/templates/landing.html:556
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
 "publishes a\n"
@@ -1130,35 +1160,35 @@ msgstr ""
 "ప్రాజెక్ట్‌ను ప్రచురించిన తర్వాత, వారు తమకు ఇష్టమైన మొబైల్ యాప్‌లో నేరుగా"
 " దానిని యాక్సెస్ చేస్తారు."
 
-#: app/templates/landing.html:535
+#: app/templates/landing.html:560
 msgid "Scan the QR code shared by your project manager"
 msgstr "మీ ప్రాజెక్ట్ మేనేజర్ పంచుకున్న QR కోడ్‌ను స్కాన్ చేయండి"
 
-#: app/templates/landing.html:536
+#: app/templates/landing.html:561
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "ప్రాజెక్ట్ ODK Collect లేదా QField లో స్వయంచాలకంగా లోడ్ అవుతుంది"
 
-#: app/templates/landing.html:537
+#: app/templates/landing.html:562
 msgid "Navigate to your assigned task area and collect data"
 msgstr "మీకు కేటాయించిన పని ప్రాంతానికి వెళ్లి డేటా సేకరించండి"
 
-#: app/templates/landing.html:538
+#: app/templates/landing.html:563
 msgid "Submit your survey, which goes straight to the server"
 msgstr "మీ సర్వేను సమర్పించండి, అది నేరుగా సర్వర్‌కి వెళుతుంది"
 
-#: app/templates/landing.html:545
+#: app/templates/landing.html:570
 msgid "Field-TM Use Cases"
 msgstr "Field-TM వినియోగ సందర్భాలు"
 
-#: app/templates/landing.html:550
+#: app/templates/landing.html:575
 msgid "Field mapping in progress"
 msgstr "ఫీల్డ్ మ్యాపింగ్ ప్రగతిలో ఉంది"
 
-#: app/templates/landing.html:555
+#: app/templates/landing.html:580
 msgid "1. Community Mapping"
 msgstr "1. సముదాయ మ్యాపింగ్"
 
-#: app/templates/landing.html:557
+#: app/templates/landing.html:582
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public\n"
@@ -1168,11 +1198,11 @@ msgstr ""
 "సదుపాయాలు మరియు స్థానిక సేవలను మ్యాప్ చేయడానికి సముదాయాలకు "
 "శక్తినిస్తుంది."
 
-#: app/templates/landing.html:562
+#: app/templates/landing.html:587
 msgid "2. Urban Planning and Management"
 msgstr "2. పట్టణ ప్రణాళిక మరియు నిర్వహణ"
 
-#: app/templates/landing.html:564
+#: app/templates/landing.html:589
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities\n"
@@ -1181,11 +1211,11 @@ msgstr ""
 "స్పష్టమైన, నిర్వహించదగిన మ్యాపింగ్ పనుల ద్వారా ఇళ్లు, రహదారులు మరియు "
 "యుటిలిటీలపై సమన్వయ సర్వేలతో మరింత స్మార్ట్ నగరాలను నిర్మించండి."
 
-#: app/templates/landing.html:569
+#: app/templates/landing.html:594
 msgid "3. Disaster Response and Recovery"
 msgstr "3. విపత్తు ప్రతిస్పందన మరియు పునరుద్ధరణ"
 
-#: app/templates/landing.html:571
+#: app/templates/landing.html:596
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
 "volunteers, and\n"
@@ -1195,47 +1225,58 @@ msgstr ""
 "కార్యకర్తలను సమన్వయం చేయండి, మరియు సహాయక చర్యలకు నమ్మదగిన డేటాను "
 "అందించండి."
 
-#: app/templates/landing.html:580
+#: app/templates/landing.html:605
 msgid "Resources"
 msgstr "వనరులు"
 
-#: app/templates/landing.html:588
+#: app/templates/landing.html:613
 msgid "Data Prep"
 msgstr "డేటా సిద్ధం"
 
-#: app/templates/landing.html:589
+#: app/templates/landing.html:614
 msgid "HOT Export Tool"
 msgstr "HOT ఎగుమతి సాధనం"
 
-#: app/templates/landing.html:591
+#: app/templates/landing.html:616
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr ""
 "మీ ప్రాజెక్ట్ ప్రాంతానికి పని-సిద్ధమైన భౌగోళిక డేటా ఎక్స్‌ట్రాక్ట్‌లను "
 "డౌన్‌లోడ్ చేయండి."
 
-#: app/templates/landing.html:600 app/templates/landing.html:612
+#: app/templates/landing.html:625 app/templates/landing.html:637
 msgid "Documentation"
 msgstr "పత్రాలు"
 
-#: app/templates/landing.html:601
+#: app/templates/landing.html:626
 msgid "ODK Central Guide"
 msgstr "ODK Central మార్గదర్శిని"
 
-#: app/templates/landing.html:603
+#: app/templates/landing.html:628
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr ""
 "ODK లో ఫారమ్‌లు, యాప్ వినియోగదారులు మరియు ఫీల్డ్ సమర్పణలను ఎలా "
 "నిర్వహించాలో తెలుసుకోండి."
 
-#: app/templates/landing.html:613
+#: app/templates/landing.html:638
 msgid "QField Guide"
 msgstr "QField మార్గదర్శిని"
 
-#: app/templates/landing.html:615
+#: app/templates/landing.html:640
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "ఆఫ్‌లైన్ మ్యాపింగ్ కోసం QFieldCloud ప్రాజెక్టులు మరియు మొబైల్ "
 "వర్క్‌ఫ్లోలను ఏర్పాటు చేయండి."
+
+#: app/templates/landing.html:648 app/templates/landing.html:661
+msgid "Join the Community"
+msgstr ""
+
+#: app/templates/landing.html:650
+msgid ""
+"Field-TM is built in the open with mappers, developers and partners "
+"around the world.\n"
+"        Come and say hello on the HOTOSM Slack."
+msgstr ""
 
 #: app/templates/layout.html:14
 msgid "Coordinated field mapping for Open Mapping campaigns."
@@ -1596,7 +1637,7 @@ msgstr ""
 "ట్యాగ్‌ను తొలగించడానికి × నొక్కండి."
 
 #: app/templates/new_project_custom.html:144
-#: app/templates/partials/project_details/setup_steps/step2_form.html:116
+#: app/templates/partials/project_details/setup_steps/step2_form.html:134
 msgid "Continue"
 msgstr "కొనసాగించు"
 
@@ -1675,11 +1716,9 @@ msgstr "ప్రాజెక్టులకు తిరిగి వెళ్�
 
 #: app/templates/project_details.html:34
 msgid ""
-"Trigger a fresh QFieldCloud package and download the project data as a "
-"single GeoJSON file."
+"Download all submissions as a single GeoJSON file, for QGIS, uMap and "
+"other tools."
 msgstr ""
-"తాజా QFieldCloud ప్యాకేజీని ట్రిగ్గర్ చేయండి మరియు ప్రాజెక్ట్ డేటాను ఒకే "
-"GeoJSON ఫైల్‌గా డౌన్‌లోడ్ చేయండి."
 
 #: app/templates/project_details.html:38
 msgid "Export Data"
@@ -1708,12 +1747,8 @@ msgstr ""
 "సంప్రదించండి."
 
 #: app/templates/project_details.html:61
-msgid ""
-"Packaging project on QFieldCloud - this may take a minute, please be "
-"patient..."
+msgid "Gathering submissions - this may take a minute, please be patient..."
 msgstr ""
-"QFieldCloudలో ప్యాకేజింగ్ ప్రాజెక్ట్ - దీనికి ఒక నిమిషం పట్టవచ్చు, దయచేసి"
-" ఓపికపట్టండి..."
 
 #: app/templates/project_details.html:62
 msgid "✓ Download started."
@@ -1765,12 +1800,19 @@ msgstr "ప్రాజెక్ట్‌ను బాహ్యంగా చూ�
 msgid "This project is not ready for mapping yet."
 msgstr "ఈ ప్రాజెక్ట్ ఇంకా మ్యాపింగ్‌కు సిద్ధంగా లేదు."
 
-#: app/templates/project_details.html:180
-#: app/templates/project_details.html:198
+#: app/templates/project_details.html:185
+msgid ""
+"You can't change this form in Field-TM. To change it, edit the project in"
+" QGIS and sync\n"
+"    the updates."
+msgstr ""
+
+#: app/templates/project_details.html:189
+#: app/templates/project_details.html:207
 msgid "Delete project"
 msgstr "ప్రాజెక్ట్‌ను తొలగించండి"
 
-#: app/templates/project_details.html:183
+#: app/templates/project_details.html:192
 msgid ""
 "Deletes the project here and in the mapping app (ODK Central or "
 "QFieldCloud), including\n"
@@ -1780,7 +1822,7 @@ msgstr ""
 "QFieldCloud), అక్కడ సేకరించిన డేటాతో సహా తొలగిస్తుంది. దీనిని రద్దు "
 "చేయలేరు."
 
-#: app/templates/project_details.html:186
+#: app/templates/project_details.html:195
 msgid ""
 "Delete this project in Field-TM and in the mapping app, including\n"
 "    collected data? This cannot be undone."
@@ -1788,15 +1830,15 @@ msgstr ""
 "ఈ ప్రాజెక్ట్‌ను Field-TM మరియు మ్యాపింగ్ యాప్‌లో, సేకరించిన డేటాతో సహా "
 "తొలగించాలా? దీనిని రద్దు చేయలేరు."
 
-#: app/templates/project_details.html:188
+#: app/templates/project_details.html:197
 msgid "Deletes the project and its tasks. This cannot be undone."
 msgstr "ప్రాజెక్ట్‌ను మరియు దాని టాస్క్‌లను తొలగిస్తుంది. దీనిని రద్దు చేయలేరు."
 
-#: app/templates/project_details.html:189
+#: app/templates/project_details.html:198
 msgid "Delete this project and its tasks? This cannot be undone."
 msgstr "ఈ ప్రాజెక్ట్‌ను మరియు దాని టాస్క్‌లను తొలగించాలా? దీనిని రద్దు చేయలేరు."
 
-#: app/templates/project_details.html:205
+#: app/templates/project_details.html:214
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view it."
@@ -1905,6 +1947,12 @@ msgstr "ముందుగా Tasking Manager ప్రాజెక్ట్ ID 
 msgid "Could not load AOI from Tasking Manager."
 msgstr "Tasking Manager నుండి ఆసక్తి ప్రాంతాన్ని లోడ్ చేయలేకపోయాము."
 
+#: app/templates/partials/new_project/map_script.html:14
+msgid ""
+"This looks like a task plan. After the project is created, upload the "
+"same file in the Tasks section to keep your tasks and assignments."
+msgstr ""
+
 #: app/templates/partials/new_project/map_section.html:5
 msgid "Draw Area"
 msgstr "ప్రాంతాన్ని గీయండి"
@@ -1923,17 +1971,17 @@ msgid ""
 "      map on the map below."
 msgstr "మీరు మ్యాప్ చేయాలనుకుంటున్న ప్రాంతాన్ని క్రింది మ్యాప్‌పై గీయండి."
 
-#: app/templates/partials/new_project/map_section.html:20
-#: app/templates/partials/project_details/setup_steps/step2_form.html:70
+#: app/templates/partials/new_project/map_section.html:21
+#: app/templates/partials/project_details/setup_steps/step2_form.html:78
 #: app/templates/partials/project_details/setup_steps/step3_data.html:44
 msgid "More options"
 msgstr "ఫారమ్ ఎంపికలు:"
 
-#: app/templates/partials/new_project/map_section.html:23
+#: app/templates/partials/new_project/map_section.html:24
 msgid "Upload a GeoJSON file"
 msgstr "GeoJSON ఫైల్‌ను అప్‌లోడ్ చేయండి"
 
-#: app/templates/partials/new_project/map_section.html:25
+#: app/templates/partials/new_project/map_section.html:26
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
@@ -1942,33 +1990,33 @@ msgstr ""
 "మీ ప్రాంత సరిహద్దుతో కూడిన మ్యాప్ ఫైల్ మీ వద్ద ఇప్పటికే ఉంటే, గీయడానికి "
 "బదులుగా ఇక్కడ అప్‌లోడ్ చేయండి."
 
-#: app/templates/partials/new_project/map_section.html:31
+#: app/templates/partials/new_project/map_section.html:32
 msgid "Upload your own map file (GeoJSON)"
 msgstr "కస్టమ్ GeoJSON అప్‌లోడ్ చేయండి"
 
-#: app/templates/partials/new_project/map_section.html:39
+#: app/templates/partials/new_project/map_section.html:40
 msgid "Load from a HOT Tasking Manager project"
 msgstr "HOT Tasking Manager ప్రాజెక్ట్ నుండి లోడ్ చేయండి"
 
-#: app/templates/partials/new_project/map_section.html:41
+#: app/templates/partials/new_project/map_section.html:42
 msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
 msgstr ""
 "దాని ఆసక్తి ప్రాంతాన్ని లోడ్ చేయడానికి HOT Tasking Manager ప్రాజెక్ట్ ID "
 "ను నమోదు చేయండి."
 
-#: app/templates/partials/new_project/map_section.html:50
+#: app/templates/partials/new_project/map_section.html:51
 msgid "Tasking Manager project ID"
 msgstr "Tasking Manager ప్రాజెక్ట్ ID"
 
-#: app/templates/partials/new_project/map_section.html:53
+#: app/templates/partials/new_project/map_section.html:54
 msgid "Load AOI"
 msgstr "ప్రాంతాన్ని లోడ్ చేయండి"
 
-#: app/templates/partials/new_project/map_section.html:60
+#: app/templates/partials/new_project/map_section.html:61
 msgid "Combine multiple shapes into one"
 msgstr "అనేక ఆకారాలను ఒకటిగా కలపండి"
 
-#: app/templates/partials/new_project/map_section.html:64
+#: app/templates/partials/new_project/map_section.html:65
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2304,6 +2352,22 @@ msgstr ""
 "చేయండి. టాస్క్ ప్రాంతాలను మార్చడం వల్ల యాప్‌లో టాస్క్ పురోగతి రీసెట్ "
 "అవుతుంది."
 
+#: app/templates/partials/project_details/update_form_section.html:2
+#: app/templates/partials/project_details/update_form_section.html:17
+msgid "Update survey form"
+msgstr ""
+
+#: app/templates/partials/project_details/update_form_section.html:7
+msgid "Replace the survey form? Mappers will receive the new version."
+msgstr ""
+
+#: app/templates/partials/project_details/update_form_section.html:11
+msgid ""
+"Upload your edited form. Mappers receive it automatically and collected "
+"data is kept.\n"
+"      Only include your survey questions, as Field-TM adds its own fields."
+msgstr ""
+
 #: app/templates/partials/project_details/fragments/basemap_progress.html:4
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
@@ -2604,23 +2668,30 @@ msgstr ""
 "మీరు మ్యాప్ చేసే దానికి సరిపోయే సిద్ధంగా ఉన్న సర్వేను ఎంచుకోండి. ఏదీ "
 "సరిపోకపోతే మీ స్వంత సర్వే ఫైల్‌ను అప్‌లోడ్ చేయవచ్చు."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:24
+#: app/templates/partials/project_details/setup_steps/step2_form.html:18
+msgid ""
+"You can't change the form in Field-TM after publishing. To change it "
+"later, edit the\n"
+"      project in QGIS and sync the updates."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:32
 msgid "Survey form"
 msgstr "సర్వే ఫారమ్"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:26
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
 msgid "Loading survey types..."
 msgstr "సర్వే రకాలు లోడ్ అవుతున్నాయి..."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:31
+#: app/templates/partials/project_details/setup_steps/step2_form.html:39
 msgid "or"
 msgstr "లేదా"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step2_form.html:42
 msgid "upload your own survey file (.xls / .xlsx)"
 msgstr "మీ స్వంత సర్వే ఫైల్‌ను అప్‌లోడ్ చేయండి (.xls / .xlsx)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:40
+#: app/templates/partials/project_details/setup_steps/step2_form.html:48
 msgid ""
 "Heads up: Field-TM auto-adds fields for tasks and feature selection. Your"
 " form should\n"
@@ -2631,57 +2702,69 @@ msgstr ""
 "ప్రశ్నలు మాత్రమే ఉండాలి (టాస్క్‌లు/ఫీచర్ల కోసం select_one_from_file "
 "ఫీల్డ్‌లను చేర్చవద్దు)."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:73
+#: app/templates/partials/project_details/setup_steps/step2_form.html:81
 msgid "Form language"
 msgstr "భాష"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:75
+#: app/templates/partials/project_details/setup_steps/step2_form.html:83
 msgid "English"
 msgstr "ఇంగ్లీష్"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:76
+#: app/templates/partials/project_details/setup_steps/step2_form.html:84
 msgid "Spanish"
 msgstr "స్పానిష్"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:77
+#: app/templates/partials/project_details/setup_steps/step2_form.html:85
 msgid "French"
 msgstr "ఫ్రెంచ్"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:78
+#: app/templates/partials/project_details/setup_steps/step2_form.html:86
 msgid "Portuguese"
 msgstr "పోర్చుగీస్"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:79
+#: app/templates/partials/project_details/setup_steps/step2_form.html:87
 msgid "Swahili"
 msgstr "స్వాహిలి"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:80
+#: app/templates/partials/project_details/setup_steps/step2_form.html:88
 msgid "Hindi"
 msgstr "హిందీ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:84
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "కొత్త బిందువులు"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "మ్యాపర్లు మ్యాప్‌లో స్థానాన్ని నొక్కుతారు"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "మ్యాపర్లు GPS ద్వారా తమ స్థానాన్ని నమోదు చేస్తారు"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:102
 msgid "Form questions"
 msgstr "ఫారమ్ ఎంపికలు:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:88
+#: app/templates/partials/project_details/setup_steps/step2_form.html:106
 msgid "Mappers will be asked to take a photo at the location."
 msgstr "వినియోగదారుని వారి ప్రదేశంలో ఫోటో తీయమని అడుగుతుంది."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:89
+#: app/templates/partials/project_details/setup_steps/step2_form.html:107
 msgid "Ask for a photo"
 msgstr "ఫోటో అడగండి"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+#: app/templates/partials/project_details/setup_steps/step2_form.html:114
 msgid "Make photo mandatory"
 msgstr "ఫోటోను తప్పనిసరి చేయండి"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:101
+#: app/templates/partials/project_details/setup_steps/step2_form.html:119
 msgid "Mappers confirm whether existing OSM features are correctly digitised."
 msgstr ""
 "ఉన్న ఫీచర్లు సరిగా డిజిటైజ్ అయ్యాయా అని మ్యాపర్‌ను ధృవీకరించమని "
 "అడుగుతుంది."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:102
+#: app/templates/partials/project_details/setup_steps/step2_form.html:120
 msgid "Ask to verify existing features"
 msgstr ""
 "ఉన్న ఫీచర్లు సరిగా డిజిటైజ్ అయ్యాయా అని మ్యాపర్‌ను ధృవీకరించమని "
@@ -2913,15 +2996,3 @@ msgstr "గుర్తింపు వివరాలను పరీక్ష�
 msgid "Save & Continue"
 msgstr "సేవ్ చేసి కొనసాగండి"
 
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:94
-msgid "New points"
-msgstr "కొత్త బిందువులు"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:96
-msgid "Mappers tap the location on a map"
-msgstr "మ్యాపర్లు మ్యాప్‌లో స్థానాన్ని నొక్కుతారు"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:97
-msgid "Mappers capture their GPS location"
-msgstr "మ్యాపర్లు GPS ద్వారా తమ స్థానాన్ని నమోదు చేస్తారు"

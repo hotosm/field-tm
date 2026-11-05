@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-10-20 23:29+0100\n"
+"POT-Creation-Date: 2026-11-05 16:09+0000\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: id\n"
@@ -18,15 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:157
+#: app/main.py:159
 msgid "Validation failed"
 msgstr "gagal"
 
-#: app/main.py:181
+#: app/main.py:183
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "Terjadi kesalahan yang tidak terduga. Silakan hubungi admin."
 
-#: app/main.py:326
+#: app/main.py:329
 msgid "Could not connect to database"
 msgstr "Tidak dapat terhubung ke database"
 
@@ -47,22 +47,27 @@ msgstr "Anda harus masuk untuk melihat proyek ini."
 msgid "User (%(user_sub)s) could not be inserted in db"
 msgstr "(%(user_sub)s) tidak dapat dimasukkan ke dalam db"
 
-#: app/central/central_crud.py:165
+#: app/central/central_crud.py:166
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
 msgstr "Terjadi kesalahan saat membuat proyek di ODK Central: %(error)s"
 
-#: app/central/central_crud.py:219
+#: app/central/central_crud.py:218
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
 msgstr "Gagal mengunggah formulir ke ODK Pusat: %(error)s"
 
-#: app/central/central_crud.py:273
+#: app/central/central_crud.py:239
+#, python-format
+msgid "Failed to update form in ODK Central: %(error)s"
+msgstr ""
+
+#: app/central/central_crud.py:287
 #, python-format
 msgid "Could not read XLSForm file: %(error)s"
 msgstr "Tidak dapat membaca file XLSForm: %(error)s"
 
-#: app/central/central_crud.py:299
+#: app/central/central_crud.py:312
 #, python-format
 msgid ""
 "XLSForm has select questions referencing lists that aren't defined in the"
@@ -72,55 +77,55 @@ msgstr ""
 "ditentukan dalam lembar pilihan: %(rows)s. Periksa survei dan lembar "
 "pilihan Anda."
 
-#: app/central/central_crud.py:318
+#: app/central/central_crud.py:331
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
 msgstr "XLS tidak valid: %(error)s"
 
-#: app/central/central_crud.py:400
+#: app/central/central_crud.py:420
 msgid "'geometry' data field is mandatory"
 msgstr "wajib diisi"
 
-#: app/central/central_crud.py:715
+#: app/central/central_crud.py:734
 msgid "ODK project_id is missing; cannot create/merge entity lists."
 msgstr ""
 "ODK project_id tidak ada; tidak dapat membuat/menggabungkan daftar "
 "entitas."
 
-#: app/central/central_crud.py:755
+#: app/central/central_crud.py:788
 msgid "Could not generate token for app user."
 msgstr "Tidak dapat membuat token untuk pengguna aplikasi."
 
-#: app/central/central_crud.py:787 app/central/central_crud.py:793
+#: app/central/central_crud.py:816 app/central/central_crud.py:821
 msgid "An error occurred while creating the app user token."
 msgstr "Terjadi kesalahan tak terduga saat membuat kode QR."
 
-#: app/central/central_crud.py:807
+#: app/central/central_crud.py:834
 #, python-format
 msgid "Could not assign %(scope)s role to app user."
 msgstr "Tidak dapat menetapkan peran %(scope)s kepada pengguna aplikasi."
 
-#: app/central/central_crud.py:846
+#: app/central/central_crud.py:871
 msgid "Could not find 'Project Manager' role in ODK Central."
 msgstr "Buka proyek di ODK Central"
 
-#: app/central/central_crud.py:871
+#: app/central/central_crud.py:893
 msgid "ODK Central returned no user ID after creation."
 msgstr "ODK Central tidak mengembalikan ID pengguna setelah pembuatan."
 
-#: app/central/central_crud.py:996
+#: app/central/central_crud.py:1009
 msgid "Failed to create ODK Central manager user."
 msgstr "Gagal membuat pengguna pengelola ODK Pusat."
 
-#: app/central/central_crud.py:1013
+#: app/central/central_crud.py:1024
 msgid "ODK credentials are invalid, or may have changed."
 msgstr "Kredensial ODK tidak valid, atau mungkin telah berubah."
 
-#: app/central/central_crud.py:1019
+#: app/central/central_crud.py:1029
 msgid "Failed to connect to Central. Is the URL valid?"
 msgstr "Gagal terhubung ke Central. Apakah URL-nya valid?"
 
-#: app/central/central_crud.py:1025
+#: app/central/central_crud.py:1034
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "Terjadi kesalahan tak terduga saat menguji kredensial ODK Central."
 
@@ -133,53 +138,89 @@ msgstr "Berikan file .xls atau .xlsx yang valid"
 msgid "No data provided."
 msgstr "Tidak ada ekstrak data yang diberikan."
 
+#: app/helpers/basemap_attach.py:91
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
+msgstr ""
+"Lampiran basemap gagal untuk saat ini. Proyek Anda siap digunakan. "
+"Silakan coba lampirkan lagi."
+
+#: app/helpers/basemap_attach.py:96
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+"Lampiran basemap tidak dapat diselesaikan karena masalah jaringan "
+"sementara. Proyek Anda siap digunakan. Silakan coba lampirkan lagi."
+
 #: app/helpers/basemap_services.py:26
 #, python-format
 msgid "%(action)s failed with HTTP %(status_code)s."
 msgstr "%(action)s gagal dengan HTTP %(status_code)s."
 
-#: app/helpers/basemap_services.py:40
+#: app/helpers/basemap_services.py:36
 #, python-format
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s gagal karena kesalahan koneksi upstream."
 
-#: app/helpers/basemap_services.py:181
+#: app/helpers/basemap_services.py:175
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "mengembalikan HTTP %(status_code)s."
+
+#: app/helpers/geometry_utils.py:82
+msgid "Project outline is missing or has no geometry."
+msgstr "Garis besar proyek tidak ada atau tidak memiliki geometri."
+
+#: app/helpers/geometry_utils.py:85
+msgid "Project outline geometry has no coordinates."
+msgstr "Geometri garis besar proyek tidak memiliki koordinat."
 
 #: app/helpers/helper_routes.py:55
 msgid "Failed to convert YAML form to XLSForm."
 msgstr "Gagal mengonversi formulir YAML ke XLSForm."
 
-#: app/htmx/project_detail_routes.py:164
+#: app/htmx/project_detail_routes.py:167 app/htmx/project_detail_routes.py:215
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "Proyek (%(project_id)s) tidak ditemukan."
 
-#: app/htmx/project_detail_routes.py:171
+#: app/htmx/project_detail_routes.py:174
 msgid "Only the project manager can delete this project."
 msgstr "Hanya manajer proyek yang dapat menghapus proyek ini."
 
-#: app/htmx/project_detail_routes.py:215 app/templates/project_details.html:204
+#: app/htmx/project_detail_routes.py:222
+msgid "Only the project creator can update the form."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:230
+msgid "Only published ODK projects can update their form."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:245
+msgid "Could not update the form. Please check the file and try again."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:250
+msgid "Survey form updated in ODK Central."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:279 app/templates/project_details.html:213
 msgid "Project not found."
 msgstr "Proyek tidak ditemukan."
 
-#: app/htmx/project_detail_routes.py:251
-#: app/htmx/setup_steps/setup_step_responses.py:70
+#: app/htmx/project_detail_routes.py:314
+#: app/htmx/setup_steps/setup_step_responses.py:68
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Kesalahan: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:292
-msgid "GeoJSON export is only available for QField projects."
-msgstr "Ekspor GeoJSON hanya tersedia untuk proyek QField."
+#: app/htmx/project_detail_routes.py:355
+msgid "This project is not yet linked to ODK Central or QFieldCloud."
+msgstr ""
 
-#: app/htmx/project_detail_routes.py:297
-msgid "This project is not yet linked to a QFieldCloud project."
-msgstr "Proyek ini belum ditautkan ke proyek QFieldCloud."
-
-#: app/htmx/project_detail_routes.py:308
+#: app/htmx/project_detail_routes.py:366
 #, python-format
 msgid "Failed to export GeoJSON: %(error)s"
 msgstr "Gagal mengekspor GeoJSON: %(error)s"
@@ -216,35 +257,19 @@ msgstr "Gagal memperbarui tugas di %(app)s. Silakan coba lagi."
 msgid "Tasks updated in %(app)s."
 msgstr "Tugas diperbarui di %(app)s."
 
-#: app/htmx/basemap/basemap_attach_flow.py:69
-msgid ""
-"Basemap attach failed for now. Your project is ready to use. Please retry"
-" attach."
-msgstr ""
-"Lampiran basemap gagal untuk saat ini. Proyek Anda siap digunakan. "
-"Silakan coba lampirkan lagi."
-
-#: app/htmx/basemap/basemap_attach_flow.py:74
-msgid ""
-"Basemap attach could not complete due to a temporary network issue. Your "
-"project is ready to use. Please retry attach."
-msgstr ""
-"Lampiran basemap tidak dapat diselesaikan karena masalah jaringan "
-"sementara. Proyek Anda siap digunakan. Silakan coba lampirkan lagi."
-
-#: app/htmx/basemap/basemap_attach_flow.py:123
+#: app/htmx/basemap/basemap_attach_flow.py:33
 msgid "Basemap attach is available after publication."
 msgstr "Pelampiran peta dasar tersedia setelah publikasi."
 
-#: app/htmx/basemap/basemap_attach_flow.py:132
+#: app/htmx/basemap/basemap_attach_flow.py:42
 msgid "Basemap attach is only available for QField projects."
 msgstr "Pelampiran peta dasar hanya tersedia untuk proyek QField."
 
-#: app/htmx/basemap/basemap_attach_flow.py:142
+#: app/htmx/basemap/basemap_attach_flow.py:52
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "Peta dasar belum siap. Harap tunggu hingga pembuatan selesai."
 
-#: app/htmx/basemap/basemap_attach_flow.py:157
+#: app/htmx/basemap/basemap_attach_flow.py:67
 msgid ""
 "Basemap download URL is not available yet. Please refresh status and try "
 "again shortly."
@@ -252,7 +277,7 @@ msgstr ""
 "URL unduhan peta dasar belum tersedia. Segarkan status dan coba lagi "
 "sebentar lagi."
 
-#: app/htmx/basemap/basemap_attach_flow.py:173
+#: app/htmx/basemap/basemap_attach_flow.py:83
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -262,7 +287,7 @@ msgstr ""
 "%(config)s tidak ada."
 
 #: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:90
+#: app/htmx/setup_steps/setup_step_responses.py:88
 msgid "Project not found or access denied."
 msgstr "Proyek tidak ditemukan atau akses ditolak."
 
@@ -306,7 +331,7 @@ msgstr ""
 "Area proyek harus berupa JSON yang valid (GeoJSON Polygon, MultiPolygon, "
 "Feature, atau FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:86
+#: app/htmx/project_create/project_create_simple_flow.py:90
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -314,15 +339,15 @@ msgstr ""
 "Tidak ditemukan bangunan OSM yang sudah ada di area ini. Lanjutkan "
 "pemetaan dari awal."
 
-#: app/htmx/project_create/project_create_simple_flow.py:184
+#: app/htmx/project_create/project_create_simple_flow.py:188
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 "Tidak dapat memuat formulir bawaan OSM Buildings untuk pembuatan proyek "
 "sederhana."
 
-#: app/htmx/project_create/project_create_simple_flow.py:312
-#: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:214
+#: app/htmx/project_create/project_create_simple_flow.py:316
+#: app/htmx/project_create/project_create_submit_routes.py:138
+#: app/htmx/project_create/project_create_submit_routes.py:212
 msgid "An unexpected error occurred. Please try again."
 msgstr "Terjadi kesalahan tak terduga. Silakan coba lagi."
 
@@ -334,11 +359,11 @@ msgstr "Gagal memuat formulir templat."
 msgid "Please select a form or upload a file."
 msgstr "Silakan pilih formulir atau unggah file."
 
-#: app/htmx/project_create/project_create_xlsform_routes.py:132
+#: app/htmx/project_create/project_create_xlsform_routes.py:128
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "Formulir berhasil divalidasi dan diunggah! Memuat ulang halaman..."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:46
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:43
 msgid ""
 "Tasks were planned with the old data. They are kept, but reopen the task "
 "planner to update feature counts."
@@ -346,12 +371,12 @@ msgstr ""
 "Tugas direncanakan dengan data lama. Tugas tetap disimpan, tetapi buka "
 "kembali perencana tugas untuk memperbarui jumlah fitur."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:79
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:76
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "Data OSM berhasil diunduh! Ditemukan %(feature_count)s fitur."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:82
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:79
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "downloading again with different parameters."
@@ -359,21 +384,21 @@ msgstr ""
 "Jika sudah benar, klik \"Terima Ekstrak Data\". Jika tidak, coba unduh "
 "lagi dengan parameter berbeda."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:115
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:112
 #: app/templates/partials/project_details/style_and_scripts.html:24
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "Jenis file tidak valid. Silakan unggah file .geojson atau .json."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:138
-msgid "No valid geometries found in GeoJSON."
-msgstr "Tidak ditemukan geometri yang valid di GeoJSON."
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:126
+msgid "The file could not be read as GeoJSON."
+msgstr ""
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:152
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:145
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ GeoJSON berhasil diunggah! Ditemukan %(feature_count)s fitur."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:155
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:148
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "uploading a different file."
@@ -381,11 +406,11 @@ msgstr ""
 "Jika sudah benar, klik \"Terima Ekstrak Data\". Jika tidak, coba unggah "
 "berkas lain."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:188
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:181
 msgid "✓ Collect-new-data mode selected. You can continue."
 msgstr "✓ Mode pengumpulan data baru dipilih. Anda dapat melanjutkan."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:222
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:215
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -393,13 +418,13 @@ msgstr ""
 "Tidak ditemukan data GeoJSON. Silakan unduh data OSM atau unggah file "
 "GeoJSON terlebih dahulu."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:241
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:234
 msgid "✓ Data extract successfully saved! You can now continue to the Tasks step."
 msgstr ""
 "✓ Ekstrak data berhasil disimpan! Sekarang Anda dapat lanjut ke langkah "
 "Tugas."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:288
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
 msgid ""
 "No data extract is staged. Please download OSM data or upload a GeoJSON "
 "file first."
@@ -407,7 +432,7 @@ msgstr ""
 "Belum ada ekstrak data yang disiapkan. Unduh data OSM atau unggah berkas "
 "GeoJSON terlebih dahulu."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:303
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:296
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
@@ -416,7 +441,7 @@ msgstr ""
 "✓ Ekstrak data diterima! %(feature_count)s fitur disimpan. Langkah 3 "
 "sekarang selesai."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:343
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
 msgid "Data extract discarded. Choose a data source above to try again."
 msgstr "Ekstrak data dibuang. Pilih sumber data di atas untuk mencoba lagi."
 
@@ -428,11 +453,11 @@ msgstr "Data GeoJSON dalam permintaan tidak valid. Silakan coba unggah lagi."
 msgid "Error reading GeoJSON data from request."
 msgstr "Kesalahan saat membaca data GeoJSON dari permintaan."
 
-#: app/htmx/setup_steps/setup_step_finalize_routes.py:104
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:92
 msgid "Project mapping app is not configured for finalisation."
 msgstr "Aplikasi pemetaan proyek belum dikonfigurasi untuk finalisasi."
 
-#: app/htmx/setup_steps/setup_step_finalize_routes.py:142
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:130
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
@@ -440,11 +465,11 @@ msgstr ""
 "Berikan URL ODK, nama pengguna, dan kata sandi (ketiganya), atau biarkan "
 "kosong untuk menggunakan bawaan server."
 
-#: app/htmx/setup_steps/setup_step_responses.py:85
+#: app/htmx/setup_steps/setup_step_responses.py:83
 msgid "An unexpected error occurred"
 msgstr "Terjadi kesalahan yang tidak terduga"
 
-#: app/htmx/setup_steps/setup_step_responses.py:160
+#: app/htmx/setup_steps/setup_step_responses.py:158
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -454,27 +479,27 @@ msgstr ""
 "Jika masih berlanjut, kirimkan rincian teknis di bawah ini kepada "
 "administrator instans atau tim dukungan Anda."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:61
+#: app/htmx/setup_steps/setup_step_validate_routes.py:58
 msgid "Could not reach Tasking Manager. Please try again later."
 msgstr "Tidak dapat menghubungi Tasking Manager. Silakan coba lagi nanti."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:66
+#: app/htmx/setup_steps/setup_step_validate_routes.py:63
 #, python-format
 msgid "Tasking Manager project %(id)s was not found."
 msgstr "Proyek Tasking Manager %(id)s tidak ditemukan."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:71
+#: app/htmx/setup_steps/setup_step_validate_routes.py:68
 #, python-format
 msgid "Tasking Manager returned an error (HTTP %(status)s)."
 msgstr "Tasking Manager mengembalikan galat (HTTP %(status)s)."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:84
+#: app/htmx/setup_steps/setup_step_validate_routes.py:81
 msgid "Tasking Manager returned an invalid response."
 msgstr "Tasking Manager mengembalikan respons yang tidak valid."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:94
-msgid "Tasking Manager project AOI did not contain any polygon geometries."
-msgstr "Area cakupan proyek Tasking Manager tidak berisi geometri poligon."
+#: app/htmx/setup_steps/setup_step_validate_routes.py:101
+msgid "The project area contains invalid geometry. Please fix it and retry."
+msgstr ""
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
@@ -488,111 +513,126 @@ msgstr ""
 #: app/htmx/setup_steps/setup_step_validate_routes.py:123
 #, python-format
 msgid ""
+"Area is %(area_km2)s km², over %(area_large)s km². Projects this large "
+"will likely fail to download OSM data, generate basemaps or split into "
+"tasks. Use them only for very sparse data collection, with your own "
+"uploaded data extract."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:130
+#, python-format
+msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
 "longer to process."
 msgstr ""
 "Area adalah %(area_km2)s km². Area besar (>%(area_warn)s km²) mungkin "
 "membutuhkan waktu lebih lama untuk diproses."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:148
+#: app/htmx/setup_steps/setup_step_validate_routes.py:155
 msgid "GeoJSON is required"
 msgstr "GeoJSON diperlukan"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:158
-msgid "No polygon geometries found. Project area must be a polygon."
-msgstr "Tidak ditemukan geometri poligon. Area proyek harus berupa poligon."
-
-#: app/htmx/setup_steps/setup_step_validate_routes.py:206
+#: app/htmx/setup_steps/setup_step_validate_routes.py:205
 msgid "Tasking Manager project ID must be a positive integer."
 msgstr "ID proyek Tasking Manager harus berupa bilangan bulat positif."
 
-#: app/projects/mapping_apps.py:48
+#: app/projects/data_extract_services.py:204
+msgid "Selected area is too large. Please select an area smaller than 200 km²."
+msgstr ""
+"Area yang dipilih terlalu luas. Silakan pilih area yang lebih kecil dari "
+"200 km²."
+
+#: app/projects/data_extract_services.py:211
+msgid "Failed to generate data extract from the raw data API."
+msgstr "Gagal menghasilkan ekstrak data dari API data mentah."
+
+#: app/projects/mapping_apps.py:53
 msgid "GIS mapping app for Android and iOS, with our simple task plugin."
 msgstr ""
 "Aplikasi pemetaan GIS untuk Android dan iOS, dengan plugin tugas kami "
 "yang sederhana."
 
-#: app/projects/mapping_apps.py:49
+#: app/projects/mapping_apps.py:54
 msgid "Drawing and editing geometry, detailed surveys"
 msgstr "Menggambar dan menyunting geometri, survei terperinci"
 
-#: app/projects/mapping_apps.py:57
+#: app/projects/mapping_apps.py:62
 msgid "Form-based survey app for Android."
 msgstr "Aplikasi survei berbasis formulir untuk Android."
 
-#: app/projects/mapping_apps.py:58
+#: app/projects/mapping_apps.py:63
 msgid "Form-heavy surveys, simple phones"
 msgstr "Survei dengan banyak formulir, ponsel sederhana"
 
-#: app/projects/mapping_apps.py:66
+#: app/projects/mapping_apps.py:71
 msgid "Fast OpenStreetMap editor for shops, amenities and entrances."
 msgstr "Penyunting OpenStreetMap cepat untuk toko, fasilitas, dan pintu masuk."
 
-#: app/projects/mapping_apps.py:67
+#: app/projects/mapping_apps.py:72
 msgid "Updating existing OSM buildings and points of interest"
 msgstr "Memperbarui bangunan dan tempat menarik OSM yang sudah ada"
 
-#: app/projects/mapping_apps.py:75
+#: app/projects/mapping_apps.py:80
 msgid "Answer simple quests to complete OpenStreetMap data."
 msgstr "Jawab misi sederhana untuk melengkapi data OpenStreetMap."
 
-#: app/projects/mapping_apps.py:76
+#: app/projects/mapping_apps.py:81
 msgid "Quick OSM attribute quests on roads and points of interest"
 msgstr "Misi atribut OSM cepat untuk jalan dan tempat menarik"
 
-#: app/projects/mapping_apps.py:84
+#: app/projects/mapping_apps.py:89
 msgid "Offline-first mapping for communities and territories."
 msgstr "Pemetaan luring untuk komunitas dan wilayah."
 
-#: app/projects/mapping_apps.py:85
+#: app/projects/mapping_apps.py:90
 msgid "Offline, community-led mapping"
 msgstr "Pemetaan luring yang dipimpin komunitas"
 
-#: app/projects/mapping_apps.py:93
+#: app/projects/mapping_apps.py:98
 msgid "Offline maps and navigation, with OSM editing."
 msgstr "Peta luring dan navigasi, dengan penyuntingan OSM."
 
-#: app/projects/mapping_apps.py:94
+#: app/projects/mapping_apps.py:99
 msgid "Navigating to tasks, editing OSM points"
 msgstr "Navigasi ke tugas, menyunting titik OSM"
 
-#: app/projects/mapping_apps.py:102
+#: app/projects/mapping_apps.py:107
 msgid "Open street-level imagery, captured with any camera."
 msgstr "Citra terbuka setingkat jalan, diambil dengan kamera apa pun."
 
-#: app/projects/mapping_apps.py:103
+#: app/projects/mapping_apps.py:108
 msgid "Street-level imagery along roads"
 msgstr "Citra setingkat jalan di sepanjang jalan"
 
-#: app/projects/mapping_apps.py:111
+#: app/projects/mapping_apps.py:116
 msgid "Print paper maps, sketch on them, scan them back."
 msgstr "Cetak peta kertas, buat sketsa di atasnya, lalu pindai kembali."
 
-#: app/projects/mapping_apps.py:112
+#: app/projects/mapping_apps.py:117
 msgid "Paper maps and sketch mapping"
 msgstr "Peta kertas dan pemetaan sketsa"
 
-#: app/projects/mapping_apps.py:120
+#: app/projects/mapping_apps.py:125
 msgid "Turn locations shared in chat apps into a map."
 msgstr "Ubah lokasi yang dibagikan di aplikasi obrolan menjadi peta."
 
-#: app/projects/mapping_apps.py:121
+#: app/projects/mapping_apps.py:126
 msgid "Location sharing from chat apps"
 msgstr "Berbagi lokasi dari aplikasi obrolan"
 
-#: app/projects/mapping_apps.py:125
+#: app/projects/mapping_apps.py:130
 msgid "Other app"
 msgstr "Aplikasi lain"
 
-#: app/projects/mapping_apps.py:129
+#: app/projects/mapping_apps.py:134
 msgid "Any other app. Share the tasks as files and links."
 msgstr "Aplikasi lain apa pun. Bagikan tugas sebagai berkas dan tautan."
 
-#: app/projects/mapping_apps.py:130
+#: app/projects/mapping_apps.py:135
 msgid "Any app"
 msgstr "Aplikasi apa pun"
 
-#: app/projects/mapping_apps.py:157
+#: app/projects/mapping_apps.py:162
 msgid ""
 "Not for OpenStreetMap: QField for map-based capture and editing, or ODK "
 "for form-heavy surveys."
@@ -600,13 +640,13 @@ msgstr ""
 "Bukan untuk OpenStreetMap: QField untuk pengambilan dan penyuntingan "
 "berbasis peta, atau ODK untuk survei dengan banyak formulir."
 
-#: app/projects/mapping_apps.py:162
+#: app/projects/mapping_apps.py:167
 msgid "Poorly mapped: QField lets mappers draw the missing geometry."
 msgstr ""
 "Belum banyak dipetakan: QField memungkinkan pemeta menggambar geometri "
 "yang belum ada."
 
-#: app/projects/mapping_apps.py:166
+#: app/projects/mapping_apps.py:171
 msgid ""
 "Already mapped: Every Door is the quickest way to update buildings and "
 "points of interest."
@@ -614,7 +654,7 @@ msgstr ""
 "Sudah dipetakan: Every Door adalah cara tercepat untuk memperbarui "
 "bangunan dan tempat menarik."
 
-#: app/projects/mapping_apps.py:171
+#: app/projects/mapping_apps.py:176
 msgid ""
 "Already mapped: StreetComplete for road details, or Panoramax for street-"
 "level imagery."
@@ -622,41 +662,31 @@ msgstr ""
 "Sudah dipetakan: StreetComplete untuk detail jalan, atau Panoramax untuk "
 "citra setingkat jalan."
 
-#: app/projects/mapping_apps.py:174
+#: app/projects/mapping_apps.py:179
 msgid "QField handles any kind of feature."
 msgstr "QField dapat menangani fitur jenis apa pun."
 
-#: app/projects/project_crud.py:120
-msgid "Selected area is too large. Please select an area smaller than 200 km²."
-msgstr ""
-"Area yang dipilih terlalu luas. Silakan pilih area yang lebih kecil dari "
-"200 km²."
-
-#: app/projects/project_crud.py:131
-msgid "Failed to generate data extract from the raw data API."
-msgstr "Gagal menghasilkan ekstrak data dari API data mentah."
-
-#: app/projects/project_crud.py:206
+#: app/projects/project_crud.py:130
 msgid "This job was interrupted. Please try again."
 msgstr "Pekerjaan ini terputus. Silakan coba lagi."
 
-#: app/projects/project_crud.py:692
+#: app/projects/project_crud.py:611
 msgid "QField project ID not found."
 msgstr "Proyek tidak ditemukan."
 
-#: app/projects/project_crud.py:712
+#: app/projects/project_crud.py:628
 msgid "Project name not found."
 msgstr "Proyek tidak ditemukan."
 
-#: app/projects/project_crud.py:719
+#: app/projects/project_crud.py:632
 msgid "ODK project ID not found."
 msgstr "Proyek tidak ditemukan."
 
-#: app/projects/project_crud.py:728
+#: app/projects/project_crud.py:638
 msgid "Appuser token not found."
 msgstr "Proyek tidak ditemukan."
 
-#: app/projects/project_crud.py:745
+#: app/projects/project_crud.py:652
 msgid "Failed to generate QR code."
 msgstr "Gagal memuat formulir templat."
 
@@ -678,90 +708,90 @@ msgstr "Area Tanpa Nama"
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "Wilayah {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:389
+#: app/projects/project_services.py:299
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/projects/project_services.py:1154
+#: app/projects/project_services.py:662
+msgid "No submissions found yet."
+msgstr ""
+
+#: app/projects/project_services.py:666
+msgid "Export is only available for ODK and QField projects."
+msgstr ""
+
+#: app/projects/task_plan.py:32
+#, python-format
+msgid "Values must be %(max_length)s characters or fewer."
+msgstr "Nilai harus %(max_length)s karakter atau kurang."
+
+#: app/projects/task_plan.py:45
+msgid "Group labels may only contain letters, numbers, hyphens and underscores."
+msgstr "Label grup hanya boleh berisi huruf, angka, tanda hubung, dan garis bawah."
+
+#: app/projects/task_plan.py:62
+msgid "Colours must be hex values such as #d63f3f."
+msgstr "Warna harus berupa nilai heksadesimal seperti #d63f3f."
+
+#: app/projects/task_plan.py:113
+#, python-format
+msgid "Task %(number)s must be a Polygon with WGS84 coordinates."
+msgstr "Tugas %(number)s harus berupa poligon dengan koordinat WGS84."
+
+#: app/projects/task_plan.py:123
+#, python-format
+msgid "Task %(number)s: %(error)s"
+msgstr "Tugas %(number)s: %(error)s"
+
+#: app/projects/task_plan.py:144
+msgid "A task plan must be a GeoJSON FeatureCollection."
+msgstr "Rencana tugas harus berupa FeatureCollection GeoJSON."
+
+#: app/projects/task_plan.py:146
+msgid "The task plan has no tasks."
+msgstr "Rencana tugas tidak memiliki tugas."
+
+#: app/projects/task_plan.py:149
+#, python-format
+msgid "A task plan can have at most %(max_tasks)s tasks."
+msgstr "Rencana tugas dapat memiliki paling banyak %(max_tasks)s tugas."
+
+#: app/projects/task_sync.py:185
 msgid "Task areas changed. Confirm the reset to re-sync the tasks."
 msgstr ""
 "Area tugas berubah. Konfirmasi pengaturan ulang untuk menyinkronkan ulang"
 " tugas."
 
-#: app/projects/task_plan.py:31
-#, python-format
-msgid "Values must be %(max_length)s characters or fewer."
-msgstr "Nilai harus %(max_length)s karakter atau kurang."
-
-#: app/projects/task_plan.py:44
-msgid "Group labels may only contain letters, numbers, hyphens and underscores."
-msgstr "Label grup hanya boleh berisi huruf, angka, tanda hubung, dan garis bawah."
-
-#: app/projects/task_plan.py:61
-msgid "Colours must be hex values such as #d63f3f."
-msgstr "Warna harus berupa nilai heksadesimal seperti #d63f3f."
-
-#: app/projects/task_plan.py:112
-#, python-format
-msgid "Task %(number)s must be a Polygon with WGS84 coordinates."
-msgstr "Tugas %(number)s harus berupa poligon dengan koordinat WGS84."
-
-#: app/projects/task_plan.py:122
-#, python-format
-msgid "Task %(number)s: %(error)s"
-msgstr "Tugas %(number)s: %(error)s"
-
-#: app/projects/task_plan.py:143
-msgid "A task plan must be a GeoJSON FeatureCollection."
-msgstr "Rencana tugas harus berupa FeatureCollection GeoJSON."
-
-#: app/projects/task_plan.py:145
-msgid "The task plan has no tasks."
-msgstr "Rencana tugas tidak memiliki tugas."
-
-#: app/projects/task_plan.py:148
-#, python-format
-msgid "A task plan can have at most %(max_tasks)s tasks."
-msgstr "Rencana tugas dapat memiliki paling banyak %(max_tasks)s tugas."
-
-#: app/qfield/qfield_crud.py:157
-msgid "Project outline is missing or has no geometry."
-msgstr "Garis besar proyek tidak ada atau tidak memiliki geometri."
-
-#: app/qfield/qfield_crud.py:163
-msgid "Project outline geometry has no coordinates."
-msgstr "Geometri garis besar proyek tidak memiliki koordinat."
-
-#: app/qfield/qfield_crud.py:450
+#: app/qfield/qfield_crud.py:386
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS selesai tetapi tidak menulis file keluaran."
 
-#: app/qfield/qfield_crud.py:462
+#: app/qfield/qfield_crud.py:395
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS selesai tetapi tidak ada file .qgz dalam output."
 
-#: app/qfield/qfield_crud.py:485
+#: app/qfield/qfield_crud.py:416
 msgid "Project outline is required for QField project creation."
 msgstr "✓ Pembagian tugas tidak diperlukan untuk pengaturan proyek ini."
 
-#: app/qfield/qfield_crud.py:490
+#: app/qfield/qfield_crud.py:419
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm diperlukan untuk pembuatan proyek QField."
 
-#: app/qfield/qfield_crud.py:502
+#: app/qfield/qfield_crud.py:428
 msgid "Failed to modify XLSForm for QField."
 msgstr "Gagal memodifikasi XLSForm untuk QField."
 
-#: app/qfield/qfield_crud.py:572
+#: app/qfield/qfield_crud.py:496
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "tidak ada; tidak dapat melampirkan peta dasar."
 
-#: app/qfield/qfield_crud.py:609
+#: app/qfield/qfield_crud.py:532
 msgid "Basemap attach completed but produced no project files."
 msgstr "Peta dasar telah dilampirkan ke proyek QField."
 
-#: app/qfield/qfield_crud.py:794
+#: app/qfield/qfield_crud.py:716
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -770,46 +800,46 @@ msgstr ""
 "QFieldCloud belum selesai memproses berkas proyek setelah %(attempts)d "
 "percobaan (status terakhir: %(status)s)."
 
-#: app/qfield/qfield_crud.py:848 app/qfield/qfield_crud.py:862
+#: app/qfield/qfield_crud.py:769 app/qfield/qfield_crud.py:779
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS gagal: %(error)s"
 
-#: app/qfield/qfield_crud.py:855
+#: app/qfield/qfield_crud.py:774
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS mengembalikan JSON yang tidak valid."
 
-#: app/qfield/qfield_crud.py:879
+#: app/qfield/qfield_crud.py:793
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "Gagal mengunduh MBTiles peta dasar untuk diunggah (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:894
+#: app/qfield/qfield_crud.py:803
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "Unduh Kode QR"
 
-#: app/qfield/qfield_crud.py:969
+#: app/qfield/qfield_crud.py:876
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "Gagal mengunggah file ke QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1084
+#: app/qfield/qfield_crud.py:988
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Kredensial valid!"
 
-#: app/qfield/qfield_crud.py:1115
+#: app/qfield/qfield_crud.py:1017
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "Proyek ini tidak terkait dengan proyek QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1122
+#: app/qfield/qfield_crud.py:1022
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "QFIELDCLOUD_QGIS_URL tidak dikonfigurasi."
 
-#: app/qfield/qfield_crud.py:1152
+#: app/qfield/qfield_crud.py:1049
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr "Tidak ada file GeoPackage yang ditemukan dalam paket QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1171
+#: app/qfield/qfield_crud.py:1066
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
@@ -817,15 +847,15 @@ msgstr ""
 "Tidak ada data survei yang ditemukan dalam paket QFieldCloud. Pemeta "
 "mungkin belum mengirimkan tanggapan apa pun."
 
-#: app/qfield/qfield_crud.py:1194
+#: app/qfield/qfield_crud.py:1087
 msgid "QFieldCloud did not return a package job id."
 msgstr "QFieldCloud tidak mengembalikan id pekerjaan paket."
 
-#: app/qfield/qfield_crud.py:1211
+#: app/qfield/qfield_crud.py:1101
 msgid "QFieldCloud failed to package the project."
 msgstr "QFieldCloud gagal mengemas proyek."
 
-#: app/qfield/qfield_crud.py:1217
+#: app/qfield/qfield_crud.py:1105
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
@@ -834,12 +864,12 @@ msgstr ""
 "Waktu tunggu QFieldCloud untuk mengemas proyek telah habis (status "
 "terakhir: %(status)s)."
 
-#: app/qfield/qfield_crud.py:1237
+#: app/qfield/qfield_crud.py:1124
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "Konversi GeoPackage gagal: %(error)s"
 
-#: app/qfield/qfield_crud.py:1244
+#: app/qfield/qfield_crud.py:1130
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "Pembungkus QGIS mengembalikan JSON yang tidak valid untuk /ekspor."
 
@@ -847,7 +877,7 @@ msgstr "Pembungkus QGIS mengembalikan JSON yang tidak valid untuk /ekspor."
 msgid "Projects"
 msgstr "Proyek"
 
-#: app/templates/home.html:7 app/templates/landing.html:447
+#: app/templates/home.html:7 app/templates/landing.html:472
 #: app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:42
 msgid "Create Project"
@@ -961,11 +991,11 @@ msgstr "Berikutnya"
 msgid "No projects found. Create your first project to get started!"
 msgstr "Tidak ada proyek ditemukan. Buat proyek pertama Anda untuk memulai!"
 
-#: app/templates/landing.html:433
+#: app/templates/landing.html:458
 msgid "Coordinate field campaigns"
 msgstr "Koordinasikan kampanye lapangan"
 
-#: app/templates/landing.html:436
+#: app/templates/landing.html:461
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
@@ -973,19 +1003,19 @@ msgstr ""
 "Meningkatkan efisiensi dan akurasi pemetaan lapangan melalui koordinasi "
 "yang mulus."
 
-#: app/templates/landing.html:440
+#: app/templates/landing.html:465
 msgid "Explore Projects"
 msgstr "Jelajahi Proyek"
 
-#: app/templates/landing.html:457
+#: app/templates/landing.html:482
 msgid "Loading metrics..."
 msgstr "Memuat metrik..."
 
-#: app/templates/landing.html:465
+#: app/templates/landing.html:490
 msgid "What is it?"
 msgstr "Apa ini?"
 
-#: app/templates/landing.html:467
+#: app/templates/landing.html:492
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
 "map features\n"
@@ -994,7 +1024,7 @@ msgstr ""
 "Field Tasking Manager (Field-TM) membantu tim menambahkan pengetahuan "
 "lokal ke fitur peta dengan mengoordinasikan pemetaan di lapangan."
 
-#: app/templates/landing.html:471
+#: app/templates/landing.html:496
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
 "mature tools\n"
@@ -1008,21 +1038,21 @@ msgstr ""
 "seluler dan web mandiri yang membantu tim mengumpulkan data geospasial "
 "secara efisien dengan perangkat Android yang umum tersedia."
 
-#: app/templates/landing.html:478
+#: app/templates/landing.html:503
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr ""
 "Seorang manajer proyek mendemonstrasikan alur kerja pemetaan FieldTM di "
 "laptop"
 
-#: app/templates/landing.html:484
+#: app/templates/landing.html:509
 msgid "Main Features"
 msgstr "Fitur Utama"
 
-#: app/templates/landing.html:487
+#: app/templates/landing.html:512
 msgid "Flexible Data Collection"
 msgstr "Pengumpulan Data Fleksibel"
 
-#: app/templates/landing.html:489
+#: app/templates/landing.html:514
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
 "workflows that\n"
@@ -1031,11 +1061,11 @@ msgstr ""
 "Mendukung beragam formulir survei, berbagai format data, dan alur kerja "
 "yang dapat disesuaikan dengan kebutuhan operasional yang berbeda."
 
-#: app/templates/landing.html:494
+#: app/templates/landing.html:519
 msgid "Open Source and Customizable"
 msgstr "Sumber Terbuka dan Dapat Disesuaikan"
 
-#: app/templates/landing.html:496
+#: app/templates/landing.html:521
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
 "\n"
@@ -1044,11 +1074,11 @@ msgstr ""
 "Sesuaikan Field-TM dengan logika survei, struktur data, dan kebutuhan "
 "integrasi Anda sendiri."
 
-#: app/templates/landing.html:501
+#: app/templates/landing.html:526
 msgid "Entity-Level Tracking"
 msgstr "Pelacakan Tingkat Entitas"
 
-#: app/templates/landing.html:503
+#: app/templates/landing.html:528
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed\n"
@@ -1057,19 +1087,19 @@ msgstr ""
 "Pantau kemajuan survei pada tingkat tugas dan fitur sehingga manajer "
 "dapat membuat keputusan berdasarkan informasi dengan cepat."
 
-#: app/templates/landing.html:511
+#: app/templates/landing.html:536
 msgid "Who is it for?"
 msgstr "Untuk siapa ini?"
 
-#: app/templates/landing.html:514
+#: app/templates/landing.html:539
 msgid "Project Manager"
 msgstr "Manajer Proyek"
 
-#: app/templates/landing.html:515
+#: app/templates/landing.html:540
 msgid "Create and coordinate field campaigns"
 msgstr "Membuat dan mengoordinasikan kampanye lapangan"
 
-#: app/templates/landing.html:517
+#: app/templates/landing.html:542
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
 " interest,\n"
@@ -1079,31 +1109,31 @@ msgstr ""
 "menentukan area minat, merancang formulir survei, dan membagi pekerjaan "
 "menjadi tugas-tugas yang dapat dikelola."
 
-#: app/templates/landing.html:521
+#: app/templates/landing.html:546
 msgid "Define a project area and upload or choose a survey form"
 msgstr "Tentukan area proyek dan unggah atau pilih formulir survei"
 
-#: app/templates/landing.html:522
+#: app/templates/landing.html:547
 msgid "Split the area into tasks and generate a data extract"
 msgstr "Bagi area menjadi tugas dan hasilkan ekstrak data"
 
-#: app/templates/landing.html:523
+#: app/templates/landing.html:548
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "Publikasikan proyek ke ODK Central atau QFieldCloud"
 
-#: app/templates/landing.html:524
+#: app/templates/landing.html:549
 msgid "Share a QR code so mappers can start collecting data"
 msgstr "Bagikan kode QR agar pemeta dapat mulai mengumpulkan data"
 
-#: app/templates/landing.html:528
+#: app/templates/landing.html:553
 msgid "Field Mapper"
 msgstr "Pemeta Lapangan"
 
-#: app/templates/landing.html:529
+#: app/templates/landing.html:554
 msgid "Collect data in the field with your phone"
 msgstr "Kumpulkan data di lapangan dengan ponsel Anda"
 
-#: app/templates/landing.html:531
+#: app/templates/landing.html:556
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
 "publishes a\n"
@@ -1114,35 +1144,35 @@ msgstr ""
 "mempublikasikan proyek, pemeta dapat mengaksesnya langsung di aplikasi "
 "seluler pilihan mereka."
 
-#: app/templates/landing.html:535
+#: app/templates/landing.html:560
 msgid "Scan the QR code shared by your project manager"
 msgstr "Pindai kode QR yang dibagikan oleh manajer proyek Anda"
 
-#: app/templates/landing.html:536
+#: app/templates/landing.html:561
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "Proyek dimuat secara otomatis di ODK Collect atau QField"
 
-#: app/templates/landing.html:537
+#: app/templates/landing.html:562
 msgid "Navigate to your assigned task area and collect data"
 msgstr "Arahkan ke area tugas yang ditugaskan dan kumpulkan data"
 
-#: app/templates/landing.html:538
+#: app/templates/landing.html:563
 msgid "Submit your survey, which goes straight to the server"
 msgstr "Kirim survei Anda, yang langsung masuk ke server"
 
-#: app/templates/landing.html:545
+#: app/templates/landing.html:570
 msgid "Field-TM Use Cases"
 msgstr "Contoh Penggunaan Field-TM"
 
-#: app/templates/landing.html:550
+#: app/templates/landing.html:575
 msgid "Field mapping in progress"
 msgstr "Pemetaan lapangan sedang berlangsung"
 
-#: app/templates/landing.html:555
+#: app/templates/landing.html:580
 msgid "1. Community Mapping"
 msgstr "1. Pemetaan Komunitas"
 
-#: app/templates/landing.html:557
+#: app/templates/landing.html:582
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public\n"
@@ -1152,11 +1182,11 @@ msgstr ""
 "informal, fasilitas publik, dan layanan lokal demi perencanaan yang "
 "inklusif."
 
-#: app/templates/landing.html:562
+#: app/templates/landing.html:587
 msgid "2. Urban Planning and Management"
 msgstr "2. Perencanaan dan Pengelolaan Kota"
 
-#: app/templates/landing.html:564
+#: app/templates/landing.html:589
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities\n"
@@ -1165,11 +1195,11 @@ msgstr ""
 "Bangun kota yang lebih cerdas dengan survei rumah, jalan, dan utilitas "
 "yang terkoordinasi melalui tugas pemetaan yang jelas dan mudah dikelola."
 
-#: app/templates/landing.html:569
+#: app/templates/landing.html:594
 msgid "3. Disaster Response and Recovery"
 msgstr "3. Tanggap dan Pemulihan Bencana"
 
-#: app/templates/landing.html:571
+#: app/templates/landing.html:596
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
 "volunteers, and\n"
@@ -1179,43 +1209,54 @@ msgstr ""
 "koordinasikan relawan, dan sediakan data yang andal untuk operasi "
 "bantuan."
 
-#: app/templates/landing.html:580
+#: app/templates/landing.html:605
 msgid "Resources"
 msgstr "Sumber Daya"
 
-#: app/templates/landing.html:588
+#: app/templates/landing.html:613
 msgid "Data Prep"
 msgstr "Persiapan Data"
 
-#: app/templates/landing.html:589
+#: app/templates/landing.html:614
 msgid "HOT Export Tool"
 msgstr "Alat Ekspor HOT"
 
-#: app/templates/landing.html:591
+#: app/templates/landing.html:616
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr "Unduh ekstrak data geospasial yang siap tugas untuk area proyek Anda."
 
-#: app/templates/landing.html:600 app/templates/landing.html:612
+#: app/templates/landing.html:625 app/templates/landing.html:637
 msgid "Documentation"
 msgstr "Dokumentasi"
 
-#: app/templates/landing.html:601
+#: app/templates/landing.html:626
 msgid "ODK Central Guide"
 msgstr "Panduan ODK Central"
 
-#: app/templates/landing.html:603
+#: app/templates/landing.html:628
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr ""
 "Pelajari cara mengelola formulir, pengguna aplikasi, dan kiriman lapangan"
 " di ODK."
 
-#: app/templates/landing.html:613
+#: app/templates/landing.html:638
 msgid "QField Guide"
 msgstr "Panduan QField"
 
-#: app/templates/landing.html:615
+#: app/templates/landing.html:640
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr "Siapkan proyek QFieldCloud dan alur kerja seluler untuk pemetaan offline."
+
+#: app/templates/landing.html:648 app/templates/landing.html:661
+msgid "Join the Community"
+msgstr ""
+
+#: app/templates/landing.html:650
+msgid ""
+"Field-TM is built in the open with mappers, developers and partners "
+"around the world.\n"
+"        Come and say hello on the HOTOSM Slack."
+msgstr ""
 
 #: app/templates/layout.html:14
 msgid "Coordinated field mapping for Open Mapping campaigns."
@@ -1576,7 +1617,7 @@ msgstr ""
 "tag untuk menghapusnya."
 
 #: app/templates/new_project_custom.html:144
-#: app/templates/partials/project_details/setup_steps/step2_form.html:116
+#: app/templates/partials/project_details/setup_steps/step2_form.html:134
 msgid "Continue"
 msgstr "Lanjutkan"
 
@@ -1654,11 +1695,9 @@ msgstr "Kembali ke Proyek"
 
 #: app/templates/project_details.html:34
 msgid ""
-"Trigger a fresh QFieldCloud package and download the project data as a "
-"single GeoJSON file."
+"Download all submissions as a single GeoJSON file, for QGIS, uMap and "
+"other tools."
 msgstr ""
-"Picu paket QFieldCloud baru dan unduh data proyek sebagai satu file "
-"GeoJSON."
 
 #: app/templates/project_details.html:38
 msgid "Export Data"
@@ -1683,12 +1722,8 @@ msgid "Create the project again, or contact an admin if this keeps happening."
 msgstr "Buat proyek lagi, atau hubungi admin jika ini terus terjadi."
 
 #: app/templates/project_details.html:61
-msgid ""
-"Packaging project on QFieldCloud - this may take a minute, please be "
-"patient..."
+msgid "Gathering submissions - this may take a minute, please be patient..."
 msgstr ""
-"Proyek pengemasan di QFieldCloud - ini mungkin memerlukan waktu beberapa "
-"menit, harap bersabar..."
 
 #: app/templates/project_details.html:62
 msgid "✓ Download started."
@@ -1738,12 +1773,19 @@ msgstr "Lihat Proyek Secara Eksternal →"
 msgid "This project is not ready for mapping yet."
 msgstr "Proyek ini belum siap untuk pemetaan."
 
-#: app/templates/project_details.html:180
-#: app/templates/project_details.html:198
+#: app/templates/project_details.html:185
+msgid ""
+"You can't change this form in Field-TM. To change it, edit the project in"
+" QGIS and sync\n"
+"    the updates."
+msgstr ""
+
+#: app/templates/project_details.html:189
+#: app/templates/project_details.html:207
 msgid "Delete project"
 msgstr "Hapus proyek"
 
-#: app/templates/project_details.html:183
+#: app/templates/project_details.html:192
 msgid ""
 "Deletes the project here and in the mapping app (ODK Central or "
 "QFieldCloud), including\n"
@@ -1753,7 +1795,7 @@ msgstr ""
 "QFieldCloud), termasuk data yang dikumpulkan di sana. Tindakan ini tidak "
 "dapat dibatalkan."
 
-#: app/templates/project_details.html:186
+#: app/templates/project_details.html:195
 msgid ""
 "Delete this project in Field-TM and in the mapping app, including\n"
 "    collected data? This cannot be undone."
@@ -1761,15 +1803,15 @@ msgstr ""
 "Hapus proyek ini di Field-TM dan di aplikasi pemetaan, termasuk data yang"
 " dikumpulkan? Tindakan ini tidak dapat dibatalkan."
 
-#: app/templates/project_details.html:188
+#: app/templates/project_details.html:197
 msgid "Deletes the project and its tasks. This cannot be undone."
 msgstr "Menghapus proyek dan tugas-tugasnya. Tindakan ini tidak dapat dibatalkan."
 
-#: app/templates/project_details.html:189
+#: app/templates/project_details.html:198
 msgid "Delete this project and its tasks? This cannot be undone."
 msgstr "Hapus proyek ini dan tugas-tugasnya? Tindakan ini tidak dapat dibatalkan."
 
-#: app/templates/project_details.html:205
+#: app/templates/project_details.html:214
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view it."
@@ -1880,6 +1922,12 @@ msgstr "Masukkan ID proyek Tasking Manager terlebih dahulu."
 msgid "Could not load AOI from Tasking Manager."
 msgstr "Gagal memuat area cakupan dari Tasking Manager."
 
+#: app/templates/partials/new_project/map_script.html:14
+msgid ""
+"This looks like a task plan. After the project is created, upload the "
+"same file in the Tasks section to keep your tasks and assignments."
+msgstr ""
+
 #: app/templates/partials/new_project/map_section.html:5
 msgid "Draw Area"
 msgstr "Gambar Area"
@@ -1898,17 +1946,17 @@ msgid ""
 "      map on the map below."
 msgstr "Gambar area yang ingin Anda petakan pada peta di bawah."
 
-#: app/templates/partials/new_project/map_section.html:20
-#: app/templates/partials/project_details/setup_steps/step2_form.html:70
+#: app/templates/partials/new_project/map_section.html:21
+#: app/templates/partials/project_details/setup_steps/step2_form.html:78
 #: app/templates/partials/project_details/setup_steps/step3_data.html:44
 msgid "More options"
 msgstr "Opsi Formulir:"
 
-#: app/templates/partials/new_project/map_section.html:23
+#: app/templates/partials/new_project/map_section.html:24
 msgid "Upload a GeoJSON file"
 msgstr "Unggah berkas GeoJSON"
 
-#: app/templates/partials/new_project/map_section.html:25
+#: app/templates/partials/new_project/map_section.html:26
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
@@ -1917,31 +1965,31 @@ msgstr ""
 "Jika Anda sudah memiliki berkas peta dengan batas area, unggah di sini "
 "daripada menggambarnya."
 
-#: app/templates/partials/new_project/map_section.html:31
+#: app/templates/partials/new_project/map_section.html:32
 msgid "Upload your own map file (GeoJSON)"
 msgstr "Unggah GeoJSON Kustom"
 
-#: app/templates/partials/new_project/map_section.html:39
+#: app/templates/partials/new_project/map_section.html:40
 msgid "Load from a HOT Tasking Manager project"
 msgstr "Muat dari proyek HOT Tasking Manager"
 
-#: app/templates/partials/new_project/map_section.html:41
+#: app/templates/partials/new_project/map_section.html:42
 msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
 msgstr "Masukkan ID proyek HOT Tasking Manager untuk memuat area cakupannya."
 
-#: app/templates/partials/new_project/map_section.html:50
+#: app/templates/partials/new_project/map_section.html:51
 msgid "Tasking Manager project ID"
 msgstr "ID proyek Tasking Manager"
 
-#: app/templates/partials/new_project/map_section.html:53
+#: app/templates/partials/new_project/map_section.html:54
 msgid "Load AOI"
 msgstr "Muat area"
 
-#: app/templates/partials/new_project/map_section.html:60
+#: app/templates/partials/new_project/map_section.html:61
 msgid "Combine multiple shapes into one"
 msgstr "Gabungkan beberapa bentuk menjadi satu"
 
-#: app/templates/partials/new_project/map_section.html:64
+#: app/templates/partials/new_project/map_section.html:65
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2277,6 +2325,22 @@ msgstr ""
 "aplikasi pemetaan. Mengubah area tugas akan mengatur ulang kemajuan tugas"
 " di aplikasi."
 
+#: app/templates/partials/project_details/update_form_section.html:2
+#: app/templates/partials/project_details/update_form_section.html:17
+msgid "Update survey form"
+msgstr ""
+
+#: app/templates/partials/project_details/update_form_section.html:7
+msgid "Replace the survey form? Mappers will receive the new version."
+msgstr ""
+
+#: app/templates/partials/project_details/update_form_section.html:11
+msgid ""
+"Upload your edited form. Mappers receive it automatically and collected "
+"data is kept.\n"
+"      Only include your survey questions, as Field-TM adds its own fields."
+msgstr ""
+
 #: app/templates/partials/project_details/fragments/basemap_progress.html:4
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
@@ -2573,23 +2637,30 @@ msgstr ""
 "Pilih survei siap pakai yang sesuai dengan apa yang Anda petakan. Anda "
 "dapat mengunggah berkas survei sendiri jika tidak ada yang cocok."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:24
+#: app/templates/partials/project_details/setup_steps/step2_form.html:18
+msgid ""
+"You can't change the form in Field-TM after publishing. To change it "
+"later, edit the\n"
+"      project in QGIS and sync the updates."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:32
 msgid "Survey form"
 msgstr "Formulir survei"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:26
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
 msgid "Loading survey types..."
 msgstr "Memuat jenis survei..."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:31
+#: app/templates/partials/project_details/setup_steps/step2_form.html:39
 msgid "or"
 msgstr "atau"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step2_form.html:42
 msgid "upload your own survey file (.xls / .xlsx)"
 msgstr "unggah file survei Anda sendiri (.xls / .xlsx)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:40
+#: app/templates/partials/project_details/setup_steps/step2_form.html:48
 msgid ""
 "Heads up: Field-TM auto-adds fields for tasks and feature selection. Your"
 " form should\n"
@@ -2600,57 +2671,69 @@ msgstr ""
 "hanya berisi pertanyaan survei yang ingin Anda ajukan (jangan sertakan "
 "kolom select_one_from_file untuk tugas/fitur)."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:73
+#: app/templates/partials/project_details/setup_steps/step2_form.html:81
 msgid "Form language"
 msgstr "Bahasa"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:75
+#: app/templates/partials/project_details/setup_steps/step2_form.html:83
 msgid "English"
 msgstr "Inggris"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:76
+#: app/templates/partials/project_details/setup_steps/step2_form.html:84
 msgid "Spanish"
 msgstr "Spanyol"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:77
+#: app/templates/partials/project_details/setup_steps/step2_form.html:85
 msgid "French"
 msgstr "Prancis"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:78
+#: app/templates/partials/project_details/setup_steps/step2_form.html:86
 msgid "Portuguese"
 msgstr "Portugis"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:79
+#: app/templates/partials/project_details/setup_steps/step2_form.html:87
 msgid "Swahili"
 msgstr "Bahasa Swahili"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:80
+#: app/templates/partials/project_details/setup_steps/step2_form.html:88
 msgid "Hindi"
 msgstr "Bahasa Hindi"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:84
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "Titik baru"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "Pemetaan dilakukan dengan mengetuk lokasi pada peta"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "Pemetaan dilakukan dengan merekam lokasi GPS pemeta"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:102
 msgid "Form questions"
 msgstr "Opsi Formulir:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:88
+#: app/templates/partials/project_details/setup_steps/step2_form.html:106
 msgid "Mappers will be asked to take a photo at the location."
 msgstr "Meminta pengguna mengambil foto di lokasi mereka."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:89
+#: app/templates/partials/project_details/setup_steps/step2_form.html:107
 msgid "Ask for a photo"
 msgstr "Minta foto"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+#: app/templates/partials/project_details/setup_steps/step2_form.html:114
 msgid "Make photo mandatory"
 msgstr "Jadikan foto wajib"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:101
+#: app/templates/partials/project_details/setup_steps/step2_form.html:119
 msgid "Mappers confirm whether existing OSM features are correctly digitised."
 msgstr ""
 "Meminta pemeta memverifikasi apakah fitur yang ada telah didigitalisasi "
 "dengan benar."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:102
+#: app/templates/partials/project_details/setup_steps/step2_form.html:120
 msgid "Ask to verify existing features"
 msgstr ""
 "Meminta pemeta memverifikasi apakah fitur yang ada telah didigitalisasi "
@@ -2880,15 +2963,3 @@ msgstr "Uji Kredensial"
 msgid "Save & Continue"
 msgstr "Simpan & Lanjutkan"
 
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:94
-msgid "New points"
-msgstr "Titik baru"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:96
-msgid "Mappers tap the location on a map"
-msgstr "Pemetaan dilakukan dengan mengetuk lokasi pada peta"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:97
-msgid "Mappers capture their GPS location"
-msgstr "Pemetaan dilakukan dengan merekam lokasi GPS pemeta"

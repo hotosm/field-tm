@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
-"POT-Creation-Date: 2026-10-20 23:29+0100\n"
+"POT-Creation-Date: 2026-11-05 16:09+0000\n"
 "PO-Revision-Date: 2026-03-18 15:17+0000\n"
 "Last-Translator: Sam Woodcock sam.woodcock@hotosm.org\n"
 "Language: vi\n"
@@ -18,15 +18,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: app/main.py:157
+#: app/main.py:159
 msgid "Validation failed"
 msgstr "không thành công"
 
-#: app/main.py:181
+#: app/main.py:183
 msgid "An unexpected error occurred. Please contact an admin."
 msgstr "Đã xảy ra lỗi không mong muốn. Vui lòng liên hệ quản trị viên."
 
-#: app/main.py:326
+#: app/main.py:329
 msgid "Could not connect to database"
 msgstr "Không thể kết nối với cơ sở dữ liệu"
 
@@ -47,22 +47,27 @@ msgstr "Bạn phải đăng nhập để xem dự án này."
 msgid "User (%(user_sub)s) could not be inserted in db"
 msgstr "(%(user_sub)s) vào db"
 
-#: app/central/central_crud.py:165
+#: app/central/central_crud.py:166
 #, python-format
 msgid "Error creating project on ODK Central: %(error)s"
 msgstr "Lỗi khi tạo dự án trong ODK Central: %(error)s"
 
-#: app/central/central_crud.py:219
+#: app/central/central_crud.py:218
 #, python-format
 msgid "Failed to upload form to ODK Central: %(error)s"
 msgstr "Không thể tải biểu mẫu lên ODK Central: %(error)s"
 
-#: app/central/central_crud.py:273
+#: app/central/central_crud.py:239
+#, python-format
+msgid "Failed to update form in ODK Central: %(error)s"
+msgstr ""
+
+#: app/central/central_crud.py:287
 #, python-format
 msgid "Could not read XLSForm file: %(error)s"
 msgstr "Không thể đọc tệp XLSForm: %(error)s"
 
-#: app/central/central_crud.py:299
+#: app/central/central_crud.py:312
 #, python-format
 msgid ""
 "XLSForm has select questions referencing lists that aren't defined in the"
@@ -72,53 +77,53 @@ msgstr ""
 "định trong bảng lựa chọn: %(rows)s. Kiểm tra bảng khảo sát và lựa chọn "
 "của bạn."
 
-#: app/central/central_crud.py:318
+#: app/central/central_crud.py:331
 #, python-format
 msgid "XLSForm is invalid: %(error)s"
 msgstr "XLSBiểu mẫu không hợp lệ: %(error)s"
 
-#: app/central/central_crud.py:400
+#: app/central/central_crud.py:420
 msgid "'geometry' data field is mandatory"
 msgstr "là bắt buộc"
 
-#: app/central/central_crud.py:715
+#: app/central/central_crud.py:734
 msgid "ODK project_id is missing; cannot create/merge entity lists."
 msgstr "ODK_id bị thiếu; không thể tạo/hợp nhất danh sách thực thể."
 
-#: app/central/central_crud.py:755
+#: app/central/central_crud.py:788
 msgid "Could not generate token for app user."
 msgstr "Không thể tạo mã thông báo cho người dùng ứng dụng."
 
-#: app/central/central_crud.py:787 app/central/central_crud.py:793
+#: app/central/central_crud.py:816 app/central/central_crud.py:821
 msgid "An error occurred while creating the app user token."
 msgstr "Đã xảy ra lỗi không mong muốn khi tạo mã QR."
 
-#: app/central/central_crud.py:807
+#: app/central/central_crud.py:834
 #, python-format
 msgid "Could not assign %(scope)s role to app user."
 msgstr "Không thể chỉ định vai trò %(scope)s cho người dùng ứng dụng."
 
-#: app/central/central_crud.py:846
+#: app/central/central_crud.py:871
 msgid "Could not find 'Project Manager' role in ODK Central."
 msgstr "Mở dự án trong ODK Central"
 
-#: app/central/central_crud.py:871
+#: app/central/central_crud.py:893
 msgid "ODK Central returned no user ID after creation."
 msgstr "ODK Central không trả lại ID người dùng sau khi tạo."
 
-#: app/central/central_crud.py:996
+#: app/central/central_crud.py:1009
 msgid "Failed to create ODK Central manager user."
 msgstr "Không thể tạo người dùng quản lý trung tâm ODK."
 
-#: app/central/central_crud.py:1013
+#: app/central/central_crud.py:1024
 msgid "ODK credentials are invalid, or may have changed."
 msgstr "Thông tin đăng nhập ODK không hợp lệ hoặc có thể đã thay đổi."
 
-#: app/central/central_crud.py:1019
+#: app/central/central_crud.py:1029
 msgid "Failed to connect to Central. Is the URL valid?"
 msgstr "Không thể kết nối tới Central. URL có hợp lệ không?"
 
-#: app/central/central_crud.py:1025
+#: app/central/central_crud.py:1034
 msgid "Unexpected error while testing ODK Central credentials."
 msgstr "Đã xảy ra lỗi không mong muốn khi tạo mã QR."
 
@@ -131,53 +136,89 @@ msgstr "Cung cấp tệp .xls hoặc .xlsx hợp lệ"
 msgid "No data provided."
 msgstr "Không có trích xuất dữ liệu nào được cung cấp."
 
+#: app/helpers/basemap_attach.py:91
+msgid ""
+"Basemap attach failed for now. Your project is ready to use. Please retry"
+" attach."
+msgstr ""
+"Việc đính kèm bản đồ nền hiện chưa thành công. Dự án của bạn đã sẵn sàng "
+"để sử dụng. Vui lòng thử đính kèm lại."
+
+#: app/helpers/basemap_attach.py:96
+msgid ""
+"Basemap attach could not complete due to a temporary network issue. Your "
+"project is ready to use. Please retry attach."
+msgstr ""
+"Không thể hoàn tất việc đính kèm bản đồ nền do sự cố mạng tạm thời. Dự án"
+" của bạn đã sẵn sàng để sử dụng. Vui lòng thử đính kèm lại."
+
 #: app/helpers/basemap_services.py:26
 #, python-format
 msgid "%(action)s failed with HTTP %(status_code)s."
 msgstr "%(action)s không thành công với HTTP %(status_code)s."
 
-#: app/helpers/basemap_services.py:40
+#: app/helpers/basemap_services.py:36
 #, python-format
 msgid "%(action)s failed due to upstream connection error."
 msgstr "%(action)s không thành công do lỗi kết nối ngược dòng."
 
-#: app/helpers/basemap_services.py:181
+#: app/helpers/basemap_services.py:175
 #, python-format
 msgid "Tilepack API returned HTTP %(status_code)s."
 msgstr "trả về HTTP %(status_code)s."
+
+#: app/helpers/geometry_utils.py:82
+msgid "Project outline is missing or has no geometry."
+msgstr "Phác thảo dự án bị thiếu hoặc không có hình học."
+
+#: app/helpers/geometry_utils.py:85
+msgid "Project outline geometry has no coordinates."
+msgstr "Hình học phác thảo dự án không có tọa độ."
 
 #: app/helpers/helper_routes.py:55
 msgid "Failed to convert YAML form to XLSForm."
 msgstr "Không thể chuyển đổi biểu mẫu YAML sang XLSForm."
 
-#: app/htmx/project_detail_routes.py:164
+#: app/htmx/project_detail_routes.py:167 app/htmx/project_detail_routes.py:215
 #, python-format
 msgid "Project (%(project_id)s) not found."
 msgstr "Không tìm thấy dự án (%(project_id)s)."
 
-#: app/htmx/project_detail_routes.py:171
+#: app/htmx/project_detail_routes.py:174
 msgid "Only the project manager can delete this project."
 msgstr "Chỉ quản lý dự án mới có thể xóa dự án này."
 
-#: app/htmx/project_detail_routes.py:215 app/templates/project_details.html:204
+#: app/htmx/project_detail_routes.py:222
+msgid "Only the project creator can update the form."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:230
+msgid "Only published ODK projects can update their form."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:245
+msgid "Could not update the form. Please check the file and try again."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:250
+msgid "Survey form updated in ODK Central."
+msgstr ""
+
+#: app/htmx/project_detail_routes.py:279 app/templates/project_details.html:213
 msgid "Project not found."
 msgstr "Không tìm thấy dự án."
 
-#: app/htmx/project_detail_routes.py:251
-#: app/htmx/setup_steps/setup_step_responses.py:70
+#: app/htmx/project_detail_routes.py:314
+#: app/htmx/setup_steps/setup_step_responses.py:68
 #, python-format
 msgid "Error: %(error_msg)s"
 msgstr "Lỗi: %(error_msg)s"
 
-#: app/htmx/project_detail_routes.py:292
-msgid "GeoJSON export is only available for QField projects."
-msgstr "Xuất GeoJSON chỉ khả dụng cho các dự án QField."
+#: app/htmx/project_detail_routes.py:355
+msgid "This project is not yet linked to ODK Central or QFieldCloud."
+msgstr ""
 
-#: app/htmx/project_detail_routes.py:297
-msgid "This project is not yet linked to a QFieldCloud project."
-msgstr "Dự án này chưa được liên kết với dự án QFieldCloud."
-
-#: app/htmx/project_detail_routes.py:308
+#: app/htmx/project_detail_routes.py:366
 #, python-format
 msgid "Failed to export GeoJSON: %(error)s"
 msgstr "Không xuất được GeoJSON: %(error)s"
@@ -212,35 +253,19 @@ msgstr "Không thể cập nhật nhiệm vụ trong %(app)s. Vui lòng thử l�
 msgid "Tasks updated in %(app)s."
 msgstr "Đã cập nhật nhiệm vụ trong %(app)s."
 
-#: app/htmx/basemap/basemap_attach_flow.py:69
-msgid ""
-"Basemap attach failed for now. Your project is ready to use. Please retry"
-" attach."
-msgstr ""
-"Việc đính kèm bản đồ nền hiện chưa thành công. Dự án của bạn đã sẵn sàng "
-"để sử dụng. Vui lòng thử đính kèm lại."
-
-#: app/htmx/basemap/basemap_attach_flow.py:74
-msgid ""
-"Basemap attach could not complete due to a temporary network issue. Your "
-"project is ready to use. Please retry attach."
-msgstr ""
-"Không thể hoàn tất việc đính kèm bản đồ nền do sự cố mạng tạm thời. Dự án"
-" của bạn đã sẵn sàng để sử dụng. Vui lòng thử đính kèm lại."
-
-#: app/htmx/basemap/basemap_attach_flow.py:123
+#: app/htmx/basemap/basemap_attach_flow.py:33
 msgid "Basemap attach is available after publication."
 msgstr "Việc đính kèm bản đồ nền khả dụng sau khi xuất bản."
 
-#: app/htmx/basemap/basemap_attach_flow.py:132
+#: app/htmx/basemap/basemap_attach_flow.py:42
 msgid "Basemap attach is only available for QField projects."
 msgstr "Việc đính kèm bản đồ nền chỉ khả dụng cho các dự án QField."
 
-#: app/htmx/basemap/basemap_attach_flow.py:142
+#: app/htmx/basemap/basemap_attach_flow.py:52
 msgid "Basemap is not ready yet. Please wait for generation to complete."
 msgstr "Bản đồ nền vẫn chưa sẵn sàng. Vui lòng chờ quá trình tạo hoàn tất."
 
-#: app/htmx/basemap/basemap_attach_flow.py:157
+#: app/htmx/basemap/basemap_attach_flow.py:67
 msgid ""
 "Basemap download URL is not available yet. Please refresh status and try "
 "again shortly."
@@ -248,7 +273,7 @@ msgstr ""
 "URL tải xuống bản đồ nền chưa khả dụng. Vui lòng làm mới trạng thái và "
 "thử lại sau ít phút."
 
-#: app/htmx/basemap/basemap_attach_flow.py:173
+#: app/htmx/basemap/basemap_attach_flow.py:83
 #, python-format
 msgid ""
 "QField basemap attach is not configured on this deployment. Missing "
@@ -258,7 +283,7 @@ msgstr ""
 "này. Thiếu %(config)s."
 
 #: app/htmx/basemap/basemap_fragments.py:17
-#: app/htmx/setup_steps/setup_step_responses.py:90
+#: app/htmx/setup_steps/setup_step_responses.py:88
 msgid "Project not found or access denied."
 msgstr "Không tìm thấy dự án hoặc bị từ chối truy cập."
 
@@ -302,7 +327,7 @@ msgstr ""
 "Khu vực dự án phải là JSON hợp lệ (GeoJSON Polygon, MultiPolygon, Feature"
 " hoặc FeatureCollection)."
 
-#: app/htmx/project_create/project_create_simple_flow.py:86
+#: app/htmx/project_create/project_create_simple_flow.py:90
 msgid ""
 "No existing OSM buildings were found in this area. Continue mapping from "
 "scratch."
@@ -310,15 +335,15 @@ msgstr ""
 "Không tìm thấy tòa nhà OSM hiện có nào trong khu vực này. Tiếp tục lập "
 "bản đồ từ đầu."
 
-#: app/htmx/project_create/project_create_simple_flow.py:184
+#: app/htmx/project_create/project_create_simple_flow.py:188
 msgid "Could not load default OSM Buildings form for simple project creation."
 msgstr ""
 "Không thể tải biểu mẫu OSM Buildings mặc định cho quy trình tạo dự án đơn"
 " giản."
 
-#: app/htmx/project_create/project_create_simple_flow.py:312
-#: app/htmx/project_create/project_create_submit_routes.py:140
-#: app/htmx/project_create/project_create_submit_routes.py:214
+#: app/htmx/project_create/project_create_simple_flow.py:316
+#: app/htmx/project_create/project_create_submit_routes.py:138
+#: app/htmx/project_create/project_create_submit_routes.py:212
 msgid "An unexpected error occurred. Please try again."
 msgstr "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại."
 
@@ -330,11 +355,11 @@ msgstr "Không tải được biểu mẫu mẫu."
 msgid "Please select a form or upload a file."
 msgstr "Vui lòng chọn biểu mẫu hoặc tải lên tệp."
 
-#: app/htmx/project_create/project_create_xlsform_routes.py:132
+#: app/htmx/project_create/project_create_xlsform_routes.py:128
 msgid "Form validated and uploaded successfully! Reloading page..."
 msgstr "Biểu mẫu đã được xác thực và tải lên thành công! Đang tải lại trang..."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:46
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:43
 msgid ""
 "Tasks were planned with the old data. They are kept, but reopen the task "
 "planner to update feature counts."
@@ -343,12 +368,12 @@ msgstr ""
 "nhưng hãy mở lại trình lập kế hoạch nhiệm vụ để cập nhật số lượng đối "
 "tượng."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:79
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:76
 #, python-format
 msgid "OSM data downloaded successfully! Found %(feature_count)s features."
 msgstr "Đã tải dữ liệu OSM thành công! Tìm thấy %(feature_count)s đối tượng."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:82
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:79
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "downloading again with different parameters."
@@ -356,21 +381,21 @@ msgstr ""
 "Nếu mọi thứ đã đúng, hãy nhấp \"Chấp nhận trích xuất dữ liệu\". Nếu "
 "không, hãy thử tải xuống lại với tham số khác."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:115
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:112
 #: app/templates/partials/project_details/style_and_scripts.html:24
 msgid "Invalid file type. Please upload a .geojson or .json file."
 msgstr "Loại tệp không hợp lệ. Vui lòng tải lên tệp .geojson hoặc .json."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:138
-msgid "No valid geometries found in GeoJSON."
-msgstr "Không tìm thấy hình học hợp lệ trong GeoJSON."
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:126
+msgid "The file could not be read as GeoJSON."
+msgstr ""
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:152
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:145
 #, python-format
 msgid "✓ GeoJSON uploaded successfully! Found %(feature_count)s features."
 msgstr "✓ Đã tải GeoJSON lên thành công! Tìm thấy %(feature_count)s đối tượng."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:155
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:148
 msgid ""
 "If this looks right, click \"Accept Data Extract\". Otherwise, try "
 "uploading a different file."
@@ -378,11 +403,11 @@ msgstr ""
 "Nếu mọi thứ đã đúng, hãy nhấp \"Chấp nhận trích xuất dữ liệu\". Nếu "
 "không, hãy thử tải lên tệp khác."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:188
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:181
 msgid "✓ Collect-new-data mode selected. You can continue."
 msgstr "✓ Đã chọn chế độ thu thập dữ liệu mới. Bạn có thể tiếp tục."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:222
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:215
 msgid ""
 "No GeoJSON data found. Please download OSM data or upload a GeoJSON file "
 "first."
@@ -390,11 +415,11 @@ msgstr ""
 "Không tìm thấy dữ liệu GeoJSON. Vui lòng tải dữ liệu OSM hoặc tải lên tệp"
 " GeoJSON trước."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:241
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:234
 msgid "✓ Data extract successfully saved! You can now continue to the Tasks step."
 msgstr "✓ Đã lưu trích xuất dữ liệu! Giờ bạn có thể chuyển sang bước Nhiệm vụ."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:288
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:281
 msgid ""
 "No data extract is staged. Please download OSM data or upload a GeoJSON "
 "file first."
@@ -402,7 +427,7 @@ msgstr ""
 "Chưa có trích xuất dữ liệu nào được chuẩn bị. Hãy tải dữ liệu OSM xuống "
 "hoặc tải lên tệp GeoJSON trước."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:303
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:296
 #, python-format
 msgid ""
 "✓ Data extract accepted! Saved %(feature_count)s features. Step 3 is now "
@@ -411,7 +436,7 @@ msgstr ""
 "✓ Đã chấp nhận phần trích xuất dữ liệu! Đã lưu %(feature_count)s đối "
 "tượng. Bước 3 hiện đã hoàn tất."
 
-#: app/htmx/setup_steps/setup_step_extract_handlers.py:343
+#: app/htmx/setup_steps/setup_step_extract_handlers.py:336
 msgid "Data extract discarded. Choose a data source above to try again."
 msgstr "Đã hủy trích xuất dữ liệu. Chọn một nguồn dữ liệu ở trên để thử lại."
 
@@ -423,11 +448,11 @@ msgstr "Dữ liệu GeoJSON trong yêu cầu không hợp lệ. Vui lòng thử 
 msgid "Error reading GeoJSON data from request."
 msgstr "Lỗi khi đọc dữ liệu GeoJSON từ yêu cầu."
 
-#: app/htmx/setup_steps/setup_step_finalize_routes.py:104
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:92
 msgid "Project mapping app is not configured for finalisation."
 msgstr "Ứng dụng lập bản đồ của dự án chưa được cấu hình để hoàn tất."
 
-#: app/htmx/setup_steps/setup_step_finalize_routes.py:142
+#: app/htmx/setup_steps/setup_step_finalize_routes.py:130
 msgid ""
 "Provide ODK URL, username, and password (all 3), or leave them all blank "
 "to use server defaults."
@@ -435,11 +460,11 @@ msgstr ""
 "Cung cấp URL ODK, tên người dùng và mật khẩu (cả 3), hoặc để trống tất cả"
 " để dùng mặc định của máy chủ."
 
-#: app/htmx/setup_steps/setup_step_responses.py:85
+#: app/htmx/setup_steps/setup_step_responses.py:83
 msgid "An unexpected error occurred"
 msgstr "Đã xảy ra lỗi không mong muốn"
 
-#: app/htmx/setup_steps/setup_step_responses.py:160
+#: app/htmx/setup_steps/setup_step_responses.py:158
 msgid ""
 "Project finalisation failed. Please check your settings and try again. If"
 " it continues, send the technical details below to your instance "
@@ -449,29 +474,27 @@ msgstr ""
 "tiếp diễn, hãy gửi chi tiết kỹ thuật bên dưới cho quản trị viên hệ thống "
 "hoặc nhóm hỗ trợ."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:61
+#: app/htmx/setup_steps/setup_step_validate_routes.py:58
 msgid "Could not reach Tasking Manager. Please try again later."
 msgstr "Không thể kết nối tới Tasking Manager. Vui lòng thử lại sau."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:66
+#: app/htmx/setup_steps/setup_step_validate_routes.py:63
 #, python-format
 msgid "Tasking Manager project %(id)s was not found."
 msgstr "Không tìm thấy dự án Tasking Manager %(id)s."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:71
+#: app/htmx/setup_steps/setup_step_validate_routes.py:68
 #, python-format
 msgid "Tasking Manager returned an error (HTTP %(status)s)."
 msgstr "Tasking Manager trả về lỗi (HTTP %(status)s)."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:84
+#: app/htmx/setup_steps/setup_step_validate_routes.py:81
 msgid "Tasking Manager returned an invalid response."
 msgstr "Tasking Manager trả về phản hồi không hợp lệ."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:94
-msgid "Tasking Manager project AOI did not contain any polygon geometries."
+#: app/htmx/setup_steps/setup_step_validate_routes.py:101
+msgid "The project area contains invalid geometry. Please fix it and retry."
 msgstr ""
-"Khu vực quan tâm của dự án Tasking Manager không chứa hình học đa giác "
-"nào."
 
 #: app/htmx/setup_steps/setup_step_validate_routes.py:118
 #, python-format
@@ -485,111 +508,124 @@ msgstr ""
 #: app/htmx/setup_steps/setup_step_validate_routes.py:123
 #, python-format
 msgid ""
+"Area is %(area_km2)s km², over %(area_large)s km². Projects this large "
+"will likely fail to download OSM data, generate basemaps or split into "
+"tasks. Use them only for very sparse data collection, with your own "
+"uploaded data extract."
+msgstr ""
+
+#: app/htmx/setup_steps/setup_step_validate_routes.py:130
+#, python-format
+msgid ""
 "Area is %(area_km2)s km². Large areas (>%(area_warn)s km²) may take "
 "longer to process."
 msgstr ""
 "Diện tích là %(area_km2)s km². Các khu vực lớn (>%(area_warn)s km²) có "
 "thể mất nhiều thời gian xử lý hơn."
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:148
+#: app/htmx/setup_steps/setup_step_validate_routes.py:155
 msgid "GeoJSON is required"
 msgstr "Yêu cầu GeoJSON"
 
-#: app/htmx/setup_steps/setup_step_validate_routes.py:158
-msgid "No polygon geometries found. Project area must be a polygon."
-msgstr "Không tìm thấy hình học đa giác. Khu vực dự án phải là đa giác."
-
-#: app/htmx/setup_steps/setup_step_validate_routes.py:206
+#: app/htmx/setup_steps/setup_step_validate_routes.py:205
 msgid "Tasking Manager project ID must be a positive integer."
 msgstr "ID dự án Tasking Manager phải là số nguyên dương."
 
-#: app/projects/mapping_apps.py:48
+#: app/projects/data_extract_services.py:204
+msgid "Selected area is too large. Please select an area smaller than 200 km²."
+msgstr "Vùng được chọn quá lớn. Vui lòng chọn khu vực nhỏ hơn 200 km²."
+
+#: app/projects/data_extract_services.py:211
+msgid "Failed to generate data extract from the raw data API."
+msgstr "Không thể tạo trích xuất dữ liệu từ API dữ liệu thô."
+
+#: app/projects/mapping_apps.py:53
 msgid "GIS mapping app for Android and iOS, with our simple task plugin."
 msgstr ""
 "Ứng dụng lập bản đồ GIS cho Android và iOS, kèm plugin nhiệm vụ đơn giản "
 "của chúng tôi."
 
-#: app/projects/mapping_apps.py:49
+#: app/projects/mapping_apps.py:54
 msgid "Drawing and editing geometry, detailed surveys"
 msgstr "Vẽ và chỉnh sửa hình học, khảo sát chi tiết"
 
-#: app/projects/mapping_apps.py:57
+#: app/projects/mapping_apps.py:62
 msgid "Form-based survey app for Android."
 msgstr "Ứng dụng khảo sát dạng biểu mẫu cho Android."
 
-#: app/projects/mapping_apps.py:58
+#: app/projects/mapping_apps.py:63
 msgid "Form-heavy surveys, simple phones"
 msgstr "Khảo sát nhiều biểu mẫu, điện thoại đơn giản"
 
-#: app/projects/mapping_apps.py:66
+#: app/projects/mapping_apps.py:71
 msgid "Fast OpenStreetMap editor for shops, amenities and entrances."
 msgstr "Trình chỉnh sửa OpenStreetMap nhanh cho cửa hàng, tiện ích và lối vào."
 
-#: app/projects/mapping_apps.py:67
+#: app/projects/mapping_apps.py:72
 msgid "Updating existing OSM buildings and points of interest"
 msgstr "Cập nhật tòa nhà và điểm quan tâm có sẵn trên OSM"
 
-#: app/projects/mapping_apps.py:75
+#: app/projects/mapping_apps.py:80
 msgid "Answer simple quests to complete OpenStreetMap data."
 msgstr "Trả lời các nhiệm vụ đơn giản để hoàn thiện dữ liệu OpenStreetMap."
 
-#: app/projects/mapping_apps.py:76
+#: app/projects/mapping_apps.py:81
 msgid "Quick OSM attribute quests on roads and points of interest"
 msgstr "Nhiệm vụ thuộc tính OSM nhanh cho đường và điểm quan tâm"
 
-#: app/projects/mapping_apps.py:84
+#: app/projects/mapping_apps.py:89
 msgid "Offline-first mapping for communities and territories."
 msgstr "Lập bản đồ ưu tiên ngoại tuyến cho cộng đồng và lãnh thổ."
 
-#: app/projects/mapping_apps.py:85
+#: app/projects/mapping_apps.py:90
 msgid "Offline, community-led mapping"
 msgstr "Lập bản đồ ngoại tuyến do cộng đồng dẫn dắt"
 
-#: app/projects/mapping_apps.py:93
+#: app/projects/mapping_apps.py:98
 msgid "Offline maps and navigation, with OSM editing."
 msgstr "Bản đồ ngoại tuyến và dẫn đường, có chỉnh sửa OSM."
 
-#: app/projects/mapping_apps.py:94
+#: app/projects/mapping_apps.py:99
 msgid "Navigating to tasks, editing OSM points"
 msgstr "Dẫn đường tới nhiệm vụ, chỉnh sửa điểm OSM"
 
-#: app/projects/mapping_apps.py:102
+#: app/projects/mapping_apps.py:107
 msgid "Open street-level imagery, captured with any camera."
 msgstr "Ảnh mở cấp đường phố, chụp bằng bất kỳ máy ảnh nào."
 
-#: app/projects/mapping_apps.py:103
+#: app/projects/mapping_apps.py:108
 msgid "Street-level imagery along roads"
 msgstr "Ảnh cấp đường phố dọc theo các tuyến đường"
 
-#: app/projects/mapping_apps.py:111
+#: app/projects/mapping_apps.py:116
 msgid "Print paper maps, sketch on them, scan them back."
 msgstr "In bản đồ giấy, vẽ phác lên đó rồi quét lại."
 
-#: app/projects/mapping_apps.py:112
+#: app/projects/mapping_apps.py:117
 msgid "Paper maps and sketch mapping"
 msgstr "Bản đồ giấy và lập bản đồ phác thảo"
 
-#: app/projects/mapping_apps.py:120
+#: app/projects/mapping_apps.py:125
 msgid "Turn locations shared in chat apps into a map."
 msgstr "Biến vị trí được chia sẻ trong ứng dụng trò chuyện thành bản đồ."
 
-#: app/projects/mapping_apps.py:121
+#: app/projects/mapping_apps.py:126
 msgid "Location sharing from chat apps"
 msgstr "Chia sẻ vị trí từ ứng dụng trò chuyện"
 
-#: app/projects/mapping_apps.py:125
+#: app/projects/mapping_apps.py:130
 msgid "Other app"
 msgstr "Ứng dụng khác"
 
-#: app/projects/mapping_apps.py:129
+#: app/projects/mapping_apps.py:134
 msgid "Any other app. Share the tasks as files and links."
 msgstr "Bất kỳ ứng dụng nào khác. Chia sẻ nhiệm vụ dưới dạng tệp và liên kết."
 
-#: app/projects/mapping_apps.py:130
+#: app/projects/mapping_apps.py:135
 msgid "Any app"
 msgstr "Bất kỳ ứng dụng nào"
 
-#: app/projects/mapping_apps.py:157
+#: app/projects/mapping_apps.py:162
 msgid ""
 "Not for OpenStreetMap: QField for map-based capture and editing, or ODK "
 "for form-heavy surveys."
@@ -597,13 +633,13 @@ msgstr ""
 "Không dành cho OpenStreetMap: QField để thu thập và chỉnh sửa trên bản "
 "đồ, hoặc ODK cho khảo sát nhiều biểu mẫu."
 
-#: app/projects/mapping_apps.py:162
+#: app/projects/mapping_apps.py:167
 msgid "Poorly mapped: QField lets mappers draw the missing geometry."
 msgstr ""
 "Ít được lập bản đồ: QField cho phép người lập bản đồ vẽ phần hình học còn"
 " thiếu."
 
-#: app/projects/mapping_apps.py:166
+#: app/projects/mapping_apps.py:171
 msgid ""
 "Already mapped: Every Door is the quickest way to update buildings and "
 "points of interest."
@@ -611,7 +647,7 @@ msgstr ""
 "Đã được lập bản đồ: Every Door là cách nhanh nhất để cập nhật tòa nhà và "
 "điểm quan tâm."
 
-#: app/projects/mapping_apps.py:171
+#: app/projects/mapping_apps.py:176
 msgid ""
 "Already mapped: StreetComplete for road details, or Panoramax for street-"
 "level imagery."
@@ -619,39 +655,31 @@ msgstr ""
 "Đã được lập bản đồ: StreetComplete cho chi tiết đường, hoặc Panoramax cho"
 " ảnh cấp đường phố."
 
-#: app/projects/mapping_apps.py:174
+#: app/projects/mapping_apps.py:179
 msgid "QField handles any kind of feature."
 msgstr "QField xử lý được mọi loại đối tượng."
 
-#: app/projects/project_crud.py:120
-msgid "Selected area is too large. Please select an area smaller than 200 km²."
-msgstr "Vùng được chọn quá lớn. Vui lòng chọn khu vực nhỏ hơn 200 km²."
-
-#: app/projects/project_crud.py:131
-msgid "Failed to generate data extract from the raw data API."
-msgstr "Không thể tạo trích xuất dữ liệu từ API dữ liệu thô."
-
-#: app/projects/project_crud.py:206
+#: app/projects/project_crud.py:130
 msgid "This job was interrupted. Please try again."
 msgstr "Công việc này đã bị gián đoạn. Vui lòng thử lại."
 
-#: app/projects/project_crud.py:692
+#: app/projects/project_crud.py:611
 msgid "QField project ID not found."
 msgstr "Không tìm thấy dự án."
 
-#: app/projects/project_crud.py:712
+#: app/projects/project_crud.py:628
 msgid "Project name not found."
 msgstr "Không tìm thấy dự án."
 
-#: app/projects/project_crud.py:719
+#: app/projects/project_crud.py:632
 msgid "ODK project ID not found."
 msgstr "Không tìm thấy dự án."
 
-#: app/projects/project_crud.py:728
+#: app/projects/project_crud.py:638
 msgid "Appuser token not found."
 msgstr "Không tìm thấy dự án."
 
-#: app/projects/project_crud.py:745
+#: app/projects/project_crud.py:652
 msgid "Failed to generate QR code."
 msgstr "Không tải được biểu mẫu mẫu."
 
@@ -672,88 +700,88 @@ msgstr "Khu vực chưa có tên"
 msgid "Area {latitude:.4f}_{longitude:.4f}"
 msgstr "Khu vực {latitude:.4f}_{longitude:.4f}"
 
-#: app/projects/project_services.py:389
+#: app/projects/project_services.py:299
 #, python-brace-format
 msgid "{location} OSM Buildings"
 msgstr "{location} OSM Buildings"
 
-#: app/projects/project_services.py:1154
-msgid "Task areas changed. Confirm the reset to re-sync the tasks."
-msgstr "Khu vực nhiệm vụ đã thay đổi. Xác nhận đặt lại để đồng bộ lại nhiệm vụ."
+#: app/projects/project_services.py:662
+msgid "No submissions found yet."
+msgstr ""
 
-#: app/projects/task_plan.py:31
+#: app/projects/project_services.py:666
+msgid "Export is only available for ODK and QField projects."
+msgstr ""
+
+#: app/projects/task_plan.py:32
 #, python-format
 msgid "Values must be %(max_length)s characters or fewer."
 msgstr "Giá trị phải có tối đa %(max_length)s ký tự."
 
-#: app/projects/task_plan.py:44
+#: app/projects/task_plan.py:45
 msgid "Group labels may only contain letters, numbers, hyphens and underscores."
 msgstr "Nhãn nhóm chỉ được chứa chữ cái, chữ số, dấu gạch ngang và dấu gạch dưới."
 
-#: app/projects/task_plan.py:61
+#: app/projects/task_plan.py:62
 msgid "Colours must be hex values such as #d63f3f."
 msgstr "Màu phải là giá trị hex, ví dụ #d63f3f."
 
-#: app/projects/task_plan.py:112
+#: app/projects/task_plan.py:113
 #, python-format
 msgid "Task %(number)s must be a Polygon with WGS84 coordinates."
 msgstr "Nhiệm vụ %(number)s phải là đa giác với tọa độ WGS84."
 
-#: app/projects/task_plan.py:122
+#: app/projects/task_plan.py:123
 #, python-format
 msgid "Task %(number)s: %(error)s"
 msgstr "Nhiệm vụ %(number)s: %(error)s"
 
-#: app/projects/task_plan.py:143
+#: app/projects/task_plan.py:144
 msgid "A task plan must be a GeoJSON FeatureCollection."
 msgstr "Kế hoạch nhiệm vụ phải là một FeatureCollection GeoJSON."
 
-#: app/projects/task_plan.py:145
+#: app/projects/task_plan.py:146
 msgid "The task plan has no tasks."
 msgstr "Kế hoạch nhiệm vụ không có nhiệm vụ nào."
 
-#: app/projects/task_plan.py:148
+#: app/projects/task_plan.py:149
 #, python-format
 msgid "A task plan can have at most %(max_tasks)s tasks."
 msgstr "Một kế hoạch nhiệm vụ có thể có tối đa %(max_tasks)s nhiệm vụ."
 
-#: app/qfield/qfield_crud.py:157
-msgid "Project outline is missing or has no geometry."
-msgstr "Phác thảo dự án bị thiếu hoặc không có hình học."
+#: app/projects/task_sync.py:185
+msgid "Task areas changed. Confirm the reset to re-sync the tasks."
+msgstr "Khu vực nhiệm vụ đã thay đổi. Xác nhận đặt lại để đồng bộ lại nhiệm vụ."
 
-#: app/qfield/qfield_crud.py:163
-msgid "Project outline geometry has no coordinates."
-msgstr "Hình học phác thảo dự án không có tọa độ."
-
-#: app/qfield/qfield_crud.py:450
+#: app/qfield/qfield_crud.py:386
 msgid "QGIS wrapper completed but wrote no output files."
 msgstr "QGIS đã hoàn thành nhưng không ghi tệp đầu ra."
 
-#: app/qfield/qfield_crud.py:462
+#: app/qfield/qfield_crud.py:395
 msgid "QGIS wrapper completed but no .qgz file in output."
 msgstr "QGIS đã hoàn tất nhưng không có tệp .qgz ở đầu ra."
 
-#: app/qfield/qfield_crud.py:485
+#: app/qfield/qfield_crud.py:416
 msgid "Project outline is required for QField project creation."
 msgstr "✓ Không cần chia nhiệm vụ cho cấu hình dự án này."
 
-#: app/qfield/qfield_crud.py:490
+#: app/qfield/qfield_crud.py:419
 msgid "XLSForm is required for QField project creation."
 msgstr "XLSForm là bắt buộc để tạo dự án QField."
 
-#: app/qfield/qfield_crud.py:502
+#: app/qfield/qfield_crud.py:428
 msgid "Failed to modify XLSForm for QField."
 msgstr "Không thể sửa đổi XLSForm cho QField."
 
-#: app/qfield/qfield_crud.py:572
+#: app/qfield/qfield_crud.py:496
 msgid "QField project ID is missing; cannot attach basemap."
 msgstr "QField bị thiếu; không thể đính kèm bản đồ cơ sở."
 
-#: app/qfield/qfield_crud.py:609
+#: app/qfield/qfield_crud.py:532
 msgid "Basemap attach completed but produced no project files."
 msgstr "Bản đồ nền đã được đính kèm vào dự án QField."
 
-#: app/qfield/qfield_crud.py:794
+#: app/qfield/qfield_crud.py:716
 #, python-format
 msgid ""
 "QFieldCloud did not finish processing the project file after %(attempts)d"
@@ -762,46 +790,46 @@ msgstr ""
 "QFieldCloud chưa xử lý xong tệp dự án sau %(attempts)d lần thử (trạng "
 "thái cuối: %(status)s)."
 
-#: app/qfield/qfield_crud.py:848 app/qfield/qfield_crud.py:862
+#: app/qfield/qfield_crud.py:769 app/qfield/qfield_crud.py:779
 #, python-format
 msgid "QGIS project generation failed: %(error)s"
 msgstr "QGIS không thành công: %(error)s"
 
-#: app/qfield/qfield_crud.py:855
+#: app/qfield/qfield_crud.py:774
 msgid "QGIS wrapper returned invalid JSON."
 msgstr "QGIS trả về JSON không hợp lệ."
 
-#: app/qfield/qfield_crud.py:879
+#: app/qfield/qfield_crud.py:793
 #, python-format
 msgid "Failed to download basemap MBTiles for upload (HTTP %(status)s)."
 msgstr "Không thể tải xuống MBTiles bản đồ cơ sở để tải lên (HTTP %(status)s)."
 
-#: app/qfield/qfield_crud.py:894
+#: app/qfield/qfield_crud.py:803
 msgid "Downloaded basemap MBTiles is empty."
 msgstr "Tải mã QR"
 
-#: app/qfield/qfield_crud.py:969
+#: app/qfield/qfield_crud.py:876
 #, python-format
 msgid "Failed to upload files to QFieldCloud: %(error)s"
 msgstr "Không thể tải tệp lên QFieldCloud: %(error)s"
 
-#: app/qfield/qfield_crud.py:1084
+#: app/qfield/qfield_crud.py:988
 msgid "QFieldCloud credentials are invalid."
 msgstr "✓ Thông tin xác thực hợp lệ!"
 
-#: app/qfield/qfield_crud.py:1115
+#: app/qfield/qfield_crud.py:1017
 msgid "This project is not linked to a QFieldCloud project."
 msgstr "Dự án này không được liên kết với dự án QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1122
+#: app/qfield/qfield_crud.py:1022
 msgid "QFIELDCLOUD_QGIS_URL is not configured."
 msgstr "QFIELDCLOUD_QGIS_URL không được định cấu hình."
 
-#: app/qfield/qfield_crud.py:1152
+#: app/qfield/qfield_crud.py:1049
 msgid "No GeoPackage files were found in the QFieldCloud package."
 msgstr "Không tìm thấy tệp GeoPackage trong gói QFieldCloud."
 
-#: app/qfield/qfield_crud.py:1171
+#: app/qfield/qfield_crud.py:1066
 msgid ""
 "No survey data found in the QFieldCloud package. Mappers may not have "
 "submitted any responses yet."
@@ -809,15 +837,15 @@ msgstr ""
 "Không tìm thấy dữ liệu khảo sát trong gói QFieldCloud. Người lập bản đồ "
 "có thể chưa gửi bất kỳ câu trả lời nào."
 
-#: app/qfield/qfield_crud.py:1194
+#: app/qfield/qfield_crud.py:1087
 msgid "QFieldCloud did not return a package job id."
 msgstr "QFieldCloud không trả lại id công việc gói."
 
-#: app/qfield/qfield_crud.py:1211
+#: app/qfield/qfield_crud.py:1101
 msgid "QFieldCloud failed to package the project."
 msgstr "QFieldCloud không thể đóng gói dự án."
 
-#: app/qfield/qfield_crud.py:1217
+#: app/qfield/qfield_crud.py:1105
 #, python-format
 msgid ""
 "Timed out waiting for QFieldCloud to package the project (last status: "
@@ -826,12 +854,12 @@ msgstr ""
 "Đã hết thời gian chờ QFieldCloud đóng gói dự án (trạng thái cuối cùng: "
 "%(status)s)."
 
-#: app/qfield/qfield_crud.py:1237
+#: app/qfield/qfield_crud.py:1124
 #, python-format
 msgid "GeoPackage conversion failed: %(error)s"
 msgstr "Chuyển đổi GeoPackage không thành công: %(error)s"
 
-#: app/qfield/qfield_crud.py:1244
+#: app/qfield/qfield_crud.py:1130
 msgid "QGIS wrapper returned invalid JSON for /export."
 msgstr "Trình bao bọc QGIS trả về JSON không hợp lệ cho/xuất."
 
@@ -839,7 +867,7 @@ msgstr "Trình bao bọc QGIS trả về JSON không hợp lệ cho/xuất."
 msgid "Projects"
 msgstr "Dự án"
 
-#: app/templates/home.html:7 app/templates/landing.html:447
+#: app/templates/home.html:7 app/templates/landing.html:472
 #: app/templates/new_project_chooser.html:1
 #: app/templates/new_project_simple.html:42
 msgid "Create Project"
@@ -953,11 +981,11 @@ msgstr "Tiếp"
 msgid "No projects found. Create your first project to get started!"
 msgstr "Không tìm thấy dự án nào. Hãy tạo dự án đầu tiên để bắt đầu!"
 
-#: app/templates/landing.html:433
+#: app/templates/landing.html:458
 msgid "Coordinate field campaigns"
 msgstr "Điều phối các chiến dịch hiện trường"
 
-#: app/templates/landing.html:436
+#: app/templates/landing.html:461
 msgid ""
 "Enhancing field mapping efficiency and accuracy through seamless "
 "coordination."
@@ -965,19 +993,19 @@ msgstr ""
 "Nâng cao hiệu quả và độ chính xác của lập bản đồ hiện trường thông qua "
 "điều phối liền mạch."
 
-#: app/templates/landing.html:440
+#: app/templates/landing.html:465
 msgid "Explore Projects"
 msgstr "Khám phá dự án"
 
-#: app/templates/landing.html:457
+#: app/templates/landing.html:482
 msgid "Loading metrics..."
 msgstr "Đang tải số liệu..."
 
-#: app/templates/landing.html:465
+#: app/templates/landing.html:490
 msgid "What is it?"
 msgstr "Đây là gì?"
 
-#: app/templates/landing.html:467
+#: app/templates/landing.html:492
 msgid ""
 "The Field Tasking Manager (Field-TM) helps teams add local knowledge to "
 "map features\n"
@@ -987,7 +1015,7 @@ msgstr ""
 "phương vào các đối tượng bản đồ bằng cách điều phối lập bản đồ ngoài hiện"
 " trường."
 
-#: app/templates/landing.html:471
+#: app/templates/landing.html:496
 msgid ""
 "Field-TM facilitates collaborative mapping by supporting and extending "
 "mature tools\n"
@@ -1001,21 +1029,21 @@ msgstr ""
 "làm việc độc lập trên di động và web, giúp các nhóm thu thập dữ liệu địa "
 "không gian hiệu quả bằng các thiết bị Android phổ biến."
 
-#: app/templates/landing.html:478
+#: app/templates/landing.html:503
 msgid "A project manager demonstrates FieldTM mapping workflow on a laptop"
 msgstr ""
 "Một quản lý dự án đang trình bày quy trình lập bản đồ FieldTM trên máy "
 "tính xách tay"
 
-#: app/templates/landing.html:484
+#: app/templates/landing.html:509
 msgid "Main Features"
 msgstr "Tính năng chính"
 
-#: app/templates/landing.html:487
+#: app/templates/landing.html:512
 msgid "Flexible Data Collection"
 msgstr "Thu thập dữ liệu linh hoạt"
 
-#: app/templates/landing.html:489
+#: app/templates/landing.html:514
 msgid ""
 "Support diverse survey forms, multiple data formats, and adaptable "
 "workflows that\n"
@@ -1024,11 +1052,11 @@ msgstr ""
 "Hỗ trợ nhiều biểu mẫu khảo sát, nhiều định dạng dữ liệu và quy trình làm "
 "việc linh hoạt phù hợp với các nhu cầu vận hành khác nhau."
 
-#: app/templates/landing.html:494
+#: app/templates/landing.html:519
 msgid "Open Source and Customizable"
 msgstr "Mã nguồn mở và có thể tùy chỉnh"
 
-#: app/templates/landing.html:496
+#: app/templates/landing.html:521
 msgid ""
 "Adapt Field-TM to your own survey logic, data structures, and integration"
 "\n"
@@ -1037,11 +1065,11 @@ msgstr ""
 "Điều chỉnh Field-TM theo logic khảo sát, cấu trúc dữ liệu và yêu cầu tích"
 " hợp của riêng bạn."
 
-#: app/templates/landing.html:501
+#: app/templates/landing.html:526
 msgid "Entity-Level Tracking"
 msgstr "Theo dõi ở cấp thực thể"
 
-#: app/templates/landing.html:503
+#: app/templates/landing.html:528
 msgid ""
 "Monitor survey progress at task and feature level so managers can make "
 "informed\n"
@@ -1050,19 +1078,19 @@ msgstr ""
 "Theo dõi tiến độ khảo sát ở cấp nhiệm vụ và đối tượng để các nhà quản lý "
 "có thể nhanh chóng đưa ra quyết định chính xác."
 
-#: app/templates/landing.html:511
+#: app/templates/landing.html:536
 msgid "Who is it for?"
 msgstr "Dành cho ai?"
 
-#: app/templates/landing.html:514
+#: app/templates/landing.html:539
 msgid "Project Manager"
 msgstr "Quản lý dự án"
 
-#: app/templates/landing.html:515
+#: app/templates/landing.html:540
 msgid "Create and coordinate field campaigns"
 msgstr "Tạo và điều phối các chiến dịch hiện trường"
 
-#: app/templates/landing.html:517
+#: app/templates/landing.html:542
 msgid ""
 "Project managers use Field-TM to set up mapping projects, define areas of"
 " interest,\n"
@@ -1072,31 +1100,31 @@ msgstr ""
 "định khu vực quan tâm, thiết kế biểu mẫu khảo sát và chia công việc thành"
 " các nhiệm vụ dễ quản lý."
 
-#: app/templates/landing.html:521
+#: app/templates/landing.html:546
 msgid "Define a project area and upload or choose a survey form"
 msgstr "Xác định khu vực dự án và tải lên hoặc chọn biểu mẫu khảo sát"
 
-#: app/templates/landing.html:522
+#: app/templates/landing.html:547
 msgid "Split the area into tasks and generate a data extract"
 msgstr "Chia khu vực thành các nhiệm vụ và tạo bản trích xuất dữ liệu"
 
-#: app/templates/landing.html:523
+#: app/templates/landing.html:548
 msgid "Publish the project to ODK Central or QFieldCloud"
 msgstr "Xuất bản dự án lên ODK Central hoặc QFieldCloud"
 
-#: app/templates/landing.html:524
+#: app/templates/landing.html:549
 msgid "Share a QR code so mappers can start collecting data"
 msgstr "Chia sẻ mã QR để người lập bản đồ có thể bắt đầu thu thập dữ liệu"
 
-#: app/templates/landing.html:528
+#: app/templates/landing.html:553
 msgid "Field Mapper"
 msgstr "Người lập bản đồ hiện trường"
 
-#: app/templates/landing.html:529
+#: app/templates/landing.html:554
 msgid "Collect data in the field with your phone"
 msgstr "Thu thập dữ liệu ngoài hiện trường bằng điện thoại của bạn"
 
-#: app/templates/landing.html:531
+#: app/templates/landing.html:556
 msgid ""
 "Mappers do not need to log in to Field-TM. Once a project manager "
 "publishes a\n"
@@ -1107,35 +1135,35 @@ msgstr ""
 " bản một dự án, họ có thể truy cập trực tiếp từ ứng dụng di động mình "
 "chọn."
 
-#: app/templates/landing.html:535
+#: app/templates/landing.html:560
 msgid "Scan the QR code shared by your project manager"
 msgstr "Quét mã QR do quản lý dự án của bạn chia sẻ"
 
-#: app/templates/landing.html:536
+#: app/templates/landing.html:561
 msgid "The project loads automatically in ODK Collect or QField"
 msgstr "Dự án sẽ tự động tải trong ODK Collect hoặc QField"
 
-#: app/templates/landing.html:537
+#: app/templates/landing.html:562
 msgid "Navigate to your assigned task area and collect data"
 msgstr "Đi tới khu vực nhiệm vụ được giao và thu thập dữ liệu"
 
-#: app/templates/landing.html:538
+#: app/templates/landing.html:563
 msgid "Submit your survey, which goes straight to the server"
 msgstr "Gửi khảo sát của bạn, dữ liệu sẽ đi thẳng đến máy chủ"
 
-#: app/templates/landing.html:545
+#: app/templates/landing.html:570
 msgid "Field-TM Use Cases"
 msgstr "Các trường hợp sử dụng Field-TM"
 
-#: app/templates/landing.html:550
+#: app/templates/landing.html:575
 msgid "Field mapping in progress"
 msgstr "Lập bản đồ hiện trường đang diễn ra"
 
-#: app/templates/landing.html:555
+#: app/templates/landing.html:580
 msgid "1. Community Mapping"
 msgstr "1. Lập bản đồ cộng đồng"
 
-#: app/templates/landing.html:557
+#: app/templates/landing.html:582
 msgid ""
 "Field Tasking Manager empowers communities to map informal settlements, "
 "public\n"
@@ -1145,11 +1173,11 @@ msgstr ""
 "cư không chính thức, cơ sở công cộng và dịch vụ địa phương nhằm phục vụ "
 "quy hoạch bao trùm."
 
-#: app/templates/landing.html:562
+#: app/templates/landing.html:587
 msgid "2. Urban Planning and Management"
 msgstr "2. Quy hoạch và quản lý đô thị"
 
-#: app/templates/landing.html:564
+#: app/templates/landing.html:589
 msgid ""
 "Build smarter cities with coordinated surveys of houses, roads, and "
 "utilities\n"
@@ -1159,11 +1187,11 @@ msgstr ""
 " đường sá và hạ tầng tiện ích thông qua các nhiệm vụ lập bản đồ rõ ràng, "
 "dễ quản lý."
 
-#: app/templates/landing.html:569
+#: app/templates/landing.html:594
 msgid "3. Disaster Response and Recovery"
 msgstr "3. Ứng phó và phục hồi sau thảm họa"
 
-#: app/templates/landing.html:571
+#: app/templates/landing.html:596
 msgid ""
 "Rapidly map damaged infrastructure after disasters, coordinate "
 "volunteers, and\n"
@@ -1172,47 +1200,58 @@ msgstr ""
 "Nhanh chóng lập bản đồ hạ tầng bị hư hại sau thiên tai, điều phối tình "
 "nguyện viên và cung cấp dữ liệu đáng tin cậy cho hoạt động cứu trợ."
 
-#: app/templates/landing.html:580
+#: app/templates/landing.html:605
 msgid "Resources"
 msgstr "Tài nguyên"
 
-#: app/templates/landing.html:588
+#: app/templates/landing.html:613
 msgid "Data Prep"
 msgstr "Chuẩn bị dữ liệu"
 
-#: app/templates/landing.html:589
+#: app/templates/landing.html:614
 msgid "HOT Export Tool"
 msgstr "Công cụ xuất HOT"
 
-#: app/templates/landing.html:591
+#: app/templates/landing.html:616
 msgid "Download task-ready geospatial data extracts for your project area."
 msgstr ""
 "Tải xuống các bản trích xuất dữ liệu địa không gian sẵn sàng cho nhiệm vụ"
 " của khu vực dự án."
 
-#: app/templates/landing.html:600 app/templates/landing.html:612
+#: app/templates/landing.html:625 app/templates/landing.html:637
 msgid "Documentation"
 msgstr "Tài liệu"
 
-#: app/templates/landing.html:601
+#: app/templates/landing.html:626
 msgid "ODK Central Guide"
 msgstr "Hướng dẫn ODK Central"
 
-#: app/templates/landing.html:603
+#: app/templates/landing.html:628
 msgid "Learn how to manage forms, app users, and field submissions in ODK."
 msgstr ""
 "Tìm hiểu cách quản lý biểu mẫu, người dùng ứng dụng và bài nộp ngoài hiện"
 " trường trong ODK."
 
-#: app/templates/landing.html:613
+#: app/templates/landing.html:638
 msgid "QField Guide"
 msgstr "Hướng dẫn QField"
 
-#: app/templates/landing.html:615
+#: app/templates/landing.html:640
 msgid "Set up QFieldCloud projects and mobile workflows for offline mapping."
 msgstr ""
 "Thiết lập các dự án QFieldCloud và quy trình làm việc trên di động cho "
 "lập bản đồ ngoại tuyến."
+
+#: app/templates/landing.html:648 app/templates/landing.html:661
+msgid "Join the Community"
+msgstr ""
+
+#: app/templates/landing.html:650
+msgid ""
+"Field-TM is built in the open with mappers, developers and partners "
+"around the world.\n"
+"        Come and say hello on the HOTOSM Slack."
+msgstr ""
 
 #: app/templates/layout.html:14
 msgid "Coordinated field mapping for Open Mapping campaigns."
@@ -1573,7 +1612,7 @@ msgstr ""
 "xóa."
 
 #: app/templates/new_project_custom.html:144
-#: app/templates/partials/project_details/setup_steps/step2_form.html:116
+#: app/templates/partials/project_details/setup_steps/step2_form.html:134
 msgid "Continue"
 msgstr "Tiếp tục"
 
@@ -1651,11 +1690,9 @@ msgstr "Quay lại dự án"
 
 #: app/templates/project_details.html:34
 msgid ""
-"Trigger a fresh QFieldCloud package and download the project data as a "
-"single GeoJSON file."
+"Download all submissions as a single GeoJSON file, for QGIS, uMap and "
+"other tools."
 msgstr ""
-"Kích hoạt gói QFieldCloud mới và tải xuống dữ liệu dự án dưới dạng một "
-"tệp GeoJSON."
 
 #: app/templates/project_details.html:38
 msgid "Export Data"
@@ -1682,12 +1719,8 @@ msgstr ""
 "ra."
 
 #: app/templates/project_details.html:61
-msgid ""
-"Packaging project on QFieldCloud - this may take a minute, please be "
-"patient..."
+msgid "Gathering submissions - this may take a minute, please be patient..."
 msgstr ""
-"Dự án đóng gói trên QFieldCloud - quá trình này có thể mất một phút, hãy "
-"kiên nhẫn..."
 
 #: app/templates/project_details.html:62
 msgid "✓ Download started."
@@ -1737,12 +1770,19 @@ msgstr "Xem dự án bên ngoài →"
 msgid "This project is not ready for mapping yet."
 msgstr "Dự án này chưa sẵn sàng để lập bản đồ."
 
-#: app/templates/project_details.html:180
-#: app/templates/project_details.html:198
+#: app/templates/project_details.html:185
+msgid ""
+"You can't change this form in Field-TM. To change it, edit the project in"
+" QGIS and sync\n"
+"    the updates."
+msgstr ""
+
+#: app/templates/project_details.html:189
+#: app/templates/project_details.html:207
 msgid "Delete project"
 msgstr "Xóa dự án"
 
-#: app/templates/project_details.html:183
+#: app/templates/project_details.html:192
 msgid ""
 "Deletes the project here and in the mapping app (ODK Central or "
 "QFieldCloud), including\n"
@@ -1751,7 +1791,7 @@ msgstr ""
 "Xóa dự án ở đây và trong ứng dụng lập bản đồ (ODK Central hoặc "
 "QFieldCloud), bao gồm cả dữ liệu đã thu thập ở đó. Không thể hoàn tác."
 
-#: app/templates/project_details.html:186
+#: app/templates/project_details.html:195
 msgid ""
 "Delete this project in Field-TM and in the mapping app, including\n"
 "    collected data? This cannot be undone."
@@ -1759,15 +1799,15 @@ msgstr ""
 "Xóa dự án này trong Field-TM và trong ứng dụng lập bản đồ, bao gồm dữ "
 "liệu đã thu thập? Không thể hoàn tác."
 
-#: app/templates/project_details.html:188
+#: app/templates/project_details.html:197
 msgid "Deletes the project and its tasks. This cannot be undone."
 msgstr "Xóa dự án và các nhiệm vụ của dự án. Không thể hoàn tác."
 
-#: app/templates/project_details.html:189
+#: app/templates/project_details.html:198
 msgid "Delete this project and its tasks? This cannot be undone."
 msgstr "Xóa dự án này và các nhiệm vụ của nó? Không thể hoàn tác."
 
-#: app/templates/project_details.html:205
+#: app/templates/project_details.html:214
 msgid ""
 "The project you're looking for doesn't exist or you don't have permission"
 " to view it."
@@ -1873,6 +1913,12 @@ msgstr "Hãy nhập ID dự án Tasking Manager trước."
 msgid "Could not load AOI from Tasking Manager."
 msgstr "Không thể tải khu vực quan tâm từ Tasking Manager."
 
+#: app/templates/partials/new_project/map_script.html:14
+msgid ""
+"This looks like a task plan. After the project is created, upload the "
+"same file in the Tasks section to keep your tasks and assignments."
+msgstr ""
+
 #: app/templates/partials/new_project/map_section.html:5
 msgid "Draw Area"
 msgstr "Vẽ khu vực"
@@ -1891,17 +1937,17 @@ msgid ""
 "      map on the map below."
 msgstr "Vẽ khu vực bạn muốn lập bản đồ trên bản đồ bên dưới."
 
-#: app/templates/partials/new_project/map_section.html:20
-#: app/templates/partials/project_details/setup_steps/step2_form.html:70
+#: app/templates/partials/new_project/map_section.html:21
+#: app/templates/partials/project_details/setup_steps/step2_form.html:78
 #: app/templates/partials/project_details/setup_steps/step3_data.html:44
 msgid "More options"
 msgstr "Tùy chọn biểu mẫu:"
 
-#: app/templates/partials/new_project/map_section.html:23
+#: app/templates/partials/new_project/map_section.html:24
 msgid "Upload a GeoJSON file"
 msgstr "Tải lên tệp GeoJSON"
 
-#: app/templates/partials/new_project/map_section.html:25
+#: app/templates/partials/new_project/map_section.html:26
 msgid ""
 "If you already have a map file with your area boundary, upload it here "
 "instead of\n"
@@ -1910,31 +1956,31 @@ msgstr ""
 "Nếu bạn đã có tệp bản đồ chứa ranh giới khu vực, hãy tải lên tại đây thay"
 " vì vẽ."
 
-#: app/templates/partials/new_project/map_section.html:31
+#: app/templates/partials/new_project/map_section.html:32
 msgid "Upload your own map file (GeoJSON)"
 msgstr "Tải GeoJSON tùy chỉnh"
 
-#: app/templates/partials/new_project/map_section.html:39
+#: app/templates/partials/new_project/map_section.html:40
 msgid "Load from a HOT Tasking Manager project"
 msgstr "Tải từ dự án HOT Tasking Manager"
 
-#: app/templates/partials/new_project/map_section.html:41
+#: app/templates/partials/new_project/map_section.html:42
 msgid "Enter a HOT Tasking Manager project ID to load its area of interest."
 msgstr "Nhập ID dự án HOT Tasking Manager để tải khu vực quan tâm của dự án."
 
-#: app/templates/partials/new_project/map_section.html:50
+#: app/templates/partials/new_project/map_section.html:51
 msgid "Tasking Manager project ID"
 msgstr "ID dự án Tasking Manager"
 
-#: app/templates/partials/new_project/map_section.html:53
+#: app/templates/partials/new_project/map_section.html:54
 msgid "Load AOI"
 msgstr "Tải khu vực"
 
-#: app/templates/partials/new_project/map_section.html:60
+#: app/templates/partials/new_project/map_section.html:61
 msgid "Combine multiple shapes into one"
 msgstr "Gộp nhiều hình thành một"
 
-#: app/templates/partials/new_project/map_section.html:64
+#: app/templates/partials/new_project/map_section.html:65
 msgid ""
 "Keep areas under 100 km² for best results. Very large areas (over 200 "
 "km²) may not\n"
@@ -2265,6 +2311,22 @@ msgstr ""
 "dụng lập bản đồ. Thay đổi khu vực nhiệm vụ sẽ đặt lại tiến độ nhiệm vụ "
 "trong ứng dụng."
 
+#: app/templates/partials/project_details/update_form_section.html:2
+#: app/templates/partials/project_details/update_form_section.html:17
+msgid "Update survey form"
+msgstr ""
+
+#: app/templates/partials/project_details/update_form_section.html:7
+msgid "Replace the survey form? Mappers will receive the new version."
+msgstr ""
+
+#: app/templates/partials/project_details/update_form_section.html:11
+msgid ""
+"Upload your edited form. Mappers receive it automatically and collected "
+"data is kept.\n"
+"      Only include your survey questions, as Field-TM adds its own fields."
+msgstr ""
+
 #: app/templates/partials/project_details/fragments/basemap_progress.html:4
 msgid ""
 "Basemap attach failed for now. Your project is ready to\n"
@@ -2560,23 +2622,30 @@ msgstr ""
 "Chọn một khảo sát dựng sẵn phù hợp với những gì bạn lập bản đồ. Bạn có "
 "thể tải lên tệp khảo sát của riêng mình nếu không có cái nào phù hợp."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:24
+#: app/templates/partials/project_details/setup_steps/step2_form.html:18
+msgid ""
+"You can't change the form in Field-TM after publishing. To change it "
+"later, edit the\n"
+"      project in QGIS and sync the updates."
+msgstr ""
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:32
 msgid "Survey form"
 msgstr "Biểu mẫu khảo sát"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:26
+#: app/templates/partials/project_details/setup_steps/step2_form.html:34
 msgid "Loading survey types..."
 msgstr "Đang tải loại khảo sát..."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:31
+#: app/templates/partials/project_details/setup_steps/step2_form.html:39
 msgid "or"
 msgstr "hoặc"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:34
+#: app/templates/partials/project_details/setup_steps/step2_form.html:42
 msgid "upload your own survey file (.xls / .xlsx)"
 msgstr "tải lên tệp khảo sát của riêng bạn (.xls / .xlsx)"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:40
+#: app/templates/partials/project_details/setup_steps/step2_form.html:48
 msgid ""
 "Heads up: Field-TM auto-adds fields for tasks and feature selection. Your"
 " form should\n"
@@ -2587,57 +2656,69 @@ msgstr ""
 " hỏi khảo sát mà bạn muốn hỏi (không bao gồm các trường "
 "select_one_from_file cho nhiệm vụ/đối tượng)."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:73
+#: app/templates/partials/project_details/setup_steps/step2_form.html:81
 msgid "Form language"
 msgstr "Ngôn ngữ"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:75
+#: app/templates/partials/project_details/setup_steps/step2_form.html:83
 msgid "English"
 msgstr "Tiếng Anh"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:76
+#: app/templates/partials/project_details/setup_steps/step2_form.html:84
 msgid "Spanish"
 msgstr "Tiếng Tây Ban Nha"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:77
+#: app/templates/partials/project_details/setup_steps/step2_form.html:85
 msgid "French"
 msgstr "Tiếng Pháp"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:78
+#: app/templates/partials/project_details/setup_steps/step2_form.html:86
 msgid "Portuguese"
 msgstr "Tiếng Bồ Đào Nha"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:79
+#: app/templates/partials/project_details/setup_steps/step2_form.html:87
 msgid "Swahili"
 msgstr "Tiếng Swahili"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:80
+#: app/templates/partials/project_details/setup_steps/step2_form.html:88
 msgid "Hindi"
 msgstr "Tiếng Hindi"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:84
+#: app/templates/partials/project_details/setup_steps/step2_form.html:94
+msgid "New points"
+msgstr "Điểm mới"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+msgid "Mappers tap the location on a map"
+msgstr "Người lập bản đồ chạm vào vị trí trên bản đồ"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:97
+msgid "Mappers capture their GPS location"
+msgstr "Người lập bản đồ ghi lại vị trí GPS của mình"
+
+#: app/templates/partials/project_details/setup_steps/step2_form.html:102
 msgid "Form questions"
 msgstr "Tùy chọn biểu mẫu:"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:88
+#: app/templates/partials/project_details/setup_steps/step2_form.html:106
 msgid "Mappers will be asked to take a photo at the location."
 msgstr "Yêu cầu người dùng chụp ảnh tại vị trí của họ."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:89
+#: app/templates/partials/project_details/setup_steps/step2_form.html:107
 msgid "Ask for a photo"
 msgstr "Yêu cầu chụp ảnh"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:96
+#: app/templates/partials/project_details/setup_steps/step2_form.html:114
 msgid "Make photo mandatory"
 msgstr "Bắt buộc có ảnh"
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:101
+#: app/templates/partials/project_details/setup_steps/step2_form.html:119
 msgid "Mappers confirm whether existing OSM features are correctly digitised."
 msgstr ""
 "Yêu cầu người lập bản đồ xác minh xem các đối tượng hiện có đã được số "
 "hóa đúng chưa."
 
-#: app/templates/partials/project_details/setup_steps/step2_form.html:102
+#: app/templates/partials/project_details/setup_steps/step2_form.html:120
 msgid "Ask to verify existing features"
 msgstr ""
 "Yêu cầu người lập bản đồ xác minh xem các đối tượng hiện có đã được số "
@@ -2867,15 +2948,3 @@ msgstr "Kiểm tra thông tin xác thực"
 msgid "Save & Continue"
 msgstr "Lưu và tiếp tục"
 
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:94
-msgid "New points"
-msgstr "Điểm mới"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:96
-msgid "Mappers tap the location on a map"
-msgstr "Người lập bản đồ chạm vào vị trí trên bản đồ"
-
-#: app/templates/partials/project_details/setup_steps/step2_form.html:97
-msgid "Mappers capture their GPS location"
-msgstr "Người lập bản đồ ghi lại vị trí GPS của mình"
