@@ -41,6 +41,11 @@ XLSForm templates and helpers for Field-TM. For ODK Central clients, use pyodk.
 - `export.py`: normalises ODK and QField submissions into one standard
   GeoJSON format (`from_odk`, `from_qfield`), for QGIS, uMap etc.
 
+## Form credits
+
+The health facility form (`xlsforms/health.yaml`) is adapted from the
+[healthsites.io](https://healthsites.io) campaign form.
+
 ## Installation
 
 ```bash

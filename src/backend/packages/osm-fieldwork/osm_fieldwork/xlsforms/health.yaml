@@ -1,5 +1,6 @@
 survey:
-  - '#': Based on the Healthsites campaign form. Edit this YAML, not an Excel copy.
+  - '#': Based on the Healthsites campaign form (https://healthsites.io).
+      Edit this YAML, not an Excel copy.
       The osm_key column gives each question's OSM tag for the GeoJSON export.
   - type: geopoint
     name: new_feature
