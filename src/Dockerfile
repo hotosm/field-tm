@@ -193,6 +193,13 @@ RUN find /opt/app/locales -path '*/LC_MESSAGES/*.po' \
 # Stage to use during local development
 FROM runtime-base AS debug
 USER root
+# JRE for ODK Validate in tests/test_xlsforms.py (postinst needs man1 on slim)
+RUN mkdir -p /usr/share/man/man1 \
+    && apt-get update --quiet \
+    && DEBIAN_FRONTEND=noninteractive \
+    apt-get install -y --quiet --no-install-recommends \
+        "default-jre-headless" \
+    && rm -rf /var/lib/apt/lists/*
 COPY --from=uv /uv /usr/local/bin/uv
 COPY backend/pyproject.toml backend/uv.lock /_lock/
 COPY backend/packages /_lock/packages
