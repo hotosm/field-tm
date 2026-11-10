@@ -19,7 +19,6 @@
 
 import logging
 from dataclasses import dataclass
-from io import BytesIO
 from typing import Optional
 
 from psycopg import AsyncConnection
@@ -141,48 +140,6 @@ async def _persist_project_odk_details(
     await db.commit()
 
 
-def _apply_default_entity_style(entities_list: list[dict]) -> None:
-    """Ensure generated entities include the default map style fields."""
-    default_style = {
-        "fill": "#1a1a1a",
-        "marker-color": "#1a1a1a",
-        "stroke": "#000000",
-        "stroke-width": "6",
-    }
-    for entity in entities_list:
-        data = entity["data"]
-        for key, value in default_style.items():
-            data.setdefault(key, value)
-
-
-async def _build_feature_dataset_payload(
-    project_id: int, project: DbProject
-) -> tuple[list[str], list[dict]]:
-    """Build the `features` dataset property list and entities."""
-    geojson_data = project.data_extract_geojson or {}
-    features = (
-        geojson_data.get("features", []) if isinstance(geojson_data, dict) else []
-    )
-    if not features:
-        log.info(
-            "No existing features supplied for project %s. "
-            "Creating empty 'features' dataset for collect-new-data workflow.",
-            project_id,
-        )
-        return [], []
-
-    entity_properties = list(features[0].get("properties", {}).keys())
-    for field in ["created_by", "fill", "marker-color", "stroke", "stroke-width"]:
-        if field not in entity_properties:
-            entity_properties.append(field)
-
-    entities_list = await central_crud.task_geojson_dict_to_entity_values(
-        geojson_data, additional_features=True
-    )
-    _apply_default_entity_style(entities_list)
-    return entity_properties, entities_list
-
-
 async def _create_manager_credentials(
     project_odk_id: int,
     project_name: str,
@@ -247,30 +204,7 @@ async def finalize_odk_project(
         custom_odk_creds,
     )
 
-    entity_properties, entities_list = await _build_feature_dataset_payload(
-        project_id,
-        project,
-    )
-
-    log.info(f"Creating entity list 'features' for ODK project {project_odk_id}")
-    await central_crud.create_entity_list(
-        custom_odk_creds,
-        project_odk_id,
-        properties=entity_properties,
-        dataset_name="features",
-        entities_list=entities_list,
-    )
-
     await sync_odk_tasks(project, custom_odk_creds, project_odk_id)
-
-    xlsform_bytes = BytesIO(project.xlsform_content)
-    xform = await central_crud.read_and_test_xform(xlsform_bytes)
-    log.info(f"Uploading XLSForm to ODK project {project_odk_id}")
-    await central_crud.create_odk_xform(
-        project_odk_id,
-        xform,
-        custom_odk_creds,
-    )
 
     log.info(f"Generating project files for project {project_id}")
     success = await _generate_project_files(db, project_id, custom_odk_creds)

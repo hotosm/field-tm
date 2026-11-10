@@ -29,7 +29,6 @@ from app.errors import (
 from app.projects import project_services
 from app.projects.odk_services import (
     ODKFinalizeResult,
-    _build_feature_dataset_payload,
     finalize_odk_project,
 )
 from app.projects.project_services import (
@@ -238,11 +237,8 @@ async def test_finalize_odk_project_allows_collect_new_data_only_mode():
 
     assert isinstance(result, ODKFinalizeResult)
     assert result.odk_url == "https://central.example.org/#/projects/42"
-    assert mock_create_entity_list.await_count == 2
-
-    features_call = mock_create_entity_list.await_args_list[0]
-    assert features_call.kwargs["dataset_name"] == "features"
-    assert features_call.kwargs["entities_list"] == []
+    [tasks_call] = mock_create_entity_list.await_args_list
+    assert tasks_call.kwargs["dataset_name"] == "tasks"
 
 
 async def test_finalize_odk_project_requires_odk_credentials(stub_project, db):
@@ -736,22 +732,6 @@ async def test_finalize_odk_project_manager_user_failure_raises_service_error():
                 project_id=1,
                 custom_odk_creds=creds,
             )
-
-
-@pytest.mark.asyncio
-async def test_build_feature_dataset_payload_allows_empty_data_extract_features():
-    """Collect-new-data mode should generate an empty features dataset payload."""
-    project = FakeProject(
-        data_extract_geojson={"type": "FeatureCollection", "features": []}
-    )
-
-    entity_properties, entities_list = await _build_feature_dataset_payload(
-        project_id=1,
-        project=project,
-    )
-
-    assert entity_properties == []
-    assert entities_list == []
 
 
 # ---------------------------------------------------------------------------
