@@ -58,6 +58,7 @@ test = [
     "pyinstrument==5.0.3",
     "coverage==7.15.2",
     "asgi-lifespan==2.1.0",
+    "jsonschema==4.26.0",
 ]
 debug = [
     "debugpy==1.8.22",

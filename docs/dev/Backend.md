@@ -97,6 +97,10 @@ To run the backend tests locally, run:
 just test backend
 ```
 
+To run only the end-to-end mapping app workflows (a headless ODK Collect
+against a real ODK Central), run `just test e2e`. They also run as part of
+`just test backend`. See `src/backend/tests/e2e/README.md`.
+
 To assess coverage of tests, run:
 
 ```bash

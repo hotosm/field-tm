@@ -51,6 +51,16 @@ backend-routes:
   docker compose -f compose.test.yaml run --rm backend pytest tests
   docker compose -f compose.test.yaml down -v --remove-orphans
 
+# End-to-end mapping app workflows (see tests/e2e/README.md)
+[no-cd]
+e2e:
+  just stop all
+  docker compose -f compose.test.yaml down -v --remove-orphans
+  just build backend
+  docker compose -f compose.test.yaml up --detach
+  docker compose -f compose.test.yaml run --rm backend pytest tests/e2e
+  docker compose -f compose.test.yaml down -v --remove-orphans
+
 # Test osm-fieldwork package only
 [no-cd]
 osm-fieldwork:
