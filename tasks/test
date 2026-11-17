@@ -124,11 +124,6 @@ odk-collect:
     -e ODK_CENTRAL_TUNNEL_URL="${odk_tunnel_url}" \
     backend python3 - < tasks/scripts/create_test_project.py
 
-# Backward-compatible alias for ODK Central mobile testing workflow
-[no-cd]
-odk-central:
-  just test odk-collect
-
 # Start services + create a test QField buildings project for mobile testing with QField
 [no-cd]
 qfield:
