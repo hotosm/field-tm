@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { legend, taskColour, UNASSIGNED } from "../src/lib/colours";
+import { legend, mapColour, taskColour, UNASSIGNED } from "../src/lib/colours";
 import type { Task } from "../src/lib/taskPlan";
 
 const task = (task_id: number, props: Partial<Task["properties"]> = {}): Task => ({
@@ -37,5 +37,33 @@ describe("legend", () => {
   it("matches taskColour for each task", () => {
     const t = task(1, { assigned_group: "north" });
     expect(legend([t])[0].colour).toBe(taskColour(t));
+  });
+});
+
+describe("mapColour", () => {
+  const route = (task_id: number, props: Partial<Task["properties"]> = {}): Task => ({
+    type: "Feature",
+    geometry: {
+      type: "MultiLineString",
+      coordinates: [
+        [
+          [0, 0],
+          [1, 0],
+        ],
+      ],
+    },
+    properties: { task_id, ...props },
+  });
+
+  it("gives neighbouring unassigned routes different colours", () => {
+    expect(mapColour(route(1))).not.toBe(mapColour(route(2)));
+    expect(mapColour(route(1))).not.toBe(UNASSIGNED);
+  });
+
+  it("uses the team colour once a route is assigned, and leaves areas alone", () => {
+    expect(mapColour(route(1, { assigned_group: "north" }))).toBe(
+      taskColour(route(1, { assigned_group: "north" })),
+    );
+    expect(mapColour(task(1))).toBe(UNASSIGNED);
   });
 });

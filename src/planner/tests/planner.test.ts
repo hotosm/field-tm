@@ -3,7 +3,7 @@ import type { FeatureCollection } from "geojson";
 import { Planner } from "../src/lib/planner.svelte";
 import { engine } from "../src/lib/engine/client";
 import { fetchRoads } from "../src/lib/io/postpass";
-import type { Task } from "../src/lib/taskPlan";
+import { makePlan, type AreaTask, type Task } from "../src/lib/taskPlan";
 
 vi.mock("../src/lib/engine/client", () => ({ engine: { split: vi.fn(async () => []) } }));
 vi.mock("../src/lib/io/postpass", async (actual) => ({
@@ -13,7 +13,7 @@ vi.mock("../src/lib/io/postpass", async (actual) => ({
 
 const roads: FeatureCollection = { type: "FeatureCollection", features: [] };
 
-const sq = (x: number): Task["geometry"] => ({
+const sq = (x: number): AreaTask["geometry"] => ({
   type: "Polygon",
   coordinates: [
     [
@@ -46,6 +46,31 @@ describe("Planner", () => {
     planner.assignSelected({ assigned_group: "north" });
     expect(planner.selected).toEqual([]);
     expect(planner.tasks.map((t) => t.properties.assigned_group)).toEqual(["north", "north"]);
+  });
+
+  it("adds a drawn route as a new, selected task", () => {
+    const planner = new Planner("test");
+    const first: Task = { type: "Feature", geometry: sq(1), properties: { task_id: 1 } };
+    planner.load({ plan: makePlan([first], "SPLIT_INTO_ROUTES") });
+    planner.addRoute({
+      type: "LineString",
+      coordinates: [
+        [0, 0],
+        [1, 1],
+      ],
+    });
+    expect(planner.tasks[1].geometry).toEqual({
+      type: "MultiLineString",
+      coordinates: [
+        [
+          [0, 0],
+          [1, 1],
+        ],
+      ],
+    });
+    expect(planner.tasks[1].properties).toEqual({ task_id: 2 });
+    expect(planner.selected).toEqual([2]);
+    expect(planner.algorithm).toBe("MANUAL");
   });
 });
 

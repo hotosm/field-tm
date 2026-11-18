@@ -1,7 +1,7 @@
 <script lang="ts">
   import { untrack, type Snippet } from 'svelte';
   import type { FeatureCollection, Geometry, LineString, Polygon, Position } from 'geojson';
-  import type { LngLatBoundsLike, Map, MapMouseEvent } from 'maplibre-gl';
+  import type { ExpressionSpecification, LngLatBoundsLike, Map, MapMouseEvent } from 'maplibre-gl';
   import 'maplibre-gl/dist/maplibre-gl.css';
   import { MapLibre, GeoJSONSource, FillLayer, LineLayer, SymbolLayer, Popup, NavigationControl, ScaleControl, GeolocateControl } from 'svelte-maplibre-gl';
   import { TerraDraw } from '@svelte-maplibre-gl/terradraw';
@@ -14,11 +14,12 @@
   } from 'terra-draw';
   import type { Area } from '../lib/geo';
   import { bbox } from '../lib/geo';
-  import { taskColour, UNASSIGNED } from '../lib/colours';
+  import { mapColour, UNASSIGNED } from '../lib/colours';
   import { addBlankImage, loadBasemap } from '../lib/basemap';
   import type { Task } from '../lib/taskPlan';
 
-  export type Tool = 'none' | 'polygon' | 'rectangle' | 'line' | 'edit';
+  /** `line` cuts the selected task; `route` adds a route task. */
+  export type Tool = 'none' | 'polygon' | 'rectangle' | 'line' | 'route' | 'edit';
 
   interface Props {
     aoi?: Area | null;
@@ -44,6 +45,10 @@
   }: Props = $props();
 
   const HOT_RED = '#d63f3f';
+  const IS_ROUTE: ExpressionSpecification = ['in', ['geometry-type'], ['literal', ['LineString', 'MultiLineString']]];
+  const SELECTED: ExpressionSpecification = ['get', '_selected'];
+  // Route tasks are lines; a wide invisible layer makes them easy to click.
+  const TASK_LAYERS = ['tasks-fill', 'tasks-hit'];
   const EMPTY: FeatureCollection = { type: 'FeatureCollection', features: [] };
 
   const modes = [
@@ -57,7 +62,7 @@
       styles: { selectedPolygonColor: HOT_RED, selectedPolygonOutlineColor: HOT_RED, selectionPointColor: HOT_RED, midPointColor: '#ffffff' },
     }),
   ];
-  const MODE: Record<Tool, string> = { none: 'static', polygon: 'polygon', rectangle: 'rectangle', line: 'linestring', edit: 'select' };
+  const MODE: Record<Tool, string> = { none: 'static', polygon: 'polygon', rectangle: 'rectangle', line: 'linestring', route: 'linestring', edit: 'select' };
 
   let draw = $state.raw<Draw>();
 
@@ -66,7 +71,7 @@
     features: tasks.map((t) => ({
       ...t,
       id: t.properties.task_id,
-      properties: { ...t.properties, _colour: taskColour(t), _selected: selected.includes(t.properties.task_id) },
+      properties: { ...t.properties, _colour: mapColour(t), _selected: selected.includes(t.properties.task_id) },
     })),
   });
   const aoiData = $derived<FeatureCollection>(aoi ? { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: aoi, properties: {} }] } : EMPTY);
@@ -116,7 +121,8 @@
 
   function onclick(e: MapMouseEvent) {
     if (tool !== 'none' || !map) return;
-    const hit = map.getLayer('tasks-fill') ? map.queryRenderedFeatures(e.point, { layers: ['tasks-fill'] })[0] : undefined;
+    const layers = TASK_LAYERS.filter((id) => map?.getLayer(id));
+    const hit = layers.length ? map.queryRenderedFeatures(e.point, { layers })[0] : undefined;
     const ev = e.originalEvent;
     onselect?.(hit ? Number(hit.properties.task_id) : null, ev.shiftKey || ev.ctrlKey || ev.metaKey);
   }
@@ -152,18 +158,22 @@
   <GeoJSONSource id="tasks" data={taskData}>
     <FillLayer
       id="tasks-fill"
+      filter={['==', ['geometry-type'], 'Polygon']}
       paint={{ 'fill-color': ['get', '_colour'], 'fill-opacity': ['case', ['get', '_selected'], 0.55, 0.25] }}
     />
+    <LineLayer id="tasks-hit" filter={IS_ROUTE} paint={{ 'line-width': 20, 'line-opacity': 0 }} />
     <!-- White casing keeps boundaries distinct from roads. -->
     <LineLayer
       id="tasks-casing"
-      paint={{ 'line-color': '#fff', 'line-width': ['case', ['get', '_selected'], 6, 4.5], 'line-opacity': 0.9 }}
+      layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+      paint={{ 'line-color': '#fff', 'line-width': ['case', IS_ROUTE, ['case', SELECTED, 11, 9], ['case', SELECTED, 6, 4.5]], 'line-opacity': 0.9 }}
     />
     <LineLayer
       id="tasks-line"
+      layout={{ 'line-cap': 'round', 'line-join': 'round' }}
       paint={{
-        'line-color': ['case', ['get', '_selected'], '#111', ['==', ['get', '_colour'], UNASSIGNED], '#222', ['get', '_colour']],
-        'line-width': ['case', ['get', '_selected'], 3, 2.5],
+        'line-color': ['case', SELECTED, '#111', IS_ROUTE, ['get', '_colour'], ['==', ['get', '_colour'], UNASSIGNED], '#222', ['get', '_colour']],
+        'line-width': ['case', IS_ROUTE, ['case', SELECTED, 7, 5], ['case', SELECTED, 3, 2.5]],
       }}
     />
     <SymbolLayer

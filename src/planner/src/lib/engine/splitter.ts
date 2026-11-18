@@ -1,6 +1,6 @@
 import type { Feature, FeatureCollection, LineString, Polygon, Position } from "geojson";
 import { featurePoint, type Area } from "../geo";
-import { renumber, type Task } from "../taskPlan";
+import { renumber, type Task, type TaskGeometry } from "../taskPlan";
 import { straightSkeleton } from "./skeleton";
 import {
   CREATE_TABLES,
@@ -368,15 +368,21 @@ export async function split(
   return tasks;
 }
 
-/** Union polygons; fails unless the result is one Polygon. */
-export async function merge(db: Db, polygons: Polygon[]): Promise<Polygon> {
-  const { rows } = await db.query<{ g: Polygon }>(
-    `SELECT ST_AsGeoJSON(ST_UnaryUnion(ST_Collect(ST_SnapToGrid(ST_MakeValid(ST_GeomFromGeoJSON(e #>> '{}')), 1e-7))), 7)::jsonb AS g
-     FROM jsonb_array_elements($1::jsonb) e`,
-    [JSON.stringify(polygons.map((p) => JSON.stringify(p)))],
+/** Union polygons into one Polygon, or routes into one MultiLineString. */
+export async function merge(db: Db, geoms: TaskGeometry[]): Promise<TaskGeometry> {
+  const routes = geoms.every((g) => g.type === "MultiLineString");
+  if (!routes && geoms.some((g) => g.type === "MultiLineString"))
+    throw new Error("Areas and routes can't be merged together");
+  const combine = routes
+    ? "ST_Multi(ST_LineMerge(ST_Collect(g)))"
+    : "ST_UnaryUnion(ST_Collect(ST_SnapToGrid(ST_MakeValid(g), 1e-7)))";
+  const { rows } = await db.query<{ g: TaskGeometry }>(
+    `SELECT ST_AsGeoJSON(${combine}, 7)::jsonb AS g
+     FROM jsonb_array_elements($1::jsonb) e, LATERAL ST_GeomFromGeoJSON(e #>> '{}') g`,
+    [JSON.stringify(geoms.map((p) => JSON.stringify(p)))],
   );
   const g = rows[0]?.g;
-  if (g?.type !== "Polygon") throw new Error("Only touching tasks can be merged");
+  if (!routes && g?.type !== "Polygon") throw new Error("Only touching tasks can be merged");
   return g;
 }
 

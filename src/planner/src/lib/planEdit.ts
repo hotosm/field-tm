@@ -1,5 +1,4 @@
-import type { Polygon } from "geojson";
-import type { Task, TaskProps } from "./taskPlan";
+import type { Task, TaskGeometry, TaskProps } from "./taskPlan";
 import { renumber } from "./taskPlan";
 
 export type Assignment = Pick<TaskProps, "assigned_group" | "comment" | "colour">;
@@ -8,7 +7,7 @@ export type Assignment = Pick<TaskProps, "assigned_group" | "comment" | "colour"
 export function replaceTasks(
   tasks: Task[],
   ids: number[],
-  geoms: Polygon[],
+  geoms: TaskGeometry[],
   featureCounts?: number[],
 ): Task[] {
   const idx = tasks.findIndex((t) => ids.includes(t.properties.task_id));

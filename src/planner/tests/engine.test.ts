@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { beforeAll, describe, expect, it } from "vitest";
-import type { FeatureCollection } from "geojson";
+import type { FeatureCollection, MultiLineString, Polygon } from "geojson";
 import { createDb } from "../src/lib/engine/db";
 import { classify, merge, split, splitByLine, type Db } from "../src/lib/engine/splitter";
 import { areaM2, featurePoint, toArea } from "../src/lib/geo";
@@ -195,7 +195,7 @@ describe("voronoi with OSM roads", () => {
     });
     const all = await split(fresh, { aoi, algorithm: "SPLIT_BY_ROADS", params: {}, roads });
     expect(all.length).toBeGreaterThan(main.length);
-    expect(all.every((t) => areaM2(t.geometry) >= 1000)).toBe(true);
+    expect(all.every((t) => areaM2(t.geometry as Polygon) >= 1000)).toBe(true);
     expect(validate(makePlan(all, "SPLIT_BY_ROADS"))).toEqual([]);
   }, 120_000);
 
@@ -361,6 +361,42 @@ describe("edit operations", () => {
   it("merges touching polygons", async () => {
     const g = await merge(db, [sq(0), sq(1)]);
     expect(g.type).toBe("Polygon");
+  });
+
+  it("merges routes into one MultiLineString", async () => {
+    const route = (x: number): MultiLineString => ({
+      type: "MultiLineString",
+      coordinates: [
+        [
+          [x, 0],
+          [x + 1, 0],
+        ],
+      ],
+    });
+    const g = await merge(db, [route(0), route(1)]);
+    expect(g).toEqual({
+      type: "MultiLineString",
+      coordinates: [
+        [
+          [0, 0],
+          [1, 0],
+          [2, 0],
+        ],
+      ],
+    });
+  });
+
+  it("refuses to merge an area with a route", async () => {
+    const route: MultiLineString = {
+      type: "MultiLineString",
+      coordinates: [
+        [
+          [0.2, 0.5],
+          [0.8, 0.5],
+        ],
+      ],
+    };
+    await expect(merge(db, [sq(0), route])).rejects.toThrow(/routes/);
   });
 
   it("refuses to merge disjoint polygons", async () => {

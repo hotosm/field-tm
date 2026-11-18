@@ -47,6 +47,23 @@ describe("building counts", () => {
     expect(featuresInside(points, withHole)).toBe(2);
   });
 
+  it("leaves route tasks uncounted", () => {
+    const route: Task = {
+      type: "Feature",
+      geometry: {
+        type: "MultiLineString",
+        coordinates: [
+          [
+            [0, 1],
+            [4, 1],
+          ],
+        ],
+      },
+      properties: { task_id: 1 },
+    };
+    expect(withFeatureCounts([route], points)).toEqual([route]);
+  });
+
   it("recounts after splitting a task in two", () => {
     const tasks: Task[] = [
       {

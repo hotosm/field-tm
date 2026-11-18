@@ -2,6 +2,7 @@ import type {
   Feature,
   FeatureCollection,
   Geometry,
+  MultiLineString,
   MultiPolygon,
   Polygon,
   Position,
@@ -111,6 +112,20 @@ export function areaM2(g: Area): number {
     (sum, rings) => sum + ringArea(rings[0]) - rings.slice(1).reduce((h, r) => h + ringArea(r), 0),
     0,
   );
+}
+
+/** Approximate length in metres (equirectangular; fine for task-sized routes). */
+export function lengthM(g: MultiLineString): number {
+  let sum = 0;
+  for (const line of g.coordinates) {
+    for (let i = 1; i < line.length; i++) {
+      const [x0, y0] = line[i - 1];
+      const [x1, y1] = line[i];
+      const dx = (x1 - x0) * Math.cos((((y0 + y1) / 2) * Math.PI) / 180);
+      sum += Math.hypot(dx, y1 - y0) * M_PER_DEG;
+    }
+  }
+  return sum;
 }
 
 /** A representative point: mean of a polygon's outer ring, a line's middle vertex, or the point. */

@@ -16,7 +16,7 @@
   import { featurePoint, toArea, toFeatureCollection } from './lib/geo';
   import { fetchJson } from './lib/io/files';
   import { ApiError, getPlannerInput, loginUrl, projectUrl } from './lib/io/fieldtm';
-  import { parse, type Task } from './lib/taskPlan';
+  import { isAreaTask, parse, type Task } from './lib/taskPlan';
 
   const mode = parseMode(location.search, location.hash);
   const readonly = mode.kind === 'task' || (mode.kind === 'fieldtm' && mode.view);
@@ -46,7 +46,7 @@
     popupHiddenFor = null;
   });
   const editing = $derived(
-    tool !== 'edit' ? null : step === 0 ? planner.aoi : (planner.selectedTasks[0]?.geometry ?? null),
+    tool !== 'edit' ? null : step === 0 ? planner.aoi : (planner.selectedTasks.filter(isAreaTask)[0]?.geometry ?? null),
   );
 
   async function init() {
@@ -118,6 +118,8 @@
       planner.commit({ aoi: g, tasks: [] }, []);
     } else if (g.type === 'LineString' && tool === 'line') {
       planner.splitSelectedByLine(g);
+    } else if (g.type === 'LineString' && tool === 'route') {
+      planner.addRoute(g);
     }
     tool = 'none';
   }

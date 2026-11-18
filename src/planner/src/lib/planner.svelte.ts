@@ -1,4 +1,4 @@
-import type { FeatureCollection, LineString, Polygon } from "geojson";
+import type { FeatureCollection, LineString, MultiLineString, Polygon } from "geojson";
 import { featurePoints, withFeatureCounts } from "./counts";
 import { engine } from "./engine/client";
 import type { SplitAlgorithm, SplitParams } from "./engine/splitter";
@@ -7,7 +7,7 @@ import { bbox, type Area } from "./geo";
 import { History } from "./history";
 import { canFetchRoads, fetchRoads } from "./io/postpass";
 import { assign, removeTasks, replaceTasks, type Assignment } from "./planEdit";
-import { makePlan, type Task, type TaskPlan } from "./taskPlan";
+import { isAreaTask, makePlan, renumber, type Task, type TaskPlan } from "./taskPlan";
 
 interface Snapshot {
   aoi: Area | null;
@@ -194,7 +194,7 @@ export class Planner {
 
   /** Re-split only the selected tasks, keeping the rest. */
   async resplitSelected(algorithm: SplitAlgorithm, params: SplitParams) {
-    const sel = this.selectedTasks;
+    const sel = this.selectedTasks.filter(isAreaTask);
     if (!sel.length) return;
     const aoi: Area =
       sel.length === 1
@@ -230,7 +230,7 @@ export class Planner {
   }
 
   async splitSelectedByLine(line: LineString) {
-    const [t] = this.selectedTasks;
+    const [t] = this.selectedTasks.filter(isAreaTask);
     if (!t) return;
     const parts = await this.run("Splitting task", () => engine.splitByLine(t.geometry, line));
     if (!parts) return;
@@ -239,6 +239,14 @@ export class Planner {
       { tasks: replaceTasks(this.tasks, [id], parts), algorithm: "MANUAL" },
       parts.map((_, i) => id + i),
     );
+  }
+
+  /** Add a drawn route as a new task, e.g. a path missing from OSM. */
+  addRoute(line: LineString) {
+    const geometry: MultiLineString = { type: "MultiLineString", coordinates: [line.coordinates] };
+    const route: Task = { type: "Feature", geometry, properties: { task_id: 0 } };
+    const tasks = renumber([...this.tasks, route]);
+    this.commit({ tasks, algorithm: "MANUAL" }, [tasks.length]);
   }
 
   updateGeometry(id: number, geometry: Polygon) {

@@ -16,7 +16,7 @@ export function taskGeoJSON(t: Task): string {
   return JSON.stringify({ type: "FeatureCollection", features: [t] }, null, 2);
 }
 
-/** GPX with the task boundary as a closed track; widely supported by mapping apps. */
+/** GPX with an area task as a closed track, or a route as tracks; widely supported by mapping apps. */
 export function taskGPX(t: Task): string {
   const name = esc(taskName(t));
   const desc = t.properties.comment ? `\n    <desc>${esc(t.properties.comment)}</desc>` : "";
