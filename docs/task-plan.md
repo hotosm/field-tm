@@ -38,15 +38,19 @@ exchange. It is plain GeoJSON, so any GIS tool can read it.
 
 ## Top level
 
-| Key                 | Type   | Notes                                                                                                                                                  |
-| ------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `task_plan_version` | int    | Always `1`                                                                                                                                             |
-| `algorithm`         | string | `DIVIDE_BY_SQUARE`, `SPLIT_BY_ROADS`, `AVG_BUILDING_VORONOI`, `AVG_BUILDING_SKELETON`, or `MANUAL` after edits                                         |
-| `params`            | object | Parameters used, e.g. `cell_size` (m), `num_buildings` (features per task), `num_enumerators` (number of tasks), `include_minor_roads` or `drop_empty` |
+| Key                 | Type   | Notes                                                                                                                                                                      |
+| ------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `task_plan_version` | int    | Always `1`                                                                                                                                                                 |
+| `algorithm`         | string | `DIVIDE_BY_SQUARE`, `SPLIT_BY_ROADS`, `SPLIT_INTO_ROUTES`, `AVG_BUILDING_VORONOI`, `AVG_BUILDING_SKELETON`, or `MANUAL` after edits                                        |
+| `params`            | object | Parameters used, e.g. `cell_size` (m), `route_length` (m), `num_buildings` (features per task), `num_enumerators` (number of tasks), `include_minor_roads` or `drop_empty` |
 
 ## Each feature (one task)
 
-Geometry must be a single `Polygon` (WGS84 lon/lat).
+Geometry (WGS84 lon/lat) is a single `Polygon` for an area to map, or a
+`MultiLineString` for a route to travel: connected streets to capture
+street-level imagery along. Routes are only for street imagery apps
+(Panoramax); ODK and QField need area tasks. Readers should accept a
+`LineString` as a one-line route.
 
 | Property         | Type   | Required | Notes                                                         |
 | ---------------- | ------ | -------- | ------------------------------------------------------------- |
@@ -66,7 +70,8 @@ Reference implementation: `src/planner/src/lib/taskPlan.ts`.
   Anyone who can view the project; `features` (the data extract) is only
   returned to project managers.
 - `PUT /api/v1/projects/{id}/task-plan`: project managers only. Accepts
-  `Polygon` or `MultiPolygon` tasks (at most 5000), validates the properties
+  `Polygon`, `MultiPolygon`, `LineString` or `MultiLineString` tasks (at most 5000;
+  line tasks only for Panoramax projects), validates the properties
   above (`assigned_group` up to 100 characters, `comment` up to 500), drops unknown
   properties, stamps missing or duplicate `task_id`s and returns
   `{"task_count": n}`. Errors are `422` with a `detail` message.

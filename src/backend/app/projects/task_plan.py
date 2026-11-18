@@ -7,6 +7,8 @@ import unicodedata
 from psycopg import AsyncConnection
 from psycopg.types.json import Jsonb
 
+from app.db.enums import FieldMappingApp
+from app.db.models import DbProject
 from app.errors import ValidationError
 from app.helpers.geometry_utils import stamp_missing_task_ids
 from app.i18n import _
@@ -20,6 +22,7 @@ GROUP_PATTERN = re.compile(r"^[A-Za-z0-9_-]*$")
 COLOUR_PATTERN = re.compile(r"^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$")
 # Slack for coordinate rounding along task edges that follow the project area.
 OUTLINE_TOLERANCE_M = 1
+ROUTE_TYPES = {"LineString", "MultiLineString"}
 
 
 def _clean_text(value: object) -> str:
@@ -90,12 +93,29 @@ def _valid_polygon(rings: object) -> bool:
     )
 
 
+def _valid_line(line: object) -> bool:
+    return (
+        isinstance(line, list)
+        and len(line) >= 2  # noqa: PLR2004
+        and all(_valid_position(p) for p in line)
+    )
+
+
 def _valid_geometry(geometry: object) -> bool:
+    """Polygons are areas to map; lines are routes to travel (e.g. street imagery)."""
     if not isinstance(geometry, dict):
         return False
     coordinates = geometry.get("coordinates")
     if geometry.get("type") == "Polygon":
         return _valid_polygon(coordinates)
+    if geometry.get("type") == "LineString":
+        return _valid_line(coordinates)
+    if geometry.get("type") == "MultiLineString":
+        return (
+            isinstance(coordinates, list)
+            and len(coordinates) > 0
+            and all(_valid_line(line) for line in coordinates)
+        )
     if geometry.get("type") == "MultiPolygon":
         return (
             isinstance(coordinates, list)
@@ -109,7 +129,7 @@ def _clean_feature(feature: object, number: int) -> dict:
     geometry = feature.get("geometry") if isinstance(feature, dict) else None
     if not _valid_geometry(geometry):
         raise ValidationError(
-            _("Task %(number)s must be a Polygon with WGS84 coordinates.")
+            _("Task %(number)s must be a Polygon or line with WGS84 coordinates.")
             % {"number": number}
         )
     properties = feature.get("properties")
@@ -191,6 +211,17 @@ async def _tasks_outside_outline(
 async def save_task_plan(db: AsyncConnection, project_id: int, plan: object) -> int:
     """Validate and store a task plan, returning the task count."""
     cleaned = clean_task_plan(plan)
+    has_routes = any(f["geometry"]["type"] in ROUTE_TYPES for f in cleaned["features"])
+    # Only street imagery apps can use line tasks; ODK and QField need areas.
+    if has_routes:
+        project = await DbProject.one(db, project_id)
+        if project.field_mapping_app != FieldMappingApp.PANORAMAX:
+            raise ValidationError(
+                _(
+                    "Route tasks are only for street-level imagery (Panoramax)"
+                    " projects. Split this project into area tasks instead."
+                )
+            )
     outside = await _tasks_outside_outline(db, project_id, cleaned)
     if outside:
         raise ValidationError(
