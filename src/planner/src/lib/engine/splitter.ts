@@ -1,6 +1,7 @@
 import type { Feature, FeatureCollection, LineString, Polygon, Position } from "geojson";
 import { featurePoint, type Area } from "../geo";
 import { renumber, type Task, type TaskGeometry } from "../taskPlan";
+import { groupRoutes, type Segment } from "./routes";
 import { straightSkeleton } from "./skeleton";
 import {
   CREATE_TABLES,
@@ -24,6 +25,7 @@ export interface Db {
 export type SplitAlgorithm =
   | "DIVIDE_BY_SQUARE"
   | "SPLIT_BY_ROADS"
+  | "SPLIT_INTO_ROUTES"
   | "AVG_BUILDING_VORONOI"
   | "AVG_BUILDING_SKELETON";
 
@@ -34,6 +36,8 @@ export const SKELETON_MAX_TASKS = 250;
 
 export interface SplitParams {
   cell_size?: number;
+  /** Target length (m) of each route, for SPLIT_INTO_ROUTES. */
+  route_length?: number;
   num_buildings?: number;
   /** Fixed number of tasks, e.g. one per enumerator or team; replaces num_buildings. */
   num_enumerators?: number;
@@ -231,6 +235,60 @@ async function gridSplit(db: Db, cellSize: number) {
   return out[0].fc;
 }
 
+/** Highways nobody captures street imagery along. */
+const NOT_TRAVERSABLE = [
+  "motorway",
+  "motorway_link",
+  "construction",
+  "proposed",
+  "abandoned",
+  "raceway",
+  "bus_guideway",
+];
+
+/** Streets and paths, split at junctions, as connected route tasks of about `routeLength` metres. */
+async function routeSplit(db: Db, routeLength: number): Promise<Task[]> {
+  await db.query(
+    `CREATE TEMP TABLE route_segments AS
+     WITH ways AS (
+       SELECT ST_CollectionExtract(ST_Intersection(a.geom, l.geom), 2) AS geom
+       FROM project_aoi a JOIN ways_line l ON ST_Intersects(a.geom, l.geom)
+       WHERE l.tags->>'highway' IS NOT NULL
+         AND NOT (l.tags->>'highway' = ANY($1))
+         AND COALESCE(l.tags->>'foot', l.tags->>'access', '') NOT IN ('private', 'no')
+         -- Sidewalks drawn beside a street are captured along with it.
+         AND COALESCE(l.tags->>'footway', '') NOT IN ('sidewalk', 'crossing')
+         AND COALESCE(l.tags->>'service', '') NOT IN ('driveway', 'parking_aisle')
+     ),
+     merged AS (SELECT (ST_Dump(ST_LineMerge(ST_Union(geom, 1e-9)))).geom AS geom FROM ways),
+     -- A long street with no junctions is cut so no piece exceeds a route.
+     segments AS (
+       SELECT ST_LineSubstring(geom, i::float8 / n, (i + 1)::float8 / n) AS geom
+       FROM merged,
+         LATERAL (SELECT ceil(ST_Length(geom::geography) / $2)::int AS n) pieces,
+         generate_series(0, n - 1) i)
+     SELECT row_number() OVER ()::int AS id, geom, ST_Length(geom::geography) AS len
+     FROM segments WHERE ST_Length(geom::geography) > 1`,
+    [NOT_TRAVERSABLE, routeLength],
+  );
+  const { rows: segs } = await db.query<Segment & { id: number }>(
+    `SELECT id, len,
+       ARRAY[ST_X(ST_StartPoint(geom)), ST_Y(ST_StartPoint(geom))] AS start,
+       ARRAY[ST_X(ST_EndPoint(geom)), ST_Y(ST_EndPoint(geom))] AS "end",
+       ARRAY[ST_X(mid), ST_Y(mid)] AS mid
+     FROM route_segments, LATERAL ST_LineInterpolatePoint(geom, 0.5) mid ORDER BY id`,
+  );
+  if (!segs.length) return [];
+  const { rows } = await db.query<{ g: TaskGeometry }>(
+    `SELECT ST_AsGeoJSON(ST_Multi(ST_LineMerge(ST_Collect(s.geom))), 7)::jsonb AS g
+     FROM route_segments s JOIN unnest($1::int[], $2::int[]) r(id, route) USING (id)
+     GROUP BY r.route
+     ORDER BY ST_Y(ST_Centroid(ST_Collect(s.geom))) DESC, ST_X(ST_Centroid(ST_Collect(s.geom)))`,
+    [segs.map((s) => s.id), groupRoutes(segs, routeLength)],
+  );
+  return rows.map((r, i) => ({ type: "Feature", geometry: r.g, properties: { task_id: i + 1 } }));
+}
+
 async function sqlSplit(
   db: Db,
   algorithm: "SPLIT_BY_ROADS" | "AVG_BUILDING_VORONOI" | "AVG_BUILDING_SKELETON",
@@ -329,6 +387,14 @@ export async function split(
 ): Promise<Task[]> {
   progress("Loading data");
   const counts = await loadInputs(db, input);
+  if (input.algorithm === "SPLIT_INTO_ROUTES") {
+    progress("Grouping streets into routes");
+    const length = posNum(input.params.route_length, "Route length (m)", 100_000);
+    const routes = await routeSplit(db, length);
+    await db.exec(DROP_TABLES);
+    if (!routes.length) throw new Error("No streets or paths found in the area");
+    return routes;
+  }
   let fc: FeatureCollection;
   if (input.algorithm === "DIVIDE_BY_SQUARE") {
     progress("Building grid");

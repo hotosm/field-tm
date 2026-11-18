@@ -105,6 +105,7 @@ export const DROP_TABLES = [
   "ways_poly",
   "ways_line",
   "grid_cells",
+  "route_segments",
 ]
   .map((t) =>
     t === "lines_view" ? "DROP VIEW IF EXISTS lines_view;" : `DROP TABLE IF EXISTS ${t} CASCADE;`,

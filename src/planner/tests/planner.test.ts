@@ -156,4 +156,13 @@ describe("Planner.split", () => {
     expect(planner.error).toMatch(/too large/);
     expect(fetchRoads).not.toHaveBeenCalled();
   });
+  it("fetches roads for street routes, but not for large areas", async () => {
+    const planner = new Planner("test");
+    planner.load({ aoi: small });
+    await planner.split("SPLIT_INTO_ROUTES", { route_length: 500 });
+    expect(fetchRoads).toHaveBeenCalledOnce();
+    planner.commit({ aoi: sq(0), tasks: [] });
+    await planner.split("SPLIT_INTO_ROUTES", { route_length: 500 });
+    expect(planner.error).toMatch(/too large/);
+  });
 });

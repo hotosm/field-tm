@@ -29,7 +29,7 @@
   let tool = $state<Tool>('none');
   let multi = $state(false);
   let map = $state.raw<Map>();
-  let project = $state<{ id: number; name: string } | null>(null);
+  let project = $state<{ id: number; name: string; field_mapping_app: string | null } | null>(null);
   let fatal = $state<{ message: string; login?: boolean } | null>(null);
   let draft = $state.raw<Draft | null>(null);
   let pendingEdit = $state.raw<Polygon | null>(null);
@@ -261,7 +261,7 @@
           {:else if step === 1}
             <DataStep {planner} {fromProject} />
           {:else if step === 2}
-            <SplitStep {planner} {fromProject} ondone={() => (step = 3)} />
+            <SplitStep {planner} project={project ?? undefined} ondone={() => (step = 3)} />
           {:else if step === 3}
             <TasksStep
               {planner}

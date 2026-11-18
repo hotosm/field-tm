@@ -152,7 +152,7 @@ export class Planner {
   }
 
   /**
-   * Roads, rivers and railways guide task edges. "By roads" needs them; the
+   * Roads, rivers and railways guide task edges. "By roads" and routes need them; the
    * feature-based methods use them when the area is small enough to fetch.
    */
   async #loadRoads(algorithm: SplitAlgorithm, progress: (m: string) => void) {
@@ -160,7 +160,7 @@ export class Planner {
     if (algorithm === "DIVIDE_BY_SQUARE" || !aoi || this.currentRoads) return;
     const b = bbox(aoi);
     if (!canFetchRoads(b)) {
-      if (algorithm !== "SPLIT_BY_ROADS") return;
+      if (algorithm !== "SPLIT_BY_ROADS" && algorithm !== "SPLIT_INTO_ROUTES") return;
       throw new Error(
         "The area is too large to fetch roads from OpenStreetMap. Upload your own in step 2.",
       );

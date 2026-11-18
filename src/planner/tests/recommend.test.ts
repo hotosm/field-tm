@@ -34,6 +34,11 @@ describe("recommend", () => {
   it("splits by roads when there are only roads", () => {
     expect(recommend(aoi, 0, 10).algorithm).toBe("SPLIT_BY_ROADS");
   });
+
+  it("recommends routes for street imagery when roads are available", () => {
+    expect(recommend(aoi, 500, 0, true).algorithm).toBe("SPLIT_INTO_ROUTES");
+    expect(recommend(aoi, 500, 0, false).algorithm).not.toBe("SPLIT_INTO_ROUTES");
+  });
 });
 
 describe("dropEmptyByDefault", () => {

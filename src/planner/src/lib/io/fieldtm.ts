@@ -4,7 +4,7 @@ import type { TaskPlan } from "../taskPlan";
 import { serialise } from "../taskPlan";
 
 export interface PlannerInput {
-  project: { id: number; name: string; field_mapping_app: string };
+  project: { id: number; name: string; field_mapping_app: string | null };
   aoi: Geometry | Feature | FeatureCollection;
   features: FeatureCollection | null;
   task_plan: FeatureCollection | null;

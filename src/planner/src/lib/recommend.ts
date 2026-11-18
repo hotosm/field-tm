@@ -8,16 +8,28 @@ import {
 
 export const MAX_TASKS = 100;
 export const FEATURES_PER_TASK = 100;
+/** About 10 minutes on foot, allowing for stops. */
+export const ROUTE_LENGTH_M = 500;
 
 /**
  * Sensible defaults: aim for <= ~100 tasks and <= ~100 features per task.
  * Prefer the street-following split (straight skeleton) when it is fast enough.
+ * Street imagery projects travel along streets, so get route tasks when roads
+ * are loaded or can be fetched (`routes`).
  */
 export function recommend(
   aoi: Area,
   features: number,
   lines = 0,
+  routes = false,
 ): { algorithm: SplitAlgorithm; params: SplitParams; note: string } {
+  if (routes) {
+    return {
+      algorithm: "SPLIT_INTO_ROUTES",
+      params: { route_length: ROUTE_LENGTH_M },
+      note: "Street imagery: streets and paths grouped into routes of about 500 m.",
+    };
+  }
   if (features > 0) {
     const perTask = Math.min(
       FEATURES_PER_TASK,

@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { FeatureCollection, MultiLineString, Polygon } from "geojson";
 import { createDb } from "../src/lib/engine/db";
 import { classify, merge, split, splitByLine, type Db } from "../src/lib/engine/splitter";
-import { areaM2, featurePoint, toArea } from "../src/lib/geo";
+import { areaM2, featurePoint, lengthM, toArea } from "../src/lib/geo";
 import { validate, makePlan, type Task } from "../src/lib/taskPlan";
 import { SKELETON_ANCHORS, VORONOI_UNION_ANCHOR } from "../src/lib/engine/sql";
 
@@ -183,6 +183,78 @@ describe("voronoi with OSM roads", () => {
       params: { cell_size: 200 },
     });
     expect(again.length).toBeGreaterThan(0);
+  }, 120_000);
+
+  it("groups streets into routes of about the target length", async () => {
+    const fresh = await createDb();
+    const tasks = await split(fresh, {
+      aoi,
+      algorithm: "SPLIT_INTO_ROUTES",
+      params: { route_length: 1000 },
+      roads,
+    });
+    const lengths = tasks.map((t) => lengthM(t.geometry as MultiLineString));
+    const total = lengths.reduce((s, l) => s + l, 0);
+    expect(tasks.every((t) => t.geometry.type === "MultiLineString")).toBe(true);
+    expect(tasks.length).toBeGreaterThan(1);
+    expect(tasks.length).toBeLessThanOrEqual(Math.ceil(total / 500));
+    expect(validate(makePlan(tasks, "SPLIT_INTO_ROUTES"))).toEqual([]);
+  }, 120_000);
+
+  it("skips motorways, private roads and sidewalks in routes, but keeps public paths", async () => {
+    const line = (highway: string, x: number, extra = {}) => ({
+      type: "Feature" as const,
+      properties: { tags: { highway, ...extra } },
+      geometry: {
+        type: "LineString" as const,
+        coordinates: [
+          [x, 27.7],
+          [x, 27.71],
+        ],
+      },
+    });
+    const box: Polygon = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [85.3, 27.69],
+          [85.33, 27.69],
+          [85.33, 27.72],
+          [85.3, 27.72],
+          [85.3, 27.69],
+        ],
+      ],
+    };
+    const fresh = await createDb();
+    const tasks = await split(fresh, {
+      aoi: box,
+      algorithm: "SPLIT_INTO_ROUTES",
+      params: { route_length: 100_000 },
+      roads: {
+        type: "FeatureCollection",
+        features: [
+          line("residential", 85.31),
+          line("motorway", 85.315),
+          line("service", 85.32, { access: "private" }),
+          line("footway", 85.322, { footway: "sidewalk" }),
+          line("footway", 85.324, { footway: "crossing" }),
+          line("cycleway", 85.326, { access: "no", foot: "designated" }),
+          line("service", 85.328, { access: "yes", foot: "no" }),
+        ],
+      },
+    });
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0].geometry.coordinates).toHaveLength(2);
+
+    // A 1.1 km street with no junctions is cut, so routes stay near 300 m.
+    const long = await split(await createDb(), {
+      aoi: box,
+      algorithm: "SPLIT_INTO_ROUTES",
+      params: { route_length: 300 },
+      roads: { type: "FeatureCollection", features: [line("residential", 85.31)] },
+    });
+    expect(long.length).toBeGreaterThan(1);
+    for (const t of long) expect(lengthM(t.geometry as MultiLineString)).toBeLessThan(600);
   }, 120_000);
 
   it("splits by every road, merging slivers", async () => {
