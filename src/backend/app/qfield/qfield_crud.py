@@ -637,6 +637,39 @@ async def _delete_qgis_job(db: AsyncConnection, job_id) -> None:
     log.debug("Deleted QGIS job %s", job_id)
 
 
+async def _poll_job_status(
+    *,
+    loop,
+    client,
+    job_id: str,
+    attempt: int,
+    poll_interval: float,
+    poll_timeout: float,
+) -> Optional[str]:
+    """Poll a QFC job until it finishes or fails, returning the last status seen."""
+    last_status: Optional[str] = None
+    elapsed = 0.0
+    while elapsed < poll_timeout:
+        await asyncio.sleep(poll_interval)
+        elapsed += poll_interval
+        try:
+            status_resp = await loop.run_in_executor(
+                None, partial(client.job_status, job_id)
+            )
+        except Exception as exc:
+            log.warning(
+                "QFC job_status failed on attempt %d for job %s: %s",
+                attempt,
+                job_id,
+                exc,
+            )
+            continue
+        last_status = status_resp.get("status")
+        if last_status in ("finished", "failed"):
+            break
+    return last_status
+
+
 async def _wait_for_projectfile_processing(
     *,
     loop,
@@ -671,37 +704,27 @@ async def _wait_for_projectfile_processing(
             )
             continue
 
-        elapsed = 0.0
-        while elapsed < poll_timeout:
-            await asyncio.sleep(poll_interval)
-            elapsed += poll_interval
-            try:
-                status_resp = await loop.run_in_executor(
-                    None, partial(client.job_status, job_id)
-                )
-            except Exception as exc:
-                log.warning(
-                    "QFC job_status failed on attempt %d for job %s: %s",
-                    attempt,
-                    job_id,
-                    exc,
-                )
-                continue
-            last_status = status_resp.get("status")
-            if last_status == "finished":
-                log.info(
-                    "QFC process_projectfile finished on attempt %d for project %s",
-                    attempt,
-                    api_project_id,
-                )
-                return
-            if last_status == "failed":
-                log.warning(
-                    "QFC process_projectfile failed on attempt %d for project %s",
-                    attempt,
-                    api_project_id,
-                )
-                break
+        last_status = await _poll_job_status(
+            loop=loop,
+            client=client,
+            job_id=job_id,
+            attempt=attempt,
+            poll_interval=poll_interval,
+            poll_timeout=poll_timeout,
+        )
+        if last_status == "finished":
+            log.info(
+                "QFC process_projectfile finished on attempt %d for project %s",
+                attempt,
+                api_project_id,
+            )
+            return
+        if last_status == "failed":
+            log.warning(
+                "QFC process_projectfile failed on attempt %d for project %s",
+                attempt,
+                api_project_id,
+            )
         else:
             log.warning(
                 "QFC process_projectfile timed out on attempt %d for project %s "
