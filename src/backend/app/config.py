@@ -183,9 +183,8 @@ class Settings(BaseSettings):
         elif self.AUTH_PROVIDER == AuthProvider.BUNDLED:
             if not self.HANKO_API_URL:
                 object.__setattr__(self, "HANKO_API_URL", "http://hanko:8000")
-        elif self.AUTH_PROVIDER == AuthProvider.CUSTOM:
-            if not self.HANKO_API_URL:
-                raise ValueError("HANKO_API_URL must be set when AUTH_PROVIDER=custom")
+        elif self.AUTH_PROVIDER == AuthProvider.CUSTOM and not self.HANKO_API_URL:
+            raise ValueError("HANKO_API_URL must be set when AUTH_PROVIDER=custom")
         return self
 
     # Built task planner (src/planner/dist), served at /planner/.
