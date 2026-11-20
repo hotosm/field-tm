@@ -15,15 +15,15 @@ const t: Task = {
       ],
     ],
   },
-  properties: { task_id: 4, assigned_to: "Chomba & <co>", comment: 'Start "Monday"' },
+  properties: { task_id: 4, assigned_group: "team-a", comment: 'Chomba & <co>, start "Monday"' },
 };
 
 describe("exports", () => {
   it("writes a GPX track of the task boundary with escaped text", () => {
     const gpx = taskGPX(t);
     expect(gpx).toContain('<gpx version="1.1"');
-    expect(gpx).toContain("<name>Task 4 (Chomba &amp; &lt;co&gt;)</name>");
-    expect(gpx).toContain("<desc>Start &quot;Monday&quot;</desc>");
+    expect(gpx).toContain("<name>Task 4 (team-a)</name>");
+    expect(gpx).toContain("<desc>Chomba &amp; &lt;co&gt;, start &quot;Monday&quot;</desc>");
     expect(gpx.match(/<trkpt /g)).toHaveLength(4);
     expect(gpx).toContain('<trkpt lat="27.71" lon="85.3"/>');
     expect(gpx).not.toMatch(/<(?!\/?(gpx|metadata|name|trk|desc|trkseg|trkpt|\?xml))\w/);

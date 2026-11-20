@@ -13,7 +13,6 @@ export function taskSheet(task: Task, mapImage: string, title?: string): string 
   const p = task.properties;
   const rows = [
     ["Team", p.assigned_group],
-    ["Assigned to", p.assigned_to],
     ["Features to map", p.feature_count?.toString()],
     ["Comment", p.comment],
   ].filter(([, v]) => v);

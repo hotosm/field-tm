@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Planner } from '../lib/planner.svelte';
   import type { Tool } from './MapView.svelte';
-  import { GROUP_PATTERN } from '../lib/taskPlan';
+  import { COMMENT_PLACEHOLDER, GROUP_PATTERN } from '../lib/taskPlan';
   import { taskColour } from '../lib/colours';
   import TaskDetails from './TaskDetails.svelte';
   import Legend from './Legend.svelte';
@@ -23,7 +23,7 @@
     e.preventDefault();
     const f = new FormData(e.currentTarget as HTMLFormElement);
     const v = (k: string) => String(f.get(k) ?? '').trim() || undefined; // blank = keep
-    planner.assignSelected({ assigned_group: v('assigned_group'), assigned_to: v('assigned_to'), comment: v('comment') });
+    planner.assignSelected({ assigned_group: v('assigned_group'), comment: v('comment') });
   }
 </script>
 
@@ -56,12 +56,11 @@
     <form onsubmit={bulk} class="stack">
       <h3>Assign {n} tasks</h3>
       <p class="hint">Blank fields are left unchanged.</p>
-      <wa-input size="s" label="Group" name="assigned_group" pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
-      <wa-input size="s" label="Assigned to" name="assigned_to"></wa-input>
-      <wa-input size="s" label="Comment" name="comment"></wa-input>
+      <wa-input size="s" label="Team" name="assigned_group" pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
+      <wa-input size="s" label="Comment" name="comment" placeholder={COMMENT_PLACEHOLDER}></wa-input>
       <div class="row">
         <wa-button size="s" type="submit" variant="brand">Assign</wa-button>
-        <wa-button size="s" appearance="outlined" onclick={() => planner.assignSelected({ assigned_group: '', assigned_to: '', comment: '', colour: '' })}>Clear assignment</wa-button>
+        <wa-button size="s" appearance="outlined" onclick={() => planner.assignSelected({ assigned_group: '', comment: '', colour: '' })}>Clear assignment</wa-button>
       </div>
     </form>
   {/if}
@@ -75,7 +74,7 @@
         <button type="button" class:selected={planner.selected.includes(id)} onclick={(e) => planner.toggleSelect(id, multi || e.shiftKey)}>
           <span class="swatch" style:background={taskColour(t)}></span>
           {id}
-          <small>{[t.properties.assigned_group, t.properties.assigned_to].filter(Boolean).join(' · ')}</small>
+          <small>{t.properties.assigned_group ?? ''}</small>
           {#if t.properties.feature_count != null}<small class="count">{t.properties.feature_count} features</small>{/if}
         </button>
       </li>

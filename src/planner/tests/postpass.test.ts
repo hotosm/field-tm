@@ -31,6 +31,13 @@ describe("fetchRoads", () => {
   it("reports HTTP errors", async () => {
     await expect(
       fetchRoads([0, 0, 1, 1], async () => new Response("", { status: 429 })),
-    ).rejects.toThrow(/429/);
+    ).rejects.toThrow(/could not be downloaded.*429/);
+  });
+
+  it("reports network failures the same way", async () => {
+    const offline = async () => {
+      throw new TypeError("Failed to fetch");
+    };
+    await expect(fetchRoads([0, 0, 1, 1], offline)).rejects.toThrow(/could not be downloaded/);
   });
 });

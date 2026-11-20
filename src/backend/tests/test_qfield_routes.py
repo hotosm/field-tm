@@ -128,7 +128,6 @@ def test_build_tasks_geojson_maps_assigned_group_to_group():
                     "properties": {
                         "task_id": 3,
                         "assigned_group": "team-a",
-                        "assigned_to": "Chomba",
                         "comment": "Start Monday",
                         "colour": "#d63f3f",
                         "status": "completed",

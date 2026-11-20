@@ -848,7 +848,6 @@ async def test_build_task_entities_include_assignments_and_colour():
                     properties={
                         "task_id": 2,
                         "assigned_group": "team-a",
-                        "assigned_to": "Chomba",
                         "comment": "Start Monday",
                         "colour": "#d63f3f",
                     }
@@ -872,14 +871,13 @@ async def test_build_task_entities_include_assignments_and_colour():
         "task_id": "2",
         "status": "ready",
         "assigned_group": "team-a",
-        "assigned_to": "Chomba",
         "comment": "Start Monday",
         "colour": "#d63f3f",
         "fill": "#d63f3f33",
         "stroke": "#d63f3f",
         "stroke-width": "3",
     }
-    assert plain["data"]["assigned_to"] == ""
+    assert plain["data"]["comment"] == ""
     assert plain["data"]["stroke"] == "#3388ff"
 
 
@@ -912,19 +910,19 @@ async def test_sync_odk_tasks_keeps_field_status():
     assert mock_create.await_args.args == (None, 17)
     assert kwargs["dataset_name"] == "tasks"
     assert kwargs["keep_existing"] == frozenset({"status"})
-    assert "assigned_to" in kwargs["properties"]
+    assert "comment" in kwargs["properties"]
 
 
 def test_entity_update_skips_kept_properties():
     """Kept properties are only written when the entity lacks them."""
-    source = {"label": "Task 1", "status": "ready", "assigned_to": "Bo"}
-    target = {"status": "mapped", "assigned_to": "Al"}
+    source = {"label": "Task 1", "status": "ready", "comment": "Bo"}
+    target = {"status": "mapped", "comment": "Al"}
 
     update = central_crud._get_entity_update_data(
         source, target, keep_existing=frozenset({"status"})
     )
 
-    assert update == {"assigned_to": "Bo"}
+    assert update == {"comment": "Bo"}
 
 
 @pytest.mark.asyncio
@@ -1265,7 +1263,7 @@ def _odk_row(task_id: int, status: str = "mapped") -> dict:
         "geometry": "old",
         "task_id": str(task_id),
         "status": status,
-        "assigned_to": "",
+        "comment": "",
     }
 
 
@@ -1276,7 +1274,7 @@ async def test_sync_odk_tasks_updates_or_resets_and_deletes(reset, status):
         task_areas_geojson={
             "type": "FeatureCollection",
             "features": [
-                _task_feature(properties={"task_id": 1, "assigned_to": "Bo"}),
+                _task_feature(properties={"task_id": 1, "comment": "Bo"}),
                 _task_feature(properties={"task_id": 3}),
             ],
         }
@@ -1300,7 +1298,7 @@ async def test_sync_odk_tasks_updates_or_resets_and_deletes(reset, status):
 
     [(uuid, update)] = entities.calls["updated"]
     assert uuid == "uuid-1"
-    assert update["assigned_to"] == "Bo"
+    assert update["comment"] == "Bo"
     assert update.get("status") == status
     assert [row["label"] for row in entities.calls["created"]] == ["Task 3"]
     assert entities.calls["deleted"] == ["uuid-2"]

@@ -18,8 +18,7 @@ const task: Task = {
   properties: {
     task_id: 3,
     assigned_group: "north",
-    assigned_to: "<b>Chomba</b>",
-    comment: 'Start "Monday"',
+    comment: '<b>Chomba</b>, start "Monday"',
     feature_count: 12,
   },
 };
@@ -30,7 +29,7 @@ describe("taskSheet", () => {
     expect(html).toContain("<title>Task 3 - Kibera survey</title>");
     expect(html).toContain("&lt;b&gt;Chomba&lt;/b&gt;");
     expect(html).not.toContain("<b>Chomba</b>");
-    expect(html).toContain("Start &quot;Monday&quot;");
+    expect(html).toContain("start &quot;Monday&quot;");
     expect(html).toContain("<dd>12</dd>");
     expect(html).toContain('src="data:image/png;base64,AAAA"');
   });

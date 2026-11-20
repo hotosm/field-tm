@@ -4,6 +4,7 @@ export const TASK_PLAN_VERSION = 1;
 export const GROUP_RE = /^[A-Za-z0-9_-]+$/;
 /** HTML pattern attribute equivalent (v-flag safe). */
 export const GROUP_PATTERN = "[A-Za-z0-9_\\-]+";
+export const COMMENT_PLACEHOLDER = "e.g. Pete & Jane, start Monday";
 const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 
 export type Algorithm =
@@ -16,7 +17,6 @@ export type Algorithm =
 export interface TaskProps {
   task_id: number;
   assigned_group?: string;
-  assigned_to?: string;
   comment?: string;
   colour?: string;
   feature_count?: number;
@@ -95,10 +95,10 @@ export function validate(input: unknown): string[] {
       p.assigned_group != null &&
       (typeof p.assigned_group !== "string" || !GROUP_RE.test(p.assigned_group))
     ) {
-      errors.push(`${at}: assigned_group may only contain letters, numbers, _ and -`);
+      errors.push(`${at}: team (assigned_group) may only contain letters, numbers, _ and -`);
     }
-    for (const k of ["assigned_to", "comment"] as const) {
-      if (p[k] != null && typeof p[k] !== "string") errors.push(`${at}: ${k} must be text`);
+    if (p.comment != null && typeof p.comment !== "string") {
+      errors.push(`${at}: comment must be text`);
     }
     if (p.colour != null && (typeof p.colour !== "string" || !HEX_RE.test(p.colour))) {
       errors.push(`${at}: colour must be a hex colour like #d63f3f`);
@@ -113,7 +113,7 @@ export function validate(input: unknown): string[] {
 /** Drop empty optional properties and unknown keys. */
 function cleanProps(p: TaskProps): TaskProps {
   const out: TaskProps = { task_id: p.task_id };
-  for (const k of ["assigned_group", "assigned_to", "comment", "colour"] as const) {
+  for (const k of ["assigned_group", "comment", "colour"] as const) {
     const v = p[k]?.trim();
     if (v) out[k] = v;
   }
@@ -148,6 +148,14 @@ export function isTaskPlan(input: unknown): boolean {
   );
 }
 
+/** Older plans had a separate `assigned_to`; keep it by moving it into the comment. */
+function withLegacyAssignee(props: TaskProps & { assigned_to?: unknown }): TaskProps {
+  const { assigned_to, ...rest } = props;
+  const who = typeof assigned_to === "string" ? assigned_to.trim() : "";
+  if (!who) return rest;
+  return { ...rest, comment: [`Assigned to ${who}`, rest.comment].filter(Boolean).join(". ") };
+}
+
 /** Parse and validate a task plan. Accepts single-part MultiPolygons and missing task_ids. */
 export function parse(input: string | unknown): TaskPlan {
   const raw = (typeof input === "string" ? JSON.parse(input) : input) as TaskPlan;
@@ -159,7 +167,7 @@ export function parse(input: string | unknown): TaskPlan {
         g?.type === "MultiPolygon" && g.coordinates.length === 1
           ? { type: "Polygon", coordinates: g.coordinates[0] }
           : g;
-      const properties = { ...(f?.properties ?? {}) } as TaskProps;
+      const properties = withLegacyAssignee({ ...(f?.properties ?? {}) });
       if (needIds) properties.task_id = i + 1;
       return { type: "Feature", geometry, properties } as Task;
     });

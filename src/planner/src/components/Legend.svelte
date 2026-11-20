@@ -7,7 +7,7 @@
 </script>
 
 {#if items.length}
-  <ul class="legend" aria-label="Task groups">
+  <ul class="legend" aria-label="Task teams">
     {#each items as item (item.group)}
       <li><span class="swatch" style:background={item.colour}></span>{item.group || 'Unassigned'} ({item.count})</li>
     {/each}

@@ -8,8 +8,8 @@ const esc = (s: string) =>
   );
 
 export function taskName(t: Task): string {
-  const who = t.properties.assigned_to || t.properties.assigned_group;
-  return `Task ${t.properties.task_id}${who ? ` (${who})` : ""}`;
+  const team = t.properties.assigned_group;
+  return `Task ${t.properties.task_id}${team ? ` (${team})` : ""}`;
 }
 
 export function taskGeoJSON(t: Task): string {

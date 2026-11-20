@@ -42,9 +42,9 @@ if status_value == 'PUBLISHED' %}
   <h2 class="wa-heading-l">{{ _("Project Setup") }}</h2>
 
   {% if syncs %} {% set steps = [ (_("Project Details"), true), (_("Survey Form"), has_xlsform),
-  (_("Get Data"), has_data_extract), (_("Tasks"), has_task_areas and data_ready), (_("Finalise"),
-  false) ] %} {% else %} {% set steps = [ (_("Project Details"), true), (_("Tasks"),
-  has_task_areas), (_("Publish"), false) ] %} {% endif %} {% set current = namespace(found=false) %}
+  (_("Data & tasks"), has_task_areas and data_ready), (_("Finalise"), false) ] %} {% else %} {% set
+  steps = [ (_("Project Details"), true), (_("Tasks"), has_task_areas), (_("Publish"), false) ] %}
+  {% endif %} {% set current = namespace(found=false) %}
   <ol class="ftm-stepper" aria-label="{{ _('Project setup progress') }}">
     {% for label, done in steps %} {% if done %}{% set state = 'is-done' %}{% elif not current.found
     %}{% set state = 'is-current' %}{% set current.found = true %}{% else %}{% set state = '' %}{%

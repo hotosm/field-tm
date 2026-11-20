@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Task } from '../lib/taskPlan';
-  import { GROUP_PATTERN } from '../lib/taskPlan';
+  import { COMMENT_PLACEHOLDER, GROUP_PATTERN } from '../lib/taskPlan';
   import { groupColour } from '../lib/colours';
   import type { Assignment } from '../lib/planEdit';
   import type { Map } from 'maplibre-gl';
@@ -25,9 +25,8 @@
     const colour = String(f.get('colour'));
     onassign?.({
       assigned_group: String(f.get('assigned_group') ?? ''),
-      assigned_to: String(f.get('assigned_to') ?? ''),
       comment: String(f.get('comment') ?? ''),
-      // Store a colour only when the user picked one; otherwise it follows the group.
+      // Store a colour only when the user picked one; otherwise it follows the team.
       colour: colour.toLowerCase() === shownColour.toLowerCase() ? (p.colour ?? '') : colour,
     });
   }
@@ -39,8 +38,7 @@
 
   {#if readonly}
     <dl>
-      {#if p.assigned_group}<dt>Group</dt><dd>{p.assigned_group}</dd>{/if}
-      {#if p.assigned_to}<dt>Assigned to</dt><dd>{p.assigned_to}</dd>{/if}
+      {#if p.assigned_group}<dt>Team</dt><dd>{p.assigned_group}</dd>{/if}
       {#if p.comment}<dt>Comment</dt><dd>{p.comment}</dd>{/if}
     </dl>
     <h4>Use this task</h4>
@@ -48,9 +46,8 @@
   {:else}
     {#key task}
       <form onsubmit={save} class="stack">
-        <wa-input size="s" label="Group" name="assigned_group" value={p.assigned_group ?? ''} pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
-        <wa-input size="s" label="Assigned to" name="assigned_to" value={p.assigned_to ?? ''} placeholder="Name or username"></wa-input>
-        <wa-textarea size="s" label="Comment" name="comment" rows="2" value={p.comment ?? ''}></wa-textarea>
+        <wa-input size="s" label="Team" name="assigned_group" value={p.assigned_group ?? ''} pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
+        <wa-textarea size="s" label="Comment" name="comment" rows="2" value={p.comment ?? ''} placeholder={COMMENT_PLACEHOLDER}></wa-textarea>
         <wa-color-picker size="s" label="Colour" name="colour" value={shownColour}></wa-color-picker>
         <div><wa-button size="s" type="submit" variant="brand">Save task</wa-button></div>
       </form>

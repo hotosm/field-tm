@@ -54,11 +54,11 @@ describe("plan edits", () => {
 
   it("assigns, leaves undefined fields and clears empty ones", () => {
     const out = assign(tasks, [1, 2], {
-      assigned_to: "Ana",
+      comment: "Ana",
       assigned_group: "",
-      comment: undefined,
+      colour: undefined,
     });
-    expect(out[0].properties).toEqual({ task_id: 1, assigned_to: "Ana", feature_count: 1 });
+    expect(out[0].properties).toEqual({ task_id: 1, comment: "Ana", feature_count: 1 });
     expect(out[2]).toBe(tasks[2]);
   });
 });

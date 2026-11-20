@@ -16,13 +16,14 @@ from app.projects.task_sync import (
     tasks_geometry_hash,
 )
 
+# Inside the test project's outline.
 SQUARE = [
     [
-        [85.30, 27.71],
-        [85.30, 27.70],
-        [85.31, 27.70],
-        [85.31, 27.71],
-        [85.30, 27.71],
+        [85.300, 27.713],
+        [85.300, 27.712],
+        [85.301, 27.712],
+        [85.301, 27.713],
+        [85.300, 27.713],
     ]
 ]
 
@@ -64,12 +65,11 @@ def test_clean_task_plan_keeps_known_properties_and_stamps_ids():
             {
                 "task_id": 2,
                 "assigned_group": "team-a",
-                "assigned_to": " Chomba​ ",
-                "comment": "Start Monday",
+                "comment": " Start Monday​ ",
                 "colour": "#ABC",
                 "building_count": 12,
             },
-            {"assigned_to": ""},
+            {"comment": ""},
         )
     )
 
@@ -77,7 +77,6 @@ def test_clean_task_plan_keeps_known_properties_and_stamps_ids():
     assert first == {
         "task_id": 2,
         "assigned_group": "team-a",
-        "assigned_to": "Chomba",
         "comment": "Start Monday",
         "colour": "#aabbcc",
     }
@@ -91,8 +90,8 @@ def test_clean_task_plan_keeps_known_properties_and_stamps_ids():
     [
         ([], "FeatureCollection"),
         ({"type": "FeatureCollection", "features": []}, "no tasks"),
-        (_plan({"assigned_group": "team a"}), "Group labels"),
-        (_plan({"assigned_to": "x" * 101}), "100 characters"),
+        (_plan({"assigned_group": "team a"}), "Team names"),
+        (_plan({"assigned_group": "x" * 101}), "100 characters"),
         (_plan({"comment": "x" * 501}), "500 characters"),
         (_plan({"colour": "red"}), "hex"),
     ],
@@ -221,6 +220,21 @@ async def test_put_task_plan_rejects_invalid_plan(client, db, project):
     assert (await DbProject.one(db, project.id)).task_areas_geojson is None
 
 
+async def test_put_task_plan_rejects_tasks_outside_project_area(client, db, project):
+    """Tasks must stay inside the project outline."""
+    # Above PostgreSQL's 32-bit int range, so ids must not be cast to int.
+    plan = _plan({"task_id": 1}, {"task_id": 2_147_483_648})
+    plan["features"][1]["geometry"]["coordinates"] = [
+        [[lon + 0.01, lat] for lon, lat in SQUARE[0]]
+    ]
+
+    response = await client.put(f"/api/v1/projects/{project.id}/task-plan", json=plan)
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "Outside: 2147483648." in response.json()["detail"]
+    assert (await DbProject.one(db, project.id)).task_areas_geojson is None
+
+
 # --- HTMX task routes ------------------------------------------------------
 
 
@@ -276,7 +290,7 @@ def test_tasks_geometry_change_detection():
     plan = _plan({"task_id": 1}, {"task_id": 2})
     synced = tasks_geometry_hash(DbProject(task_areas_geojson=plan))
 
-    plan["features"][0]["properties"]["assigned_to"] = "Bo"
+    plan["features"][0]["properties"]["comment"] = "Bo"
     project = DbProject(task_areas_geojson=plan, tasks_synced_hash=synced)
     assert not tasks_geometry_changed(project)
 
