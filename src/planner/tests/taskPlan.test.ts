@@ -74,7 +74,7 @@ describe("validate", () => {
 describe("parse / serialise", () => {
   it("round-trips and drops empty optional fields", () => {
     const plan = makePlan(
-      [task(1, { assigned_to: "  ", comment: "Start Monday" })],
+      [task(1, { assigned_group: "  ", comment: "Start Monday" })],
       "DIVIDE_BY_SQUARE",
       { cell_size: 100 },
     );
@@ -117,7 +117,7 @@ describe("importing a task plan", () => {
       geometry: sq(0),
       properties: { task_id: 1, assigned_group: "north", comment: "Start here", feature_count: 4 },
     },
-    { type: "Feature", geometry: sq(1), properties: { task_id: 2, assigned_to: "Chomba" } },
+    { type: "Feature", geometry: sq(1), properties: { task_id: 2, comment: "Chomba" } },
   ];
 
   it("round-trips an exported plan with its assignments", () => {
@@ -128,6 +128,20 @@ describe("importing a task plan", () => {
     const plan = parse(json);
     expect(plan.features.map((f) => f.properties)).toEqual(tasks.map((t) => t.properties));
     expect(plan.algorithm).toBe("AVG_BUILDING_VORONOI");
+  });
+
+  it("moves a legacy assigned_to into the comment", () => {
+    const legacy = (props: object) =>
+      parse({
+        type: "FeatureCollection",
+        features: [{ type: "Feature", geometry: sq(0), properties: { task_id: 1, ...props } }],
+      }).features[0].properties;
+    expect(legacy({ assigned_to: " Bo ", comment: "Start Monday" })).toEqual({
+      task_id: 1,
+      comment: "Assigned to Bo. Start Monday",
+    });
+    expect(legacy({ assigned_to: "Bo" })).toEqual({ task_id: 1, comment: "Assigned to Bo" });
+    expect(legacy({ assigned_to: "" })).toEqual({ task_id: 1 });
   });
 
   it("detects plans without task_plan_version by their task ids", () => {

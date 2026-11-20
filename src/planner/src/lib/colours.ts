@@ -26,11 +26,11 @@ export function taskColour(t: Task): string {
   return t.properties.colour || groupColour(t.properties.assigned_group);
 }
 
-/** Labels in use (team, else assignee) with their map colour, for the legend. */
+/** Teams in use with their map colour, for the legend. */
 export function legend(tasks: Task[]): { group: string; colour: string; count: number }[] {
   const m = new Map<string, { group: string; colour: string; count: number }>();
   for (const t of tasks) {
-    const group = t.properties.assigned_group || t.properties.assigned_to || "";
+    const group = t.properties.assigned_group ?? "";
     const e = m.get(group) ?? { group, colour: taskColour(t), count: 0 };
     e.count++;
     m.set(group, e);

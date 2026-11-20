@@ -2,7 +2,7 @@ import type { Polygon } from "geojson";
 import type { Task, TaskProps } from "./taskPlan";
 import { renumber } from "./taskPlan";
 
-export type Assignment = Pick<TaskProps, "assigned_group" | "assigned_to" | "comment" | "colour">;
+export type Assignment = Pick<TaskProps, "assigned_group" | "comment" | "colour">;
 
 /** Replace tasks `ids` with `geoms`, placed where the first replaced task was. Keeps the first task's assignment. */
 export function replaceTasks(
