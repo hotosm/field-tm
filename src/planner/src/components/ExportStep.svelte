@@ -33,6 +33,7 @@
     if (res) {
       saved = res.task_count;
       planner.unsaved = false;
+      window.top!.location.assign(`${projectUrl(project.id)}#tasks-section`);
     }
   }
 </script>
@@ -42,9 +43,9 @@
 {:else}
   <p>{planner.tasks.length} tasks.</p>
   {#if project}
-    <div><wa-button class="cta" variant="brand" onclick={save} disabled={!!planner.busy}>Save to Field-TM</wa-button></div>
+    <div><wa-button class="cta" variant="brand" onclick={save} disabled={!!planner.busy}>Save tasks & continue</wa-button></div>
     {#if saved != null}
-      <wa-callout variant="success" size="s" role="status">Saved {saved} tasks. <a href={projectUrl(project.id)} target="_top">Return to project</a></wa-callout>
+      <wa-callout variant="success" size="s" role="status">Saved {saved} tasks. Returning to the project… <a href={`${projectUrl(project.id)}#tasks-section`} target="_top">Go now</a></wa-callout>
     {/if}
     {#if authError}
       <wa-callout variant="warning" size="s"><a href={loginUrl(location.pathname + location.search)} target="_top">Log in to Field-TM</a>, then save again. Your work is kept in this browser.</wa-callout>
