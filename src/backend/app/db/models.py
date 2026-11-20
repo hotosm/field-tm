@@ -429,6 +429,8 @@ class DbProject:
     # Computed
     manager_username: Optional[str] = None
     centroid: Optional[dict] = None
+    # Only set when listing projects sorted by distance from a point
+    distance_km: Optional[float] = None
 
     @classmethod
     async def one(
@@ -477,8 +479,14 @@ class DbProject:
         field_mapping_app: Optional[FieldMappingApp] = None,
         country: Optional[str] = None,
         sort_by: Optional[str] = None,
+        near: Optional[tuple[float, float]] = None,
     ) -> Optional[list[Self]]:  # noqa: PLR0913
-        """Fetch all projects with optional filters."""
+        """Fetch all projects with optional filters.
+
+        Pass ``near`` as a ``(latitude, longitude)`` pair together with
+        ``sort_by="nearest"`` to order projects by distance from that point.
+        The point is only used for this query and is never stored.
+        """
         filters = []
         params = {}
 
@@ -535,15 +543,32 @@ class DbProject:
         }
         selected_sort = sort_options.get(sort_by or "newest", sort_options["newest"])
 
+        distance_column = sql.SQL("")
+        if sort_by == "nearest" and near is not None:
+            # Geography gives metres on the spheroid; zero when inside outline
+            distance_column = sql.SQL(
+                """,
+                ST_Distance(
+                    p.outline::geography,
+                    ST_SetSRID(
+                        ST_MakePoint(%(near_lon)s, %(near_lat)s), 4326
+                    )::geography
+                ) / 1000.0 AS distance_km
+                """
+            )
+            params["near_lat"], params["near_lon"] = near
+            selected_sort = sql.SQL("distance_km ASC NULLS LAST, id DESC")
+
         query = sql.SQL(
             """
             SELECT
                 p.*,
                 ST_AsGeoJSON(p.outline)::jsonb AS outline,
                 ST_AsGeoJSON(ST_Centroid(p.outline))::jsonb AS centroid
+                {distance_column}
             FROM projects p
         """
-        )
+        ).format(distance_column=distance_column)
         if filters:
             query += sql.SQL(" WHERE ")
             query += sql.SQL(" AND ").join(sql.SQL(clause) for clause in filters)
