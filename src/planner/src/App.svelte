@@ -21,6 +21,8 @@
   const mode = parseMode(location.search, location.hash);
   const readonly = mode.kind === 'task' || (mode.kind === 'fieldtm' && mode.view);
   const planner = new Planner(mode.kind === 'fieldtm' ? `project-${mode.project}` : 'standalone');
+  // A Field-TM project owns its area and features; the planner only edits tasks.
+  const fromProject = mode.kind === 'fieldtm';
 
   const STEPS = ['Area', 'Data', 'Split', 'Tasks', mode.kind === 'fieldtm' ? 'Save' : 'Export'] as const;
   let step = $state(0);
@@ -58,7 +60,7 @@
         document.title = `${input.project.name} · Task Planner`;
         const plan = input.task_plan?.features.length ? parse(input.task_plan) : null;
         planner.load({ aoi: toArea(input.aoi), features: input.features, plan });
-        if (plan) step = 3;
+        step = plan ? 3 : 2;
         if (!mode.view) offerDraft();
       } else {
         const get = async (url?: string) => (url ? toFeatureCollection(await fetchJson(url)) : null);
@@ -83,9 +85,12 @@
   function restoreDraft() {
     if (!draft) return;
     const plan = draft.plan ? parse(draft.plan) : null;
-    planner.load({ ...draft, features: draft.features ?? planner.features, roads: draft.roads ?? planner.roads, plan });
+    // The project's area and features win over an older draft's.
+    const aoi = fromProject ? planner.aoi : draft.aoi;
+    const features = fromProject ? planner.features : (draft.features ?? planner.features);
+    planner.load({ ...draft, aoi, features, roads: draft.roads ?? planner.roads, plan });
     planner.unsaved = true;
-    step = plan ? 3 : draft.aoi ? 2 : 0;
+    step = plan ? 3 : planner.aoi ? 2 : 0;
     draft = null;
   }
 
@@ -213,6 +218,8 @@
                 variant={step === i ? 'brand' : 'neutral'}
                 appearance={step === i ? 'accent' : 'outlined'}
                 aria-current={step === i ? 'step' : undefined}
+                disabled={fromProject && i === 0}
+                title={fromProject && i === 0 ? 'The area is set in the Field-TM project' : undefined}
                 onclick={() => (step = i)}>{i + 1}. {label}</wa-button
               >
             {/each}
@@ -250,9 +257,9 @@
           {#if step === 0}
             <AreaStep {planner} {map} bind:tool onplan={() => (step = 3)} />
           {:else if step === 1}
-            <DataStep {planner} />
+            <DataStep {planner} {fromProject} />
           {:else if step === 2}
-            <SplitStep {planner} ondone={() => (step = 3)} />
+            <SplitStep {planner} {fromProject} ondone={() => (step = 3)} />
           {:else if step === 3}
             <TasksStep
               {planner}
@@ -276,7 +283,7 @@
         aoi={planner.aoi}
         tasks={planner.tasks}
         features={readonly ? null : planner.features}
-        roads={readonly ? null : planner.roads}
+        roads={readonly ? null : planner.currentRoads}
         selected={planner.selected}
         {tool}
         {editing}

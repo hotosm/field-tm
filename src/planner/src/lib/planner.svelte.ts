@@ -3,8 +3,9 @@ import { featurePoints, withFeatureCounts } from "./counts";
 import { engine } from "./engine/client";
 import type { SplitAlgorithm, SplitParams } from "./engine/splitter";
 import { saveDraft, type Draft } from "./draft";
-import type { Area } from "./geo";
+import { bbox, type Area } from "./geo";
 import { History } from "./history";
+import { canFetchRoads, fetchRoads } from "./io/postpass";
 import { assign, removeTasks, replaceTasks, type Assignment } from "./planEdit";
 import { makePlan, type Task, type TaskPlan } from "./taskPlan";
 
@@ -23,6 +24,8 @@ export class Planner {
   params = $state.raw<Record<string, unknown>>({});
   features = $state.raw<FeatureCollection | null>(null);
   roads = $state.raw<FeatureCollection | null>(null);
+  /** The area `roads` were fetched from OSM for; null when the user supplied them. */
+  osmRoadsArea = $state.raw<Area | null>(null);
   /** One point per uploaded building, for recounting tasks after edits. */
   points = $derived(featurePoints(this.features));
   selected = $state<number[]>([]);
@@ -80,7 +83,10 @@ export class Planner {
   /** Replace everything without an undo step (initial load, restore draft). */
   load(d: Partial<Draft> & { algorithm?: string; params?: Record<string, unknown> }) {
     this.features = d.features ?? null;
-    this.roads = d.roads ?? null;
+    // Passing the current roads back in keeps track of the area they were fetched for.
+    const roads = d.roads ?? null;
+    if (roads !== this.roads) this.osmRoadsArea = null;
+    this.roads = roads;
     const s: Snapshot = {
       aoi: d.aoi ?? null,
       tasks: d.features
@@ -97,6 +103,7 @@ export class Planner {
 
   setData(kind: "features" | "roads", fc: FeatureCollection | null) {
     this[kind] = fc;
+    if (kind === "roads") this.osmRoadsArea = null;
     this.#autosave();
   }
 
@@ -138,12 +145,50 @@ export class Planner {
     }
   }
 
-  async split(algorithm: SplitAlgorithm, params: SplitParams) {
+  /** Roads the user supplied, or OSM roads fetched for the current area. */
+  get currentRoads(): FeatureCollection | null {
+    const stale = this.osmRoadsArea !== null && this.osmRoadsArea !== this.aoi;
+    return stale ? null : this.roads;
+  }
+
+  /**
+   * Roads, rivers and railways guide task edges. "By roads" needs them; the
+   * feature-based methods use them when the area is small enough to fetch.
+   */
+  async #loadRoads(algorithm: SplitAlgorithm, progress: (m: string) => void) {
     const aoi = this.aoi;
-    if (!aoi) return;
-    const tasks = await this.run("Splitting", (p) =>
-      engine.split({ aoi, algorithm, params, features: this.features, roads: this.roads }, p),
-    );
+    if (algorithm === "DIVIDE_BY_SQUARE" || !aoi || this.currentRoads) return;
+    const b = bbox(aoi);
+    if (!canFetchRoads(b)) {
+      if (algorithm !== "SPLIT_BY_ROADS") return;
+      throw new Error(
+        "The area is too large to fetch roads from OpenStreetMap. Upload your own in step 2.",
+      );
+    }
+    progress("Fetching roads from OpenStreetMap");
+    this.setData("roads", await fetchRoads(b));
+    this.osmRoadsArea = aoi;
+  }
+
+  /** Fetch roads if the method uses them, then split `area` in the engine. */
+  #splitArea(area: Area, algorithm: SplitAlgorithm, params: SplitParams) {
+    return this.run("Splitting", async (p) => {
+      await this.#loadRoads(algorithm, p);
+      p("Splitting");
+      const input = {
+        aoi: area,
+        algorithm,
+        params,
+        features: this.features,
+        roads: this.currentRoads,
+      };
+      return engine.split(input, p);
+    });
+  }
+
+  async split(algorithm: SplitAlgorithm, params: SplitParams) {
+    if (!this.aoi) return;
+    const tasks = await this.#splitArea(this.aoi, algorithm, params);
     if (tasks) this.commit({ tasks, algorithm, params: { ...params } }, []);
   }
 
@@ -155,9 +200,7 @@ export class Planner {
       sel.length === 1
         ? sel[0].geometry
         : { type: "MultiPolygon", coordinates: sel.map((t) => t.geometry.coordinates) };
-    const parts = await this.run("Splitting", (p) =>
-      engine.split({ aoi, algorithm, params, features: this.features, roads: this.roads }, p),
-    );
+    const parts = await this.#splitArea(aoi, algorithm, params);
     if (!parts) return;
     const ids = sel.map((t) => t.properties.task_id);
     const first = Math.min(...ids);

@@ -1,19 +1,26 @@
 <script lang="ts">
   import type { Planner } from '../lib/planner.svelte';
   import { classify, SKELETON_MAX_FEATURES, type SplitAlgorithm } from '../lib/engine/splitter';
+  import { bbox } from '../lib/geo';
+  import { canFetchRoads } from '../lib/io/postpass';
   import { dropEmptyByDefault, estimateTasks, gridSize, recommend, MAX_TASKS } from '../lib/recommend';
 
-  let { planner, ondone }: { planner: Planner; ondone?: () => void } = $props();
+  let { planner, fromProject = false, ondone }: { planner: Planner; fromProject?: boolean; ondone?: () => void } = $props();
 
-  const data = $derived(classify(planner.features, planner.roads));
+  const data = $derived(classify(planner.features, planner.currentRoads));
+  // Too large for PostPass and no roads supplied: nothing to guide task edges.
+  const noRoads = $derived(!data.lines.length && !!planner.aoi && !canFetchRoads(bbox(planner.aoi)));
   const available = $derived<{ id: SplitAlgorithm; label: string; help: string; ok: boolean }[]>([
     { id: 'DIVIDE_BY_SQUARE', label: 'Square grid', help: 'Equal squares. Needs no data.', ok: true },
-    { id: 'SPLIT_BY_ROADS', label: 'By roads', help: 'Blocks bounded by streets, rivers and railways. Suits walking or street imagery routes.', ok: data.lines.length > 0 },
+    { id: 'SPLIT_BY_ROADS', label: 'By roads', help: 'Blocks bounded by streets, rivers and railways. Suits walking or street imagery routes.', ok: !noRoads },
     { id: 'AVG_BUILDING_SKELETON', label: 'Similar-sized tasks, following streets', help: 'Groups nearby features; task edges run along streets and gaps between features. Takes a little longer.', ok: data.polys.length > 0 && data.polys.length <= SKELETON_MAX_FEATURES },
     { id: 'AVG_BUILDING_VORONOI', label: 'Similar-sized tasks, quick', help: 'Groups nearby features fast; edges can cut between features. Best for very large areas.', ok: data.polys.length > 0 },
   ]);
-  const unavailable = (id: SplitAlgorithm) =>
-    id === 'SPLIT_BY_ROADS' ? 'Add roads, rivers and railways in step 2.' : data.polys.length > SKELETON_MAX_FEATURES ? `Only for up to ${SKELETON_MAX_FEATURES} features.` : 'Add features to map in step 2.';
+  function unavailable(id: SplitAlgorithm): string {
+    if (id === 'SPLIT_BY_ROADS') return 'The area is too large to fetch roads from OpenStreetMap. Upload your own in step 2.';
+    if (data.polys.length > SKELETON_MAX_FEATURES) return `Only for up to ${SKELETON_MAX_FEATURES} features.`;
+    return fromProject ? 'Add features to map in the Field-TM project setup.' : 'Add features to map in step 2.';
+  }
 
   const rec = $derived(planner.aoi ? recommend(planner.aoi, data.polys.length, data.lines.length) : null);
   let algorithm = $state<SplitAlgorithm>('DIVIDE_BY_SQUARE');
@@ -83,6 +90,12 @@
       <wa-input label="Features per task" type="number" min="1" max="10000" value={String(numFeatures)} oninput={(e: Event) => (numFeatures = Number((e.currentTarget as HTMLInputElement).value))}></wa-input>
     {/if}
   {/if}
+  {#if byFeatures && noRoads}
+    <wa-callout variant="warning" size="s">
+      The area is too large to fetch roads from OpenStreetMap, so task edges won't follow streets,
+      rivers or railways. Upload your own roads in step 2.
+    </wa-callout>
+  {/if}
   {#if estimate}
     <p class:warn={estimate > MAX_TASKS}>About {estimate} tasks{estimate > MAX_TASKS ? ' - consider larger tasks' : ''}.</p>
   {/if}
@@ -100,6 +113,11 @@
     </wa-button>
   </div>
   {#if planner.tasks.length && !onlySelected}<p class="hint">Splitting again replaces all tasks. You can undo.</p>{/if}
+  {#if planner.osmRoadsArea}
+    <p class="hint">
+      Road data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap contributors</a>, via the <a href="https://postpass.geofabrik.de" target="_blank" rel="noopener">PostPass API</a>.
+    </p>
+  {/if}
 {/if}
 
 <style>
