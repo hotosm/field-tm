@@ -91,7 +91,7 @@ def test_clean_task_plan_keeps_known_properties_and_stamps_ids():
     [
         ([], "FeatureCollection"),
         ({"type": "FeatureCollection", "features": []}, "no tasks"),
-        (_plan({"assigned_group": "team a"}), "Group labels"),
+        (_plan({"assigned_group": "team a"}), "Team names"),
         (_plan({"assigned_to": "x" * 101}), "100 characters"),
         (_plan({"comment": "x" * 501}), "500 characters"),
         (_plan({"colour": "red"}), "hex"),

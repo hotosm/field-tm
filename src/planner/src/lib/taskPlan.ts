@@ -95,7 +95,7 @@ export function validate(input: unknown): string[] {
       p.assigned_group != null &&
       (typeof p.assigned_group !== "string" || !GROUP_RE.test(p.assigned_group))
     ) {
-      errors.push(`${at}: assigned_group may only contain letters, numbers, _ and -`);
+      errors.push(`${at}: team (assigned_group) may only contain letters, numbers, _ and -`);
     }
     for (const k of ["assigned_to", "comment"] as const) {
       if (p[k] != null && typeof p[k] !== "string") errors.push(`${at}: ${k} must be text`);

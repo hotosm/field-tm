@@ -56,7 +56,7 @@
     <form onsubmit={bulk} class="stack">
       <h3>Assign {n} tasks</h3>
       <p class="hint">Blank fields are left unchanged.</p>
-      <wa-input size="s" label="Group" name="assigned_group" pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
+      <wa-input size="s" label="Team" name="assigned_group" pattern={GROUP_PATTERN} placeholder="e.g. team-a"></wa-input>
       <wa-input size="s" label="Assigned to" name="assigned_to"></wa-input>
       <wa-input size="s" label="Comment" name="comment"></wa-input>
       <div class="row">

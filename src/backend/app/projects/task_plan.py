@@ -41,10 +41,7 @@ def _clean_properties(properties: dict) -> dict:
     group = _clean_text(properties.get("assigned_group"))
     if not GROUP_PATTERN.match(group):
         raise ValidationError(
-            _(
-                "Group labels may only contain letters, numbers, "
-                "hyphens and underscores."
-            )
+            _("Team names may only contain letters, numbers, hyphens and underscores.")
         )
     for key, value, max_length in (
         ("assigned_group", group, MAX_NAME_LENGTH),
