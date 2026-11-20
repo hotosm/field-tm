@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { Planner } from '../lib/planner.svelte';
   import type { Tool } from './MapView.svelte';
-  import { COMMENT_PLACEHOLDER, GROUP_PATTERN } from '../lib/taskPlan';
+  import { COMMENT_PLACEHOLDER, GROUP_PATTERN, isAreaTask } from '../lib/taskPlan';
+  import { lengthM } from '../lib/geo';
   import { taskColour } from '../lib/colours';
   import TaskDetails from './TaskDetails.svelte';
   import Legend from './Legend.svelte';
@@ -18,6 +19,7 @@
 
   const n = $derived(planner.selected.length);
   const single = $derived(n === 1 ? planner.selectedTasks[0] : undefined);
+  const hasRoutes = $derived(planner.tasks.some((t) => !isAreaTask(t)));
 
   function bulk(e: SubmitEvent) {
     e.preventDefault();
@@ -36,14 +38,20 @@
     <wa-switch size="s" checked={multi} onchange={(e: Event) => (multi = (e.currentTarget as HTMLInputElement).checked)}>Multi-select</wa-switch>
     <wa-button size="s" appearance="outlined" onclick={() => (planner.selected = planner.tasks.map((t) => t.properties.task_id))}>Select all</wa-button>
     <wa-button size="s" appearance="outlined" onclick={() => (planner.selected = [])} disabled={!n}>Clear selection</wa-button>
+    {#if hasRoutes}
+      <wa-button size="s" variant={tool === 'route' ? 'brand' : 'neutral'} appearance={tool === 'route' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'route' ? 'none' : 'route')}>Draw route</wa-button>
+    {/if}
   </div>
+  {#if tool === 'route'}<p class="hint">Draw a street or path missing from the map as a new task; double-click to finish.</p>{/if}
 
   {#if n}
     <p><strong>{n} selected</strong></p>
     <div class="row">
       <wa-button size="s" appearance="outlined" onclick={() => planner.mergeSelected()} disabled={n < 2 || !!planner.busy}>Merge</wa-button>
-      <wa-button size="s" variant={tool === 'line' ? 'brand' : 'neutral'} appearance={tool === 'line' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'line' ? 'none' : 'line')} disabled={n !== 1}>Split with line</wa-button>
-      <wa-button size="s" appearance="outlined" onclick={() => (tool = 'edit')} disabled={n !== 1}>Edit shape</wa-button>
+      {#if !single || isAreaTask(single)}
+        <wa-button size="s" variant={tool === 'line' ? 'brand' : 'neutral'} appearance={tool === 'line' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'line' ? 'none' : 'line')} disabled={n !== 1}>Split with line</wa-button>
+        <wa-button size="s" appearance="outlined" onclick={() => (tool = 'edit')} disabled={n !== 1}>Edit shape</wa-button>
+      {/if}
       <wa-button size="s" variant="danger" appearance="outlined" onclick={() => planner.deleteSelected()}>Delete</wa-button>
     </div>
     {#if tool === 'line'}<p class="hint">Draw a line across the task; double-click (or click the last point again) to finish.</p>{/if}
@@ -75,7 +83,8 @@
           <span class="swatch" style:background={taskColour(t)}></span>
           {id}
           <small>{t.properties.assigned_group ?? ''}</small>
-          {#if t.properties.feature_count != null}<small class="count">{t.properties.feature_count} features</small>{/if}
+          {#if t.geometry.type === 'MultiLineString'}<small class="count">{(lengthM(t.geometry) / 1000).toFixed(1)} km</small>
+          {:else if t.properties.feature_count != null}<small class="count">{t.properties.feature_count} features</small>{/if}
         </button>
       </li>
     {/each}

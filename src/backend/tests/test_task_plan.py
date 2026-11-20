@@ -107,6 +107,7 @@ def test_clean_task_plan_rejects_invalid_plans(plan, message):
     [
         {"type": "Point", "coordinates": [85.3, 27.7]},
         {"type": "Polygon", "coordinates": [[[500, 27.7], [85.3, 27.7]]]},
+        {"type": "MultiLineString", "coordinates": [[[85.3, 27.7]]]},
         None,
     ],
 )
@@ -116,6 +117,20 @@ def test_clean_task_plan_rejects_non_polygons(geometry):
     plan["features"][0]["geometry"] = geometry
     with pytest.raises(ValidationError, match="Task 1 must be a Polygon"):
         task_plan.clean_task_plan(plan)
+
+
+@pytest.mark.parametrize(
+    "geometry",
+    [
+        {"type": "LineString", "coordinates": [[85.30, 27.70], [85.31, 27.70]]},
+        {"type": "MultiLineString", "coordinates": [[[85.30, 27.70], [85.31, 27.70]]]},
+    ],
+)
+def test_clean_task_plan_accepts_route_tasks(geometry):
+    """Lines are route tasks, e.g. for street-level imagery."""
+    plan = _plan({"task_id": 1})
+    plan["features"][0]["geometry"] = geometry
+    assert task_plan.clean_task_plan(plan)["features"][0]["geometry"] == geometry
 
 
 def test_clean_task_plan_limits_task_count(monkeypatch):
@@ -233,6 +248,37 @@ async def test_put_task_plan_rejects_tasks_outside_project_area(client, db, proj
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "Outside: 2147483648." in response.json()["detail"]
     assert (await DbProject.one(db, project.id)).task_areas_geojson is None
+
+
+def _route_plan() -> dict:
+    plan = _plan({})
+    plan["features"][0]["geometry"] = {
+        "type": "MultiLineString",
+        "coordinates": [[[85.3002, 27.7125], [85.3008, 27.7125]]],
+    }
+    return plan
+
+
+async def test_put_task_plan_rejects_routes_outside_street_imagery(client, db, project):
+    """ODK and QField need area tasks, so route tasks are refused."""
+    response = await client.put(
+        f"/api/v1/projects/{project.id}/task-plan", json=_route_plan()
+    )
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "Panoramax" in response.json()["detail"]
+    assert (await DbProject.one(db, project.id)).task_areas_geojson is None
+
+
+async def test_put_task_plan_accepts_routes_for_panoramax(client, db, project):
+    """Street imagery projects can save route tasks."""
+    await _set_project(db, project.id, field_mapping_app="Panoramax")
+
+    response = await client.put(
+        f"/api/v1/projects/{project.id}/task-plan", json=_route_plan()
+    )
+
+    assert response.status_code == status.HTTP_200_OK
 
 
 # --- HTMX task routes ------------------------------------------------------

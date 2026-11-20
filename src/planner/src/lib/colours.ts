@@ -1,4 +1,4 @@
-import type { Task } from "./taskPlan";
+import { isAreaTask, type Task } from "./taskPlan";
 
 // Colour-blind friendly palette (Okabe-Ito + Tol), HOT red first.
 const PALETTE = [
@@ -24,6 +24,13 @@ export function groupColour(group?: string): string {
 
 export function taskColour(t: Task): string {
   return t.properties.colour || groupColour(t.properties.assigned_group);
+}
+
+/** Unassigned routes cycle through the palette so neighbouring routes stand apart. */
+export function mapColour(t: Task): string {
+  const colour = taskColour(t);
+  if (isAreaTask(t) || colour !== UNASSIGNED) return colour;
+  return PALETTE[t.properties.task_id % PALETTE.length];
 }
 
 /** Teams in use with their map colour, for the legend. */

@@ -44,6 +44,9 @@ services:
     volumes: !override
       - ftm_logs:/opt/logs
       # No mounts needed, as we do a re-built before every test run
+    # Tests run as the local admin / no auth
+    environment:
+      AUTH_PROVIDER: disabled
     # We don't need proxy
     depends_on: !override
       fieldtm-db:

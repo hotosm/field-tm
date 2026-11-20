@@ -34,6 +34,23 @@ describe("validate", () => {
     ).toEqual([]);
   });
 
+  it("accepts route tasks", () => {
+    const route: Task = {
+      type: "Feature",
+      geometry: {
+        type: "MultiLineString",
+        coordinates: [
+          [
+            [0, 0],
+            [1, 0],
+          ],
+        ],
+      },
+      properties: { task_id: 2 },
+    };
+    expect(validate(makePlan([task(1), route]))).toEqual([]);
+  });
+
   it.each([
     ["not a collection", { type: "Feature" }, /FeatureCollection/],
     ["wrong version", { ...makePlan([task(1)]), task_plan_version: 2 }, /task_plan_version/],
@@ -43,6 +60,11 @@ describe("validate", () => {
     ["duplicate ids", makePlan([task(1), task(1)]), /duplicate/],
     ["gaps in ids", makePlan([task(1), task(3)]), /1\.\.n/],
     ["non-integer id", makePlan([task(1.5)]), /task_id/],
+    [
+      "single-point line",
+      makePlan([{ ...task(1), geometry: { type: "MultiLineString", coordinates: [[[0, 0]]] } }]),
+      /MultiLineString/,
+    ],
     [
       "multipolygon",
       makePlan([{ ...task(1), geometry: { type: "MultiPolygon", coordinates: [] } as never }]),
@@ -83,6 +105,24 @@ describe("parse / serialise", () => {
     expect(out.params).toEqual({ cell_size: 100 });
     expect(out.features[0].properties).toEqual({ task_id: 1, comment: "Start Monday" });
     expect(parse(out).features).toHaveLength(1);
+  });
+
+  it("reads a LineString as a one-line route", () => {
+    const line = {
+      type: "LineString",
+      coordinates: [
+        [0, 0],
+        [1, 0],
+      ],
+    };
+    const plan = parse({
+      type: "FeatureCollection",
+      features: [{ type: "Feature", geometry: line, properties: {} }],
+    });
+    expect(plan.features[0].geometry).toEqual({
+      type: "MultiLineString",
+      coordinates: [line.coordinates],
+    });
   });
 
   it("fills in missing task ids, version and single-part multipolygons", () => {

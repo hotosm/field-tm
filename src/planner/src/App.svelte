@@ -16,7 +16,7 @@
   import { featurePoint, toArea, toFeatureCollection } from './lib/geo';
   import { fetchJson } from './lib/io/files';
   import { ApiError, getPlannerInput, loginUrl, projectUrl } from './lib/io/fieldtm';
-  import { parse, type Task } from './lib/taskPlan';
+  import { isAreaTask, parse, type Task } from './lib/taskPlan';
 
   const mode = parseMode(location.search, location.hash);
   const readonly = mode.kind === 'task' || (mode.kind === 'fieldtm' && mode.view);
@@ -29,7 +29,7 @@
   let tool = $state<Tool>('none');
   let multi = $state(false);
   let map = $state.raw<Map>();
-  let project = $state<{ id: number; name: string } | null>(null);
+  let project = $state<{ id: number; name: string; field_mapping_app: string | null } | null>(null);
   let fatal = $state<{ message: string; login?: boolean } | null>(null);
   let draft = $state.raw<Draft | null>(null);
   let pendingEdit = $state.raw<Polygon | null>(null);
@@ -46,7 +46,7 @@
     popupHiddenFor = null;
   });
   const editing = $derived(
-    tool !== 'edit' ? null : step === 0 ? planner.aoi : (planner.selectedTasks[0]?.geometry ?? null),
+    tool !== 'edit' ? null : step === 0 ? planner.aoi : (planner.selectedTasks.filter(isAreaTask)[0]?.geometry ?? null),
   );
 
   async function init() {
@@ -118,6 +118,8 @@
       planner.commit({ aoi: g, tasks: [] }, []);
     } else if (g.type === 'LineString' && tool === 'line') {
       planner.splitSelectedByLine(g);
+    } else if (g.type === 'LineString' && tool === 'route') {
+      planner.addRoute(g);
     }
     tool = 'none';
   }
@@ -259,7 +261,7 @@
           {:else if step === 1}
             <DataStep {planner} {fromProject} />
           {:else if step === 2}
-            <SplitStep {planner} {fromProject} ondone={() => (step = 3)} />
+            <SplitStep {planner} project={project ?? undefined} ondone={() => (step = 3)} />
           {:else if step === 3}
             <TasksStep
               {planner}

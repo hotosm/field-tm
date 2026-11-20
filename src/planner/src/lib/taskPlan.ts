@@ -1,4 +1,4 @@
-import type { Feature, FeatureCollection, Polygon } from "geojson";
+import type { Feature, FeatureCollection, MultiLineString, Polygon } from "geojson";
 
 export const TASK_PLAN_VERSION = 1;
 export const GROUP_RE = /^[A-Za-z0-9_-]+$/;
@@ -10,6 +10,7 @@ const HEX_RE = /^#[0-9a-fA-F]{6}$/;
 export type Algorithm =
   | "DIVIDE_BY_SQUARE"
   | "SPLIT_BY_ROADS"
+  | "SPLIT_INTO_ROUTES"
   | "AVG_BUILDING_VORONOI"
   | "AVG_BUILDING_SKELETON"
   | "MANUAL";
@@ -22,9 +23,14 @@ export interface TaskProps {
   feature_count?: number;
 }
 
-export type Task = Feature<Polygon, TaskProps>;
+/** An area to map, or a route to travel (e.g. for street-level imagery). */
+export type TaskGeometry = Polygon | MultiLineString;
+export type Task = Feature<TaskGeometry, TaskProps>;
+export type AreaTask = Feature<Polygon, TaskProps>;
 
-export interface TaskPlan extends FeatureCollection<Polygon, TaskProps> {
+export const isAreaTask = (t: Task): t is AreaTask => t.geometry.type === "Polygon";
+
+export interface TaskPlan extends FeatureCollection<TaskGeometry, TaskProps> {
   task_plan_version: 1;
   algorithm: Algorithm | string;
   params: Record<string, unknown>;
@@ -63,6 +69,20 @@ function isPolygonCoords(c: unknown): boolean {
   );
 }
 
+function isLinesCoords(c: unknown): boolean {
+  return (
+    Array.isArray(c) &&
+    c.length > 0 &&
+    c.every((line) => Array.isArray(line) && line.length >= 2 && line.every(isPosition))
+  );
+}
+
+function isTaskGeometry(g: { type?: string; coordinates?: unknown } | undefined): boolean {
+  if (g?.type === "Polygon") return isPolygonCoords(g.coordinates);
+  if (g?.type === "MultiLineString") return isLinesCoords(g.coordinates);
+  return false;
+}
+
 /** Return a list of problems; empty means valid. */
 export function validate(input: unknown): string[] {
   const errors: string[] = [];
@@ -80,8 +100,8 @@ export function validate(input: unknown): string[] {
   const ids = new Set<number>();
   fc.features.forEach((f, i) => {
     const at = `Task ${i + 1}`;
-    if (f?.geometry?.type !== "Polygon" || !isPolygonCoords(f.geometry.coordinates)) {
-      errors.push(`${at}: geometry must be a Polygon`);
+    if (!isTaskGeometry(f?.geometry)) {
+      errors.push(`${at}: geometry must be a Polygon or MultiLineString`);
     }
     const p = (f?.properties ?? {}) as Partial<TaskProps>;
     if (!Number.isInteger(p.task_id) || (p.task_id as number) < 1) {
@@ -137,7 +157,7 @@ export function serialise(plan: TaskPlan): string {
 
 /** True for a task plan file, including older exports without `task_plan_version` (polygons with `task_id`). */
 export function isTaskPlan(input: unknown): boolean {
-  const fc = input as { type?: string; task_plan_version?: unknown; features?: Task[] };
+  const fc = input as { type?: string; task_plan_version?: unknown; features?: Feature[] };
   if (fc?.type !== "FeatureCollection" || !Array.isArray(fc.features) || !fc.features.length)
     return false;
   if (fc.task_plan_version != null) return true;
@@ -156,7 +176,7 @@ function withLegacyAssignee(props: TaskProps & { assigned_to?: unknown }): TaskP
   return { ...rest, comment: [`Assigned to ${who}`, rest.comment].filter(Boolean).join(". ") };
 }
 
-/** Parse and validate a task plan. Accepts single-part MultiPolygons and missing task_ids. */
+/** Parse and validate a task plan. Accepts single-part MultiPolygons, LineStrings and missing task_ids. */
 export function parse(input: string | unknown): TaskPlan {
   const raw = (typeof input === "string" ? JSON.parse(input) : input) as TaskPlan;
   if (raw?.type === "FeatureCollection" && Array.isArray(raw.features)) {
@@ -166,7 +186,9 @@ export function parse(input: string | unknown): TaskPlan {
       const geometry =
         g?.type === "MultiPolygon" && g.coordinates.length === 1
           ? { type: "Polygon", coordinates: g.coordinates[0] }
-          : g;
+          : g?.type === "LineString"
+            ? { type: "MultiLineString", coordinates: [g.coordinates] }
+            : g;
       const properties = withLegacyAssignee({ ...(f?.properties ?? {}) });
       if (needIds) properties.task_id = i + 1;
       return { type: "Feature", geometry, properties } as Task;

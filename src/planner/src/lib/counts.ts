@@ -1,7 +1,7 @@
 import type { FeatureCollection, Geometry, Polygon, Position } from "geojson";
 import { classify } from "./engine/splitter";
 import { featurePoint } from "./geo";
-import type { Task } from "./taskPlan";
+import { isAreaTask, type Task } from "./taskPlan";
 
 export type Point = [number, number];
 
@@ -40,10 +40,11 @@ export function featuresInside(points: Point[], polygon: Polygon): number {
   return n;
 }
 
-/** Recount features in every task, e.g. after a manual edit. */
+/** Recount features in every area task, e.g. after a manual edit. Routes have no count. */
 export function withFeatureCounts(tasks: Task[], points: Point[]): Task[] {
-  return tasks.map((t) => ({
-    ...t,
-    properties: { ...t.properties, feature_count: featuresInside(points, t.geometry) },
-  }));
+  return tasks.map((t) => {
+    if (!isAreaTask(t)) return t;
+    const feature_count = featuresInside(points, t.geometry);
+    return { ...t, properties: { ...t.properties, feature_count } };
+  });
 }

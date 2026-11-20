@@ -1,5 +1,5 @@
 import type { LineString, Polygon } from "geojson";
-import type { Task } from "../taskPlan";
+import type { Task, TaskGeometry } from "../taskPlan";
 import type { SplitInput } from "./splitter";
 import type { Op } from "./worker";
 
@@ -56,7 +56,7 @@ function call<T>(op: Op, args: unknown[], onProgress?: (m: string) => void): Pro
 export const engine = {
   split: (input: SplitInput, onProgress?: (m: string) => void) =>
     call<Task[]>("split", [input], onProgress),
-  merge: (polygons: Polygon[]) => call<Polygon>("merge", [polygons]),
+  merge: (geoms: TaskGeometry[]) => call<TaskGeometry>("merge", [geoms]),
   splitByLine: (polygon: Polygon, line: LineString) =>
     call<Polygon[]>("splitByLine", [polygon, line]),
 };
