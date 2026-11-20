@@ -772,9 +772,7 @@ async def test_finalize_odk_project_uses_outline_geometry_for_single_task(
 
     tasks_dataset = next(ds for ds in created_datasets if ds["dataset_name"] == "tasks")
     assert tasks_dataset["entities_list"][0]["label"] == "Task 1"
-    assert {"assigned_group", "assigned_to", "comment", "colour"} <= set(
-        tasks_dataset["properties"]
-    )
+    assert {"assigned_group", "comment", "colour"} <= set(tasks_dataset["properties"])
 
     assert result.odk_url == "https://central.example.org/#/projects/17"
     assert result.manager_username == "field-tm-manager-17@fieldtm.org"

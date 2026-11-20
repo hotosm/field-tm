@@ -1,8 +1,7 @@
 {# Tasks: read-only task map (the planner in view mode) plus manager actions. #} {% set
 task_features = (project.task_areas_geojson or {}).get('features') or [] %} {% set assigned =
-task_features | selectattr('properties.assigned_to') | list | length + task_features |
-rejectattr('properties.assigned_to') | selectattr('properties.assigned_group') | list | length %} {%
-set published = project.status == 'PUBLISHED' %}
+task_features | selectattr('properties.assigned_group') | list | length %} {% set published =
+project.status == 'PUBLISHED' %}
 <wa-card id="tasks-section" with-header>
   <div slot="header" class="wa-split">
     <h3 class="ftm-section-title">{{ _("Tasks") }}</h3>

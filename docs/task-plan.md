@@ -28,8 +28,7 @@ exchange. It is plain GeoJSON, so any GIS tool can read it.
       "properties": {
         "task_id": 1,
         "assigned_group": "team-a",
-        "assigned_to": "Chomba",
-        "comment": "Start Monday",
+        "comment": "Chomba, start Monday",
         "colour": "#d63f3f"
       }
     }
@@ -53,8 +52,7 @@ Geometry must be a single `Polygon` (WGS84 lon/lat).
 | ---------------- | ------ | -------- | ------------------------------------------------------------- |
 | `task_id`        | int    | yes      | `1..n`, unique, no gaps                                       |
 | `assigned_group` | string | no       | Team label, letters, digits, `_` and `-` only                 |
-| `assigned_to`    | string | no       | Free-text name or username                                    |
-| `comment`        | string | no       | e.g. "Assigned to Chomba, start Monday"                       |
+| `comment`        | string | no       | Free text, e.g. who is doing the task: "Chomba, start Monday" |
 | `colour`         | string | no       | `#rrggbb`. Defaults to a colour derived from `assigned_group` |
 
 Readers should ignore unknown properties (the planner may add
@@ -69,7 +67,7 @@ Reference implementation: `src/planner/src/lib/taskPlan.ts`.
   returned to project managers.
 - `PUT /api/v1/projects/{id}/task-plan`: project managers only. Accepts
   `Polygon` or `MultiPolygon` tasks (at most 5000), validates the properties
-  above (`assigned_to` up to 100 characters, `comment` up to 500), drops unknown
+  above (`assigned_group` up to 100 characters, `comment` up to 500), drops unknown
   properties, stamps missing or duplicate `task_id`s and returns
   `{"task_count": n}`. Errors are `422` with a `detail` message.
 

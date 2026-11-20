@@ -45,7 +45,6 @@ def _clean_properties(properties: dict) -> dict:
         )
     for key, value, max_length in (
         ("assigned_group", group, MAX_NAME_LENGTH),
-        ("assigned_to", _clean_text(properties.get("assigned_to")), MAX_NAME_LENGTH),
         ("comment", _clean_text(properties.get("comment")), MAX_COMMENT_LENGTH),
     ):
         if len(value) > max_length:

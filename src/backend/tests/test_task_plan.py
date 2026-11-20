@@ -64,12 +64,11 @@ def test_clean_task_plan_keeps_known_properties_and_stamps_ids():
             {
                 "task_id": 2,
                 "assigned_group": "team-a",
-                "assigned_to": " Chomba​ ",
-                "comment": "Start Monday",
+                "comment": " Start Monday​ ",
                 "colour": "#ABC",
                 "building_count": 12,
             },
-            {"assigned_to": ""},
+            {"comment": ""},
         )
     )
 
@@ -77,7 +76,6 @@ def test_clean_task_plan_keeps_known_properties_and_stamps_ids():
     assert first == {
         "task_id": 2,
         "assigned_group": "team-a",
-        "assigned_to": "Chomba",
         "comment": "Start Monday",
         "colour": "#aabbcc",
     }
@@ -92,7 +90,7 @@ def test_clean_task_plan_keeps_known_properties_and_stamps_ids():
         ([], "FeatureCollection"),
         ({"type": "FeatureCollection", "features": []}, "no tasks"),
         (_plan({"assigned_group": "team a"}), "Team names"),
-        (_plan({"assigned_to": "x" * 101}), "100 characters"),
+        (_plan({"assigned_group": "x" * 101}), "100 characters"),
         (_plan({"comment": "x" * 501}), "500 characters"),
         (_plan({"colour": "red"}), "hex"),
     ],
@@ -276,7 +274,7 @@ def test_tasks_geometry_change_detection():
     plan = _plan({"task_id": 1}, {"task_id": 2})
     synced = tasks_geometry_hash(DbProject(task_areas_geojson=plan))
 
-    plan["features"][0]["properties"]["assigned_to"] = "Bo"
+    plan["features"][0]["properties"]["comment"] = "Bo"
     project = DbProject(task_areas_geojson=plan, tasks_synced_hash=synced)
     assert not tasks_geometry_changed(project)
 
