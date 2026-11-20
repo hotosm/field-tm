@@ -16,13 +16,14 @@ from app.projects.task_sync import (
     tasks_geometry_hash,
 )
 
+# Inside the test project's outline.
 SQUARE = [
     [
-        [85.30, 27.71],
-        [85.30, 27.70],
-        [85.31, 27.70],
-        [85.31, 27.71],
-        [85.30, 27.71],
+        [85.300, 27.713],
+        [85.300, 27.712],
+        [85.301, 27.712],
+        [85.301, 27.713],
+        [85.300, 27.713],
     ]
 ]
 
@@ -216,6 +217,21 @@ async def test_put_task_plan_rejects_invalid_plan(client, db, project):
 
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert "hex" in response.json()["detail"]
+    assert (await DbProject.one(db, project.id)).task_areas_geojson is None
+
+
+async def test_put_task_plan_rejects_tasks_outside_project_area(client, db, project):
+    """Tasks must stay inside the project outline."""
+    # Above PostgreSQL's 32-bit int range, so ids must not be cast to int.
+    plan = _plan({"task_id": 1}, {"task_id": 2_147_483_648})
+    plan["features"][1]["geometry"]["coordinates"] = [
+        [[lon + 0.01, lat] for lon, lat in SQUARE[0]]
+    ]
+
+    response = await client.put(f"/api/v1/projects/{project.id}/task-plan", json=plan)
+
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "Outside: 2147483648." in response.json()["detail"]
     assert (await DbProject.one(db, project.id)).task_areas_geojson is None
 
 

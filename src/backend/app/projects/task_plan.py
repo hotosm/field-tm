@@ -5,6 +5,7 @@ import re
 import unicodedata
 
 from psycopg import AsyncConnection
+from psycopg.types.json import Jsonb
 
 from app.errors import ValidationError
 from app.helpers.geometry_utils import stamp_missing_task_ids
@@ -17,6 +18,8 @@ MAX_COMMENT_LENGTH = 500
 # Matches ODK Central's property-name charset, so labels stay sync-safe.
 GROUP_PATTERN = re.compile(r"^[A-Za-z0-9_-]*$")
 COLOUR_PATTERN = re.compile(r"^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$")
+# Slack for coordinate rounding along task edges that follow the project area.
+OUTLINE_TOLERANCE_M = 1
 
 
 def _clean_text(value: object) -> str:
@@ -161,6 +164,37 @@ def clean_task_plan(plan: object) -> dict:
     )
 
 
+async def _tasks_outside_outline(
+    db: AsyncConnection, project_id: int, plan: dict
+) -> list[str]:
+    """Return the ids of tasks that extend past the project area."""
+    async with db.cursor() as cur:
+        await cur.execute(
+            """
+            SELECT task->'properties'->>'task_id'
+            FROM projects p, jsonb_array_elements(%(plan)s->'features') AS task
+            WHERE p.id = %(project_id)s
+              AND NOT ST_Covers(
+                ST_Buffer(p.outline::geography, %(tolerance)s)::geometry,
+                ST_SetSRID(ST_GeomFromGeoJSON(task->'geometry'), 4326)
+              );
+            """,
+            {
+                "plan": Jsonb(plan),
+                "project_id": project_id,
+                "tolerance": OUTLINE_TOLERANCE_M,
+            },
+        )
+        return [row[0] for row in await cur.fetchall()]
+
+
 async def save_task_plan(db: AsyncConnection, project_id: int, plan: object) -> int:
     """Validate and store a task plan, returning the task count."""
-    return await save_task_areas(db, project_id, clean_task_plan(plan))
+    cleaned = clean_task_plan(plan)
+    outside = await _tasks_outside_outline(db, project_id, cleaned)
+    if outside:
+        raise ValidationError(
+            _("Tasks must stay inside the project area. Outside: %(task_ids)s.")
+            % {"task_ids": ", ".join(outside)}
+        )
+    return await save_task_areas(db, project_id, cleaned)
