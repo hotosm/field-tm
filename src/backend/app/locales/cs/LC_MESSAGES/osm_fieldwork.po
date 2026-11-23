@@ -8,14 +8,16 @@ msgstr ""
 "Project-Id-Version: Field-TM VERSION\n"
 "Report-Msgid-Bugs-To: tech@hotosm.org\n"
 "POT-Creation-Date: 2026-11-05 16:09+0000\n"
-"PO-Revision-Date: 2026-03-18 17:03+0000\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2026-04-09 21:09+0000\n"
+"Last-Translator: Jiří Podhorecký <j.podhorecky@volny.cz>\n"
+"Language-Team: Czech <https://hosted.weblate.org/projects/hotosm/field-tm-"
+"forms/cs/>\n"
 "Language: cs\n"
-"Language-Team: cs <LL@li.org>\n"
-"Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=((n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2);\n"
+"X-Generator: Weblate 5.17-dev\n"
 "Generated-By: Babel 2.18.0\n"
 
 #: i18n/osm_fieldwork_strings.py:9
@@ -26,14 +28,12 @@ msgstr "Je digitalizovaná poloha tohoto prvku správná?"
 #: i18n/osm_fieldwork_strings.py:10
 msgctxt "xlsform_label"
 msgid "digitisation_problem"
-msgstr "Co je špatného na digitalizaci?"
+msgstr "Problém digitalizace"
 
 #: i18n/osm_fieldwork_strings.py:11
 msgctxt "xlsform_label"
 msgid "digitisation_problem_other"
-msgstr ""
-"Zvolili jste možnost „Jiné“. Prosím, sdělte nám, co se při digitalizaci "
-"pokazilo!"
+msgstr "Problém digitalizace (jiný)"
 
 #: i18n/osm_fieldwork_strings.py:12
 msgctxt "xlsform_label"
@@ -53,7 +53,7 @@ msgstr "Geometrie"
 #: i18n/osm_fieldwork_strings.py:15
 msgctxt "xlsform_label"
 msgid "feature_exists"
-msgstr "Existuje tato funkce?"
+msgstr "Funkce existuje"
 
 #: i18n/osm_fieldwork_strings.py:16
 msgctxt "xlsform_label"
@@ -70,7 +70,7 @@ msgstr ""
 #: i18n/osm_fieldwork_strings.py:18
 msgctxt "xlsform_label"
 msgid "mapping_mode"
-msgstr "Chcete mapovat existující nebo novou funkci?"
+msgstr "Režim mapování"
 
 #: i18n/osm_fieldwork_strings.py:19
 msgctxt "xlsform_label"
@@ -95,14 +95,12 @@ msgstr "Posun"
 #: i18n/osm_fieldwork_strings.py:23
 msgctxt "xlsform_label"
 msgid "osm_username"
-msgstr ""
-"Jaké je vaše uživatelské jméno OSM (pokud chcete být uveden jako autor "
-"úprav)?"
+msgstr "Uživatelské jméno OSM"
 
 #: i18n/osm_fieldwork_strings.py:24
 msgctxt "xlsform_label"
 msgid "other"
-msgstr "OSTATNÍ"
+msgstr "Ostatní"
 
 #: i18n/osm_fieldwork_strings.py:25
 msgctxt "xlsform_label"
@@ -140,4 +138,3 @@ msgstr "Ověření"
 msgctxt "xlsform_label"
 msgid "yes"
 msgstr "Ano"
-
