@@ -3,7 +3,7 @@ import { renumber } from "./taskPlan";
 
 export type Assignment = Pick<TaskProps, "assigned_group" | "comment" | "colour">;
 
-/** Replace tasks `ids` with `geoms`, placed where the first replaced task was. Keeps the first task's assignment. */
+/** Replace tasks `ids` with `geoms`, placed where the first replaced task was. Keeps the first task's assignment, not its terrain. */
 export function replaceTasks(
   tasks: Task[],
   ids: number[],
@@ -12,7 +12,7 @@ export function replaceTasks(
 ): Task[] {
   const idx = tasks.findIndex((t) => ids.includes(t.properties.task_id));
   if (idx < 0) return tasks;
-  const { feature_count: _, ...inherit } = tasks[idx].properties;
+  const { feature_count: _, slope_deg: _s, hilly: _h, ...inherit } = tasks[idx].properties;
   const added: Task[] = geoms.map((geometry, i) => ({
     type: "Feature",
     geometry,

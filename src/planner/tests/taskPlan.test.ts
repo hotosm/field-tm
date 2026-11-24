@@ -107,6 +107,11 @@ describe("parse / serialise", () => {
     expect(parse(out).features).toHaveLength(1);
   });
 
+  it("keeps terrain properties", () => {
+    const out = JSON.parse(serialise(makePlan([task(1, { slope_deg: 12.5, hilly: true })])));
+    expect(out.features[0].properties).toEqual({ task_id: 1, slope_deg: 12.5, hilly: true });
+  });
+
   it("reads a LineString as a one-line route", () => {
     const line = {
       type: "LineString",

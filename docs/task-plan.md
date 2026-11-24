@@ -59,8 +59,9 @@ street-level imagery along. Routes are only for street imagery apps
 | `comment`        | string | no       | Free text, e.g. who is doing the task: "Chomba, start Monday" |
 | `colour`         | string | no       | `#rrggbb`. Defaults to a colour derived from `assigned_group` |
 
-Readers should ignore unknown properties (the planner may add
-`feature_count`, the number of features to map in the task). Empty optional values are omitted.
+Readers should ignore unknown properties. The planner may add `feature_count`
+(features to map in the task), and `slope_deg` / `hilly` (mean terrain slope,
+set by "Divide among teams"). Empty optional values are omitted.
 
 Reference implementation: `src/planner/src/lib/taskPlan.ts`.
 

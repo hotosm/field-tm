@@ -275,7 +275,7 @@
           {/if}
         </section>
         <p class="hint">
-          <a href="https://github.com/hotosm/field-tm" target="_blank" rel="noopener">Field-TM</a> by HOT. Everything stays in your browser{mode.kind === 'fieldtm' ? ' until you save to Field-TM' : '. Download the task plan to keep it'}.
+          <a href="https://github.com/hotosm/field-tm" target="_blank" rel="noopener">Field-TM</a> by HOT. Your plan stays in your browser{mode.kind === 'fieldtm' ? ' until you save to Field-TM' : '. Download the task plan to keep it'}.
         </p>
       </aside>
     {/if}

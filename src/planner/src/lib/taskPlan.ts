@@ -21,6 +21,9 @@ export interface TaskProps {
   comment?: string;
   colour?: string;
   feature_count?: number;
+  /** Mean terrain slope in degrees, from the GLO-30 DEM. */
+  slope_deg?: number;
+  hilly?: boolean;
 }
 
 /** An area to map, or a route to travel (e.g. for street-level imagery). */
@@ -138,6 +141,8 @@ function cleanProps(p: TaskProps): TaskProps {
     if (v) out[k] = v;
   }
   if (typeof p.feature_count === "number") out.feature_count = p.feature_count;
+  if (typeof p.slope_deg === "number") out.slope_deg = p.slope_deg;
+  if (typeof p.hilly === "boolean") out.hilly = p.hilly;
   return out;
 }
 

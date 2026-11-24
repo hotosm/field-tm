@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { legend, mapColour, taskColour, UNASSIGNED } from "../src/lib/colours";
+import { groupColour, legend, mapColour, taskColour, UNASSIGNED } from "../src/lib/colours";
 import type { Task } from "../src/lib/taskPlan";
 
 const task = (task_id: number, props: Partial<Task["properties"]> = {}): Task => ({
@@ -32,6 +32,14 @@ describe("legend", () => {
     ]);
     expect(items.find((i) => i.group === "team-a")?.colour).toBe("#123456");
     expect(items.find((i) => i.group === "")?.colour).toBe(UNASSIGNED);
+  });
+
+  it("counts hilly tasks per team", () => {
+    const items = legend([
+      task(1, { assigned_group: "a", hilly: true }),
+      task(2, { assigned_group: "a" }),
+    ]);
+    expect(items).toEqual([{ group: "a", colour: groupColour("a"), count: 2, hilly: 1 }]);
   });
 
   it("matches taskColour for each task", () => {

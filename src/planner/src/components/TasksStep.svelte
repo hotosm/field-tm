@@ -4,6 +4,7 @@
   import { COMMENT_PLACEHOLDER, GROUP_PATTERN, isAreaTask } from '../lib/taskPlan';
   import { lengthM } from '../lib/geo';
   import { taskColour } from '../lib/colours';
+  import { FLAT_SLOPE_DEG, MAX_TEAMS } from '../lib/teams';
   import TaskDetails from './TaskDetails.svelte';
   import Legend from './Legend.svelte';
 
@@ -16,6 +17,9 @@
     onactions?: () => void;
   }
   let { planner, tool = $bindable(), multi = $bindable(), onsplit, onactions }: Props = $props();
+
+  const DEFAULT_TEAMS = 4;
+  let teams = $state(DEFAULT_TEAMS);
 
   const n = $derived(planner.selected.length);
   const single = $derived(n === 1 ? planner.selectedTasks[0] : undefined);
@@ -33,6 +37,15 @@
   <p>No tasks yet.</p>
   <wa-button size="s" variant="brand" onclick={onsplit}>Split the area</wa-button>
 {:else}
+  <section class="stack">
+    <h3>Divide among teams</h3>
+    <p class="hint">Each team gets one or two groups of neighbouring tasks, with hilly ground (slopes of {FLAT_SLOPE_DEG}° or more) shared out as evenly as possible.</p>
+    <div class="row teams">
+      <wa-input size="s" type="number" label="Teams" min="1" max={MAX_TEAMS} step="1" value={teams} oninput={(e: Event) => (teams = Number((e.currentTarget as HTMLInputElement).value))}></wa-input>
+      <wa-button size="s" variant="brand" onclick={() => planner.divideAmongTeams(teams)} disabled={!!planner.busy || !(teams >= 1)}>Divide</wa-button>
+    </div>
+  </section>
+
   <p class="hint">Click tasks on the map to select them. Shift-click, or turn on multi-select, to select several.</p>
   <div class="row">
     <wa-switch size="s" checked={multi} onchange={(e: Event) => (multi = (e.currentTarget as HTMLInputElement).checked)}>Multi-select</wa-switch>
@@ -120,6 +133,9 @@
   }
   .tasklist button.selected {
     background: var(--selected);
+  }
+  .teams {
+    align-items: end;
   }
   .count {
     margin-left: auto;
