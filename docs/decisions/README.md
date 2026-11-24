@@ -16,3 +16,4 @@ from the projects inception.
 - [0005 - Gettext `.po` Files and Babel for Translations](./0005-gettext-babel-translations.md)
 - [0006 - DB Shared State for QGIS Jobs](./0006-db-shared-state-qgis-jobs.md)
 - [0007 - Svelte for Map-Heavy UI](./0007-svelte-map-ui.md)
+- [0008 - Reusable Task Planner with Team Assignment](./0008-planner-team-split.md)
