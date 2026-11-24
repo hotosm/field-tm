@@ -30,6 +30,7 @@
   let multi = $state(false);
   let map = $state.raw<Map>();
   let project = $state<{ id: number; name: string; field_mapping_app: string | null } | null>(null);
+  let name = $state<string>();
   let fatal = $state<{ message: string; login?: boolean } | null>(null);
   let draft = $state.raw<Draft | null>(null);
   let pendingEdit = $state.raw<Polygon | null>(null);
@@ -57,6 +58,7 @@
       } else if (mode.kind === 'fieldtm') {
         const input = await getPlannerInput(mode.project);
         project = input.project;
+        name = input.project.name;
         document.title = `${input.project.name} · Task Planner`;
         const plan = input.task_plan?.features.length ? parse(input.task_plan) : null;
         planner.load({ aoi: toArea(input.aoi), features: input.features, plan });
@@ -187,7 +189,7 @@
 <svelte:window {onkeydown} {onbeforeunload} />
 
 {#snippet details(task: Task)}
-  <TaskDetails {task} readonly {map} title={project?.name} />
+  <TaskDetails {task} readonly {map} title={name} />
 {/snippet}
 
 {#snippet taskPopup()}
@@ -197,7 +199,7 @@
         <strong>Task {popupTask.properties.task_id}</strong>
         <wa-button size="s" appearance="plain" onclick={() => (popupHiddenFor = popupTask.properties.task_id)} aria-label="Close">✕</wa-button>
       </div>
-      <TaskActions task={popupTask} {map} title={project?.name} compact />
+      <TaskActions task={popupTask} {map} title={name} compact />
     </div>
   {/if}
 {/snippet}
@@ -265,6 +267,8 @@
           {:else if step === 3}
             <TasksStep
               {planner}
+              {map}
+              title={name}
               bind:tool
               bind:multi
               onsplit={() => (step = 2)}

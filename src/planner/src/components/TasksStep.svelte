@@ -1,25 +1,30 @@
 <script lang="ts">
+  import type { Map } from 'maplibre-gl';
   import type { Planner } from '../lib/planner.svelte';
   import type { Tool } from './MapView.svelte';
   import { COMMENT_PLACEHOLDER, GROUP_PATTERN, isAreaTask } from '../lib/taskPlan';
   import { lengthM } from '../lib/geo';
   import { taskColour } from '../lib/colours';
+  import { printTeams } from '../lib/print';
   import { FLAT_SLOPE_DEG, MAX_TEAMS } from '../lib/teams';
   import TaskDetails from './TaskDetails.svelte';
   import Legend from './Legend.svelte';
 
   interface Props {
     planner: Planner;
+    map?: Map;
+    title?: string;
     tool: Tool;
     multi: boolean;
     onsplit: () => void;
     /** Reopens the task's downloads popup after it was closed. */
     onactions?: () => void;
   }
-  let { planner, tool = $bindable(), multi = $bindable(), onsplit, onactions }: Props = $props();
+  let { planner, map, title, tool = $bindable(), multi = $bindable(), onsplit, onactions }: Props = $props();
 
   const DEFAULT_TEAMS = 4;
   let teams = $state(DEFAULT_TEAMS);
+  const assigned = $derived(planner.tasks.some((t) => t.properties.assigned_group));
 
   const n = $derived(planner.selected.length);
   const single = $derived(n === 1 ? planner.selectedTasks[0] : undefined);
@@ -43,6 +48,9 @@
     <div class="row teams">
       <wa-input size="s" type="number" label="Teams" min="1" max={MAX_TEAMS} step="1" value={teams} oninput={(e: Event) => (teams = Number((e.currentTarget as HTMLInputElement).value))}></wa-input>
       <wa-button size="s" variant="brand" onclick={() => planner.divideAmongTeams(teams)} disabled={!!planner.busy || !(teams >= 1)}>Divide</wa-button>
+      {#if map && assigned}
+        <wa-button size="s" appearance="outlined" onclick={() => printTeams(map, planner.tasks, title).catch((e) => (planner.error = e.message))}>Print teams</wa-button>
+      {/if}
     </div>
   </section>
 
