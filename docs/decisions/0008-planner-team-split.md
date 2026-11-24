@@ -16,8 +16,14 @@ split by location only, some teams get all the hills (we don't want disgruntled 
 The method below was co-developed with the Sierra Leone field and drone
 mapping team, based on how they already divide work between teams.
 
-The planner already splits, colours and prints tasks with no backend, so it
-makes sense to build this once there, and let other tools reuse it.
+The planner already splits, colours and prints tasks in the browser, so we
+build this once there and let other tools reuse it.
+
+This replaces the [`area-splitter`](../../src/backend/packages/area-splitter)
+Python package as our shared splitting tool. Browser splitting is more user
+friendly (instant previews, editing on the map), and needs no backend. The
+SQL algorithms in `area-splitter` remain the source of truth, compiled into
+the planner at build time.
 
 ## Considered Options
 
@@ -38,7 +44,7 @@ One input (number of teams) and one button. No other options.
    flat tasks into N equal runs each. Team _i_ gets hilly run _i_ and flat
    run _i_, so its two clusters stay close together.
 3. **Teams**: named `alpha`, `bravo`, `charlie`... (max 12), each with a
-   colour. Hilly tasks get a darker shade. Taken from practices by Sierra Leone team.
+   colour. Hilly tasks get a darker shade.
 4. **Print**: an overview page with the team map and each team's hilly /
    flat task counts.
 
@@ -81,12 +87,10 @@ still publish an npm package later for non-Docker users, from the same
 
 ### Consequences
 
-- ✅ Same behaviour in Field-TM, Drone-TM and standalone.
+- ✅ Same behaviour in Field-TM, Drone-TM and standalone, with no backend.
 - ✅ Every team gets an equal share of hilly and flat tasks.
-- ✅ Frontend-only, no backend APIs needed.
-- ✅ Runs standalone for deployments outside of Field-TM + Drone-TM.
 - ❌ If all the hills are at one end of the area, each team's two clusters
   end up far apart. We favour fairness over walking distance here.
 - ❌ Apps bundling the planner need to bump the pinned version to get fixes.
-- ❌ Slightly more complex architecture, for the benefit of having a standalone
-  planner module, that others could contribute to.
+- ❌ A separate frontend module to maintain, but one others can easily
+  contribute to.
