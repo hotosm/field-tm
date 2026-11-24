@@ -14,13 +14,15 @@
     planner: Planner;
     map?: Map;
     title?: string;
+    /** Task shapes come from another tool (Drone-TM): only teams can change. */
+    fixed?: boolean;
     tool: Tool;
     multi: boolean;
     onsplit: () => void;
     /** Reopens the task's downloads popup after it was closed. */
     onactions?: () => void;
   }
-  let { planner, map, title, tool = $bindable(), multi = $bindable(), onsplit, onactions }: Props = $props();
+  let { planner, map, title, fixed = false, tool = $bindable(), multi = $bindable(), onsplit, onactions }: Props = $props();
 
   const DEFAULT_TEAMS = 4;
   let teams = $state(DEFAULT_TEAMS);
@@ -59,7 +61,7 @@
     <wa-switch size="s" checked={multi} onchange={(e: Event) => (multi = (e.currentTarget as HTMLInputElement).checked)}>Multi-select</wa-switch>
     <wa-button size="s" appearance="outlined" onclick={() => (planner.selected = planner.tasks.map((t) => t.properties.task_id))}>Select all</wa-button>
     <wa-button size="s" appearance="outlined" onclick={() => (planner.selected = [])} disabled={!n}>Clear selection</wa-button>
-    {#if hasRoutes}
+    {#if hasRoutes && !fixed}
       <wa-button size="s" variant={tool === 'route' ? 'brand' : 'neutral'} appearance={tool === 'route' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'route' ? 'none' : 'route')}>Draw route</wa-button>
     {/if}
   </div>
@@ -67,14 +69,16 @@
 
   {#if n}
     <p><strong>{n} selected</strong></p>
-    <div class="row">
-      <wa-button size="s" appearance="outlined" onclick={() => planner.mergeSelected()} disabled={n < 2 || !!planner.busy}>Merge</wa-button>
-      {#if !single || isAreaTask(single)}
-        <wa-button size="s" variant={tool === 'line' ? 'brand' : 'neutral'} appearance={tool === 'line' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'line' ? 'none' : 'line')} disabled={n !== 1}>Split with line</wa-button>
-        <wa-button size="s" appearance="outlined" onclick={() => (tool = 'edit')} disabled={n !== 1}>Edit shape</wa-button>
-      {/if}
-      <wa-button size="s" variant="danger" appearance="outlined" onclick={() => planner.deleteSelected()}>Delete</wa-button>
-    </div>
+    {#if !fixed}
+      <div class="row">
+        <wa-button size="s" appearance="outlined" onclick={() => planner.mergeSelected()} disabled={n < 2 || !!planner.busy}>Merge</wa-button>
+        {#if !single || isAreaTask(single)}
+          <wa-button size="s" variant={tool === 'line' ? 'brand' : 'neutral'} appearance={tool === 'line' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'line' ? 'none' : 'line')} disabled={n !== 1}>Split with line</wa-button>
+          <wa-button size="s" appearance="outlined" onclick={() => (tool = 'edit')} disabled={n !== 1}>Edit shape</wa-button>
+        {/if}
+        <wa-button size="s" variant="danger" appearance="outlined" onclick={() => planner.deleteSelected()}>Delete</wa-button>
+      </div>
+    {/if}
     {#if tool === 'line'}<p class="hint">Draw a line across the task; double-click (or click the last point again) to finish.</p>{/if}
   {/if}
 

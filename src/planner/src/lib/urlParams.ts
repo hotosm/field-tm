@@ -4,6 +4,8 @@ import { decodeTask } from "./share";
 export type Mode =
   | { kind: "standalone"; aoi?: string; features?: string; roads?: string; returnTo?: string }
   | { kind: "fieldtm"; project: string; view: boolean }
+  /** A Drone-TM project URL; its tasks are fixed, only teams change. */
+  | { kind: "dronetm"; url: string }
   | { kind: "task"; task: Task };
 
 /** Lets relative URLs (fetched from this site) pass the http(s) check. */
@@ -31,6 +33,8 @@ export function parseMode(search: string, hash = ""): Mode {
   if (project && /^\d+$/.test(project)) {
     return { kind: "fieldtm", project, view: ["1", "true"].includes(q.get("view") ?? "") };
   }
+  const dronetm = httpUrl(q.get("dronetm"), RELATIVE_BASE);
+  if (dronetm) return { kind: "dronetm", url: dronetm };
   const url = (k: string) => httpUrl(q.get(k), RELATIVE_BASE);
   return {
     kind: "standalone",

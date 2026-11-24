@@ -13,16 +13,27 @@
   import { Planner } from './lib/planner.svelte';
   import { parseMode } from './lib/urlParams';
   import { clearDraft, loadDraft, type Draft } from './lib/draft';
-  import { featurePoint, toArea, toFeatureCollection } from './lib/geo';
+  import { featurePoint, toArea, toFeatureCollection, type Area } from './lib/geo';
   import { fetchJson } from './lib/io/files';
   import { ApiError, getPlannerInput, loginUrl, projectUrl } from './lib/io/fieldtm';
+  import { getDroneTmProject } from './lib/io/dronetm';
   import { isAreaTask, parse, type Task } from './lib/taskPlan';
 
   const mode = parseMode(location.search, location.hash);
   const readonly = mode.kind === 'task' || (mode.kind === 'fieldtm' && mode.view);
-  const planner = new Planner(mode.kind === 'fieldtm' ? `project-${mode.project}` : 'standalone');
+  const draftScope =
+    mode.kind === 'fieldtm' ? `project-${mode.project}` : mode.kind === 'dronetm' ? 'dronetm' : 'standalone';
+  const planner = new Planner(draftScope);
   // A Field-TM project owns its area and features; the planner only edits tasks.
   const fromProject = mode.kind === 'fieldtm';
+  // Drone-TM owns its task shapes too, so the planner only assigns teams.
+  const fixedTasks = mode.kind === 'dronetm';
+
+  /** Why a step is unavailable, if it is. */
+  function stepLock(i: number): string | undefined {
+    if (fromProject && i === 0) return 'The area is set in the Field-TM project';
+    if (fixedTasks && i < 3) return 'Tasks are set in the Drone-TM project';
+  }
 
   const STEPS = ['Area', 'Data', 'Split', 'Tasks', mode.kind === 'fieldtm' ? 'Save' : 'Export'] as const;
   let step = $state(0);
@@ -31,6 +42,7 @@
   let map = $state.raw<Map>();
   let project = $state<{ id: number; name: string; field_mapping_app: string | null } | null>(null);
   let name = $state<string>();
+  let noFlyZones = $state.raw<Area | null>(null);
   let fatal = $state<{ message: string; login?: boolean } | null>(null);
   let draft = $state.raw<Draft | null>(null);
   let pendingEdit = $state.raw<Polygon | null>(null);
@@ -64,6 +76,13 @@
         planner.load({ aoi: toArea(input.aoi), features: input.features, plan });
         step = plan ? 3 : 2;
         if (!mode.view) offerDraft();
+      } else if (mode.kind === 'dronetm') {
+        const input = await getDroneTmProject(mode.url);
+        name = input.name;
+        document.title = `${input.name} · Task Planner`;
+        noFlyZones = input.noFlyZones;
+        planner.load({ aoi: input.aoi, plan: input.plan });
+        step = 3;
       } else {
         const get = async (url?: string) => (url ? toFeatureCollection(await fetchJson(url)) : null);
         if (mode.aoi || mode.features || mode.roads) {
@@ -222,8 +241,8 @@
                 variant={step === i ? 'brand' : 'neutral'}
                 appearance={step === i ? 'accent' : 'outlined'}
                 aria-current={step === i ? 'step' : undefined}
-                disabled={fromProject && i === 0}
-                title={fromProject && i === 0 ? 'The area is set in the Field-TM project' : undefined}
+                disabled={!!stepLock(i)}
+                title={stepLock(i)}
                 onclick={() => (step = i)}>{i + 1}. {label}</wa-button
               >
             {/each}
@@ -269,6 +288,7 @@
               {planner}
               {map}
               title={name}
+              fixed={fixedTasks}
               bind:tool
               bind:multi
               onsplit={() => (step = 2)}
@@ -290,6 +310,7 @@
         tasks={planner.tasks}
         features={readonly ? null : planner.features}
         roads={readonly ? null : planner.currentRoads}
+        {noFlyZones}
         selected={planner.selected}
         {tool}
         {editing}
