@@ -4,7 +4,7 @@
 
 ### Feat
 
-- **planner**: new standalone Task Planner (`src/planner/`, Svelte 5 + MapLibre + PGlite/PostGIS). Splits an area by grid, roads or buildings in the browser; edit, merge and split tasks; assign by team, name and comment; download tasks as GeoJSON or GPX, or share with a link and QR code. Works on its own (files in, files out) or with a Field-TM project (`/planner/?project=<id>`)
+- **planner**: new standalone Task Planner (`src/planner/`, Svelte 5 + MapLibre + PGlite/PostGIS). Splits an area by grid, roads or buildings in the browser; edit, merge and split tasks; assign by team, name and comment; download tasks as GeoJSON or GPX, or share with a link and QR code. Works on its own (files in, files out) or with a Field-TM project (`/planner/?fieldtm=<id>`)
 - **api**: `GET /api/v1/projects/{id}/planner-input` and `PUT /api/v1/projects/{id}/task-plan`, plus a task plan file upload on the project page (format: `docs/task-plan.md`)
 - **projects**: new Tasks step and read-only task map on the project page, replacing the split wizard step and the Leaflet assignment panel
 - **projects**: guided mapping app recommendation (#3135) with app logos

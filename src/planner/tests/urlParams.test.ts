@@ -51,9 +51,9 @@ describe("parseMode", () => {
   });
 
   it("reads Field-TM project and viewer mode", () => {
-    expect(parseMode("?project=12")).toEqual({ kind: "fieldtm", project: "12", view: false });
-    expect(parseMode("?project=12&view=1")).toEqual({ kind: "fieldtm", project: "12", view: true });
-    expect(parseMode("?project=../x").kind).toBe("standalone");
+    expect(parseMode("?fieldtm=12")).toEqual({ kind: "fieldtm", project: "12", view: false });
+    expect(parseMode("?fieldtm=12&view=1")).toEqual({ kind: "fieldtm", project: "12", view: true });
+    expect(parseMode("?fieldtm=../x").kind).toBe("standalone");
   });
 
   it("reads a shared task from the hash or query", () => {
@@ -73,7 +73,7 @@ describe("share", () => {
   });
 
   it("builds a link without the original query", () => {
-    const url = shareUrl(t, "https://example.org/planner/?project=3#x");
+    const url = shareUrl(t, "https://example.org/planner/?fieldtm=3#x");
     expect(url).toMatch(/^https:\/\/example\.org\/planner\/#task=[\w-]+$/);
   });
 

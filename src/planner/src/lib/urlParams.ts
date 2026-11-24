@@ -33,7 +33,7 @@ export function parseMode(search: string, hash = ""): Mode {
     const task = decodeTask(shared);
     if (task) return { kind: "task", task };
   }
-  const project = q.get("project");
+  const project = q.get("fieldtm");
   if (project && /^\d+$/.test(project)) {
     return { kind: "fieldtm", project, view: ["1", "true"].includes(q.get("view") ?? "") };
   }

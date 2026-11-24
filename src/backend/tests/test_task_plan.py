@@ -472,15 +472,15 @@ def planner_dir(tmp_path, monkeypatch):
 
 async def test_planner_redirects_to_trailing_slash(client, planner_dir):
     """/planner needs the slash for relative asset paths; the query is kept."""
-    response = await client.get("/planner?project=3", follow_redirects=False)
+    response = await client.get("/planner?fieldtm=3", follow_redirects=False)
 
     assert response.status_code == status.HTTP_301_MOVED_PERMANENTLY
-    assert response.headers["location"] == "/planner/?project=3"
+    assert response.headers["location"] == "/planner/?fieldtm=3"
 
 
 async def test_planner_serves_index_and_assets(client, planner_dir):
     """Index, wasm and gz files get the right headers."""
-    index = await client.get("/planner/?project=3")
+    index = await client.get("/planner/?fieldtm=3")
     assert index.status_code == status.HTTP_200_OK
     assert index.headers["content-type"].startswith("text/html")
     assert index.headers["x-frame-options"] == "SAMEORIGIN"

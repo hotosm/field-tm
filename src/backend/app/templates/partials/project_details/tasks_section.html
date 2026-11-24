@@ -22,19 +22,19 @@ project.status == 'PUBLISHED' %}
 
     <iframe
       class="ftm-task-map"
-      src="/planner/?project={{ project.id }}&view=1"
+      src="/planner/?fieldtm={{ project.id }}&view=1"
       title="{{ _('Task map') }}"
       loading="lazy"
     ></iframe>
 
     {% if not syncs %}
-    <a href="/planner/?project={{ project.id }}&view=1" target="_blank"
+    <a href="/planner/?fieldtm={{ project.id }}&view=1" target="_blank"
       >{{ _("Open tasks for download and sharing (GPX, GeoJSON, QR codes)") }} →</a
     >
     {% endif %} {% if is_manager %}
     <div class="wa-cluster wa-gap-s">
       <wa-button
-        href="/planner/?project={{ project.id }}"
+        href="/planner/?fieldtm={{ project.id }}"
         variant="brand"
         {%
         if

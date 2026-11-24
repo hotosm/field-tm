@@ -27,8 +27,8 @@ Conventions: runes only, `$state.raw` for GeoJSON, logic in plain `.ts`.
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | none                                    | Standalone: draw/upload an area, download the result                                                                                   |
 | `?aoi=<url>&features=<url>&roads=<url>` | Standalone, preloaded from public GeoJSON                                                                                              |
-| `?project=<id>`                         | Field-TM: loads `GET /api/v1/projects/{id}/planner-input`, saves with `PUT /api/v1/projects/{id}/task-plan` (same origin, cookie auth) |
-| `?project=<id>&view=1`                  | Read-only viewer (for the iframe on the project page)                                                                                  |
+| `?fieldtm=<id>`                         | Field-TM: loads `GET /api/v1/projects/{id}/planner-input`, saves with `PUT /api/v1/projects/{id}/task-plan` (same origin, cookie auth) |
+| `?fieldtm=<id>&view=1`                  | Read-only viewer (for the iframe on the project page)                                                                                  |
 | `#task=<base64url GeoJSON>`             | Read-only view of one shared task                                                                                                      |
 
 ## Deploy

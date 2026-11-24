@@ -69,6 +69,6 @@ describe("Field-TM API adapter", () => {
   });
 
   it("builds a login link that returns here", () => {
-    expect(loginUrl("/planner/?project=5")).toBe("/login?return_to=%2Fplanner%2F%3Fproject%3D5");
+    expect(loginUrl("/planner/?fieldtm=5")).toBe("/login?return_to=%2Fplanner%2F%3Ffieldtm%3D5");
   });
 });

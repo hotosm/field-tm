@@ -148,8 +148,8 @@ async def test_project_setup_tasks_step_links_to_planner(client, db, project):
     response = await client.get(f"/projects/{project.id}")
 
     assert response.status_code == status.HTTP_200_OK
-    assert f'href="/planner/?project={project.id}"' in response.text
-    assert f'src="/planner/?project={project.id}&view=1"' in response.text
+    assert f'href="/planner/?fieldtm={project.id}"' in response.text
+    assert f'src="/planner/?fieldtm={project.id}&view=1"' in response.text
     assert "Use whole area as one task" in response.text
     # Finalise waits until tasks are decided.
     assert 'id="step-5-container"' not in response.text
