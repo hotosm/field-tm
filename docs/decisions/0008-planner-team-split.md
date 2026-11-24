@@ -83,8 +83,8 @@ still publish an npm package later for non-Docker users, from the same
 
 - ✅ Same behaviour in Field-TM, Drone-TM and standalone.
 - ✅ Every team gets an equal share of hilly and flat tasks.
-- ✅ Frontend-only, no backend APIs needed. Can work offline.
-- ✅ Runs standalone for deployments outside of FieldTM + DroneTM.
+- ✅ Frontend-only, no backend APIs needed.
+- ✅ Runs standalone for deployments outside of Field-TM + Drone-TM.
 - ❌ If all the hills are at one end of the area, each team's two clusters
   end up far apart. We favour fairness over walking distance here.
 - ❌ Apps bundling the planner need to bump the pinned version to get fixes.
