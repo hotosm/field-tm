@@ -6,7 +6,7 @@ import { saveDraft, type Draft } from "./draft";
 import { bbox, type Area } from "./geo";
 import { History } from "./history";
 import { canFetchRoads, fetchRoads } from "./io/postpass";
-import { assign, removeTasks, replaceTasks, type Assignment } from "./planEdit";
+import { assign, removeTasks, replaceTasks, sumFeatures, type Assignment } from "./planEdit";
 import { isAreaTask, makePlan, renumber, type Task, type TaskPlan } from "./taskPlan";
 
 interface Snapshot {
@@ -222,10 +222,8 @@ export class Planner {
     const g = await this.run("Merging", () => engine.merge(sel.map((t) => t.geometry)));
     if (!g) return;
     const ids = sel.map((t) => t.properties.task_id);
-    const counts = sel.every((t) => typeof t.properties.feature_count === "number")
-      ? [sel.reduce((s, t) => s + (t.properties.feature_count ?? 0), 0)]
-      : undefined;
-    const tasks = replaceTasks(this.tasks, ids, [g], counts);
+    const count = sumFeatures(this.tasks, ids);
+    const tasks = replaceTasks(this.tasks, ids, [g], count === undefined ? undefined : [count]);
     this.commit({ tasks, algorithm: "MANUAL" }, [Math.min(...ids)]);
   }
 
