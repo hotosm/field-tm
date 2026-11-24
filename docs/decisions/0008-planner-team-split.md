@@ -37,16 +37,16 @@ the planner at build time.
 
 One input (number of teams) and one button. No other options.
 
-1. **Hilliness**: fetch a GLO-30 DEM crop for the area from the HOTOSM
-   raster API, and score each task by mean slope. A task is hilly if it's
-   above the median _and_ at least 5°. If the DEM fails, everything is flat.
-2. **Clusters**: order tasks along a Hilbert curve, then cut the hilly and
-   flat tasks into N equal runs each. Team _i_ gets hilly run _i_ and flat
-   run _i_, so its two clusters stay close together.
-3. **Teams**: named `alpha`, `bravo`, `charlie`... (max 12), each with a
+1. **Hilliness**: ask the HOTOSM raster API for each task's mean slope
+   from the GLO-30 DEM. A task is hilly if it's
+   above the median _and_ at least 10°. GLO-30 includes buildings and trees, so a flat town still averages 4–6°. If the DEM fails, everything is flat.
+2. **Clusters**: order tasks along a Hilbert curve and cut them into 2N
+   runs of tasks that share edges (corners don't count). Each team gets two
+   runs, one hillier and one flatter, so at most two clusters and no enclaves.
+3. **Teams**: named `alpha`, `bravo`, `charlie`... (max 10), each with a
    colour. Hilly tasks get a darker shade.
 4. **Print**: an overview page with the team map and each team's hilly /
-   flat task counts.
+   flat task counts, then a page per team with only its tasks highlighted.
 
 Tasks gain two optional properties: `slope_deg` and `hilly`.
 
@@ -88,9 +88,10 @@ still publish an npm package later for non-Docker users, from the same
 ### Consequences
 
 - ✅ Same behaviour in Field-TM, Drone-TM and standalone, with no backend.
-- ✅ Every team gets an equal share of hilly and flat tasks.
-- ❌ If all the hills are at one end of the area, each team's two clusters
-  end up far apart. We favour fairness over walking distance here.
+- ✅ Each team has at most two clusters of touching tasks.
+- ❌ Hilly tasks are shared out as evenly as the clusters allow, not
+  exactly. Compact clusters come first.
+- ❌ A team's two clusters can be far apart.
 - ❌ Apps bundling the planner need to bump the pinned version to get fixes.
 - ❌ A separate frontend module to maintain, but one others can easily
   contribute to.
