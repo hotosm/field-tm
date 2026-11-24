@@ -4,11 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
+    "dev": "sh scripts/slim-postgis.sh && vite",
+    "build": "sh scripts/slim-postgis.sh && vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "test": "vitest run"
+    "test": "sh scripts/slim-postgis.sh && vitest run"
   },
   "dependencies": {
     "@awesome.me/webawesome": "3.11.0",

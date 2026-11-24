@@ -13,7 +13,7 @@ export default defineConfig({
   plugins: [svelte(), circularChunkGuard()],
   resolve: { alias: { "@algorithms": algorithms } },
   server: { fs: { allow: [".", algorithms] } },
-  optimizeDeps: { exclude: ["@electric-sql/pglite", "@electric-sql/pglite-postgis"] },
+  optimizeDeps: { exclude: ["@electric-sql/pglite"] },
   worker: { format: "es", rolldownOptions: { checks: { eval: false } } },
   build: {
     outDir: "dist",
