@@ -35,13 +35,13 @@
     onselect?: (id: number | null, additive: boolean) => void;
     ondrawn?: (g: Polygon | LineString) => void;
     onedited?: (g: Polygon) => void;
-    /** Popup anchored on the map; `key` remounts it when the subject changes. */
+    onaoi?: (at: Position | null) => void;
     popup?: { key: number; at: Position; content: Snippet } | null;
   }
 
   let {
     aoi = null, tasks = [], features = null, roads = null, selected = [], tool = 'none', editing = null,
-    fitKey = 0, map = $bindable(), onselect, ondrawn, onedited, popup = null,
+    fitKey = 0, map = $bindable(), onselect, ondrawn, onedited, onaoi, popup = null,
   }: Props = $props();
 
   const HOT_RED = '#d63f3f';
@@ -125,6 +125,9 @@
     const hit = layers.length ? map.queryRenderedFeatures(e.point, { layers })[0] : undefined;
     const ev = e.originalEvent;
     onselect?.(hit ? Number(hit.properties.task_id) : null, ev.shiftKey || ev.ctrlKey || ev.metaKey);
+    if (!onaoi) return;
+    const onAoi = !hit && map.getLayer('aoi-fill') && map.queryRenderedFeatures(e.point, { layers: ['aoi-fill'] }).length > 0;
+    onaoi(onAoi ? [e.lngLat.lng, e.lngLat.lat] : null);
   }
 
   const basemap = loadBasemap();
@@ -153,6 +156,8 @@
     <LineLayer id="roads-line" paint={{ 'line-color': '#777', 'line-width': 1.5, 'line-opacity': 0.6 }} />
   </GeoJSONSource>
   <GeoJSONSource id="aoi" data={aoiData}>
+    <!-- Invisible, so a click inside the area can open its popup. -->
+    <FillLayer id="aoi-fill" paint={{ 'fill-color': HOT_RED, 'fill-opacity': 0 }} />
     <LineLayer id="aoi-line" paint={{ 'line-color': HOT_RED, 'line-width': 3, 'line-dasharray': [2, 1] }} />
   </GeoJSONSource>
   <GeoJSONSource id="tasks" data={taskData}>

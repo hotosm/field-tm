@@ -5,6 +5,7 @@
   import { download } from '../lib/io/files';
   import { shareUrl } from '../lib/share';
   import { printTask } from '../lib/print';
+  import ActionGrid from './ActionGrid.svelte';
   import QrCode from './QrCode.svelte';
 
   interface Props {
@@ -48,13 +49,13 @@
 </script>
 
 {#if compact}
-  <div class="grid">
+  <ActionGrid>
     <wa-button size="s" appearance="outlined" onclick={gpx} title="GPX for OsmAnd, CoMaps, Organic Maps or a GPS">GPX</wa-button>
     <wa-button size="s" appearance="outlined" onclick={geojson} title="GeoJSON for QGIS, JOSM or other tools">GeoJSON</wa-button>
     {#if map}<wa-button size="s" appearance="outlined" onclick={print} title="Paper map for the field (save as PDF)">Print / PDF</wa-button>{/if}
     <wa-button size="s" appearance="outlined" onclick={copy} title="Link to open the task on a phone">{copied ? 'Copied' : 'Copy link'}</wa-button>
     <wa-button size="s" appearance="outlined" onclick={() => (showQr = !showQr)} aria-expanded={showQr}>QR code</wa-button>
-  </div>
+  </ActionGrid>
 {:else}
   <ul class="uses">
     <li>
@@ -84,11 +85,6 @@
 {#if showQr}<QrCode text={link} />{/if}
 
 <style>
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--wa-space-2xs);
-  }
   .uses {
     list-style: none;
     margin: 0;

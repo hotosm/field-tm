@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { LineString, Polygon } from 'geojson';
+  import type { LineString, Polygon, Position } from 'geojson';
   import type { Map } from 'maplibre-gl';
   import MapView, { type Tool } from './components/MapView.svelte';
   import AreaStep from './components/AreaStep.svelte';
@@ -9,10 +9,12 @@
   import ExportStep from './components/ExportStep.svelte';
   import TaskDetails from './components/TaskDetails.svelte';
   import TaskActions from './components/TaskActions.svelte';
+  import AreaActions from './components/AreaActions.svelte';
   import Legend from './components/Legend.svelte';
   import { Planner } from './lib/planner.svelte';
   import { parseMode } from './lib/urlParams';
   import { clearDraft, loadDraft, type Draft } from './lib/draft';
+  import { aoiPopupOpen, nextAoiClick, type AoiClick } from './lib/aoiPopup';
   import { featurePoint, toArea, toFeatureCollection } from './lib/geo';
   import { fetchJson } from './lib/io/files';
   import { ApiError, getPlannerInput, loginUrl, projectUrl } from './lib/io/fieldtm';
@@ -45,6 +47,16 @@
     void planner.selected.join();
     popupHiddenFor = null;
   });
+  // Downloads for the drawn area, opened by clicking it on the Area step.
+  let aoiClick = $state<AoiClick | null>(null);
+  const showAoiPopup = $derived(aoiPopupOpen({ readonly, step, tool, hasAoi: !!planner.aoi, click: aoiClick }));
+  $effect(() => {
+    void planner.aoi;
+    aoiClick = null;
+  });
+  function onaoi(at: Position | null) {
+    aoiClick = nextAoiClick(aoiClick?.n ?? 0, at);
+  }
   const editing = $derived(
     tool !== 'edit' ? null : step === 0 ? planner.aoi : (planner.selectedTasks.filter(isAreaTask)[0]?.geometry ?? null),
   );
@@ -147,6 +159,7 @@
     if (readonly || (e.target as HTMLElement).closest('input, textarea, select')) return;
     if (e.key === 'Escape') {
       if (popupTask && tool === 'none') popupHiddenFor = popupTask.properties.task_id;
+      aoiClick = null;
       cancelTool();
     }
     if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
@@ -198,6 +211,18 @@
         <wa-button size="s" appearance="plain" onclick={() => (popupHiddenFor = popupTask.properties.task_id)} aria-label="Close">✕</wa-button>
       </div>
       <TaskActions task={popupTask} {map} title={project?.name} compact />
+    </div>
+  {/if}
+{/snippet}
+
+{#snippet aoiPopup()}
+  {#if planner.aoi}
+    <div class="stack">
+      <div class="row popup-head">
+        <strong>Area of Interest (AOI)</strong>
+        <wa-button size="s" appearance="plain" onclick={() => (aoiClick = null)} aria-label="Close">✕</wa-button>
+      </div>
+      <AreaActions aoi={planner.aoi} />
     </div>
   {/if}
 {/snippet}
@@ -294,7 +319,12 @@
         {onselect}
         {ondrawn}
         onedited={(g) => (pendingEdit = g)}
-        popup={popupTask && popupAt ? { key: popupTask.properties.task_id, at: popupAt, content: taskPopup } : null}
+        {onaoi}
+        popup={popupTask && popupAt
+          ? { key: popupTask.properties.task_id, at: popupAt, content: taskPopup }
+          : showAoiPopup && aoiClick
+            ? { key: -aoiClick.n, at: aoiClick.at, content: aoiPopup }
+            : null}
       />
       {#if tool === 'edit'}
         <div class="floating row">
