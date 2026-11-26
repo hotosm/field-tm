@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { aoiPopupOpen, nextAoiClick } from "../src/lib/aoiPopup";
 
-const open = { readonly: false, step: 0, tool: "none", hasAoi: true, click: { n: 1, at: [85.3, 27.7] } };
+const open = {
+  readonly: false,
+  step: 0,
+  tool: "none",
+  hasAoi: true,
+  click: { n: 1, at: [85.3, 27.7] },
+};
 
 describe("aoiPopupOpen", () => {
   it("opens on the Area step after a click on the area", () => {
