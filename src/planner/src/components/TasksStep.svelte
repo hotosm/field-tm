@@ -1,21 +1,32 @@
 <script lang="ts">
+  import type { Map } from 'maplibre-gl';
   import type { Planner } from '../lib/planner.svelte';
   import type { Tool } from './MapView.svelte';
   import { COMMENT_PLACEHOLDER, GROUP_PATTERN, isAreaTask } from '../lib/taskPlan';
   import { lengthM } from '../lib/geo';
   import { taskColour } from '../lib/colours';
+  import { printTeams } from '../lib/print';
+  import { FLAT_SLOPE_DEG, MAX_TEAMS } from '../lib/teams';
   import TaskDetails from './TaskDetails.svelte';
   import Legend from './Legend.svelte';
 
   interface Props {
     planner: Planner;
+    map?: Map;
+    title?: string;
+    /** Task shapes come from another tool (Drone-TM): only teams can change. */
+    fixed?: boolean;
     tool: Tool;
     multi: boolean;
     onsplit: () => void;
     /** Reopens the task's downloads popup after it was closed. */
     onactions?: () => void;
   }
-  let { planner, tool = $bindable(), multi = $bindable(), onsplit, onactions }: Props = $props();
+  let { planner, map, title, fixed = false, tool = $bindable(), multi = $bindable(), onsplit, onactions }: Props = $props();
+
+  const DEFAULT_TEAMS = 4;
+  let teams = $state(DEFAULT_TEAMS);
+  const assigned = $derived(planner.tasks.some((t) => t.properties.assigned_group));
 
   const n = $derived(planner.selected.length);
   const single = $derived(n === 1 ? planner.selectedTasks[0] : undefined);
@@ -33,12 +44,24 @@
   <p>No tasks yet.</p>
   <wa-button size="s" variant="brand" onclick={onsplit}>Split the area</wa-button>
 {:else}
+  <section class="stack">
+    <h3>Divide among teams</h3>
+    <p class="hint">Each team gets one or two groups of neighbouring tasks, with hilly ground (slopes of {FLAT_SLOPE_DEG}° or more) shared out as evenly as possible.</p>
+    <div class="row teams">
+      <wa-input size="s" type="number" label="Teams" min="1" max={MAX_TEAMS} step="1" value={teams} oninput={(e: Event) => (teams = Number((e.currentTarget as HTMLInputElement).value))}></wa-input>
+      <wa-button size="s" variant="brand" onclick={() => planner.divideAmongTeams(teams)} disabled={!!planner.busy || !(teams >= 1)}>Divide</wa-button>
+      {#if map && assigned}
+        <wa-button size="s" appearance="outlined" onclick={() => printTeams(map, planner.tasks, title).catch((e) => (planner.error = e.message))}>Print teams</wa-button>
+      {/if}
+    </div>
+  </section>
+
   <p class="hint">Click tasks on the map to select them. Shift-click, or turn on multi-select, to select several.</p>
   <div class="row">
     <wa-switch size="s" checked={multi} onchange={(e: Event) => (multi = (e.currentTarget as HTMLInputElement).checked)}>Multi-select</wa-switch>
     <wa-button size="s" appearance="outlined" onclick={() => (planner.selected = planner.tasks.map((t) => t.properties.task_id))}>Select all</wa-button>
     <wa-button size="s" appearance="outlined" onclick={() => (planner.selected = [])} disabled={!n}>Clear selection</wa-button>
-    {#if hasRoutes}
+    {#if hasRoutes && !fixed}
       <wa-button size="s" variant={tool === 'route' ? 'brand' : 'neutral'} appearance={tool === 'route' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'route' ? 'none' : 'route')}>Draw route</wa-button>
     {/if}
   </div>
@@ -46,14 +69,16 @@
 
   {#if n}
     <p><strong>{n} selected</strong></p>
-    <div class="row">
-      <wa-button size="s" appearance="outlined" onclick={() => planner.mergeSelected()} disabled={n < 2 || !!planner.busy}>Merge</wa-button>
-      {#if !single || isAreaTask(single)}
-        <wa-button size="s" variant={tool === 'line' ? 'brand' : 'neutral'} appearance={tool === 'line' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'line' ? 'none' : 'line')} disabled={n !== 1}>Split with line</wa-button>
-        <wa-button size="s" appearance="outlined" onclick={() => (tool = 'edit')} disabled={n !== 1}>Edit shape</wa-button>
-      {/if}
-      <wa-button size="s" variant="danger" appearance="outlined" onclick={() => planner.deleteSelected()}>Delete</wa-button>
-    </div>
+    {#if !fixed}
+      <div class="row">
+        <wa-button size="s" appearance="outlined" onclick={() => planner.mergeSelected()} disabled={n < 2 || !!planner.busy}>Merge</wa-button>
+        {#if !single || isAreaTask(single)}
+          <wa-button size="s" variant={tool === 'line' ? 'brand' : 'neutral'} appearance={tool === 'line' ? 'accent' : 'outlined'} onclick={() => (tool = tool === 'line' ? 'none' : 'line')} disabled={n !== 1}>Split with line</wa-button>
+          <wa-button size="s" appearance="outlined" onclick={() => (tool = 'edit')} disabled={n !== 1}>Edit shape</wa-button>
+        {/if}
+        <wa-button size="s" variant="danger" appearance="outlined" onclick={() => planner.deleteSelected()}>Delete</wa-button>
+      </div>
+    {/if}
     {#if tool === 'line'}<p class="hint">Draw a line across the task; double-click (or click the last point again) to finish.</p>{/if}
   {/if}
 
@@ -120,6 +145,9 @@
   }
   .tasklist button.selected {
     background: var(--selected);
+  }
+  .teams {
+    align-items: end;
   }
   .count {
     margin-left: auto;

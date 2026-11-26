@@ -78,7 +78,7 @@ export function toFeatureCollection(input: unknown): FeatureCollection {
   throw new Error("Not valid GeoJSON");
 }
 
-const M_PER_DEG = 111_320;
+export const M_PER_DEG = 111_320;
 
 /** Square of `sizeM` metres centred on a point. */
 export function squareAround([lng, lat]: [number, number], sizeM: number): Polygon {

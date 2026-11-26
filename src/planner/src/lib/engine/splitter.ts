@@ -1,6 +1,6 @@
 import type { Feature, FeatureCollection, LineString, Polygon, Position } from "geojson";
 import { featurePoint, type Area } from "../geo";
-import { renumber, type Task, type TaskGeometry } from "../taskPlan";
+import { renumber, type Algorithm, type Task, type TaskGeometry } from "../taskPlan";
 import { groupRoutes, type Segment } from "./routes";
 import { straightSkeleton } from "./skeleton";
 import {
@@ -22,12 +22,7 @@ export interface Db {
   close?(): Promise<void>;
 }
 
-export type SplitAlgorithm =
-  | "DIVIDE_BY_SQUARE"
-  | "SPLIT_BY_ROADS"
-  | "SPLIT_INTO_ROUTES"
-  | "AVG_BUILDING_VORONOI"
-  | "AVG_BUILDING_SKELETON";
+export type SplitAlgorithm = Exclude<Algorithm, "MANUAL">;
 
 /** Same limit as the backend's simple flow: the skeleton gets slow beyond this. */
 export const SKELETON_MAX_FEATURES = 5000;

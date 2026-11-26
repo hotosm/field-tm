@@ -6,7 +6,9 @@ import { saveDraft, type Draft } from "./draft";
 import { bbox, type Area } from "./geo";
 import { History } from "./history";
 import { canFetchRoads, fetchRoads } from "./io/postpass";
-import { assign, removeTasks, replaceTasks, type Assignment } from "./planEdit";
+import { withSlopes } from "./io/terrain";
+import { divideAmongTeams } from "./teams";
+import { assign, removeTasks, replaceTasks, sumFeatures, type Assignment } from "./planEdit";
 import { isAreaTask, makePlan, renumber, type Task, type TaskPlan } from "./taskPlan";
 
 interface Snapshot {
@@ -222,10 +224,8 @@ export class Planner {
     const g = await this.run("Merging", () => engine.merge(sel.map((t) => t.geometry)));
     if (!g) return;
     const ids = sel.map((t) => t.properties.task_id);
-    const counts = sel.every((t) => typeof t.properties.feature_count === "number")
-      ? [sel.reduce((s, t) => s + (t.properties.feature_count ?? 0), 0)]
-      : undefined;
-    const tasks = replaceTasks(this.tasks, ids, [g], counts);
+    const count = sumFeatures(this.tasks, ids);
+    const tasks = replaceTasks(this.tasks, ids, [g], count === undefined ? undefined : [count]);
     this.commit({ tasks, algorithm: "MANUAL" }, [Math.min(...ids)]);
   }
 
@@ -255,6 +255,19 @@ export class Planner {
 
   deleteSelected() {
     this.commit({ tasks: removeTasks(this.tasks, this.selected), algorithm: "MANUAL" }, []);
+  }
+
+  /** Score terrain once, then share hilly and flat tasks evenly between teams. */
+  async divideAmongTeams(teams: number) {
+    const before = this.tasks;
+    const scored = await this.run("Scoring terrain", (p) => withSlopes(before, p));
+    if (this.tasks !== before) {
+      this.error = "Tasks changed while scoring terrain. Divide again.";
+      return;
+    }
+    if (!scored)
+      this.error = "Could not load terrain data, so teams were divided by location only.";
+    this.commit({ tasks: divideAmongTeams(scored ?? before, teams) }, []);
   }
 
   /** Assign, then clear the selection so the next task can be picked straight away. */

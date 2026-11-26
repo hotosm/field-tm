@@ -56,6 +56,12 @@ describe("parseMode", () => {
     expect(parseMode("?fieldtm=../x").kind).toBe("standalone");
   });
 
+  it("reads a Drone-TM project url", () => {
+    const url = "https://api.example.org/projects/abc";
+    expect(parseMode(`?dronetm=${encodeURIComponent(url)}`)).toEqual({ kind: "dronetm", url });
+    expect(parseMode("?dronetm=javascript:alert(1)").kind).toBe("standalone");
+  });
+
   it("reads a shared task from the hash or query", () => {
     const enc = encodeTask(t);
     const m = parseMode("", `#task=${enc}`);

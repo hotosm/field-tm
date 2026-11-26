@@ -26,6 +26,7 @@
     tasks?: Task[];
     features?: FeatureCollection | null;
     roads?: FeatureCollection | null;
+    noFlyZones?: Area | null;
     selected?: number[];
     tool?: Tool;
     /** Geometry loaded into the vertex editor when tool is 'edit'. */
@@ -40,11 +41,13 @@
   }
 
   let {
-    aoi = null, tasks = [], features = null, roads = null, selected = [], tool = 'none', editing = null,
+    aoi = null, tasks = [], features = null, roads = null, noFlyZones = null, selected = [], tool = 'none', editing = null,
     fitKey = 0, map = $bindable(), onselect, ondrawn, onedited, popup = null,
   }: Props = $props();
 
   const HOT_RED = '#d63f3f';
+  // Overlays vanish when zoomed far past the source maxzoom (default 18), so build tiles up to the map's limit.
+  const MAX_ZOOM = 22;
   const IS_ROUTE: ExpressionSpecification = ['in', ['geometry-type'], ['literal', ['LineString', 'MultiLineString']]];
   const SELECTED: ExpressionSpecification = ['get', '_selected'];
   // Route tasks are lines; a wide invisible layer makes them easy to click.
@@ -74,7 +77,10 @@
       properties: { ...t.properties, _colour: mapColour(t), _selected: selected.includes(t.properties.task_id) },
     })),
   });
-  const aoiData = $derived<FeatureCollection>(aoi ? { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: aoi, properties: {} }] } : EMPTY);
+  const asCollection = (g: Area | null): FeatureCollection =>
+    g ? { type: 'FeatureCollection', features: [{ type: 'Feature', geometry: g, properties: {} }] } : EMPTY;
+  const aoiData = $derived(asCollection(aoi));
+  const noFlyData = $derived(asCollection(noFlyZones));
 
   const round = (g: Polygon): Polygon => ({
     type: 'Polygon',
@@ -146,20 +152,23 @@
   <GeolocateControl position="top-right" />
   <ScaleControl position="bottom-left" />
 
-  <GeoJSONSource id="features" data={features ?? EMPTY}>
+  <GeoJSONSource id="features" data={features ?? EMPTY} maxzoom={MAX_ZOOM}>
     <FillLayer id="features-fill" filter={['==', ['geometry-type'], 'Polygon']} paint={{ 'fill-color': '#555', 'fill-opacity': 0.35 }} />
   </GeoJSONSource>
-  <GeoJSONSource id="roads" data={roads ?? EMPTY}>
+  <GeoJSONSource id="roads" data={roads ?? EMPTY} maxzoom={MAX_ZOOM}>
     <LineLayer id="roads-line" paint={{ 'line-color': '#777', 'line-width': 1.5, 'line-opacity': 0.6 }} />
   </GeoJSONSource>
-  <GeoJSONSource id="aoi" data={aoiData}>
+  <GeoJSONSource id="no-fly" data={noFlyData} maxzoom={MAX_ZOOM}>
+    <FillLayer id="no-fly-fill" paint={{ 'fill-color': '#111', 'fill-opacity': 0.3 }} />
+  </GeoJSONSource>
+  <GeoJSONSource id="aoi" data={aoiData} maxzoom={MAX_ZOOM}>
     <LineLayer id="aoi-line" paint={{ 'line-color': HOT_RED, 'line-width': 3, 'line-dasharray': [2, 1] }} />
   </GeoJSONSource>
-  <GeoJSONSource id="tasks" data={taskData}>
+  <GeoJSONSource id="tasks" data={taskData} maxzoom={MAX_ZOOM}>
     <FillLayer
       id="tasks-fill"
       filter={['==', ['geometry-type'], 'Polygon']}
-      paint={{ 'fill-color': ['get', '_colour'], 'fill-opacity': ['case', ['get', '_selected'], 0.55, 0.25] }}
+      paint={{ 'fill-color': ['get', '_colour'], 'fill-opacity': ['case', SELECTED, 0.6, 0.4] }}
     />
     <LineLayer id="tasks-hit" filter={IS_ROUTE} paint={{ 'line-width': 20, 'line-opacity': 0 }} />
     <!-- White casing keeps boundaries distinct from roads. -->

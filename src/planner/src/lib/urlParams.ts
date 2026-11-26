@@ -4,26 +4,22 @@ import { decodeTask } from "./share";
 export type Mode =
   | { kind: "standalone"; aoi?: string; features?: string; roads?: string; returnTo?: string }
   | { kind: "fieldtm"; project: string; view: boolean }
+  /** A Drone-TM project URL; its tasks are fixed, only teams change. */
+  | { kind: "dronetm"; url: string }
   | { kind: "task"; task: Task };
 
-/** An absolute http(s) URL to send the user back to, e.g. a Field-TM project page. */
-function returnUrl(v: string | null): string | undefined {
+/** Lets relative URLs (fetched from this site) pass the http(s) check. */
+const RELATIVE_BASE = "https://x";
+
+/** `v` if it is an http(s) URL. Relative URLs are accepted only with a `base`. */
+function httpUrl(v: string | null, base?: string): string | undefined {
+  if (!v) return undefined;
   try {
-    return v && ["http:", "https:"].includes(new URL(v).protocol)
-      ? new URL(v).toString()
-      : undefined;
+    return ["http:", "https:"].includes(new URL(v, base).protocol) ? v : undefined;
   } catch {
     return undefined;
   }
 }
-
-const isHttpUrl = (s: string) => {
-  try {
-    return ["http:", "https:"].includes(new URL(s, "https://x").protocol);
-  } catch {
-    return false;
-  }
-};
 
 export function parseMode(search: string, hash = ""): Mode {
   const q = new URLSearchParams(search);
@@ -37,15 +33,14 @@ export function parseMode(search: string, hash = ""): Mode {
   if (project && /^\d+$/.test(project)) {
     return { kind: "fieldtm", project, view: ["1", "true"].includes(q.get("view") ?? "") };
   }
-  const url = (k: string) => {
-    const v = q.get(k);
-    return v && isHttpUrl(v) ? v : undefined;
-  };
+  const dronetm = httpUrl(q.get("dronetm"), RELATIVE_BASE);
+  if (dronetm) return { kind: "dronetm", url: dronetm };
+  const url = (k: string) => httpUrl(q.get(k), RELATIVE_BASE);
   return {
     kind: "standalone",
     aoi: url("aoi"),
     features: url("features"),
     roads: url("roads"),
-    returnTo: returnUrl(q.get("return_to")),
+    returnTo: httpUrl(q.get("return_to")),
   };
 }

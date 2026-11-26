@@ -1,17 +1,17 @@
 import { isAreaTask, type Task } from "./taskPlan";
 
-// Colour-blind friendly palette (Okabe-Ito + Tol), HOT red first.
-const PALETTE = [
-  "#d63f3f",
-  "#0072b2",
-  "#e69f00",
-  "#009e73",
-  "#cc79a7",
-  "#56b4e9",
-  "#882255",
-  "#117733",
-  "#999933",
-  "#6c4ba8",
+// Sasha Trubetskoy's distinct colours: easier to tell apart on the map than a colour-blind safe set.
+export const PALETTE = [
+  "#e6194b",
+  "#4363d8",
+  "#f58231",
+  "#3cb44b",
+  "#911eb4",
+  "#ffe119",
+  "#42d4f4",
+  "#f032e6",
+  "#9a6324",
+  "#000075",
 ];
 export const UNASSIGNED = "#7f7f7f";
 
@@ -33,13 +33,21 @@ export function mapColour(t: Task): string {
   return PALETTE[t.properties.task_id % PALETTE.length];
 }
 
+export interface LegendItem {
+  group: string;
+  colour: string;
+  count: number;
+  hilly: number;
+}
+
 /** Teams in use with their map colour, for the legend. */
-export function legend(tasks: Task[]): { group: string; colour: string; count: number }[] {
-  const m = new Map<string, { group: string; colour: string; count: number }>();
+export function legend(tasks: Task[]): LegendItem[] {
+  const m = new Map<string, LegendItem>();
   for (const t of tasks) {
     const group = t.properties.assigned_group ?? "";
-    const e = m.get(group) ?? { group, colour: taskColour(t), count: 0 };
+    const e = m.get(group) ?? { group, colour: taskColour(t), count: 0, hilly: 0 };
     e.count++;
+    if (t.properties.hilly) e.hilly++;
     m.set(group, e);
   }
   return [...m.values()].sort((a, b) => a.group.localeCompare(b.group));

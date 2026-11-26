@@ -43,6 +43,15 @@ describe("plan edits", () => {
     ]);
   });
 
+  it("drops terrain from replaced tasks, as their shape changed", () => {
+    const scored = tasks.map((t) => ({
+      ...t,
+      properties: { ...t.properties, slope_deg: 9, hilly: true },
+    }));
+    const [merged] = replaceTasks(scored, [1, 2], [sq(9)]);
+    expect(merged.properties).toEqual({ task_id: 1, assigned_group: "g1" });
+  });
+
   it("removes and renumbers", () => {
     expect(
       removeTasks(tasks, [1, 3]).map((t) => [t.properties.task_id, t.properties.assigned_group]),

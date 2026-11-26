@@ -3,9 +3,11 @@ import type { FeatureCollection } from "geojson";
 import { Planner } from "../src/lib/planner.svelte";
 import { engine } from "../src/lib/engine/client";
 import { fetchRoads } from "../src/lib/io/postpass";
+import { withSlopes } from "../src/lib/io/terrain";
 import { makePlan, type AreaTask, type Task } from "../src/lib/taskPlan";
 
 vi.mock("../src/lib/engine/client", () => ({ engine: { split: vi.fn(async () => []) } }));
+vi.mock("../src/lib/io/terrain", () => ({ withSlopes: vi.fn(async (tasks: Task[]) => tasks) }));
 vi.mock("../src/lib/io/postpass", async (actual) => ({
   ...(await actual<typeof import("../src/lib/io/postpass")>()),
   fetchRoads: vi.fn(async () => roads),
@@ -24,6 +26,12 @@ const sq = (x: number): AreaTask["geometry"] => ({
       [x, 0],
     ],
   ],
+});
+
+const task = (id: number): Task => ({
+  type: "Feature",
+  geometry: sq(id),
+  properties: { task_id: id },
 });
 
 describe("Planner", () => {
@@ -164,5 +172,36 @@ describe("Planner.split", () => {
     planner.commit({ aoi: sq(0), tasks: [] });
     await planner.split("SPLIT_INTO_ROUTES", { route_length: 500 });
     expect(planner.error).toMatch(/too large/);
+  });
+
+  it("divides tasks among teams after scoring terrain", async () => {
+    const planner = new Planner("test");
+    planner.commit({ tasks: [1, 2, 3, 4].map((id) => task(id)) }, []);
+    await planner.divideAmongTeams(2);
+    expect(new Set(planner.tasks.map((t) => t.properties.assigned_group))).toEqual(
+      new Set(["alpha", "bravo"]),
+    );
+  });
+
+  it("still divides by location when terrain fails", async () => {
+    vi.mocked(withSlopes).mockRejectedValueOnce(new Error("HTTP 500"));
+    const planner = new Planner("test");
+    planner.commit({ tasks: [1, 2].map((id) => task(id)) }, []);
+    await planner.divideAmongTeams(2);
+    expect(planner.error).toMatch("by location only");
+    expect(planner.tasks.every((t) => t.properties.assigned_group)).toBe(true);
+  });
+
+  it("doesn't overwrite edits made while terrain was scoring", async () => {
+    const planner = new Planner("test");
+    planner.commit({ tasks: [1, 2].map((id) => task(id)) }, []);
+    vi.mocked(withSlopes).mockImplementationOnce(async (tasks) => {
+      planner.commit({ tasks: tasks.slice(0, 1) }, []);
+      return tasks;
+    });
+    await planner.divideAmongTeams(2);
+    expect(planner.tasks).toHaveLength(1);
+    expect(planner.tasks[0].properties.assigned_group).toBeUndefined();
+    expect(planner.error).toMatch("Divide again");
   });
 });

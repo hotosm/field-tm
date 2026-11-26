@@ -9,7 +9,7 @@
 {#if items.length}
   <ul class="legend" aria-label="Task teams">
     {#each items as item (item.group)}
-      <li><span class="swatch" style:background={item.colour}></span>{item.group || 'Unassigned'} ({item.count})</li>
+      <li><span class="swatch" style:background={item.colour}></span>{item.group || 'Unassigned'}: {item.count} {item.count === 1 ? 'task' : 'tasks'}{item.hilly ? `, ${item.hilly} hilly` : ''}</li>
     {/each}
   </ul>
 {/if}
